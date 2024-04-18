@@ -1,5 +1,8 @@
 [![.NET - 7](https://img.shields.io/badge/.NET-7-blue?logo=dotnet)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) [![.NET - 7](https://img.shields.io/badge/PG-16-blue?logo=postgresql)](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
-[![dotnet-cicd](https://github.com/nguyenvancaokyfpt/geo-net-api/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/nguyenvancaokyfpt/geo-net-api/actions/workflows/dotnet.yml)
+
+[![pipeline status](https://gitlab.com/guardian-exam-online/geo-dotnet-api/badges/main/pipeline.svg)](https://gitlab.com/guardian-exam-online/geo-dotnet-api/-/commits/main)
+
+[![Latest Release](https://gitlab.com/guardian-exam-online/geo-dotnet-api/-/badges/release.svg)](https://gitlab.com/guardian-exam-online/geo-dotnet-api/-/releases)
 
 # GEO-NET-API
 
