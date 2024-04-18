@@ -1,0 +1,41 @@
+version: '3.8'
+name: geonet
+services:
+  dotnet-webapi:
+    image: nguyenvancaoky/geo-net-api:latest
+    container_name: dotnet-webapi
+    networks:
+      - geonet
+    environment:
+      - ASPNETCORE_ENVIRONMENT=docker
+      - ASPNETCORE_URLS=https://+:5100;http://+:5010
+      - ASPNETCORE_HTTPS_PORT=5100
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=caoky123!
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx
+      - DatabaseSettings__ConnectionString=Server=geo-postgresql-sgp1-13977-do-user-11263864-0.c.db.ondigitalocean.com;Port=25060;Database=geo-db-test;User Id=geo-db-test;Password=AVNS_w0nYzHOzw-hDxPYRY_6
+      - HangfireSettings__Storage__ConnectionString=Server=geo-postgresql-sgp1-13977-do-user-11263864-0.c.db.ondigitalocean.com;Port=25060;Database=geo-db-test;User Id=geo-db-test;Password=AVNS_w0nYzHOzw-hDxPYRY_6
+      - DatabaseSettings__DBProvider=postgresql
+      - HangfireSettings__Storage__StorageProvider=postgresql
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    ports:
+      - 5100:5100
+      - 5010:5010
+    restart: on-failure
+  # elk:
+  #     container_name:  elasticsearch-kibana
+  #     image: sebp/elk:oss-8.5.3
+  #     environment:
+  #       - LOGSTASH_START=0
+  #     volumes:
+  #       - sebp-elk-data:/usr/share/elk/data
+  #     ports:
+  #       - 5601:5601
+  #       - 9200:9200
+  #     networks:
+  #       - geonet
+# volumes:
+  # sebp-elk-data:
+networks:
+  geonet:
+    name:  geonet

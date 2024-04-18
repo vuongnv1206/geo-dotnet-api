@@ -1,0 +1,13 @@
+{
+  "SwaggerSettings": {
+    "Enable": true,
+    "Title": ".NET 7 GEO WebAPI",
+    "Version": "1.0.0",
+    "Description": "Guardian Exam Online - Securing the integrity of online exams. WebApi built with Multitenancy Support.",
+    "ContactName": "nguyenvancaoky",
+    "ContactEmail": "nguyenvancaoky@gmail.com",
+    "ContactUrl": "https://facebook.com/nguyenvancaoky",
+    "License": true,
+    "LicenseName": "MIT License"
+  }
+}
