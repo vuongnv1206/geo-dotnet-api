@@ -1,0 +1,12 @@
+[
+  {
+    "Id": "ca43337c-c9bc-4c18-98e1-3bf8693f9fb7",
+    "Name": "Ngành SE",
+    "ParentId": null
+  },
+  {
+    "Id": "d72ee823-f4e6-43c4-84b5-0e2748c290f2",
+    "Name": "Ngành IA",
+    "ParentId": null
+  }
+]

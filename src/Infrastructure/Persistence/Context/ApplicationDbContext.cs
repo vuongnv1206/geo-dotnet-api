@@ -2,6 +2,7 @@ using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Catalog;
+using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -17,11 +18,12 @@ public class ApplicationDbContext : BaseDbContext
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Brand> Brands => Set<Brand>();
+    public DbSet<QuestionFolder> QuestionFolders => Set<QuestionFolder>();
+    public DbSet<QuestionFolderPermission> QuestionFolderPermissions => Set<QuestionFolderPermission>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         modelBuilder.HasDefaultSchema(SchemaNames.Catalog);
     }
 }
