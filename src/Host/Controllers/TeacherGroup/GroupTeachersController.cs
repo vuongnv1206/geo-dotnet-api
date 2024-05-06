@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Catalog.Brands;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+using FSH.WebApi.Application.TeacherGroup.TeacherInGroups;
 using FSH.WebApi.Domain.TeacherGroup;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -49,5 +50,21 @@ public class GroupTeachersController : VersionedApiController
     public Task<Guid> DeleteAsync(Guid id)
     {
         return Mediator.Send(new DeleteGroupTeacherRequest(id));
+    }
+
+    [HttpPost("add-teacher-into-group")]
+    [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Add a teacher into group")]
+    public Task AddTeacherIntoTeam(AddTeacherIntoGroupRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpDelete("remove-teacher-into-group")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Remove a teacher in group")]
+    public Task RemoveTeacherInGroup(RemoveTeacherInGroupRequest request)
+    {
+        return Mediator.Send(request);
     }
 }
