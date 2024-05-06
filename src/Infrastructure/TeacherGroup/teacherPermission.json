@@ -1,0 +1,50 @@
+﻿[
+  {
+    "Id": "13e8cbc1-3e41-45a8-8a43-548fd0230a32",
+    "ClassId": "0b5fcbe5-9174-4c2f-b585-7f8e655242f4",
+    "TeacherId": "31d28176-af65-4cf8-91e6-cbbc9e69a065",
+    "CanAssignExamination": true,
+    "CanMarking": true,
+    "CanManagementStudent": false
+  },
+  {
+    "Id": "03f2623b-fd5b-46f6-bcbf-bebc2e0a8e9f",
+    "ClassId": "0b5fcbe5-9174-4c2f-b585-7f8e655242f4",
+    "TeacherId": "ed5da3ae-d83e-41ca-89b8-72460d4e0d49",
+    "CanAssignExamination": true,
+    "CanMarking": true,
+    "CanManagementStudent": false
+  },
+  {
+    "Id": "49c7148d-a583-442a-a24e-7c948ff8f3f4",
+    "ClassId": "ee12cb98-d2f1-4f63-8569-fcab2449d665",
+    "TeacherId": "584854f1-584f-4e3f-9c10-e8aed0f1bd35",
+    "CanAssignExamination": true,
+    "CanMarking": false,
+    "CanManagementStudent": false
+  },
+  {
+    "Id": "5acd54a1-b569-40fc-a562-5fa2a706a1aa",
+    "ClassId": "ee12cb98-d2f1-4f63-8569-fcab2449d665",
+    "TeacherId": "3c95b5f6-9f6e-4026-80f0-8a029a24359d",
+    "CanAssignExamination": true,
+    "CanMarking": false,
+    "CanManagementStudent": false
+  },
+  {
+    "Id": "96ab433c-0ec0-46b6-9f6c-b36eaa9f19c8",
+    "ClassId": "adb507dd-0950-48d2-b9b8-072a16ed6e2a",
+    "TeacherId": "97c7aa82-bb91-4c6f-ada4-ea6e2c628976",
+    "CanAssignExamination": true,
+    "CanMarking": true,
+    "CanManagementStudent": true
+  },
+  {
+    "Id": "89eb89b0-70fe-4c3c-863a-65f816ac8436",
+    "ClassId": "adb507dd-0950-48d2-b9b8-072a16ed6e2a",
+    "TeacherId": "cc699839-201d-42fe-9fb5-9bec1f92df88",
+    "CanAssignExamination": true,
+    "CanMarking": true,
+    "CanManagementStudent": true
+  }
+]
