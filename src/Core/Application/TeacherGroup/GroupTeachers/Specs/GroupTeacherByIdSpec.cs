@@ -5,6 +5,6 @@ public class GroupTeacherByIdSpec : Specification<GroupTeacher,GroupTeacherDto>,
 {
     public GroupTeacherByIdSpec(Guid id)
     {
-        Query.Where(x => x.Id == id);
+        Query.Where(x => x.Id == id).Include(x => x.TeacherInGroups);
     }
 }
