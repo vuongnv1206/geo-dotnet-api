@@ -71,6 +71,9 @@
     <ItemGroup>
         <None Update="Catalog\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
+        <ItemGroup>
+        <None Update="Question\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
     <ItemGroup>
       <PackageReference Update="Roslynator.Analyzers" Version="4.2.0">
         <PrivateAssets>all</PrivateAssets>
