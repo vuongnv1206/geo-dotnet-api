@@ -22,23 +22,23 @@ public class TeacherTeamSeeder : ICustomSeeder
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        if (!_db.TeacherTeams.Any())
-        {
-            _logger.LogInformation("Started to Seed TeacherTeams.");
-            string teacherTeamData = await File.ReadAllTextAsync(path + "/TeacherGroup/teacherTeam.json", cancellationToken);
-            var teacherTeams = _serializerService.Deserialize<List<TeacherTeam>>(teacherTeamData);
+        //string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        //if (!_db.TeacherTeams.Any())
+        //{
+        //    _logger.LogInformation("Started to Seed TeacherTeams.");
+        //    string teacherTeamData = await File.ReadAllTextAsync(path + "/TeacherGroup/teacherTeam.json", cancellationToken);
+        //    var teacherTeams = _serializerService.Deserialize<List<TeacherTeam>>(teacherTeamData);
 
-            if (teacherTeams != null)
-            {
-                foreach (var team in teacherTeams)
-                {
-                    await _db.TeacherTeams.AddAsync(team, cancellationToken);
-                }
-            }
+        //    if (teacherTeams != null)
+        //    {
+        //        foreach (var team in teacherTeams)
+        //        {
+        //            await _db.TeacherTeams.AddAsync(team, cancellationToken);
+        //        }
+        //    }
 
-            await _db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Seeded TeacherTeams.");
-        }
+        //    await _db.SaveChangesAsync(cancellationToken);
+        //    _logger.LogInformation("Seeded TeacherTeams.");
+        //}
     }
 }
