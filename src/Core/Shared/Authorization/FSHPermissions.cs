@@ -26,6 +26,8 @@ public static class FSHResource
     public const string RoleClaims = nameof(RoleClaims);
     public const string Products = nameof(Products);
     public const string Brands = nameof(Brands);
+    public const string Assignments = nameof(Assignments);
+    public const string Subjects = nameof(Subjects);
 }
 
 public static class FSHPermissions
@@ -64,7 +66,18 @@ public static class FSHPermissions
         new("View Tenants", FSHAction.View, FSHResource.Tenants, IsRoot: true),
         new("Create Tenants", FSHAction.Create, FSHResource.Tenants, IsRoot: true),
         new("Update Tenants", FSHAction.Update, FSHResource.Tenants, IsRoot: true),
-        new("Upgrade Tenant Subscription", FSHAction.UpgradeSubscription, FSHResource.Tenants, IsRoot: true)
+        new("Upgrade Tenant Subscription", FSHAction.UpgradeSubscription, FSHResource.Tenants, IsRoot: true),
+        new("View Assignments", FSHAction.View, FSHResource.Assignments, IsBasic: true),
+        new("Search Assignments", FSHAction.Search, FSHResource.Assignments, IsBasic: true),
+        new("Create Assignments", FSHAction.Create, FSHResource.Assignments),
+        new("Update Assignments", FSHAction.Update, FSHResource.Assignments),
+        new("Delete Assignments", FSHAction.Delete, FSHResource.Assignments),
+        new("Export Assignments", FSHAction.Export, FSHResource.Assignments),
+        new("View Subjects", FSHAction.View, FSHResource.Assignments, IsBasic: true),
+        new("Search Subjects", FSHAction.Search, FSHResource.Subjects, IsBasic: true),
+        new("Create Subjects", FSHAction.Create, FSHResource.Subjects),
+        new("Update Subjects", FSHAction.Update, FSHResource.Subjects),
+        new("Delete Subjects", FSHAction.Delete, FSHResource.Subjects)
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);

@@ -1,6 +1,6 @@
 using FSH.WebApi.Domain.Common.Events;
+namespace FSH.WebApi.Application.Assignments.EventHandlers;
 
-namespace FSH.WebApi.Application.Catalog.Products.EventHandlers;
 
 public class AssignmentDeletedEventHandler : EventNotificationHandler<EntityDeletedEvent<Product>>
 {

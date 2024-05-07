@@ -1,6 +1,7 @@
 using FSH.WebApi.Domain.Common.Events;
 
-namespace FSH.WebApi.Application.Catalog.Products.EventHandlers;
+namespace FSH.WebApi.Application.Assignments.EventHandlers;
+
 
 public class AssignmentUpdatedEventHandler : EventNotificationHandler<EntityUpdatedEvent<Product>>
 {
