@@ -68,6 +68,14 @@ public class GroupTeachersController : VersionedApiController
         return Mediator.Send(request);
     }
 
+    [HttpPost("add-teacher-into-team")]
+    [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Add a teacher in my teacher team")]
+    public Task AddTeacherInTeacherTeam(AddTeacherIntoTeacherTeamRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
     [HttpDelete("remove-teacher-in-team")]
     [MustHavePermission(FSHAction.Delete, FSHResource.GroupTeachers)]
     [OpenApiOperation("Remove a teacher in team")]
