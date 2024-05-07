@@ -28,6 +28,8 @@ public static class FSHResource
     public const string Brands = nameof(Brands);
     public const string Classes = nameof(Classes);
     public const string GroupClasses = nameof(GroupClasses);
+    public const string QuestionFolders = nameof(QuestionFolders);
+    public const string GroupTeachers = nameof(GroupTeachers);
 }
 
 public static class FSHPermissions
@@ -63,6 +65,13 @@ public static class FSHPermissions
         new("Delete Brands", FSHAction.Delete, FSHResource.Brands),
         new("Generate Brands", FSHAction.Generate, FSHResource.Brands),
         new("Clean Brands", FSHAction.Clean, FSHResource.Brands),
+
+        new("View GroupTeachers", FSHAction.View, FSHResource.GroupTeachers, IsBasic: true),
+        new("Search GroupTeachers", FSHAction.Search, FSHResource.GroupTeachers, IsBasic: true),
+        new("Create GroupTeachers", FSHAction.Create, FSHResource.GroupTeachers),
+        new("Update GroupTeachers", FSHAction.Update, FSHResource.GroupTeachers),
+        new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
+
         new("View Tenants", FSHAction.View, FSHResource.Tenants, IsRoot: true),
         new("Create Tenants", FSHAction.Create, FSHResource.Tenants, IsRoot: true),
         new("Update Tenants", FSHAction.Update, FSHResource.Tenants, IsRoot: true),
@@ -76,7 +85,8 @@ public static class FSHPermissions
         new("Search GroupClasses", FSHAction.Search, FSHResource.GroupClasses, IsBasic: true),
         new("Create GroupClasses", FSHAction.Create, FSHResource.GroupClasses),
         new("Update GroupClasses", FSHAction.Update, FSHResource.GroupClasses),
-        new("Delete GroupClasses", FSHAction.Delete, FSHResource.GroupClasses)
+        new("Delete GroupClasses", FSHAction.Delete, FSHResource.GroupClasses),
+        new("View QuestionFolders", FSHAction.View, FSHResource.QuestionFolders),
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);

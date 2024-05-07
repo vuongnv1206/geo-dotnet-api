@@ -1,0 +1,30 @@
+﻿[
+  {
+    "Id": "65f7ae33-6789-4f85-843e-05d5d7b84611",
+    "TeacherId": "1f2b6b8e-4576-4b62-8d8d-89a11b9b8a22",
+    "TeacherName": "John Doe",
+    "Email": null,
+    "Phone": "0789123123"
+  },
+  {
+    "Id": "a04b62e7-fc34-4c78-8d1a-bf2b518971b3",
+    "TeacherId": null,
+    "TeacherName": "Jane Smith",
+    "Email": null,
+    "Phone": "0918271777"
+  },
+  {
+    "Id": "c77fe08d-0b6d-4a5f-ae11-2684f9614f7e",
+    "TeacherId": null,
+    "TeacherName": "Alice Johnson",
+    "Email": "alice.johnson@example.com",
+    "Phone": null
+  },
+  {
+    "Id": "f3c45a7c-6fe3-4138-8b8a-aa60777e3e0b",
+    "TeacherId": "8c981593-6e82-4b1e-ae75-d80fe3bfc4a4",
+    "TeacherName": "Bob Brown",
+    "Email": null,
+    "Phone": "0123456789"
+  }
+]

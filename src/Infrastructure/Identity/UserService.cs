@@ -1,5 +1,6 @@
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Caching;
 using FSH.WebApi.Application.Common.Events;
@@ -149,5 +150,33 @@ internal partial class UserService : IUserService
         await _userManager.UpdateAsync(user);
 
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+    }
+
+    public async Task<UserDetailsDto> GetUserDetailByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users
+           .AsNoTracking()
+           .Where(u => u.Email == email && u.IsActive)
+           .FirstOrDefaultAsync(cancellationToken);
+        if (user is null)
+        {
+            return new UserDetailsDto();
+        }
+
+        return user.Adapt<UserDetailsDto>();
+    }
+
+    public async Task<UserDetailsDto> GetUserDetailByPhoneAsync(string phoneNumber, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users
+           .AsNoTracking()
+           .Where(u => u.PhoneNumber == phoneNumber && u.IsActive)
+           .FirstOrDefaultAsync(cancellationToken);
+        if (user is null)
+        {
+            return new UserDetailsDto();
+        }
+
+        return user.Adapt<UserDetailsDto>();
     }
 }
