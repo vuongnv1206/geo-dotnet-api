@@ -24,6 +24,7 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<TeacherInGroup> TeacherInGroups { get; set; }
     public DbSet<GroupTeacher> GroupTeachers { get; set; }
     public DbSet<TeacherPermission> TeacherPermissions { get; set; }
+    public DbSet<TeacherTeam> TeacherTeams { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
