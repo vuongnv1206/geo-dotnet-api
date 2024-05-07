@@ -26,6 +26,8 @@ public static class FSHResource
     public const string RoleClaims = nameof(RoleClaims);
     public const string Products = nameof(Products);
     public const string Brands = nameof(Brands);
+    public const string Classes = nameof(Classes);
+    public const string GroupClasses = nameof(GroupClasses);
 }
 
 public static class FSHPermissions
@@ -64,7 +66,17 @@ public static class FSHPermissions
         new("View Tenants", FSHAction.View, FSHResource.Tenants, IsRoot: true),
         new("Create Tenants", FSHAction.Create, FSHResource.Tenants, IsRoot: true),
         new("Update Tenants", FSHAction.Update, FSHResource.Tenants, IsRoot: true),
-        new("Upgrade Tenant Subscription", FSHAction.UpgradeSubscription, FSHResource.Tenants, IsRoot: true)
+        new("Upgrade Tenant Subscription", FSHAction.UpgradeSubscription, FSHResource.Tenants, IsRoot: true),
+        new("View Classes", FSHAction.View, FSHResource.Classes, IsBasic: true),
+        new("Search Classes", FSHAction.Search, FSHResource.Classes, IsBasic: true),
+        new("Create Classes", FSHAction.Create, FSHResource.Classes),
+        new("Update Classes", FSHAction.Update, FSHResource.Classes),
+        new("Delete Classes", FSHAction.Delete, FSHResource.Classes),
+        new("View GroupClasses", FSHAction.View, FSHResource.GroupClasses, IsBasic: true),
+        new("Search GroupClasses", FSHAction.Search, FSHResource.GroupClasses, IsBasic: true),
+        new("Create GroupClasses", FSHAction.Create, FSHResource.GroupClasses),
+        new("Update GroupClasses", FSHAction.Update, FSHResource.GroupClasses),
+        new("Delete GroupClasses", FSHAction.Delete, FSHResource.GroupClasses)
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);

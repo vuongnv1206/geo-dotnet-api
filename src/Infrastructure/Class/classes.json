@@ -1,0 +1,16 @@
+[
+  {
+    "Id": "62b06dd9-c123-4284-a4cd-6d69c87019b9",
+    "Name": "SE1631",
+    "SchoolYear": "Sp24",
+    "OwnerId": null,
+    "GroupClassId": "5f669a5e-1de1-4baa-99f1-9e09105756a2"
+  },
+  {
+    "Id": "d9054926-9644-4872-acb2-9d94581b93c2",
+    "Name": "SE1640",
+    "SchoolYear": "Sp24",
+    "OwnerId": null,
+    "GroupClassId": "5f669a5e-1de1-4baa-99f1-9e09105756a2"
+  }
+]
