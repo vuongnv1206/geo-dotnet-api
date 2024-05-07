@@ -1,18 +1,18 @@
 [
   {
-    "Id": "5f669a5e-1de1-4baa-99f1-9e09105756a2",
-    "Name": "Nhom nganh SE"
-  },
-  {
-    "Id": "a6df4f43-ef77-4ddf-ace5-ace47ba35135",
-    "Name": "Nhom nganh MK"
-  },
-  {
-    "Id": "f86b5527-aea8-42e3-90ec-107fc11cf68b",
+    "Id": "0c1ea90a-1bc4-4494-ae05-aeb90526ed0b",
     "Name": "Nhom nganh AI"
   },
   {
-    "Id": "ab16e66e-c660-4f77-bf04-c0c9fe64f105",
+    "Id": "2ecff7a5-a796-4141-9dba-159979c1ab07",
+    "Name": "Nhom nganh SE"
+  },
+  {
+    "Id": "49854dc4-7760-4681-bf2b-0622a62d7706",
     "Name": "Nhom nganh IA"
+  },
+  {
+    "Id": "5ea67291-0c8b-487e-8c15-b042cddae9bd",
+    "Name": "Nhom nganh MK"
   }
 ]

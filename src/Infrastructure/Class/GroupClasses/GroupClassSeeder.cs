@@ -48,5 +48,24 @@ public class GroupClassSeeder : ICustomSeeder
             await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded GroupClasses.");
         }
+
+        if (!_db.Classes.Any())
+        {
+            _logger.LogInformation("Started to Seed Classes.");
+
+            string classesData = await File.ReadAllTextAsync(path + "/Class/classes.json", cancellationToken);
+            var classes = _serializerService.Deserialize<List<Classes>>(classesData);
+
+            if (classes != null)
+            {
+                foreach (var c in classes)
+                {
+                    await _db.Classes.AddAsync(c, cancellationToken);
+                }
+            }
+
+            await _db.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Seeded TeacherPermissions.");
+        }
     }
 }
