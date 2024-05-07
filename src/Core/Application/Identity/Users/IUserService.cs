@@ -36,5 +36,6 @@ public interface IUserService : ITransientService
     Task<string> ForgotPasswordAsync(ForgotPasswordRequest request, string origin);
     Task<string> ResetPasswordAsync(ResetPasswordRequest request);
     Task ChangePasswordAsync(ChangePasswordRequest request, string userId);
-    Task<UserDetailsDto> GetUserDetailByEmail(string email, CancellationToken cancellationToken);
+    Task<UserDetailsDto> GetUserDetailByEmailAsync(string email, CancellationToken cancellationToken);
+    Task<UserDetailsDto> GetUserDetailByPhoneAsync(string phoneNumber, CancellationToken cancellationToken);
 }

@@ -152,7 +152,7 @@ internal partial class UserService : IUserService
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
     }
 
-    public async Task<UserDetailsDto> GetUserDetailByEmail(string email, CancellationToken cancellationToken)
+    public async Task<UserDetailsDto> GetUserDetailByEmailAsync(string email, CancellationToken cancellationToken)
     {
         var user = await _userManager.Users
            .AsNoTracking()
@@ -162,6 +162,21 @@ internal partial class UserService : IUserService
         {
             return new UserDetailsDto();
         }
+
+        return user.Adapt<UserDetailsDto>();
+    }
+
+    public async Task<UserDetailsDto> GetUserDetailByPhoneAsync(string phoneNumber, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users
+           .AsNoTracking()
+           .Where(u => u.PhoneNumber == phoneNumber && u.IsActive)
+           .FirstOrDefaultAsync(cancellationToken);
+        if (user is null)
+        {
+            return new UserDetailsDto();
+        }
+
         return user.Adapt<UserDetailsDto>();
     }
 }

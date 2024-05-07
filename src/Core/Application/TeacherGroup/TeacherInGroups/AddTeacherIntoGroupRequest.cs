@@ -45,7 +45,7 @@ public class AddTeacherIntoTeamRequestHandler : IRequestHandler<AddTeacherIntoGr
         }
 
         //note: need to check teacher in my team
-        var teacherToAdd = await _userService.GetUserDetailByEmail(request.EmailTeacher, cancellationToken);
+        var teacherToAdd = await _userService.GetUserDetailByEmailAsync(request.EmailTeacher, cancellationToken);
         if (teacherToAdd.Id == Guid.Empty)
         {
             // create new user with active false
