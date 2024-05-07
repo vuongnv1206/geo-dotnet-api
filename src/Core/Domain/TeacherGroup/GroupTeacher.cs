@@ -5,6 +5,7 @@ public class GroupTeacher : AuditableEntity,IAggregateRoot
 {
     public string Name { get; set; } = null!;
     public virtual IEnumerable<TeacherInGroup>? TeacherInGroups { get; set; }
+    public virtual IEnumerable<GroupPermissionInClass> GroupPermissionInClasses { get; set; }
 
     public GroupTeacher(string name)
     {

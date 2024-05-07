@@ -12,6 +12,8 @@ public class TeacherTeam : AuditableEntity, IAggregateRoot
     [Phone]
     public string? Phone { get; set; }
 
+    public virtual IEnumerable<TeacherPermissionInClass> TeacherPermissionInClasses { get; set; }
+
     public TeacherTeam Update(string? teacherName, string? teacherEmail, string? teacherPhone)
     {
         if (teacherName is not null && TeacherName?.Equals(teacherName) is not true) TeacherName = teacherName;

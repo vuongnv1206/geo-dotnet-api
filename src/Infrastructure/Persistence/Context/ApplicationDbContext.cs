@@ -30,8 +30,9 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<QuestionFolderPermission> QuestionFolderPermissions => Set<QuestionFolderPermission>();
     public DbSet<TeacherInGroup> TeacherInGroups { get; set; }
     public DbSet<GroupTeacher> GroupTeachers { get; set; }
-    public DbSet<TeacherPermission> TeacherPermissions { get; set; }
+    public DbSet<TeacherPermissionInClass> TeacherPermissionInClasses { get; set; }
     public DbSet<TeacherTeam> TeacherTeams { get; set; }
+    public DbSet<GroupPermissionInClass> GroupPermissionInClasses { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
