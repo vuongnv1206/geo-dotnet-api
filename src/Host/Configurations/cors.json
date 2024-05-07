@@ -1,10 +1,5 @@
 {
   "CorsSettings": {
-    "local": "https://localhost:5100",
-    "local-fe": "http://localhost:3000",
-    "test": "https://test-api.guardianexam.com",
-    "test-fe": "https://test.guardianexam.com",
-    "prod": "https://api.guardianexam.com",
-    "prod-fe": "https://guardianexam.com"
+    "Vue": "http://localhost:5173;https://test.guardianexam.com;https://guardianexam.com"
   }
 }
