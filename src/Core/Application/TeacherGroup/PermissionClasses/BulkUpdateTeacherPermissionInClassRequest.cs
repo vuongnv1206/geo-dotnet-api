@@ -11,19 +11,6 @@ public class BulkUpdateTeacherPermissionInClassRequest : IRequest<Guid>
     public List<PermissionInClassDto> PermissionInClassDtos { get; set; }
 }
 
-public class PermissionInClassDto
-{
-    public Guid ClassId { get; set; }
-    public PermissionType PermissionType { get; set; }
-}
-
-public class TeacherTeamByIdWithPermissionSpec : Specification<TeacherTeam>, ISingleResultSpecification
-{
-    public TeacherTeamByIdWithPermissionSpec(Guid id)
-    {
-        Query.Where(x => x.Id == id).Include(x => x.TeacherPermissionInClasses);
-    }
-}
 
 public class BulkUpdateTeacherPermissionInClassRequestHandler : IRequestHandler<BulkUpdateTeacherPermissionInClassRequest, Guid>
 {

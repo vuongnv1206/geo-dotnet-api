@@ -55,7 +55,7 @@ public class TeacherGroupSeeder : ICustomSeeder
             {
                 var teacherInGroups = groupTeachers.Select(groupTeacher => new TeacherInGroup
                 {
-                    TeacherId = Guid.NewGuid(),
+                    TeacherTeamId = Guid.NewGuid(),
                     GroupTeacherId = groupTeacher.Id,
                 }).ToList();
 

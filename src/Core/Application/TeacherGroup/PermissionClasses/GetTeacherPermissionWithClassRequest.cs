@@ -1,11 +1,7 @@
 ﻿using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.TeacherGroup;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 public class GetTeacherPermissionWithClassRequest : IRequest<TeacherTeamDto>
@@ -17,12 +13,7 @@ public class GetTeacherPermissionWithClassRequest : IRequest<TeacherTeamDto>
     }
 }
 
-public class TeacherPermissionInClassDto
-{
-    public Guid Id { get; set; }
-    public Guid ClassId { get; set; }
-    public string PermissionType { get; set; }
-}
+
 
 public class GetTeacherPermissionWithClassRequestHandler : IRequestHandler<GetTeacherPermissionWithClassRequest, TeacherTeamDto>
 {
