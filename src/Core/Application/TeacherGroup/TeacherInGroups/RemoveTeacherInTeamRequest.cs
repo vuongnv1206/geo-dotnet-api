@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers.Specs;
-using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.TeacherInGroups;
 public class RemoveTeacherInTeamRequest : IRequest<Guid>

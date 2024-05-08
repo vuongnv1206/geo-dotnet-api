@@ -1,4 +1,6 @@
-﻿namespace FSH.WebApi.Application.TeacherGroup.TeacherTeams;
+﻿using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
+
+namespace FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 public class TeacherTeamDto : IDto
 {
     public Guid Id { get; set; }
@@ -6,4 +8,5 @@ public class TeacherTeamDto : IDto
     public string TeacherName { get; set; } = null!;
     public string? Email { get; set; }
     public string? Phone { get; set; }
+    public List<TeacherPermissionInClassDto> TeacherPermissionInClassDto { get; set; }
 }

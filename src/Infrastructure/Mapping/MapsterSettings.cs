@@ -1,5 +1,7 @@
 ﻿using FSH.WebApi.Application.Questions;
+using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
 namespace FSH.WebApi.Infrastructure.Mapping;
@@ -21,5 +23,8 @@ public class MapsterSettings
             .Map(dest => dest.ParentId, src => src.ParentId)
             .Map(dest => dest.Permission, src => src.Permissions)
             .Map(dest => dest.Children, src => src.Children);
+
+        TypeAdapterConfig<TeacherTeam, TeacherTeamDto>.NewConfig()
+            .Map(dest => dest.TeacherPermissionInClassDto, src => src.TeacherPermissionInClasses);
     }
 }
