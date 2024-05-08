@@ -35,4 +35,38 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
         return this;
     }
 
+    public bool CanDelete(DefaultIdType guid)
+    {
+        if (CreatedBy == guid) return true;
+        return Permissions.Any(x => x.UserId == guid && x.CanDelete);
+    }
+
+    public bool CanUpdate(DefaultIdType guid)
+    {
+        if (CreatedBy == guid) return true;
+        return Permissions.Any(x => x.UserId == guid && x.CanUpdate);
+    }
+
+    public bool CanAdd(DefaultIdType guid)
+    {
+        if (CreatedBy == guid) return true;
+        return Permissions.Any(x => x.UserId == guid && x.CanAdd);
+    }
+
+    public bool CanView(DefaultIdType guid)
+    {
+        if (CreatedBy == guid) return true;
+        return Permissions.Any(x => x.UserId == guid && x.CanView);
+    }
+
+    public void CopyPermissions(QuestionFolder? parentFolder)
+    {
+        if (parentFolder is null) return;
+
+        foreach (var permission in parentFolder.Permissions)
+        {
+            AddPermission(new QuestionFolderPermission(permission.UserId, Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
+            AddPermission(new QuestionFolderPermission(parentFolder.CreatedBy, Id, true, true, true, true));
+        }
+    }
 }

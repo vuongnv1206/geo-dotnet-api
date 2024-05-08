@@ -4,5 +4,8 @@ namespace FSH.WebApi.Application.Questions.Specs;
 public class QuestionFolderByIdSpec : Specification<QuestionFolder>, ISingleResultSpecification
 {
     public QuestionFolderByIdSpec(Guid? id) =>
-        Query.Where(b => b.Id == id);
+        Query
+        .Include(b => b.Permissions)
+        .Include(b => b.Children)
+        .Where(b => b.Id == id);
 }
