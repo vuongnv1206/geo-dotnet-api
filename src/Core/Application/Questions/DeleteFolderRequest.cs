@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Question;
+﻿using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Domain.Question;
 using MediatR;
 
 namespace FSH.WebApi.Host.Controllers.Question;
@@ -25,17 +26,24 @@ public class DeleteFolderRequestHandler : IRequestHandler<DeleteFolderRequest, G
 {
     private readonly IRepositoryWithEvents<QuestionFolder> _repository;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
 
-    public DeleteFolderRequestHandler(IRepositoryWithEvents<QuestionFolder> repository, IStringLocalizer<DeleteFolderRequestHandler> localizer)
+    public DeleteFolderRequestHandler(IRepositoryWithEvents<QuestionFolder> repository, IStringLocalizer<DeleteFolderRequestHandler> localizer, ICurrentUser currentUser)
     {
         _repository = repository;
         _t = localizer;
+        _currentUser = currentUser;
     }
 
     public async Task<DefaultIdType> Handle(DeleteFolderRequest request, CancellationToken cancellationToken)
     {
-        var folder = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var folder = await _repository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(request.Id), cancellationToken);
         _ = folder ?? throw new NotFoundException(_t["Folder {0} Not Found.", request.Id]);
+
+        if (!folder.CanDelete(_currentUser.GetUserId()))
+        {
+            throw new ForbiddenException(_t["You do not have permission to delete this folder."]);
+        }
 
         await _repository.DeleteAsync(folder, cancellationToken);
 

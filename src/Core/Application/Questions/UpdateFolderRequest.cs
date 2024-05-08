@@ -29,18 +29,25 @@ public class UpdateFolderRequestHandler : IRequestHandler<UpdateFolderRequest, G
 {
     private readonly IRepositoryWithEvents<QuestionFolder> _repository;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
 
-    public UpdateFolderRequestHandler(IRepositoryWithEvents<QuestionFolder> repository, IStringLocalizer<UpdateFolderRequestHandler> localizer)
+    public UpdateFolderRequestHandler(IRepositoryWithEvents<QuestionFolder> repository, IStringLocalizer<UpdateFolderRequestHandler> localizer, ICurrentUser currentUser)
     {
         _repository = repository;
         _t = localizer;
+        _currentUser = currentUser;
     }
 
     public async Task<Guid> Handle(UpdateFolderRequest request, CancellationToken cancellationToken)
     {
-        var folder = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var folder = await _repository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(request.Id), cancellationToken);
 
         _ = folder ?? throw new NotFoundException(_t["Folder {0} Not Found.", request.Id]);
+
+        if (!folder.CanUpdate(_currentUser.GetUserId()))
+        {
+            throw new ForbiddenException(_t["You do not have permission to update this folder."]);
+        }
 
         var updatedFolder = folder.Update(request.Name, request.ParentId);
 
