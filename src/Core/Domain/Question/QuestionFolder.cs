@@ -23,4 +23,16 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
         Children.Add(questionFolder);
     }
 
+    public void AddPermission(QuestionFolderPermission permission)
+    {
+        Permissions.Add(permission);
+    }
+
+    public QuestionFolder Update(string name, Guid? parentId)
+    {
+        Name = name;
+        ParentId = parentId;
+        return this;
+    }
+
 }

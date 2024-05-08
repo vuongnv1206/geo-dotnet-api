@@ -87,6 +87,9 @@ public static class FSHPermissions
         new("Update GroupClasses", FSHAction.Update, FSHResource.GroupClasses),
         new("Delete GroupClasses", FSHAction.Delete, FSHResource.GroupClasses),
         new("View QuestionFolders", FSHAction.View, FSHResource.QuestionFolders),
+        new("Create QuestionFolders", FSHAction.Create, FSHResource.QuestionFolders),
+        new("Update QuestionFolders", FSHAction.Update, FSHResource.QuestionFolders),
+        new("Delete QuestionFolders", FSHAction.Delete, FSHResource.QuestionFolders),
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);
