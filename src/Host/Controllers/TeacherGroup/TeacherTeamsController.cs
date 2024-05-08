@@ -25,7 +25,7 @@ public class TeacherTeamsController : VersionedApiController
     [HttpPut("{id:guid}")]
     [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
     [OpenApiOperation("Update a teacherTeam.", "")]
-    public async Task<ActionResult<Guid>> UpdateAsync(UpdateTeacherRegistrationStatusRequest request, Guid id)
+    public async Task<ActionResult<Guid>> UpdateTeacherRegistrationStatusAsync(UpdateTeacherRegistrationStatusRequest request, Guid id)
     {
         return id != request.Id
             ? BadRequest()
@@ -33,7 +33,7 @@ public class TeacherTeamsController : VersionedApiController
     }
 
 
-    [HttpPost("add-teacher-into-team")]
+    [HttpPost("teacher-in-team")]
     [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
     [OpenApiOperation("Add a teacher in my teacher team")]
     public Task AddTeacherInTeacherTeam(AddTeacherIntoTeacherTeamRequest request)
@@ -41,11 +41,21 @@ public class TeacherTeamsController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpDelete("remove-teacher-in-team")]
+    [HttpDelete("teacher-in-team")]
     [MustHavePermission(FSHAction.Delete, FSHResource.GroupTeachers)]
     [OpenApiOperation("Remove a teacher in team")]
     public Task RemoveTeacherInTeam(RemoveTeacherInTeamRequest request)
     {
         return Mediator.Send(request);
+    }
+
+    [HttpPut("teacher-in-team/{id:guid}")]
+    [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Update information of teacher in team")]
+    public async Task<ActionResult<Guid>> UpdateInformationTeacherInTeam(UpdateInformationTeacherInTeamRequest request, Guid id)
+    {
+        return id != request.Id
+            ? BadRequest()
+            : Ok(await Mediator.Send(request));
     }
 }
