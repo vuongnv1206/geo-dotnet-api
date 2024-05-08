@@ -4,6 +4,8 @@ using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Question;
 using Mapster;
+using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.Questions.Specs;
 namespace FSH.WebApi.Application.Questions;
 
 public class GetFolderTreeRequest : IRequest<QuestionTreeDto>
