@@ -54,7 +54,7 @@ public class AddTeacherIntoTeamRequestHandler : IRequestHandler<AddTeacherIntoGr
         {
             await _repository.AddTeacherIntoGroup(new TeacherInGroup
             {
-                TeacherId = Guid.NewGuid(),
+                TeacherTeamId = Guid.NewGuid(),
                 GroupTeacherId = request.GroupId
             });
         }

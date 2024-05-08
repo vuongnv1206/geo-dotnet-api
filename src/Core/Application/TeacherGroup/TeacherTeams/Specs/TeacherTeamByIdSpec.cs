@@ -6,6 +6,6 @@ public class TeacherTeamByIdSpec : Specification<TeacherTeam, TeacherTeamDto>, I
 {
     public TeacherTeamByIdSpec(Guid id)
     {
-        Query.Where(x => x.Id == id);
+        Query.Where(x => x.Id == id).Include(x => x.TeacherPermissionInClasses);
     }
 }

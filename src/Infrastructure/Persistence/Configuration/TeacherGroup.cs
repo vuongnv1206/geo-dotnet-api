@@ -32,7 +32,7 @@ public class TeacherInGroupConfig : IEntityTypeConfiguration<TeacherInGroup>
     public void Configure(EntityTypeBuilder<TeacherInGroup> builder)
     {
         builder.IsMultiTenant();
-        builder.HasKey(tig => new { tig.TeacherId, tig.GroupTeacherId });
+        builder.HasKey(tig => new { tig.TeacherTeamId, tig.GroupTeacherId });
         builder.ToTable("TeacherInGroups", SchemaNames.GroupTeacher);
     }
 }
