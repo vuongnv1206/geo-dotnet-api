@@ -1,13 +1,12 @@
-﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers.Specs;
-using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Domain.TeacherGroup;
 
-namespace FSH.WebApi.Application.TeacherGroup.TeacherInGroups;
-public class RemoveTeacherInTeamRequest : IRequest<Guid>
+namespace FSH.WebApi.Application.TeacherGroup.TeacherTeams;
+public class RemoveTeacherInTeamRequest : IRequest<DefaultIdType>
 {
-    public Guid Id { get; set; }
+    public DefaultIdType Id { get; set; }
 }
 
-public class RemoveTeacherInTeamRequestHandler : IRequestHandler<RemoveTeacherInTeamRequest, Guid>
+public class RemoveTeacherInTeamRequestHandler : IRequestHandler<RemoveTeacherInTeamRequest, DefaultIdType>
 {
     private readonly IRepositoryWithEvents<TeacherTeam> _teacherTeamRepo;
     private readonly IStringLocalizer _t;

@@ -39,7 +39,7 @@ public class RemoveTeacherInGroupRequestHandler : IRequestHandler<RemoveTeacherI
     {
         var teacherInGroup = await _repository.GetTeacherInGroup(new TeacherInGroup
         {
-            TeacherId = request.TeacherId,
+            TeacherTeamId = request.TeacherId,
             GroupTeacherId = request.GroupId,
         });
         if (teacherInGroup is null)

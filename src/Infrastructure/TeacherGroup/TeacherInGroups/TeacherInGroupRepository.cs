@@ -33,5 +33,5 @@ public class TeacherInGroupRepository : ITeacherInGroupRepository
 
     public async Task<TeacherInGroup> GetTeacherInGroup(TeacherInGroup request) =>
        await _context.TeacherInGroups.FirstOrDefaultAsync(t => t.GroupTeacherId == request.GroupTeacherId
-                                                    && t.TeacherId == request.TeacherId);
+                                                    && t.TeacherTeamId == request.TeacherTeamId);
 }
