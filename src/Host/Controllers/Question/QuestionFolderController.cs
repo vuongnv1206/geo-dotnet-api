@@ -41,4 +41,14 @@ public class QuestionFolderController : VersionedApiController
         return Mediator.Send(new DeleteFolderRequest(id));
     }
 
+    [HttpPost("share/{id:guid}")]
+    [MustHavePermission(FSHAction.Update, FSHResource.QuestionFolders)]
+    [OpenApiOperation("Share a question folder.", "")]
+    public async Task<ActionResult<Guid>> ShareAsync(ShareQuestionFolderRequest request, Guid id)
+    {
+        return id != request.FolderId
+            ? BadRequest()
+            : await Mediator.Send(request);
+    }
+
 }
