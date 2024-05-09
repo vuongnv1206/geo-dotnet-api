@@ -1,9 +1,9 @@
 ﻿using FSH.WebApi.Domain.Question;
 
-namespace FSH.WebApi.Application.Questions;
+namespace FSH.WebApi.Application.Questions.Specs;
 public class QuestionFoldersWithPermissionsSpecByUserId : Specification<QuestionFolder>, ISingleResultSpecification
 {
-    public QuestionFoldersWithPermissionsSpecByUserId(Guid userId, Guid? parentFolderId) =>
+    public QuestionFoldersWithPermissionsSpecByUserId(DefaultIdType userId, DefaultIdType? parentFolderId) =>
         Query
         .Include(qf => qf.Permissions)
         .Include(qf => qf.Children)

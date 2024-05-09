@@ -27,45 +27,45 @@ public class GroupClassSeeder : ICustomSeeder
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        if (!_db.GroupClasses.Any())
-        {
-            _logger.LogInformation("Started to Seed GroupClass.");
+        //string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        //if (!_db.GroupClasses.Any())
+        //{
+        //    _logger.LogInformation("Started to Seed GroupClass.");
 
-            // Here you can use your own logic to populate the database.
-            // As an example, I am using a JSON file to populate the database.
-            string groupClassData = await File.ReadAllTextAsync(path + "/Class/GroupClasses/groupClasses.json", cancellationToken);
-            var groupClass = _serializerService.Deserialize<List<GroupClass>>(groupClassData);
+        //    // Here you can use your own logic to populate the database.
+        //    // As an example, I am using a JSON file to populate the database.
+        //    string groupClassData = await File.ReadAllTextAsync(path + "/Class/GroupClasses/groupClasses.json", cancellationToken);
+        //    var groupClass = _serializerService.Deserialize<List<GroupClass>>(groupClassData);
 
-            if (groupClass != null)
-            {
-                foreach (var gc in groupClass)
-                {
-                    await _db.GroupClasses.AddAsync(gc, cancellationToken);
-                }
-            }
+        //    if (groupClass != null)
+        //    {
+        //        foreach (var gc in groupClass)
+        //        {
+        //            await _db.GroupClasses.AddAsync(gc, cancellationToken);
+        //        }
+        //    }
 
-            await _db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Seeded GroupClasses.");
-        }
+        //    await _db.SaveChangesAsync(cancellationToken);
+        //    _logger.LogInformation("Seeded GroupClasses.");
+        //}
 
-        if (!_db.Classes.Any())
-        {
-            _logger.LogInformation("Started to Seed Classes.");
+        //if (!_db.Classes.Any())
+        //{
+        //    _logger.LogInformation("Started to Seed Classes.");
 
-            string classesData = await File.ReadAllTextAsync(path + "/Class/classes.json", cancellationToken);
-            var classes = _serializerService.Deserialize<List<Classes>>(classesData);
+        //    string classesData = await File.ReadAllTextAsync(path + "/Class/classes.json", cancellationToken);
+        //    var classes = _serializerService.Deserialize<List<Classes>>(classesData);
 
-            if (classes != null)
-            {
-                foreach (var c in classes)
-                {
-                    await _db.Classes.AddAsync(c, cancellationToken);
-                }
-            }
+        //    if (classes != null)
+        //    {
+        //        foreach (var c in classes)
+        //        {
+        //            await _db.Classes.AddAsync(c, cancellationToken);
+        //        }
+        //    }
 
-            await _db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Seeded TeacherPermissions.");
-        }
+        //    await _db.SaveChangesAsync(cancellationToken);
+        //    _logger.LogInformation("Seeded TeacherPermissions.");
+        //}
     }
 }

@@ -1,8 +1,8 @@
 ﻿using FSH.WebApi.Domain.Question;
 
-namespace FSH.WebApi.Application.Questions;
+namespace FSH.WebApi.Application.Questions.Specs;
 public class QuestionFolderPermissionByUserIdSpec : Specification<QuestionFolderPermission>, ISingleResultSpecification
 {
-    public QuestionFolderPermissionByUserIdSpec(Guid userId) =>
+    public QuestionFolderPermissionByUserIdSpec(DefaultIdType userId) =>
         Query.Where(q => q.UserId == userId);
 }

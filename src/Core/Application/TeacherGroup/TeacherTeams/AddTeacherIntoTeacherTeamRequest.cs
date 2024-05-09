@@ -9,8 +9,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace FSH.WebApi.Application.TeacherGroup.TeacherInGroups;
-public class AddTeacherIntoTeacherTeamRequest : IRequest<Guid>
+namespace FSH.WebApi.Application.TeacherGroup.TeacherTeams;
+public class AddTeacherIntoTeacherTeamRequest : IRequest<DefaultIdType>
 {
     public string TeacherName { get; set; } = null!;
     public string Contact { get; set; } = null!;
@@ -24,7 +24,7 @@ public class AddTeacherIntoTeacherTeamRequestValidator : CustomValidator<AddTeac
            .MaximumLength(50);
 }
 
-public class AddTeacherIntoTeacherTeamRequestHandler : IRequestHandler<AddTeacherIntoTeacherTeamRequest, Guid>
+public class AddTeacherIntoTeacherTeamRequestHandler : IRequestHandler<AddTeacherIntoTeacherTeamRequest, DefaultIdType>
 {
     private readonly IRepositoryWithEvents<TeacherTeam> _repository;
     private readonly IStringLocalizer _t;
@@ -47,7 +47,7 @@ public class AddTeacherIntoTeacherTeamRequestHandler : IRequestHandler<AddTeache
             TeacherName = request.TeacherName,
         };
 
-        switch(request.Contact.CheckType())
+        switch (request.Contact.CheckType())
         {
             case ValidationType.EmailAddress:
                 teacherTeam.Email = request.Contact;

@@ -19,4 +19,18 @@ public class QuestionFolderPermission : AuditableEntity, IAggregateRoot
         CanUpdate = canUpdate;
         CanDelete = canDelete;
     }
+
+    public QuestionFolderPermission(DefaultIdType id, DefaultIdType userId)
+    {
+        Id = id;
+        UserId = userId;
+    }
+
+    public void SetPermissions(bool canView, bool canAdd, bool canUpdate, bool canDelete)
+    {
+        CanView = canView;
+        CanAdd = canAdd;
+        CanUpdate = canUpdate;
+        CanDelete = canDelete;
+    }
 }
