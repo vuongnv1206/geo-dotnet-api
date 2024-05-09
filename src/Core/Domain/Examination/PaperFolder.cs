@@ -22,4 +22,13 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
         ParentId = parentId;
         SubjectId = subjectId;
     }
+    
+    public PaperFolder Update(string name, Guid? parentId, Guid? subjectId)
+    {
+        Name= name;
+        ParentId= parentId;
+        SubjectId = subjectId;
+
+        return this;
+    }
 }
