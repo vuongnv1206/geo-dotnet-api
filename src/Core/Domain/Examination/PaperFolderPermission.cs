@@ -10,8 +10,28 @@ public class PaperFolderPermission : AuditableEntity, IAggregateRoot
 {
     public Guid UserId { get; set; }
     public Guid FolderId { get; set; }
-    public bool CanView { get; set; }
-    public bool CanEdit { get; set; }
+    public bool CanView { get; private set; }
+    public bool CanAdd { get; private set; }
+    public bool CanUpdate { get; private set; }
+    public bool CanDelete { get; private set; }
     [ForeignKey(nameof(FolderId))]
     public virtual PaperFolder PaperFolder { get; set; }
+
+    public PaperFolderPermission(Guid userId, Guid folderId, bool canView, bool canAdd, bool canUpdate, bool canDelete)
+    {
+        UserId = userId;
+        FolderId = folderId;
+        CanView = canView;
+        CanAdd = canAdd;
+        CanUpdate = canUpdate;
+        CanDelete = canDelete;
+    }
+
+    public void SetPermissions(bool canView, bool canAdd, bool canUpdate, bool canDelete)
+    {
+        CanView = canView;
+        CanAdd = canAdd;
+        CanUpdate = canUpdate;
+        CanDelete = canDelete;
+    }
 }

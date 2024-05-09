@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FSH.WebApi.Domain.Question;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -15,8 +16,9 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
     [ForeignKey(nameof(ParentId))]
     public virtual PaperFolder? PaperFolderParent { get; set; }
     public virtual IEnumerable<PaperFolder>? PaperFolderChildrens { get; set; }
+    public virtual IList<PaperFolderPermission> PaperFolderPermissions { get; set; }
 
-    public PaperFolder(string name, DefaultIdType? parentId, DefaultIdType? subjectId)
+    public PaperFolder(string name, Guid? parentId, Guid? subjectId)
     {
         Name = name;
         ParentId = parentId;
@@ -30,5 +32,45 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
         SubjectId = subjectId;
 
         return this;
+    }
+
+    public void AddPermission(PaperFolderPermission permission)
+    {
+        PaperFolderPermissions.Add(permission);
+    }
+
+    public bool CanDelete(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperFolderPermissions.Any(x => x.UserId == userId && x.CanDelete);
+    }
+
+    public bool CanUpdate(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperFolderPermissions.Any(x => x.UserId == userId && x.CanUpdate);
+    }
+
+    public bool CanAdd(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperFolderPermissions.Any(x => x.UserId == userId && x.CanAdd);
+    }
+
+    public bool CanView(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperFolderPermissions.Any(x => x.UserId == userId && x.CanView);
+    }
+
+    public void CopyPermissions(PaperFolder? paperFolderParent)
+    {
+        if (paperFolderParent is null) return;
+
+        foreach (var permission in paperFolderParent.PaperFolderPermissions)
+        {
+            AddPermission(new PaperFolderPermission(permission.UserId, Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
+            AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, true, true, true, true));
+        }
     }
 }
