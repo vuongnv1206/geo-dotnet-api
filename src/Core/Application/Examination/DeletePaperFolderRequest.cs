@@ -1,6 +1,4 @@
-﻿
-
-using FSH.WebApi.Application.Examination.PaperFolders;
+﻿using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination;
@@ -28,10 +26,13 @@ public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolder
     public async Task<Guid> Handle(DeletePaperFolderRequest request, CancellationToken cancellationToken)
     {
         var paperFolder = await _repository.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.Id), cancellationToken);
-
-
         _ = paperFolder ?? throw new NotFoundException(_t["PaperFolder {0} Not Found."]);
 
+
+        if (!paperFolder.CanDelete(_currentUser.GetUserId()))
+        {
+            throw new ForbiddenException(_t["You do not have permission to delete this folder."]);
+        }
         await DeleteChildrenPaperFolders(paperFolder.Id, cancellationToken);
 
         await _repository.DeleteAsync(paperFolder);
@@ -46,7 +47,7 @@ public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolder
         foreach (var childFolder in childrenFolders)
         {
             await DeleteChildrenPaperFolders(childFolder.Id, cancellationToken);
-            await _repository.DeleteAsync(childFolder); 
+            await _repository.DeleteAsync(childFolder);
         }
     }
 }

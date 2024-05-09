@@ -27,8 +27,8 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
     
     public PaperFolder Update(string name, Guid? parentId, Guid? subjectId)
     {
-        Name= name;
-        ParentId= parentId;
+        Name = name;
+        ParentId = parentId;
         SubjectId = subjectId;
 
         return this;

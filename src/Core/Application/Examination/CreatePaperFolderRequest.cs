@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Examination.PaperFolders;
+﻿using FSH.WebApi.Application.Common.Models;
+using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
 namespace FSH.WebApi.Application.Examination;
@@ -38,11 +39,23 @@ public class CreatePaperFolderRequestHandler : IRequestHandler<CreatePaperFolder
         {
             var parent = await _repository.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value), cancellationToken);
             _ = parent ?? throw new NotFoundException(_t["Folder {0} Not Found.", request.ParentId]);
+
+
+            if (!parent.CanAdd(_currentUser.GetUserId()))
+            {
+                throw new ForbiddenException(_t["You do not have permission to create a folder in this folder."]);
+            }
         }
 
         var paperFolder = new PaperFolder(request.Name, request.ParentId, request.SubjectId);
         await _repository.AddAsync(paperFolder, cancellationToken);
 
+        if (request.ParentId.HasValue)
+        {
+            var parent = await _repository.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value), cancellationToken);
+            paperFolder.CopyPermissions(parent);
+            await _repository.UpdateAsync(paperFolder, cancellationToken);
+        }
         return paperFolder.Id;
     }
 }
