@@ -5,8 +5,10 @@ using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class SearchPaperFolderRequest : PaginationFilter, IRequest<List<PaperFolderDto>>
+public class SearchPaperFolderRequest : IRequest<List<PaperFolderDto>>
 {
+    public Guid? ParentId { get; set; }
+    public string? Name { get; set; }
 }
 
 public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolderRequest, List<PaperFolderDto>>

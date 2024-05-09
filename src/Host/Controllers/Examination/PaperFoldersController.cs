@@ -15,13 +15,6 @@ public class PaperFoldersController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpGet("{id:guid}")]
-    [OpenApiOperation("Get paper folder detail.")]
-    public Task<PaperFolderDto> GetAsync(Guid id)
-    {
-        return Mediator.Send(new GetPaperFolderRequest(id));
-    }
-
     [HttpPut("{id:guid}")]
     [OpenApiOperation("Update information of paper folder.")]
     public async Task<ActionResult<Guid>> UpdateAsync(UpdatePaperFolderRequest request, Guid id)

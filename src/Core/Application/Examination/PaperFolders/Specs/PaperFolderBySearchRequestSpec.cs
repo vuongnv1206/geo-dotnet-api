@@ -5,10 +5,12 @@ using FSH.WebApi.Domain.Question;
 namespace FSH.WebApi.Application.Examination.PaperFolders.Specs;
 public class PaperFolderBySearchRequestSpec : Specification<PaperFolder>
 {
-    public PaperFolderBySearchRequestSpec(PaginationFilter request, Guid currentUserId) =>
+    public PaperFolderBySearchRequestSpec(SearchPaperFolderRequest request, DefaultIdType currentUserId) =>
         Query
             .Where(x => x.CreatedBy == currentUserId)
-            .OrderBy(x => x.CreatedOn, !request.HasOrderBy())
+            .Where(x => (!request.ParentId.HasValue || x.ParentId == request.ParentId)
+                     && (string.IsNullOrEmpty(request.Name) || x.Name.Contains(request.Name)))
+            .OrderBy(x => x.CreatedOn)
             .Include(x => x.PaperFolderChildrens)
             .Include(x => x.PaperFolderParent);
 }

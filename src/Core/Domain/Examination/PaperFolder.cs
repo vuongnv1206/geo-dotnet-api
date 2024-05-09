@@ -15,4 +15,13 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
     [ForeignKey(nameof(ParentId))]
     public virtual PaperFolder? PaperFolderParent { get; set; }
     public virtual IEnumerable<PaperFolder>? PaperFolderChildrens { get; set; }
+
+    public PaperFolder Update(string name, Guid? parentId, Guid? subjectId)
+    {
+        Name= name;
+        ParentId= parentId;
+        SubjectId = subjectId;
+
+        return this;
+    }
 }
