@@ -1,9 +1,6 @@
 ﻿using FSH.WebApi.Application.Examination;
 ﻿using FSH.WebApi.Application.Examination.PaperFolders;
-using FSH.WebApi.Application.Examination.PaperFolders.Dtos;
-using FSH.WebApi.Host.Controllers.Question;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class PaperFoldersController : VersionedApiController

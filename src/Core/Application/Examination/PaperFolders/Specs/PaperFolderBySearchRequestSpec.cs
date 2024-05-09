@@ -1,8 +1,7 @@
-﻿using FSH.WebApi.Application.Examination.PaperFolders.Dtos;
-using FSH.WebApi.Domain.Examination;
-using FSH.WebApi.Domain.Question;
+﻿using FSH.WebApi.Domain.Examination;
 
-namespace FSH.WebApi.Application.Examination.PaperFolders.Specs;
+
+namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class PaperFolderBySearchRequestSpec : Specification<PaperFolder>
 {
     public PaperFolderBySearchRequestSpec(SearchPaperFolderRequest request, DefaultIdType currentUserId) =>

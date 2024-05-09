@@ -1,4 +1,4 @@
-namespace FSH.WebApi.Application.Examination.PaperFolders.Dtos;
+namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class PaperFolderDto : IDto
 {
     public string Name { get; set; }

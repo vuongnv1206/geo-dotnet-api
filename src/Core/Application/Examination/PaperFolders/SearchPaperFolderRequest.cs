@@ -1,7 +1,4 @@
-﻿using FSH.WebApi.Application.Examination.PaperFolders.Dtos;
-using FSH.WebApi.Application.Examination.PaperFolders.Specs;
-using FSH.WebApi.Application.Questions.Dtos;
-using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;

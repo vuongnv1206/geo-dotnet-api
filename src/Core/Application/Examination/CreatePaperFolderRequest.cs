@@ -36,7 +36,7 @@ public class CreatePaperFolderRequestHandler : IRequestHandler<CreatePaperFolder
 
         if (request.ParentId.HasValue)
         {
-            var parent = await _repository.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId), cancellationToken);
+            var parent = await _repository.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value), cancellationToken);
             _ = parent ?? throw new NotFoundException(_t["Folder {0} Not Found.", request.ParentId]);
         }
 
