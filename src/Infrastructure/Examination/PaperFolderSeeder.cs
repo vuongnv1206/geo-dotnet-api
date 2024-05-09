@@ -31,9 +31,7 @@ public class PaperFolderSeeder : ICustomSeeder
         {
             _logger.LogInformation("Started to Seed PaperFolders.");
 
-            // Here you can use your own logic to populate the database.
-            // As an example, I am using a JSON file to populate the database.
-            string paperFolderData = await File.ReadAllTextAsync(path + "/paperFolder.json", cancellationToken);
+            string paperFolderData = await File.ReadAllTextAsync(path + "/Examination/paperFolder.json", cancellationToken);
             var paperFolders = _serializerService.Deserialize<List<PaperFolder>>(paperFolderData);
 
             if (paperFolders != null)
@@ -59,12 +57,12 @@ public class PaperFolderSeeder : ICustomSeeder
         await _db.PaperFolders.AddAsync(paperFolder, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
-        if (paperFolder.ChildrenPaperFolders != null)
-        {
-            foreach (var childFolder in paperFolder.ChildrenPaperFolders)
-            {
-                await SeedPaperFolder(childFolder, paperFolder.Id, cancellationToken);
-            }
-        }
+        //if (paperFolder.ChildrenPaperFolders != null)
+        //{
+        //    foreach (var childFolder in paperFolder.ChildrenPaperFolders)
+        //    {
+        //        await SeedPaperFolder(childFolder, paperFolder.Id, cancellationToken);
+        //    }
+        //}
     }
 }
