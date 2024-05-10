@@ -1,15 +1,15 @@
 ﻿
 
 namespace FSH.WebApi.Domain.Examination;
-public class PaperLable : AuditableEntity, IAggregateRoot
+public class PaperLabel : AuditableEntity, IAggregateRoot
 {
     public string Name { get; set; } = null!;
-    public PaperLable Update(string? name)
+    public PaperLabel Update(string? name)
     {
         if (name is not null && Name?.Equals(name) is not true) Name = name;
         return this;
     }
-    public PaperLable(string name)
+    public PaperLabel(string name)
     {
         Name = name;
     }

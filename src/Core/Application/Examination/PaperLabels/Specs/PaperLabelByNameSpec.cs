@@ -2,7 +2,7 @@
 
 
 namespace FSH.WebApi.Application.Examination.PaperLabels;
-public class PaperLabelByNameSpec : Specification<PaperLable>, ISingleResultSpecification
+public class PaperLabelByNameSpec : Specification<PaperLabel>, ISingleResultSpecification
 {
     public PaperLabelByNameSpec(string name)
     {

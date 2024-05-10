@@ -13,7 +13,7 @@ public class CreatePaperLabelRequest : IRequest<Guid>
 
 public class CreatePaperLabelRequestValidator : CustomValidator<CreatePaperLabelRequest>
 {
-    public CreatePaperLabelRequestValidator(IReadRepository<PaperLable> repository, IStringLocalizer<CreatePaperLabelRequestValidator> T) =>
+    public CreatePaperLabelRequestValidator(IReadRepository<PaperLabel> repository, IStringLocalizer<CreatePaperLabelRequestValidator> T) =>
         RuleFor(x => x.Name)
         .NotEmpty()
         .MaximumLength(50)
@@ -23,17 +23,17 @@ public class CreatePaperLabelRequestValidator : CustomValidator<CreatePaperLabel
 
 public class CreatePaperLabelRequestHandler : IRequestHandler<CreatePaperLabelRequest, Guid>
 {
-    private readonly IRepositoryWithEvents<PaperLable> _repository;
+    private readonly IRepositoryWithEvents<PaperLabel> _repository;
 
     public CreatePaperLabelRequestHandler(
-        IRepositoryWithEvents<PaperLable> repository)
+        IRepositoryWithEvents<PaperLabel> repository)
     {
         _repository = repository;
     }
 
     public async Task<Guid> Handle(CreatePaperLabelRequest request, CancellationToken cancellationToken)
     {
-        var paperLabel = new PaperLable(request.Name);
+        var paperLabel = new PaperLabel(request.Name);
 
         await _repository.AddAsync(paperLabel, cancellationToken);
 

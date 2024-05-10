@@ -23,14 +23,14 @@ public class PaperLabelSeeder : ICustomSeeder
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
         string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        if (!_db.PaperLables.Any())
+        if (!_db.PaperLabels.Any())
         {
             _logger.LogInformation("Started to Seed PaperLabels.");
 
             string paperLabelData = await File.ReadAllTextAsync(path + "/Examination/paperLabel.json", cancellationToken);
-            var paperLabels = _serializerService.Deserialize<List<PaperLable>>(paperLabelData);
+            var paperLabels = _serializerService.Deserialize<List<PaperLabel>>(paperLabelData);
 
-            await _db.PaperLables.AddRangeAsync(paperLabels, cancellationToken);
+            await _db.PaperLabels.AddRangeAsync(paperLabels, cancellationToken);
 
             await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded PaperLabels.");
