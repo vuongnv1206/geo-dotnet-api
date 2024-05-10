@@ -36,11 +36,21 @@ public class PaperFolderPermissionConfig : IEntityTypeConfiguration<PaperFolderP
     }
 }
 
-public class PaperLabelConfig : IEntityTypeConfiguration<PaperLable>
+public class PaperLabelConfig : IEntityTypeConfiguration<PaperLabel>
 {
-    public void Configure(EntityTypeBuilder<PaperLable> builder)
+    public void Configure(EntityTypeBuilder<PaperLabel> builder)
     {
         builder.IsMultiTenant();
         builder.ToTable("PaperLabels", SchemaNames.Examination);
+    }
+}
+
+public class PaperQuestionConfig : IEntityTypeConfiguration<PaperQuestion>
+{
+    public void Configure(EntityTypeBuilder<PaperQuestion> builder)
+    {
+        builder.IsMultiTenant();
+        builder.HasKey(tig => new { tig.PaperId, tig.QuestionId });
+        builder.ToTable("PaperQuestions", SchemaNames.Examination);
     }
 }

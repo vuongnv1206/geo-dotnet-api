@@ -17,11 +17,11 @@ public class RemovePaperLabelRequest : IRequest<Guid>
 
 public class RemovePaperLabelRequestHandler : IRequestHandler<RemovePaperLabelRequest, Guid>
 {
-    private readonly IRepositoryWithEvents<PaperLable> _repo;
+    private readonly IRepositoryWithEvents<PaperLabel> _repo;
     private readonly IStringLocalizer _t;
 
     public RemovePaperLabelRequestHandler(
-        IRepositoryWithEvents<PaperLable> repo,
+        IRepositoryWithEvents<PaperLabel> repo,
         IStringLocalizer<RemovePaperLabelRequestHandler> t)
     {
         _repo = repo;

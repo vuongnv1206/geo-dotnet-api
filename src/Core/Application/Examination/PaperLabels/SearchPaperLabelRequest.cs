@@ -8,9 +8,9 @@ public class SearchPaperLabelRequest : PaginationFilter, IRequest<PaginationResp
 
 public class SearchPaperLabelRequestHandler : IRequestHandler<SearchPaperLabelRequest, PaginationResponse<PaperLabelDto>>
 {
-    private readonly IReadRepository<PaperLable> _repository;
+    private readonly IReadRepository<PaperLabel> _repository;
 
-    public SearchPaperLabelRequestHandler(IReadRepository<PaperLable> repository) => _repository = repository;
+    public SearchPaperLabelRequestHandler(IReadRepository<PaperLabel> repository) => _repository = repository;
 
     public async Task<PaginationResponse<PaperLabelDto>> Handle(SearchPaperLabelRequest request, CancellationToken cancellationToken)
     {

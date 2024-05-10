@@ -9,23 +9,23 @@ public class UpdatePaperLabelRequest : IRequest<Guid>
 }
 public class UpdatePaperLabelRequestValidator : CustomValidator<UpdatePaperLabelRequest>
 {
-    public UpdatePaperLabelRequestValidator(IRepository<PaperLable> repository, IStringLocalizer<UpdatePaperLabelRequestValidator> T) =>
+    public UpdatePaperLabelRequestValidator(IRepository<PaperLabel> repository, IStringLocalizer<UpdatePaperLabelRequestValidator> T) =>
         RuleFor(p => p.Name)
             .NotEmpty()
             .MaximumLength(75)
             .MustAsync(async (label, name, ct) =>
                     await repository.FirstOrDefaultAsync(new PaperLabelByNameSpec(name), ct)
-                        is not PaperLable existingLabel || existingLabel.Id == label.Id)
+                        is not PaperLabel existingLabel || existingLabel.Id == label.Id)
                 .WithMessage((_, name) => T["PaperLabel {0} already Exists.", name]);
 }
 
 public class UpdatePaperLabelRequestHandler : IRequestHandler<UpdatePaperLabelRequest, Guid>
 {
     // Add Domain Events automatically by using IRepositoryWithEvents
-    private readonly IRepositoryWithEvents<PaperLable> _repository;
+    private readonly IRepositoryWithEvents<PaperLabel> _repository;
     private readonly IStringLocalizer _t;
 
-    public UpdatePaperLabelRequestHandler(IRepositoryWithEvents<PaperLable> repository, IStringLocalizer<UpdatePaperLabelRequestHandler> localizer) =>
+    public UpdatePaperLabelRequestHandler(IRepositoryWithEvents<PaperLabel> repository, IStringLocalizer<UpdatePaperLabelRequestHandler> localizer) =>
         (_repository, _t) = (repository, localizer);
 
     public async Task<Guid> Handle(UpdatePaperLabelRequest request, CancellationToken cancellationToken)

@@ -23,7 +23,8 @@ public class Paper : AuditableEntity, IAggregateRoot
     public Guid? PaperFolderId { get; set; }
     public bool IsPublish{ get; set; }
     public string ExamCode { get; set; } = null!;
-
-    public virtual PaperLable? PaperLable { get; set; }
+    public string? Content { get; set; }
+    public string? Description { get; set; }
+    public virtual PaperLabel? PaperLable { get; set; }
     public virtual PaperFolder? PaperFolder { get; set; }
 }
