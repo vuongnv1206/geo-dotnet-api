@@ -1,17 +1,16 @@
-﻿using FSH.WebApi.Application.Examination.PaperFolders;
-using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Domain.Examination;
 
-namespace FSH.WebApi.Application.Examination;
-public class DeletePaperFolderRequest : IRequest<Guid>
+namespace FSH.WebApi.Application.Examination.PaperFolders;
+public class DeletePaperFolderRequest : IRequest<DefaultIdType>
 {
-    public Guid Id { get; set; }
-    public DeletePaperFolderRequest(Guid id)
+    public DefaultIdType Id { get; set; }
+    public DeletePaperFolderRequest(DefaultIdType id)
     {
         Id = id;
     }
 }
 
-public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolderRequest, Guid>
+public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolderRequest, DefaultIdType>
 {
     private readonly IRepository<PaperFolder> _repository;
     private readonly IStringLocalizer _t;
@@ -23,7 +22,7 @@ public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolder
         _currentUser = currentUser;
     }
 
-    public async Task<Guid> Handle(DeletePaperFolderRequest request, CancellationToken cancellationToken)
+    public async Task<DefaultIdType> Handle(DeletePaperFolderRequest request, CancellationToken cancellationToken)
     {
         var paperFolder = await _repository.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.Id), cancellationToken);
         _ = paperFolder ?? throw new NotFoundException(_t["PaperFolder {0} Not Found."]);
@@ -40,7 +39,7 @@ public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolder
         return request.Id;
     }
 
-    private async Task DeleteChildrenPaperFolders(Guid parentId, CancellationToken cancellationToken)
+    private async Task DeleteChildrenPaperFolders(DefaultIdType parentId, CancellationToken cancellationToken)
     {
         var childrenFolders = await _repository.ListAsync(new PaperFolderByParentIdSpec(parentId), cancellationToken);
 

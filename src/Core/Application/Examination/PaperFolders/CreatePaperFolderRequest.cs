@@ -1,13 +1,12 @@
 ﻿using FSH.WebApi.Application.Common.Models;
-using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
-namespace FSH.WebApi.Application.Examination;
-public class CreatePaperFolderRequest : IRequest<Guid>
+namespace FSH.WebApi.Application.Examination.PaperFolders;
+public class CreatePaperFolderRequest : IRequest<DefaultIdType>
 {
     public string Name { get; set; }
-    public Guid? ParentId { get; set; }
-    public Guid? SubjectId { get; set; }
+    public DefaultIdType? ParentId { get; set; }
+    public DefaultIdType? SubjectId { get; set; }
 }
 
 public class CreatePaperFolderRequestValidator : CustomValidator<CreatePaperFolderRequest>
@@ -20,7 +19,7 @@ public class CreatePaperFolderRequestValidator : CustomValidator<CreatePaperFold
                 .WithMessage((_, name) => T["PaperFolder {0} already Exists.", name]);
 }
 
-public class CreatePaperFolderRequestHandler : IRequestHandler<CreatePaperFolderRequest, Guid>
+public class CreatePaperFolderRequestHandler : IRequestHandler<CreatePaperFolderRequest, DefaultIdType>
 {
     private readonly IRepository<PaperFolder> _repository;
     private readonly IStringLocalizer _t;
