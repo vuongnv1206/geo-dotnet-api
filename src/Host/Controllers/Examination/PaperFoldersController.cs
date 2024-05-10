@@ -35,4 +35,14 @@ public class PaperFoldersController : VersionedApiController
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }
+
+    [HttpPost("{id:guid}/share-paper-folder")]
+    [OpenApiOperation("Share paper folder.")]
+    public async Task<ActionResult<Guid>> ShareFolder(Guid id, SharePaperFolderRequest request)
+    {
+        return id != request.FolderId
+            ? BadRequest()
+            : Ok(await Mediator.Send(request));
+    }
+
 }

@@ -30,6 +30,12 @@ public class UpdatePaperFolderRequestHandler : IRequestHandler<UpdatePaperFolder
         var folder = await _paperFolderRepo.GetByIdAsync(request.Id);
         _ = folder ?? throw new NotFoundException(_t["Paper Folder {0} Not Found.", request.Id]);
 
+        var userId = _currentUser.GetUserId();
+        if (!folder.CanUpdate(userId))
+        {
+            throw new ForbiddenException(_t["You do not have permission to edit this folder."]);
+        }
+
         var updatedFolder = folder.Update(request.Name, request.ParentId, request.SubjectId);
 
         await _paperFolderRepo.UpdateAsync(updatedFolder);

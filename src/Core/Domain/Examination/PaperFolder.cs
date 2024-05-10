@@ -15,8 +15,8 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
     //public virtual Subject Subject { get; set; }
     [ForeignKey(nameof(ParentId))]
     public virtual PaperFolder? PaperFolderParent { get; set; }
-    public virtual IEnumerable<PaperFolder>? PaperFolderChildrens { get; set; }
-    public virtual IList<PaperFolderPermission> PaperFolderPermissions { get; set; }
+    public virtual List<PaperFolder>? PaperFolderChildrens { get; set; } = new();
+    public virtual List<PaperFolderPermission> PaperFolderPermissions { get; set; } = new();
 
     public PaperFolder(string name, Guid? parentId, Guid? subjectId)
     {
@@ -24,7 +24,7 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
         ParentId = parentId;
         SubjectId = subjectId;
     }
-    
+
     public PaperFolder Update(string name, Guid? parentId, Guid? subjectId)
     {
         Name = name;
@@ -69,8 +69,8 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
 
         foreach (var permission in paperFolderParent.PaperFolderPermissions)
         {
-            AddPermission(new PaperFolderPermission(permission.UserId, Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
-            AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, true, true, true, true));
+            AddPermission(new PaperFolderPermission(permission.UserId, Id, permission.GroupTeacherId, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
+            AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true));
         }
     }
 }
