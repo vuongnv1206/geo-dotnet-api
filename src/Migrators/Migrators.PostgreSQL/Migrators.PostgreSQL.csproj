@@ -15,4 +15,7 @@
     <ItemGroup>
         <Folder Include="Migrations\Application\" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Migrations\Application\" />
+    </ItemGroup>
 </Project>

@@ -1,3 +1,8 @@
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Infrastructure.Auth;
@@ -9,16 +14,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+using Newtonsoft.Json;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
 internal class TokenService : ITokenService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly IStringLocalizer _t;
     private readonly SecuritySettings _securitySettings;
     private readonly JwtSettings _jwtSettings;
@@ -26,12 +29,14 @@ internal class TokenService : ITokenService
 
     public TokenService(
         UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager,
         IOptions<JwtSettings> jwtSettings,
         IStringLocalizer<TokenService> localizer,
         FSHTenantInfo? currentTenant,
         IOptions<SecuritySettings> securitySettings)
     {
         _userManager = userManager;
+        _roleManager = roleManager;
         _t = localizer;
         _jwtSettings = jwtSettings.Value;
         _currentTenant = currentTenant;
@@ -106,8 +111,22 @@ internal class TokenService : ITokenService
     private string GenerateJwt(ApplicationUser user, string ipAddress) =>
         GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress));
 
-    private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress) =>
-        new List<Claim>
+    private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress)
+    {
+        var roles = _userManager.GetRolesAsync(user).Result;
+
+        var roleClaims = new List<Claim>();
+        foreach (string role in roles)
+        {
+            var applicationRole = _roleManager.FindByNameAsync(role).Result;
+            if (applicationRole is not null)
+            {
+                var roleC = _roleManager.GetClaimsAsync(applicationRole).Result;
+                roleClaims.AddRange(roleC);
+            }
+        }
+
+        var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id),
             new(ClaimTypes.Email, user.Email!),
@@ -117,8 +136,14 @@ internal class TokenService : ITokenService
             new(FSHClaims.IpAddress, ipAddress),
             new(FSHClaims.Tenant, _currentTenant!.Id),
             new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
-            new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
+            new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
+            new(ClaimTypes.Role, string.Join(',', roles)),
         };
+
+        claims.AddRange(roleClaims);
+
+        return claims;
+    }
 
     private static string GenerateRefreshToken()
     {

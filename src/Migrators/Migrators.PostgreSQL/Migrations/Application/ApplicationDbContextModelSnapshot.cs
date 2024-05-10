@@ -628,6 +628,175 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Brand");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Classes", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.GroupClass", "GroupClass")
+                        .WithMany()
+                        .HasForeignKey("GroupClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroupClass");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classes")
+                        .WithMany()
+                        .HasForeignKey("ClassesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Classes");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.NewsReaction", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.News", "News")
+                        .WithMany()
+                        .HasForeignKey("NewsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("News");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserClass", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classes")
+                        .WithMany()
+                        .HasForeignKey("ClassesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Classes");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperFolder", "PaperFolder")
+                        .WithMany()
+                        .HasForeignKey("PaperFolderId");
+
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperLable", "PaperLable")
+                        .WithMany()
+                        .HasForeignKey("PaperLableId");
+
+                    b.Navigation("PaperFolder");
+
+                    b.Navigation("PaperLable");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolder", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperFolder", "PaperFolderParent")
+                        .WithMany("PaperFolderChildrens")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("PaperFolderParent");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolderPermission", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperFolder", "PaperFolder")
+                        .WithMany("PaperFolderPermissions")
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
+                        .WithMany()
+                        .HasForeignKey("GroupTeacherId");
+
+                    b.Navigation("GroupTeacher");
+
+                    b.Navigation("PaperFolder");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.Answer", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Parent")
+                        .WithMany("QuestionPassages")
+                        .HasForeignKey("ParentId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
+                        .WithMany()
+                        .HasForeignKey("QuestionFolderId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionLable", "QuestionLable")
+                        .WithMany()
+                        .HasForeignKey("QuestionLableId");
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("QuestionFolder");
+
+                    b.Navigation("QuestionLable");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolderPermission", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
+                        .WithMany("Permissions")
+                        .HasForeignKey("QuestionFolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("QuestionFolder");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupPermissionInClass", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
+                        .WithMany("GroupPermissionInClasses")
+                        .HasForeignKey("GroupTeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroupTeacher");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherInGroup", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
+                        .WithMany("TeacherInGroups")
+                        .HasForeignKey("GroupTeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroupTeacher");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherPermissionInClass", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.TeacherTeam", "TeacherTeam")
+                        .WithMany("TeacherPermissionInClasses")
+                        .HasForeignKey("TeacherTeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeacherTeam");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
                     b.HasOne("FSH.WebApi.Infrastructure.Identity.ApplicationRole", null)
@@ -677,6 +846,39 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolder", b =>
+                {
+                    b.Navigation("PaperFolderChildrens");
+
+                    b.Navigation("PaperFolderPermissions");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
+                {
+                    b.Navigation("Answers");
+
+                    b.Navigation("QuestionPassages");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("Permissions");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", b =>
+                {
+                    b.Navigation("GroupPermissionInClasses");
+
+                    b.Navigation("TeacherInGroups");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherTeam", b =>
+                {
+                    b.Navigation("TeacherPermissionInClasses");
                 });
 #pragma warning restore 612, 618
         }

@@ -30,6 +30,8 @@ public static class FSHResource
     public const string GroupTeachers = nameof(GroupTeachers);
     public const string Assignments = nameof(Assignments);
     public const string Subjects = nameof(Subjects);
+    public const string Classes = nameof(Classes);
+    public const string GroupClasses = nameof(GroupClasses);
 }
 
 public static class FSHPermissions
@@ -97,7 +99,21 @@ public static class FSHPermissions
         new("Search Subjects", FSHAction.Search, FSHResource.Subjects, IsBasic: true),
         new("Create Subjects", FSHAction.Create, FSHResource.Subjects),
         new("Update Subjects", FSHAction.Update, FSHResource.Subjects),
-        new("Delete Subjects", FSHAction.Delete, FSHResource.Subjects)
+        new("Delete Subjects", FSHAction.Delete, FSHResource.Subjects),
+        new("View Classes", FSHAction.View, FSHResource.Classes, IsBasic: true),
+        new("Search Classes", FSHAction.Search, FSHResource.Classes, IsBasic: true),
+        new("Create Classes", FSHAction.Create, FSHResource.Classes),
+        new("Update Classes", FSHAction.Update, FSHResource.Classes),
+        new("Delete Classes", FSHAction.Delete, FSHResource.Classes),
+        new("View GroupClasses", FSHAction.View, FSHResource.GroupClasses, IsBasic: true),
+        new("Search GroupClasses", FSHAction.Search, FSHResource.GroupClasses, IsBasic: true),
+        new("Create GroupClasses", FSHAction.Create, FSHResource.GroupClasses),
+        new("Update GroupClasses", FSHAction.Update, FSHResource.GroupClasses),
+        new("Delete GroupClasses", FSHAction.Delete, FSHResource.GroupClasses),
+        new("View QuestionFolders", FSHAction.View, FSHResource.QuestionFolders),
+        new("Create QuestionFolders", FSHAction.Create, FSHResource.QuestionFolders),
+        new("Update QuestionFolders", FSHAction.Update, FSHResource.QuestionFolders),
+        new("Delete QuestionFolders", FSHAction.Delete, FSHResource.QuestionFolders),
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);

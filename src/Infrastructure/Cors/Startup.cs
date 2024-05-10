@@ -20,6 +20,8 @@ internal static class Startup
             origins.AddRange(corsSettings.Blazor.Split(';', StringSplitOptions.RemoveEmptyEntries));
         if (corsSettings.React is not null)
             origins.AddRange(corsSettings.React.Split(';', StringSplitOptions.RemoveEmptyEntries));
+        if (corsSettings.Vue is not null)
+            origins.AddRange(corsSettings.Vue.Split(';', StringSplitOptions.RemoveEmptyEntries));
 
         return services.AddCors(opt =>
             opt.AddPolicy(CorsPolicy, policy =>
