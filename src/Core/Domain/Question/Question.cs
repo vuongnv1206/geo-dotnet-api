@@ -14,6 +14,6 @@ public class Question : AuditableEntity, IAggregateRoot
     public virtual QuestionLable? QuestionLable { get; set; }
     public Guid? ParentId { get; set; }
     public virtual Question? Parent { get; set; }
-    public virtual List<Question> Passages { get; set; } = new();
+    public virtual List<Question> QuestionPassages { get; set; } = new();
     public virtual List<Answer> Answers { get; set; } = new();
 }

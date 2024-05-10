@@ -12,8 +12,7 @@ public enum QuestionType
     FillBlank = 4,
     Matching = 5,
     Reading = 6,
-    ReadingPassage = 7,
-    Listening = 8,
-    Writing = 9,
+    ReadingQuestionPassage = 7,
+    Writing = 8,
     Other = 100
 }
