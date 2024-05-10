@@ -22,7 +22,7 @@ public class PaperLabelsController : VersionedApiController
 
 
     [HttpPost]
-    [OpenApiOperation("")]
+    [OpenApiOperation("Create paper label")]
     public Task<Guid> CreateAsync(CreatePaperLabelRequest request)
     {
         return Mediator.Send(request);
@@ -39,8 +39,8 @@ public class PaperLabelsController : VersionedApiController
 
     [HttpDelete("{id:guid}")]
     [OpenApiOperation("")]
-    public Task RemoveAsync(RemovePaperLabelRequest request)
+    public Task RemoveAsync(Guid id)
     {
-        return Mediator.Send(request);
+        return Mediator.Send(new RemovePaperLabelRequest(id));
     }
 }

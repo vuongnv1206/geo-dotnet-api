@@ -9,5 +9,9 @@ public class PaperLable : AuditableEntity, IAggregateRoot
         if (name is not null && Name?.Equals(name) is not true) Name = name;
         return this;
     }
+    public PaperLable(string name)
+    {
+        Name = name;
+    }
 }
 
