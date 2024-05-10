@@ -28,6 +28,12 @@ public class MapsterSettings
             .Map(dest => dest.Permission, src => src.Permissions)
             .Map(dest => dest.Children, src => src.Children);
 
+        // Map Question to QuestionDto
+        TypeAdapterConfig<Domain.Question.Question, QuestionDto>.NewConfig()
+            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+            .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
+            .Map(dest => dest.Answers, src => src.Answers);
+
         TypeAdapterConfig<TeacherTeam, TeacherTeamDto>.NewConfig()
             .Map(dest => dest.TeacherPermissionInClassDto, src => src.TeacherPermissionInClasses);
 
