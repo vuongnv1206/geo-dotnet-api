@@ -40,10 +40,6 @@ public class NewsConfig : IEntityTypeConfiguration<News>
     {
         builder.ToTable("News", SchemaNames.Classes).IsMultiTenant();
 
-        builder.Property(b => b.ClassId).HasMaxLength(256);
-        builder.Property(b => b.Content).HasMaxLength(2048);
-        builder.Property(b => b.IsLockCommnet).HasMaxLength(20);
-        builder.Property(b => b.ParentId).HasMaxLength(256);
     }
 }
 
@@ -51,7 +47,6 @@ public class NewsReactionConfig : IEntityTypeConfiguration<NewsReaction>
 {
     public void Configure(EntityTypeBuilder<NewsReaction> builder)
     {
-
         builder.IsMultiTenant();
         builder.HasKey(b => new { b.UserId, b.NewsId });
         builder.ToTable("NewsReactions", SchemaNames.Classes);
@@ -63,9 +58,8 @@ public class UserClassConfig : IEntityTypeConfiguration<UserClass>
     public void Configure(EntityTypeBuilder<UserClass> builder)
     {
         builder.IsMultiTenant();
-        builder.HasKey(b => new { b.UserId, b.ClassId });
+        builder.HasKey(b => new { b.UserId, b.ClassesId });
         builder.Property(b => b.Email).HasMaxLength(256);
-        builder.Property(b => b.IsGender).HasMaxLength(20);
         builder.Property(b => b.StudentCode).HasMaxLength(256);
         builder.Property(b => b.PhoneNumber).HasMaxLength(256);
         builder.ToTable("UserClasses", SchemaNames.Classes);

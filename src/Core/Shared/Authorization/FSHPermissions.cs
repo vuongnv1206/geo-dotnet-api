@@ -30,6 +30,8 @@ public static class FSHResource
     public const string GroupClasses = nameof(GroupClasses);
     public const string QuestionFolders = nameof(QuestionFolders);
     public const string GroupTeachers = nameof(GroupTeachers);
+    public const string News = nameof(News);
+    public const string NewsReaction = nameof(NewsReaction);
 }
 
 public static class FSHPermissions
@@ -87,6 +89,17 @@ public static class FSHPermissions
         new("Update GroupClasses", FSHAction.Update, FSHResource.GroupClasses),
         new("Delete GroupClasses", FSHAction.Delete, FSHResource.GroupClasses),
         new("View QuestionFolders", FSHAction.View, FSHResource.QuestionFolders),
+        new("View News", FSHAction.View, FSHResource.News, IsBasic: true),
+        new("Search News", FSHAction.Search, FSHResource.News, IsBasic: true),
+        new("Create News", FSHAction.Create, FSHResource.News),
+        new("Update News", FSHAction.Update, FSHResource.News),
+        new("Delete News", FSHAction.Delete, FSHResource.News),
+
+        new("View NewsReaction", FSHAction.View, FSHResource.NewsReaction, IsBasic: true),
+        new("Search NewsReaction", FSHAction.Search, FSHResource.NewsReaction, IsBasic: true),
+        new("Create NewsReaction", FSHAction.Create, FSHResource.NewsReaction),
+        new("Update NewsReaction", FSHAction.Update, FSHResource.NewsReaction),
+        new("Delete NewsReaction", FSHAction.Delete, FSHResource.NewsReaction),
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);

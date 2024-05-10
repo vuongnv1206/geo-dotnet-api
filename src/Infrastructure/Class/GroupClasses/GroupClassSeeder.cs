@@ -2,6 +2,7 @@
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,53 @@ public class GroupClassSeeder : ICustomSeeder
 
             await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded GroupClasses.");
+        }
+
+        var adminUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "admin@root.com", cancellationToken);
+        var basicUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "basic@root.com", cancellationToken);
+        var adminGuid = Guid.Parse(adminUser.Id);
+        var basicGuid = Guid.Parse(basicUser.Id);
+
+        if (!_db.Classes.Any())
+        {
+            _logger.LogInformation("Started to Seed Classes.");
+
+            var groupClasses = await _db.GroupClasses.ToListAsync(cancellationToken);
+
+            foreach (var gc in groupClasses)
+            {
+                await _db.Classes.AddAsync(new Classes("Se1600", "2024", basicGuid, gc.Id));
+            }
+            await _db.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Seeded Class.");
+        }
+
+        if (!_db.News.Any())
+        {
+            _logger.LogInformation("Started to Seed News.");
+
+            var classes = await _db.Classes.ToListAsync(cancellationToken);
+
+            foreach (var c in classes)
+            {
+                await _db.News.AddAsync(new Domain.Class.News("The news in the class", true, null, c.Id));
+            }
+            await _db.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Seeded News.");
+        }
+
+        if (!_db.NewsReactions.Any())
+        {
+            _logger.LogInformation("Started to Seed NewsReaction.");
+
+            var news = await _db.News.ToListAsync(cancellationToken);
+
+            foreach (var n in news)
+            {
+                await _db.NewsReactions.AddAsync(new NewsReaction(adminGuid, n.Id));
+            }
+            await _db.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Seeded NewsReaction.");
         }
     }
 }
