@@ -1,14 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Migrators.PostgreSQL.Migrations.Application
 {
-    public partial class InitialMigration : Migration
+    /// <inheritdoc />
+    public partial class AssignmentAndSubjectTable : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "Assignment");
+
             migrationBuilder.EnsureSchema(
                 name: "Auditing");
 
@@ -17,6 +23,39 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.EnsureSchema(
                 name: "Identity");
+
+            migrationBuilder.EnsureSchema(
+                name: "Subject");
+
+            migrationBuilder.CreateTable(
+                name: "AssignmentClass",
+                schema: "Assignment",
+                columns: table => new
+                {
+                    AssignmentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssignmentClass", x => new { x.AssignmentId, x.ClassId });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AssignmentStudent",
+                schema: "Assignment",
+                columns: table => new
+                {
+                    AssignmentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AttachmentPath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    Score = table.Column<string>(type: "text", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssignmentStudent", x => new { x.AssignmentId, x.StudentId });
+                });
 
             migrationBuilder.CreateTable(
                 name: "AuditTrails",
@@ -75,6 +114,27 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Subject",
+                schema: "Subject",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subject", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -164,6 +224,40 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         column: x => x.RoleId,
                         principalSchema: "Identity",
                         principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Assignment",
+                schema: "Assignment",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    AttachmentPath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    CanViewResult = table.Column<bool>(type: "boolean", nullable: false),
+                    RequireLoginToSubmit = table.Column<bool>(type: "boolean", nullable: false),
+                    SubjectId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Assignment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Assignment_Subject_SubjectId",
+                        column: x => x.SubjectId,
+                        principalSchema: "Subject",
+                        principalTable: "Subject",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -268,6 +362,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Assignment_SubjectId",
+                schema: "Assignment",
+                table: "Assignment",
+                column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_BrandId",
                 schema: "Catalog",
                 table: "Products",
@@ -325,8 +425,21 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 unique: true);
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Assignment",
+                schema: "Assignment");
+
+            migrationBuilder.DropTable(
+                name: "AssignmentClass",
+                schema: "Assignment");
+
+            migrationBuilder.DropTable(
+                name: "AssignmentStudent",
+                schema: "Assignment");
+
             migrationBuilder.DropTable(
                 name: "AuditTrails",
                 schema: "Auditing");
@@ -354,6 +467,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
             migrationBuilder.DropTable(
                 name: "UserTokens",
                 schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Subject",
+                schema: "Subject");
 
             migrationBuilder.DropTable(
                 name: "Brands",

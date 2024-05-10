@@ -2,8 +2,8 @@ using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Assignment;
-using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Subjects;
+using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -17,11 +17,10 @@ public class ApplicationDbContext : BaseDbContext
     {
     }
 
-
     public DbSet<Assignment> Assignments => Set<Assignment>();
     public DbSet<AssignmentStudent> AssignmentStudent => Set<AssignmentStudent>();
     public DbSet<AssignmentClass> AssignmentClass => Set<AssignmentClass>();
-    public DbSet<Subject> Subject => Set<Subject>();
+    public DbSet<Subject> Subjects => Set<Subject>();
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Brand> Brands => Set<Brand>();

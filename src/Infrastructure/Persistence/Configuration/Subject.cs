@@ -1,7 +1,7 @@
-﻿using FSH.WebApi.Domain.Subjects;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
+﻿using Finbuckle.MultiTenant.EntityFrameworkCore;
+using FSH.WebApi.Domain.Subjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 public class SubjectConfig : IEntityTypeConfiguration<Subject>

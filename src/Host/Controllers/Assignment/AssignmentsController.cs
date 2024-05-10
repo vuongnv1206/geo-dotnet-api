@@ -1,7 +1,5 @@
 ﻿using FSH.WebApi.Application.Assignments;
 using FSH.WebApi.Application.Assignments.Dtos;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.Assignment;
 [Route("api/[controller]")]

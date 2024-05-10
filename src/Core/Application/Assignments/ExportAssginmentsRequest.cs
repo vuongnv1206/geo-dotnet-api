@@ -1,12 +1,4 @@
-﻿using FSH.WebApi.Application.Common.Exporters;
-using FSH.WebApi.Domain.Assignment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FSH.WebApi.Application.Assignments;
+﻿namespace FSH.WebApi.Application.Assignments;
 
 //public class ExportAssignmentsRequest : BaseFilter, IRequest<Stream>
 //{

@@ -1,19 +1,18 @@
-using FSH.WebApi.Application.Common.Interfaces;
+﻿using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
-using FSH.WebApi.Domain.Catalog;
+using FSH.WebApi.Domain.Subjects;
 
-namespace FSH.WebApi.Infrastructure.Catalog;
-
-public class BrandSeeder : ICustomSeeder
+namespace FSH.WebApi.Infrastructure.Subjects;
+public class SubjectSeeder : ICustomSeeder
 {
     private readonly ISerializerService _serializerService;
     private readonly ApplicationDbContext _db;
-    private readonly ILogger<BrandSeeder> _logger;
+    private readonly ILogger<SubjectSeeder> _logger;
 
-    public BrandSeeder(ISerializerService serializerService, ILogger<BrandSeeder> logger, ApplicationDbContext db)
+    public SubjectSeeder(ISerializerService serializerService, ILogger<SubjectSeeder> logger, ApplicationDbContext db)
     {
         _serializerService = serializerService;
         _logger = logger;
@@ -23,25 +22,25 @@ public class BrandSeeder : ICustomSeeder
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
         string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        if (!_db.Brands.Any())
+        if (!_db.Subjects.Any())
         {
-            _logger.LogInformation("Started to Seed Brands.");
+            _logger.LogInformation("Started to Seed Subjects.");
 
             // Here you can use your own logic to populate the database.
             // As an example, I am using a JSON file to populate the database.
-            string brandData = await File.ReadAllTextAsync(path + "/Catalog/brands.json", cancellationToken);
-            var brands = _serializerService.Deserialize<List<Brand>>(brandData);
+            string subjectData = await File.ReadAllTextAsync(path + "/Subjects/subject.json", cancellationToken);
+            var subjects = _serializerService.Deserialize<List<Subject>>(subjectData);
 
-            if (brands != null)
+            if (subjects != null)
             {
-                foreach (var brand in brands)
+                foreach (var subject in subjects)
                 {
-                    await _db.Brands.AddAsync(brand, cancellationToken);
+                    await _db.Subjects.AddAsync(subject, cancellationToken);
                 }
             }
 
             await _db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Seeded Brands.");
+            _logger.LogInformation("Seeded Subjects.");
         }
     }
 }

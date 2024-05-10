@@ -1,11 +1,5 @@
 ﻿using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Domain.Assignment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Assignments;
 
@@ -27,11 +21,11 @@ public class GetAssignmentViaDapperRequestHandler : IRequestHandler<GetAssignmen
     public async Task<AssignmentDto> Handle(GetAssignmentViaDapperRequest request, CancellationToken cancellationToken)
     {
         var assignment = await _repository.QueryFirstOrDefaultAsync<Assignment>(
-            $"SELECT * FROM Catalog.\"Assignments\" WHERE \"Id\"  = '{request.Id}' AND \"TenantId\" = '@tenant'", cancellationToken: cancellationToken);
+            $"SELECT * FROM \"Assignment\".\"Assignment\" WHERE \"Id\"  = '{request.Id}' AND \"TenantId\" = '@tenant'", cancellationToken: cancellationToken);
 
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
 
-        // Using mapster here throws a nullreference exception because of the "BrandName" property
+        // Using mapster here throws a nullreference exception because of the "SubjectName" property
         // in AssignmentDto and the assignment not having a Brand assigned.
         return new AssignmentDto
         {
@@ -43,7 +37,7 @@ public class GetAssignmentViaDapperRequestHandler : IRequestHandler<GetAssignmen
             Content = assignment.Content,
             CanViewResult = assignment.CanViewResult,
             RequireLoginToSubmit = assignment.RequireLoginToSubmit,
-            SubjectId = assignment.SubjectId,
+            SubjectId = (DefaultIdType)assignment.SubjectId,
             SubjectName = string.Empty
         };
     }

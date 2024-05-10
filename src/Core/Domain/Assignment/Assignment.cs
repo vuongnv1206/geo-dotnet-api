@@ -4,21 +4,21 @@ namespace FSH.WebApi.Domain.Assignment;
 public class Assignment : AuditableEntity, IAggregateRoot
 {
 
-    public string Name { get; private set; } = default!;
-    public DateTime? StartTime { get; private set; }
-    public DateTime? EndTime { get; private set; }
-    public string? AttachmentPath { get; private set; }
-    public string? Content { get; private set; }
-    public bool CanViewResult { get; private set; }
-    public bool RequireLoginToSubmit { get; private set; }
-    public Guid SubjectId { get; private set; }
-    public virtual Subject Subject { get; private set; } = default!;
+    public string Name { get; set; } = default!;
+    public DateTime? StartTime { get; set; }
+    public DateTime? EndTime { get; set; }
+    public string? AttachmentPath { get; set; }
+    public string? Content { get; set; }
+    public bool CanViewResult { get; set; }
+    public bool RequireLoginToSubmit { get; set; }
+    public Guid? SubjectId { get; set; }
+    public virtual Subject Subject { get; set; } = default!;
 
     public Assignment()
     {
 
     }
-    public Assignment(string name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool canViewResult, bool requireLoginToSubmit, DefaultIdType subjectId)
+    public Assignment(string name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool canViewResult, bool requireLoginToSubmit, Guid subjectId)
     {
         Name = name;
         StartTime = startTime;

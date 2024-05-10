@@ -4,14 +4,14 @@ using FSH.WebApi.Domain.Common.Events;
 namespace FSH.WebApi.Application.Assignments;
 public class CreateAssignmentRequest : IRequest<Guid>
 {
-    public string Name { get; private set; } = default!;
-    public DateTime? StartTime { get; private set; }
-    public DateTime? EndTime { get; private set; }
-    public string? Content { get; private set; }
-    public bool CanViewResult { get; private set; }
-    public bool RequireLoginToSubmit { get; private set; }
-    public Guid SubjectId { get; private set; }
-    public FileUploadRequest? Image { get; set; }
+    public string Name { get; set; } = default!;
+    public DateTime? StartTime { get; set; }
+    public DateTime? EndTime { get; set; }
+    public string? Content { get; set; }
+    public bool CanViewResult { get; set; }
+    public bool RequireLoginToSubmit { get; set; }
+    public Guid SubjectId { get; set; }
+    public FileUploadRequest? Attachment { get; set; }
 }
 
 public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRequest, Guid>
@@ -24,9 +24,9 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
 
     public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
     {
-        string productImagePath = await _file.UploadAsync<Assignment>(request.Image, FileType.Image, cancellationToken);
+        string productAttachmentPath = await _file.UploadAsync<Assignment>(request.Attachment, FileType.Image, cancellationToken);
 
-        var assignment = new Assignment(request.Name, request.StartTime, request.EndTime, productImagePath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
+        var assignment = new Assignment(request.Name, request.StartTime, request.EndTime, productAttachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
 
         // Add Domain Events to be raised after the commit
         assignment.DomainEvents.Add(EntityCreatedEvent.WithEntity(assignment));

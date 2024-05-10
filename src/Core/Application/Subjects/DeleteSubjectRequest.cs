@@ -1,11 +1,6 @@
 ﻿using FSH.WebApi.Application.Assignments;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Subjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Subjects;
 public class DeleteSubjectRequest : IRequest<Guid>
