@@ -12,7 +12,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public PaperStatus Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public Guid PaperLabelId { get; set; }
+    public Guid? PaperLabelId { get; set; }
     public int NumberOfQuestion { get; set; }
     public int? Duration { get; set; }
     public bool Shuffle { get; set; }
@@ -24,6 +24,6 @@ public class Paper : AuditableEntity, IAggregateRoot
     public bool IsPublish{ get; set; }
     public string ExamCode { get; set; } = null!;
 
-    public virtual PaperLable PaperLable { get; set; }
+    public virtual PaperLable? PaperLable { get; set; }
     public virtual PaperFolder? PaperFolder { get; set; }
 }

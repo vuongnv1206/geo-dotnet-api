@@ -26,8 +26,10 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<News> News => Set<News>();
     public DbSet<UserClass> UserClasses => Set<UserClass>();
     public DbSet<NewsReaction> NewsReactions => Set<NewsReaction>();
-
     public DbSet<QuestionFolder> QuestionFolders => Set<QuestionFolder>();
+    public DbSet<Domain.Question.Question> Questions => Set<Domain.Question.Question>();
+    public DbSet<QuestionLable> QuestionLables => Set<QuestionLable>();
+    public DbSet<Answer> Answers => Set<Answer>();
     public DbSet<QuestionFolderPermission> QuestionFolderPermissions => Set<QuestionFolderPermission>();
     public DbSet<TeacherInGroup> TeacherInGroups { get; set; }
     public DbSet<GroupTeacher> GroupTeachers { get; set; }
@@ -42,6 +44,5 @@ public class ApplicationDbContext : BaseDbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema(SchemaNames.Catalog);
-
     }
 }

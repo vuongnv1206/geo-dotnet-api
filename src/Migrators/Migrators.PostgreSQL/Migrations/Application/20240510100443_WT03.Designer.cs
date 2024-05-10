@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240507152011_WT02")]
-    partial class WT02
+    [Migration("20240510100443_WT03")]
+    partial class WT03
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -389,6 +389,355 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExamCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExamName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsPublish")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("NumberOfQuestion")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("PaperFolderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("PaperLabelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("PaperLableId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("ShowMarkResult")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ShowQuestionAnswer")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("Shuffle")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaperFolderId");
+
+                    b.HasIndex("PaperLableId");
+
+                    b.ToTable("Papers", "Examination");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SubjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("PaperFolders", "Examination");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolderPermission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("CanAdd")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanDelete")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanUpdate")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanView")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FolderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("GroupTeacherId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FolderId");
+
+                    b.HasIndex("GroupTeacherId");
+
+                    b.ToTable("PaperFolderPermissions", "Examination");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperLable", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaperLabels", "Examination");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.Answer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("Answers", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Audio")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionFolderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionLableId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("QuestionType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("QuestionFolderId");
+
+                    b.HasIndex("QuestionLableId");
+
+                    b.ToTable("Questions", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
                 {
                     b.Property<Guid>("Id")
@@ -488,6 +837,93 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionLable", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("QuestionLabels", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupPermissionInClass", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClassId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("GroupTeacherId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PermissionType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupTeacherId");
+
+                    b.ToTable("GroupPermissionInClasses", "GroupTeacher");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", b =>
                 {
                     b.Property<Guid>("Id")
@@ -531,7 +967,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherInGroup", b =>
                 {
-                    b.Property<Guid>("TeacherId")
+                    b.Property<Guid>("TeacherTeamId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("GroupTeacherId")
@@ -542,7 +978,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.HasKey("TeacherId", "GroupTeacherId");
+                    b.HasKey("TeacherTeamId", "GroupTeacherId");
 
                     b.HasIndex("GroupTeacherId");
 
@@ -551,26 +987,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherPermission", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherPermissionInClass", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<bool>("CanAssignExamination")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("CanManagementStudent")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("CanMarking")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
 
                     b.Property<Guid>("ClassId")
                         .HasColumnType("uuid");
@@ -593,7 +1014,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("TeacherId")
+                    b.Property<int>("PermissionType")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TeacherTeamId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("TenantId")
@@ -603,7 +1027,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.ToTable("TeacherPermissions", "GroupTeacher");
+                    b.HasIndex("TeacherTeamId");
+
+                    b.ToTable("TeacherPermissionInClasses", "GroupTeacher");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -1042,6 +1468,77 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Classes");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperFolder", "PaperFolder")
+                        .WithMany()
+                        .HasForeignKey("PaperFolderId");
+
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperLable", "PaperLable")
+                        .WithMany()
+                        .HasForeignKey("PaperLableId");
+
+                    b.Navigation("PaperFolder");
+
+                    b.Navigation("PaperLable");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolder", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperFolder", "PaperFolderParent")
+                        .WithMany("PaperFolderChildrens")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("PaperFolderParent");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolderPermission", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperFolder", "PaperFolder")
+                        .WithMany("PaperFolderPermissions")
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
+                        .WithMany()
+                        .HasForeignKey("GroupTeacherId");
+
+                    b.Navigation("GroupTeacher");
+
+                    b.Navigation("PaperFolder");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.Answer", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Parent")
+                        .WithMany("Passages")
+                        .HasForeignKey("ParentId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
+                        .WithMany()
+                        .HasForeignKey("QuestionFolderId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionLable", "QuestionLable")
+                        .WithMany()
+                        .HasForeignKey("QuestionLableId");
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("QuestionFolder");
+
+                    b.Navigation("QuestionLable");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "Parent")
@@ -1063,6 +1560,17 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("QuestionFolder");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupPermissionInClass", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
+                        .WithMany("GroupPermissionInClasses")
+                        .HasForeignKey("GroupTeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroupTeacher");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherInGroup", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
@@ -1072,6 +1580,17 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired();
 
                     b.Navigation("GroupTeacher");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherPermissionInClass", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.TeacherTeam", "TeacherTeam")
+                        .WithMany("TeacherPermissionInClasses")
+                        .HasForeignKey("TeacherTeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeacherTeam");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Infrastructure.Identity.ApplicationRoleClaim", b =>
@@ -1125,6 +1644,20 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolder", b =>
+                {
+                    b.Navigation("PaperFolderChildrens");
+
+                    b.Navigation("PaperFolderPermissions");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
+                {
+                    b.Navigation("Answers");
+
+                    b.Navigation("Passages");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
                 {
                     b.Navigation("Children");
@@ -1134,7 +1667,14 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", b =>
                 {
+                    b.Navigation("GroupPermissionInClasses");
+
                     b.Navigation("TeacherInGroups");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherTeam", b =>
+                {
+                    b.Navigation("TeacherPermissionInClasses");
                 });
 #pragma warning restore 612, 618
         }
