@@ -1518,7 +1518,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Question.Question", "Parent")
-                        .WithMany("Passages")
+                        .WithMany("QuestionPassages")
                         .HasForeignKey("ParentId");
 
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
@@ -1652,7 +1652,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.Navigation("Answers");
 
-                    b.Navigation("Passages");
+                    b.Navigation("QuestionPassages");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>

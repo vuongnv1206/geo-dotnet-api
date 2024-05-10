@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240510100443_WT03")]
+    [Migration("20240510114820_WT03")]
     partial class WT03
     {
         /// <inheritdoc />
@@ -1521,7 +1521,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Question.Question", "Parent")
-                        .WithMany("Passages")
+                        .WithMany("QuestionPassages")
                         .HasForeignKey("ParentId");
 
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
@@ -1655,7 +1655,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.Navigation("Answers");
 
-                    b.Navigation("Passages");
+                    b.Navigation("QuestionPassages");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
