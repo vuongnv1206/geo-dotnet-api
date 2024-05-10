@@ -57,12 +57,6 @@ public class PaperFolderSeeder : ICustomSeeder
         await _db.PaperFolders.AddAsync(paperFolder, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
-        //if (paperFolder.ChildrenPaperFolders != null)
-        //{
-        //    foreach (var childFolder in paperFolder.ChildrenPaperFolders)
-        //    {
-        //        await SeedPaperFolder(childFolder, paperFolder.Id, cancellationToken);
-        //    }
-        //}
+
     }
 }
