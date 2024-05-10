@@ -1,6 +1,8 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Domain.Assignment;
+using FSH.WebApi.Domain.Subjects;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
@@ -18,6 +20,11 @@ public class ApplicationDbContext : BaseDbContext
         : base(currentTenant, options, currentUser, serializer, dbSettings, events)
     {
     }
+
+    public DbSet<Assignment> Assignments => Set<Assignment>();
+    public DbSet<AssignmentStudent> AssignmentStudent => Set<AssignmentStudent>();
+    public DbSet<AssignmentClass> AssignmentClass => Set<AssignmentClass>();
+    public DbSet<Subject> Subjects => Set<Subject>();
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Brand> Brands => Set<Brand>();

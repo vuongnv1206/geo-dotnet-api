@@ -1,0 +1,62 @@
+[
+  {
+    "Name": "Computer Science",
+    "Description": "Introduction to computer science concepts and programming."
+  },
+  {
+    "Name": "Mathematics",
+    "Description": "Fundamental concepts of mathematics including algebra, calculus, and geometry."
+  },
+  {
+    "Name": "Physics",
+    "Description": "Study of matter, energy, and the fundamental forces of nature."
+  },
+  {
+    "Name": "Biology",
+    "Description": "Study of living organisms and their interactions with each other and their environments."
+  },
+  {
+    "Name": "History",
+    "Description": "Study of past events and their impact on society."
+  },
+  {
+    "Name": "Chemistry",
+    "Description": "Study of the composition, properties, and reactions of matter."
+  },
+  {
+    "Name": "English",
+    "Description": "Study of literature, language, and writing."
+  },
+  {
+    "Name": "Art",
+    "Description": "Study of visual arts, music, and performing arts."
+  },
+  {
+    "Name": "Physical Education",
+    "Description": "Study of physical fitness, sports, and health."
+  },
+  {
+    "Name": "Foreign Language",
+    "Description": "Study of languages other than one's native language."
+  },
+  {
+    "Name": "Economics",
+    "Description": "Study of the production, distribution, and consumption of goods and services."
+  },
+  {
+    "Name": "Psychology",
+    "Description": "Study of the mind and behavior."
+  },
+  {
+    "Name": "Sociology",
+    "Description": "Study of human society and social behavior."
+  },
+  {
+    "Name": "Philosophy",
+    "Description": "Study of fundamental questions about existence, knowledge, values, reason, mind, and language."
+  },
+  {
+    "Name": "Geography",
+    "Description": "Study of the Earth's physical features and human populations"
+  }
+]
