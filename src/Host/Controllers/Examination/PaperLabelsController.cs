@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Examination.PaperLabels;
+﻿using FSH.WebApi.Application.Catalog.Brands;
+using FSH.WebApi.Application.Examination.PaperLabels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,14 @@ public class PaperLabelsController : VersionedApiController
     {
         return Mediator.Send(request);
     }
+
+    [HttpGet("{id:guid}")]
+    [OpenApiOperation("Get paper label details.", "")]
+    public Task<PaperLabelDto> GetAsync(Guid id)
+    {
+        return Mediator.Send(new GetPaperLabelRequest(id));
+    }
+
 
     [HttpPost]
     [OpenApiOperation("")]
