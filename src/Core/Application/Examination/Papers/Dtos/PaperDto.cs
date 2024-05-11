@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FSH.WebApi.Domain.Examination.Enums;
+﻿using FSH.WebApi.Domain.Examination.Enums;
+using FSH.WebApi.Application.Examination.PaperLabels;
+using FSH.WebApi.Application.Examination.PaperFolders;
+using FSH.WebApi.Application.Questions.Dtos;
 
-namespace FSH.WebApi.Domain.Examination;
-public class Paper : AuditableEntity, IAggregateRoot
+namespace FSH.WebApi.Application.Examination.Papers;
+public class PaperDto : IDto
 {
+    public Guid Id { get; set; }
     public string ExamName { get; set; } = null!;
-    public PaperStatus Status { get; set; }
+    public string Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public Guid? PaperLabelId { get; set; }
@@ -19,13 +18,13 @@ public class Paper : AuditableEntity, IAggregateRoot
     public bool ShowMarkResult { get; set; }
     public bool ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
-    public PaperType Type { get; set; }
+    public string Type { get; set; }
     public Guid? PaperFolderId { get; set; }
-    public bool IsPublish{ get; set; }
+    public bool IsPublish { get; set; }
     public string ExamCode { get; set; } = null!;
     public string? Content { get; set; }
     public string? Description { get; set; }
-    public virtual PaperLabel? PaperLable { get; set; }
-    public virtual PaperFolder? PaperFolder { get; set; }
-    public virtual List<PaperQuestion> PaperQuestions { get; set; }
+    public PaperLabelDto PaperLable { get; set; }
+    public PaperFolderDto PaperFolder { get; set; }
+    public List<QuestionDto> Questions { get; set; }
 }
