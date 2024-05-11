@@ -33,6 +33,8 @@ public static class FSHResource
     public const string Subjects = nameof(Subjects);
     public const string Classes = nameof(Classes);
     public const string GroupClasses = nameof(GroupClasses);
+    public const string News = nameof(News);
+    public const string NewsReaction = nameof(NewsReaction);
 }
 
 public static class FSHPermissions
@@ -116,6 +118,17 @@ public static class FSHPermissions
 
         // QUESTIONS FOLDERS
         new("View QuestionFolders", FSHAction.View, FSHResource.QuestionFolders),
+        new("View News", FSHAction.View, FSHResource.News, IsBasic: true),
+        new("Search News", FSHAction.Search, FSHResource.News, IsBasic: true),
+        new("Create News", FSHAction.Create, FSHResource.News),
+        new("Update News", FSHAction.Update, FSHResource.News),
+        new("Delete News", FSHAction.Delete, FSHResource.News),
+
+        new("View NewsReaction", FSHAction.View, FSHResource.NewsReaction, IsBasic: true),
+        new("Search NewsReaction", FSHAction.Search, FSHResource.NewsReaction, IsBasic: true),
+        new("Create NewsReaction", FSHAction.Create, FSHResource.NewsReaction),
+        new("Update NewsReaction", FSHAction.Update, FSHResource.NewsReaction),
+        new("Delete NewsReaction", FSHAction.Delete, FSHResource.NewsReaction),
         new("Create QuestionFolders", FSHAction.Create, FSHResource.QuestionFolders),
         new("Update QuestionFolders", FSHAction.Update, FSHResource.QuestionFolders),
         new("Delete QuestionFolders", FSHAction.Delete, FSHResource.QuestionFolders),
