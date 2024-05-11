@@ -1,6 +1,5 @@
 using System.Reflection;
 using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;

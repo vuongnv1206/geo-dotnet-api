@@ -5,15 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
-public class TeacherPermissionConfig : IEntityTypeConfiguration<TeacherPermission>
+public class TeacherPermissionConfig : IEntityTypeConfiguration<TeacherPermissionInClass>
 {
-    public void Configure(EntityTypeBuilder<TeacherPermission> builder)
+    public void Configure(EntityTypeBuilder<TeacherPermissionInClass> builder)
     {
         builder.IsMultiTenant();
         builder.ToTable("TeacherPermissions", SchemaNames.GroupTeacher);
-        builder.Property(b => b.CanAssignExamination).HasDefaultValue(false);
-        builder.Property(b => b.CanMarking).HasDefaultValue(false);
-        builder.Property(b => b.CanManagementStudent).HasDefaultValue(false);
+       
     }
 }
 
@@ -34,7 +32,7 @@ public class TeacherInGroupConfig : IEntityTypeConfiguration<TeacherInGroup>
     public void Configure(EntityTypeBuilder<TeacherInGroup> builder)
     {
         builder.IsMultiTenant();
-        builder.HasKey(tig => new { tig.TeacherId, tig.GroupTeacherId });
+        builder.HasKey(tig => new { tig.TeacherTeamId, tig.GroupTeacherId });
         builder.ToTable("TeacherInGroups", SchemaNames.GroupTeacher);
     }
 }
@@ -48,5 +46,24 @@ public class TeacherTeamConfig : IEntityTypeConfiguration<TeacherTeam>
         builder.Property(b => b.TeacherName).HasMaxLength(50);
         builder.Property(b => b.Phone).HasMaxLength(20);
         builder.Property(b => b.Email).HasMaxLength(20);
+    }
+}
+
+
+public class TeacherPermissionInClassConfig : IEntityTypeConfiguration<TeacherPermissionInClass>
+{
+    public void Configure(EntityTypeBuilder<TeacherPermissionInClass> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("TeacherPermissionInClasses", SchemaNames.GroupTeacher);
+    }
+}
+
+public class GroupPermissionInClassConfig : IEntityTypeConfiguration<GroupPermissionInClass>
+{
+    public void Configure(EntityTypeBuilder<GroupPermissionInClass> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("GroupPermissionInClasses", SchemaNames.GroupTeacher);
     }
 }

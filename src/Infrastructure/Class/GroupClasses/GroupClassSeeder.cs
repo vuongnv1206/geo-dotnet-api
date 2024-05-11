@@ -4,12 +4,7 @@ using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Infrastructure.Class.GroupClasses;
 public class GroupClassSeeder : ICustomSeeder
@@ -17,7 +12,6 @@ public class GroupClassSeeder : ICustomSeeder
     private readonly ISerializerService _serializerService;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<GroupClassSeeder> _logger;
-
 
     public GroupClassSeeder(ISerializerService serializerService, ApplicationDbContext db, ILogger<GroupClassSeeder> logger)
     {
@@ -65,6 +59,7 @@ public class GroupClassSeeder : ICustomSeeder
             {
                 await _db.Classes.AddAsync(new Classes("Se1600", "2024", basicGuid, gc.Id));
             }
+
             await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded Class.");
         }
@@ -79,6 +74,7 @@ public class GroupClassSeeder : ICustomSeeder
             {
                 await _db.News.AddAsync(new Domain.Class.News("The news in the class", true, null, c.Id));
             }
+
             await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded News.");
         }
@@ -93,6 +89,7 @@ public class GroupClassSeeder : ICustomSeeder
             {
                 await _db.NewsReactions.AddAsync(new NewsReaction(adminGuid, n.Id));
             }
+
             await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded NewsReaction.");
         }

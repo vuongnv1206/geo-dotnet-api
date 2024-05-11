@@ -44,24 +44,6 @@ public class TeacherGroupSeeder : ICustomSeeder
             _logger.LogInformation("Seeded GroupTeachers.");
         }
 
-        if (!_db.TeacherPermissions.Any())
-        {
-            _logger.LogInformation("Started to Seed TeacherPermissions.");
-
-            string teacherPermissionData = await File.ReadAllTextAsync(path + "/TeacherGroup/teacherPermission.json", cancellationToken);
-            var teacherPermissions = _serializerService.Deserialize<List<TeacherPermission>>(teacherPermissionData);
-
-            if (teacherPermissions != null)
-            {
-                foreach (var teacherPermission in teacherPermissions)
-                {
-                    await _db.TeacherPermissions.AddAsync(teacherPermission, cancellationToken);
-                }
-            }
-
-            await _db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Seeded TeacherPermissions.");
-        }
 
         if (!_db.TeacherInGroups.Any())
         {
@@ -73,7 +55,7 @@ public class TeacherGroupSeeder : ICustomSeeder
             {
                 var teacherInGroups = groupTeachers.Select(groupTeacher => new TeacherInGroup
                 {
-                    TeacherId = Guid.NewGuid(),
+                    TeacherTeamId = Guid.NewGuid(),
                     GroupTeacherId = groupTeacher.Id,
                 }).ToList();
 

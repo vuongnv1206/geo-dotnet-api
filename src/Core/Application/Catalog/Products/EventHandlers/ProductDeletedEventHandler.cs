@@ -2,11 +2,11 @@ using FSH.WebApi.Domain.Common.Events;
 
 namespace FSH.WebApi.Application.Catalog.Products.EventHandlers;
 
-public class ProductDeletedEventHandler : EventNotificationHandler<EntityDeletedEvent<Product>>
+public class AssignmentDeletedEventHandler : EventNotificationHandler<EntityDeletedEvent<Product>>
 {
-    private readonly ILogger<ProductDeletedEventHandler> _logger;
+    private readonly ILogger<AssignmentDeletedEventHandler> _logger;
 
-    public ProductDeletedEventHandler(ILogger<ProductDeletedEventHandler> logger) => _logger = logger;
+    public AssignmentDeletedEventHandler(ILogger<AssignmentDeletedEventHandler> logger) => _logger = logger;
 
     public override Task Handle(EntityDeletedEvent<Product> @event, CancellationToken cancellationToken)
     {

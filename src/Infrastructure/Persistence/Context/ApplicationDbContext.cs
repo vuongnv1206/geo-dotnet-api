@@ -1,8 +1,11 @@
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Domain.Assignment;
+using FSH.WebApi.Domain.Subjects;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
@@ -18,6 +21,11 @@ public class ApplicationDbContext : BaseDbContext
     {
     }
 
+    public DbSet<Assignment> Assignments => Set<Assignment>();
+    public DbSet<AssignmentStudent> AssignmentStudent => Set<AssignmentStudent>();
+    public DbSet<AssignmentClass> AssignmentClass => Set<AssignmentClass>();
+    public DbSet<Subject> Subjects => Set<Subject>();
+
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Brand> Brands => Set<Brand>();
     public DbSet<Classes> Classes => Set<Classes>();
@@ -25,17 +33,24 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<News> News => Set<News>();
     public DbSet<UserClass> UserClasses => Set<UserClass>();
     public DbSet<NewsReaction> NewsReactions => Set<NewsReaction>();
-
     public DbSet<QuestionFolder> QuestionFolders => Set<QuestionFolder>();
+    public DbSet<Domain.Question.Question> Questions => Set<Domain.Question.Question>();
+    public DbSet<QuestionLable> QuestionLables => Set<QuestionLable>();
+    public DbSet<Answer> Answers => Set<Answer>();
     public DbSet<QuestionFolderPermission> QuestionFolderPermissions => Set<QuestionFolderPermission>();
     public DbSet<TeacherInGroup> TeacherInGroups { get; set; }
     public DbSet<GroupTeacher> GroupTeachers { get; set; }
-    public DbSet<TeacherPermission> TeacherPermissions { get; set; }
+    public DbSet<TeacherPermissionInClass> TeacherPermissionInClasses { get; set; }
     public DbSet<TeacherTeam> TeacherTeams { get; set; }
+    public DbSet<GroupPermissionInClass> GroupPermissionInClasses { get; set; }
+    public DbSet<Paper> Papers{ get; set; }
+    public DbSet<PaperFolder> PaperFolders{ get; set; }
+    public DbSet<PaperFolderPermission> PaperFolderPermissions { get; set; }
+    public DbSet<PaperLabel> PaperLabels { get; set; }
+    public DbSet<PaperQuestion> PaperQuestions { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema(SchemaNames.Catalog);
-
     }
 }

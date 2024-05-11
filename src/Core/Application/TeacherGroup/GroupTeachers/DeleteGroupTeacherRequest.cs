@@ -22,7 +22,7 @@ public class DeleteGroupTeacherRequestHandler : IRequestHandler<DeleteGroupTeach
     {
         var group = await _groupRepo.GetByIdAsync(request.Id, cancellationToken);
 
-        _ = group ?? throw new NotFoundException(_t["GroupTaacher {0} Not Found."]);
+        _ = group ?? throw new NotFoundException(_t["GroupTeacher {0} Not Found."]);
 
         await _groupRepo.DeleteAsync(group, cancellationToken);
 
