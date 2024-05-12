@@ -30,7 +30,14 @@ public class Paper : AuditableEntity, IAggregateRoot
     public virtual PaperFolder? PaperFolder { get; set; }
     public virtual List<PaperQuestion> PaperQuestions { get; set; }
 
-    public Paper(string examName, PaperStatus status, PaperType type, string? content, string? description, Guid? paperFolderId, string? password)
+    public Paper(
+        string examName,
+        PaperStatus status,
+        PaperType type,
+        string? content,
+        string? description,
+        Guid? paperFolderId,
+        string? password)
     {
         ExamName = examName;
         Status = status;
@@ -39,6 +46,22 @@ public class Paper : AuditableEntity, IAggregateRoot
         Description = description;
         PaperFolderId = paperFolderId;
         Password = password;
+    }
+
+    public void AddQuestions(Dictionary<Guid, float> questions)
+    {
+        foreach(var q in questions)
+        {
+            if (PaperQuestions.Any(x => x.QuestionId == q.Key))
+                continue;
+
+            PaperQuestions.Add(new PaperQuestion
+            {
+                QuestionId = q.Key,
+                PaperId = Id,
+                Mark = q.Value
+            });
+        }
     }
 
     public Paper Update(string examName,
@@ -75,6 +98,7 @@ public class Paper : AuditableEntity, IAggregateRoot
 
         return this;
     }
+
     public bool CanUpdate(DefaultIdType userId)
     {
         return CreatedBy == userId;

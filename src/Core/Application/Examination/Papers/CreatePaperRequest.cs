@@ -13,6 +13,7 @@ public class CreatePaperRequest : IRequest<PaperDto>
     public Guid? PaperFolderId { get; set; }
     public string? Content { get; set; }
     public string? Description { get; set; }
+    public Dictionary<Guid, float> Questions { get; set; }
 }
 
 public class CreatePaperRequestValidator : CustomValidator<CreatePaperRequest>
@@ -55,6 +56,11 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
             request.PaperFolderId,
             request.Password
         );
+
+        if (!request.Questions.Any())
+            throw new ConflictException(_t["Create paper must to have question"]);
+
+        newPaper.AddQuestions(request.Questions);
 
         await _paperRepo.AddAsync( newPaper );
         var paperDto = newPaper.Adapt<PaperDto>();
