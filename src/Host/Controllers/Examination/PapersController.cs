@@ -9,4 +9,13 @@ public class PapersController : VersionedApiController
     {
         return Mediator.Send(request);
     }
+
+    [HttpPut("{id:guid}")]
+    [OpenApiOperation("Update information of paper")]
+    public async Task<ActionResult<Guid>> UpdateAsync(UpdatePaperRequest request, Guid id)
+    {
+        return id != request.Id
+            ? BadRequest()
+            : Ok(await Mediator.Send(request));
+    }
 }

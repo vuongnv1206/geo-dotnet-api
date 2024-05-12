@@ -23,7 +23,6 @@
       </PackageReference>
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Examination\Papers\Dtos\" />
       <Folder Include="Examination\Papers\Specs\" />
     </ItemGroup>
 </Project>
