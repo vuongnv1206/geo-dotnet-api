@@ -18,4 +18,11 @@ public class PapersController : VersionedApiController
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }
+
+    [HttpDelete("{id:guid}")]
+    [OpenApiOperation("Delete a paper")]
+    public async Task<Guid> DeleteAsync(Guid id)
+    {
+        return await Mediator.Send(new DeletePaperRequest(id));
+    }
 }
