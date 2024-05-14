@@ -2,7 +2,7 @@
 using FSH.WebApi.Domain.Question;
 
 namespace FSH.WebApi.Application.Questions;
-public class CreateQuestionDto 
+public class CreateQuestionDto
 {
     public string? Content { get; set; }
     public string? Image { get; set; }

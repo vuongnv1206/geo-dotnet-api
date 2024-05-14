@@ -44,4 +44,32 @@ public class Question : AuditableEntity, IAggregateRoot
         if (answers.Any())
             Answers.AddRange(answers);
     }
+
+    public void AddAnswer(Answer answer)
+    {
+        Answers.Add(answer);
+    }
+
+    public void RemoveAnswer(Answer answer)
+    {
+        Answers.Remove(answer);
+    }
+
+    public Question Update(string? content, string? image, string? audio, Guid? questionFolderId, QuestionType? questionType, Guid? questionLableId, Guid? parentId)
+    {
+        Content = content;
+        Image = image;
+        Audio = audio;
+        QuestionFolderId = questionFolderId;
+        QuestionType = questionType;
+        QuestionLableId = questionLableId;
+        ParentId = parentId;
+
+        return this;
+    }
+
+    public bool CanUpdate(Guid userId)
+    {
+        return CreatedBy == userId;
+    }
 }
