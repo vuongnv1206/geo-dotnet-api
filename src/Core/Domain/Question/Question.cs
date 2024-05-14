@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Question.Enums;
+using System.ComponentModel;
 
 namespace FSH.WebApi.Domain.Question;
 
@@ -13,7 +14,34 @@ public class Question : AuditableEntity, IAggregateRoot
     public Guid? QuestionLableId { get; set; }
     public virtual QuestionLable? QuestionLable { get; set; }
     public Guid? ParentId { get; set; }
-    public virtual Question? Parent { get; set; }
+    public virtual Question? QuestionParent { get; set; }
     public virtual List<Question> QuestionPassages { get; set; } = new();
     public virtual List<Answer> Answers { get; set; } = new();
+
+    public Question()
+    {
+
+    }
+
+    public Question(
+        string? content,
+        string? image,
+        string? audio,
+        Guid? questionFolderId,
+        QuestionType? questionType,
+        Guid? questionLableId)
+    {
+        Content = content;
+        Image = image;
+        Audio = audio;
+        QuestionFolderId = questionFolderId;
+        QuestionType = questionType;
+        QuestionLableId = questionLableId;
+    }
+
+    public void AddAnswers(List<Answer> answers)
+    {
+        if (answers.Any())
+            Answers.AddRange(answers);
+    }
 }
