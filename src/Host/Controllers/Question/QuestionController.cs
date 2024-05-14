@@ -12,4 +12,12 @@ public class QuestionController : VersionedApiController
     {
         return Mediator.Send(request);
     }
+
+    [HttpPost]
+    [MustHavePermission(FSHAction.Create, FSHResource.Question)]
+    [OpenApiOperation("Create a questions.", "")]
+    public async Task<List<Guid>> CreateAsync(CreateQuestionRequest request)
+    {
+        return await Mediator.Send(request);
+    }
 }
