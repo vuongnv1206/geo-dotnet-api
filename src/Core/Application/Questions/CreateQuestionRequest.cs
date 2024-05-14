@@ -46,12 +46,17 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
                 question.AddAnswers(answers);
             }
 
+            await _questionRepo.AddAsync(question);
+
             if (questionRequest.QuestionPassages is not null)
             {
-                await AddQuestion(questionRequest.QuestionPassages);
+                questionRequest.QuestionPassages.ForEach(x =>
+                {
+                    x.ParentId = question.Id;
+                });
+                ids.AddRange(await AddQuestion(questionRequest.QuestionPassages));
             }
 
-            await _questionRepo.AddAsync(question);
             ids.Add(question.Id);
         }
 
