@@ -2,6 +2,9 @@
 using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.GroupClasses;
+using FSH.WebApi.Application.Class.New;
+using FSH.WebApi.Application.Class.UserClasses;
+using FSH.WebApi.Domain.Class;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.Class;
@@ -13,6 +16,14 @@ public class ClassController : VersionedApiController
     public Task<PaginationResponse<ClassDto>> SearchAsync(SearchClassesRequest request)
     {
         return Mediator.Send(request);
+    }
+
+    [HttpGet]
+    [MustHavePermission(FSHAction.View, FSHResource.Classes)]
+    [OpenApiOperation("Get class of user", "")]
+    public Task<List<ClassDto>> GetClassByUserAsync()
+    {
+        return Mediator.Send(new GetClassOfUserRequest());
     }
 
     [HttpGet("{id:guid}")]
@@ -37,5 +48,37 @@ public class ClassController : VersionedApiController
     public async Task<ActionResult<Guid>> UpdateAsync(UpdateClassRequest request, Guid id)
     {
         return id != request.Id ? BadRequest() : Ok(await Mediator.Send(request));
+    }
+
+    [HttpGet("getall-user-in-class")]
+    [MustHavePermission(FSHAction.View, FSHResource.UserClasses)]
+    [OpenApiOperation("get all user in class", "")]
+    public Task<List<UserClass>> GetListAsync(Guid classId)
+    {
+        return Mediator.Send(new GetUserInClassRequest(classId));
+    }
+
+    [HttpPost("add-user-in-class")]
+    [MustHavePermission(FSHAction.Create, FSHResource.UserClasses)]
+    [OpenApiOperation("Add new user in class.", "")]
+    public Task<Guid> CreateAsync(AddUserInClassRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPut("update-user-in-class")]
+    [MustHavePermission(FSHAction.Update, FSHResource.UserClasses)]
+    [OpenApiBodyParameter("Update user in class.", "")]
+    public Task UpdateUserInClass(UpdateUserInClassRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpDelete("remove-user-in-class")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.UserClasses)]
+    [OpenApiOperation("Delete user in class.", "")]
+    public Task DeleteUserInClass(DeleteUserInClassRequest request)
+    {
+        return Mediator.Send(request);
     }
 }

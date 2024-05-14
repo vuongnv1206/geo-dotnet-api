@@ -35,6 +35,7 @@ public static class FSHResource
     public const string GroupClasses = nameof(GroupClasses);
     public const string News = nameof(News);
     public const string NewsReaction = nameof(NewsReaction);
+    public const string UserClasses = nameof(UserClasses);
 }
 
 public static class FSHPermissions
@@ -138,6 +139,14 @@ public static class FSHPermissions
         new("Create Question", FSHAction.Create, FSHResource.Question),
         new("Update Question", FSHAction.Update, FSHResource.Question),
         new("Delete Question", FSHAction.Delete, FSHResource.Question),
+
+        // USER CLASSES
+        new("View UserClasses", FSHAction.View, FSHResource.UserClasses, IsBasic: true),
+        new("Search UserClasses", FSHAction.Search, FSHResource.UserClasses, IsBasic: true),
+        new("Create UserClasses", FSHAction.Create, FSHResource.UserClasses),
+        new("Update UserClasses", FSHAction.Update, FSHResource.UserClasses),
+        new("Delete UserClasses", FSHAction.Delete, FSHResource.UserClasses),
+
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);

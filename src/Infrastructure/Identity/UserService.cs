@@ -179,4 +179,14 @@ internal partial class UserService : IUserService
 
         return user.Adapt<UserDetailsDto>();
     }
+
+    public async Task GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var user = _userManager.Users
+           .AsNoTracking()
+           .Where(u => u.Id.Trim().Equals(userId))
+           .FirstOrDefaultAsync(cancellationToken);
+
+        _ = user ?? throw new NotFoundException(_t["User Not Found."]);
+    }
 }
