@@ -1,8 +1,10 @@
 
+using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
+using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -43,5 +45,11 @@ public class MapsterSettings
 
         TypeAdapterConfig<PaperFolder, PaperFolderDto>.NewConfig()
            .Map(dest => dest.PaperFolderChildrens, src => src.PaperFolderChildrens);
+
+        // UserClasses
+        TypeAdapterConfig<UserClass, UserClassDto>.NewConfig()
+            .Map(dest => dest.ClassesId, src => src.ClassesId)
+            .Map(dest => dest.UserId, src => src.UserId);
+
     }
 }

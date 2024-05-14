@@ -19,7 +19,4 @@ public class ClassesBySearchRequestWithGroupClassSpec : EntitiesByPaginationFilt
 
         Query.Where(p => p.OwnerId == userId);
     }
-
-
-
 }
