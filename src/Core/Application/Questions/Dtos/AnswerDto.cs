@@ -1,6 +1,6 @@
 ﻿using FSH.WebApi.Domain.Question;
 
-namespace FSH.WebApi.Application.Questions.Dtos;
+namespace FSH.WebApi.Application.Questions;
 
 public class AnswerDto : IDto
 {
