@@ -77,4 +77,8 @@ public class Question : AuditableEntity, IAggregateRoot
     {
         return CreatedBy == userId;
     }
+    public bool CanDelete(DefaultIdType userId)
+    {
+        return CreatedBy == userId;
+    }
 }
