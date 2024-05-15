@@ -20,4 +20,12 @@ public class QuestionController : VersionedApiController
     {
         return await Mediator.Send(request);
     }
+
+    [HttpDelete("id:guid")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Question)]
+    [OpenApiOperation("Delete a questions.", "")]
+    public async Task<Guid> DeleteAsync(Guid id)
+    {
+        return await Mediator.Send(new DeleteQuestionRequest(id));
+    }
 }
