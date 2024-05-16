@@ -8,7 +8,7 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
     public Guid? ParentId { get; private set; }
     public virtual QuestionFolder? Parent { get; private set; }
 
-    public virtual ICollection<QuestionFolder>? Children { get; private set; }
+    public virtual ICollection<QuestionFolder> Children { get; private set; } = new List<QuestionFolder>();
 
     public virtual ICollection<QuestionFolderPermission> Permissions { get; private set; } = new List<QuestionFolderPermission>();
 

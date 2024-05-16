@@ -585,6 +585,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     QuestionType = table.Column<int>(type: "integer", nullable: true),
                     QuestionLableId = table.Column<Guid>(type: "uuid", nullable: true),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    QuestionParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -609,8 +610,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         principalTable: "QuestionLabels",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Questions_Questions_ParentId",
-                        column: x => x.ParentId,
+                        name: "FK_Questions_Questions_QuestionParentId",
+                        column: x => x.QuestionParentId,
                         principalSchema: "Question",
                         principalTable: "Questions",
                         principalColumn: "Id");
@@ -899,6 +900,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     PaperId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Mark = table.Column<float>(type: "real", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
@@ -1032,12 +1034,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Questions_ParentId",
-                schema: "Question",
-                table: "Questions",
-                column: "ParentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Questions_QuestionFolderId",
                 schema: "Question",
                 table: "Questions",
@@ -1048,6 +1044,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Question",
                 table: "Questions",
                 column: "QuestionLableId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Questions_QuestionParentId",
+                schema: "Question",
+                table: "Questions",
+                column: "QuestionParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",

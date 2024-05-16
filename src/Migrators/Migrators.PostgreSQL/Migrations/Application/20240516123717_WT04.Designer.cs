@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240512152342_WT04")]
+    [Migration("20240516123717_WT04")]
     partial class WT04
     {
         /// <inheritdoc />
@@ -700,6 +700,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
 
+                    b.Property<float>("Mark")
+                        .HasColumnType("real");
+
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -803,6 +806,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("QuestionLableId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("QuestionParentId")
+                        .HasColumnType("uuid");
+
                     b.Property<int?>("QuestionType")
                         .HasColumnType("integer");
 
@@ -813,11 +819,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
-
                     b.HasIndex("QuestionFolderId");
 
                     b.HasIndex("QuestionLableId");
+
+                    b.HasIndex("QuestionParentId");
 
                     b.ToTable("Questions", "Question");
 
@@ -1657,7 +1663,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperQuestion", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Examination.Paper", "Paper")
-                        .WithMany()
+                        .WithMany("PaperQuestions")
                         .HasForeignKey("PaperId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1684,10 +1690,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Parent")
-                        .WithMany("QuestionPassages")
-                        .HasForeignKey("ParentId");
-
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
                         .WithMany()
                         .HasForeignKey("QuestionFolderId");
@@ -1696,11 +1698,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .WithMany()
                         .HasForeignKey("QuestionLableId");
 
-                    b.Navigation("Parent");
+                    b.HasOne("FSH.WebApi.Domain.Question.Question", "QuestionParent")
+                        .WithMany("QuestionPassages")
+                        .HasForeignKey("QuestionParentId");
 
                     b.Navigation("QuestionFolder");
 
                     b.Navigation("QuestionLable");
+
+                    b.Navigation("QuestionParent");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
@@ -1806,6 +1812,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
+                {
+                    b.Navigation("PaperQuestions");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolder", b =>
