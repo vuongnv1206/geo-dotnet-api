@@ -39,4 +39,7 @@ public class DapperRepository : IDapperRepository
 
         return _dbContext.Connection.QuerySingleAsync<T>(sql, param, transaction);
     }
+
+    public async Task<T> RawQuerySingleAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default) =>
+        await _dbContext.Connection.QuerySingleAsync<T>(sql, param, transaction);
 }

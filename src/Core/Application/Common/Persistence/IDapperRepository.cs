@@ -39,4 +39,7 @@ public interface IDapperRepository : ITransientService
     /// <returns>Returns <see cref="Task"/> of <typeparamref name="T"/>.</returns>
     Task<T> QuerySingleAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default)
     where T : class, IEntity;
+
+    // Custom methods
+    Task<T> RawQuerySingleAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default);
 }
