@@ -76,6 +76,8 @@
     </ItemGroup>
     <ItemGroup>
         <None Update="Assignment\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+    <ItemGroup>
         <None Update="Question\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
     <ItemGroup>
