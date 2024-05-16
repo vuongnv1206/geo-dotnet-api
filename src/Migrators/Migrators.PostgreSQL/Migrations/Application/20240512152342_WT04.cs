@@ -809,10 +809,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", maxLength: 256, nullable: false),
-                    Content = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    IsLockCommnet = table.Column<bool>(type: "boolean", maxLength: 20, nullable: false),
-                    ParentId = table.Column<Guid>(type: "uuid", maxLength: 256, nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    IsLockComment = table.Column<bool>(type: "boolean", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     ClassesId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -832,6 +831,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_News_News_ParentId",
+                        column: x => x.ParentId,
+                        principalSchema: "Classes",
+                        principalTable: "News",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -839,25 +844,17 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Classes",
                 columns: table => new
                 {
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassesId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsGender = table.Column<bool>(type: "boolean", maxLength: 20, nullable: false),
+                    IsGender = table.Column<bool>(type: "boolean", nullable: false),
                     StudentCode = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     PhoneNumber = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    ClassesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserClasses", x => new { x.UserId, x.ClassId });
+                    table.PrimaryKey("PK_UserClasses", x => new { x.UserId, x.ClassesId });
                     table.ForeignKey(
                         name: "FK_UserClasses_Classes_ClassesId",
                         column: x => x.ClassesId,
@@ -930,14 +927,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     NewsId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -980,6 +970,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Classes",
                 table: "News",
                 column: "ClassesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_News_ParentId",
+                schema: "Classes",
+                table: "News",
+                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NewsReactions_NewsId",
