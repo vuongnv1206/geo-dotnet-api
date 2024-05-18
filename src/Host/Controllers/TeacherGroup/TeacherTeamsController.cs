@@ -41,12 +41,12 @@ public class TeacherTeamsController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpDelete("teacher-in-team")]
+    [HttpDelete("{id:guid}")]
     [MustHavePermission(FSHAction.Delete, FSHResource.GroupTeachers)]
     [OpenApiOperation("Remove a teacher in team")]
-    public Task RemoveTeacherInTeam(RemoveTeacherInTeamRequest request)
+    public Task RemoveTeacherInTeam(Guid id)
     {
-        return Mediator.Send(request);
+        return Mediator.Send(new RemoveTeacherInTeamRequest(id));
     }
 
     [HttpPut("teacher-in-team/{id:guid}")]
