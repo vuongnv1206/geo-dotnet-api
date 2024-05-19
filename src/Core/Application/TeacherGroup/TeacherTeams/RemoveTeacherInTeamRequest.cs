@@ -1,12 +1,16 @@
 ﻿using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.TeacherTeams;
-public class RemoveTeacherInTeamRequest : IRequest<DefaultIdType>
+public class RemoveTeacherInTeamRequest : IRequest<Guid>
 {
-    public DefaultIdType Id { get; set; }
+    public Guid Id { get; set; }
+    public RemoveTeacherInTeamRequest(Guid id)
+    {
+        Id = id;
+    }
 }
 
-public class RemoveTeacherInTeamRequestHandler : IRequestHandler<RemoveTeacherInTeamRequest, DefaultIdType>
+public class RemoveTeacherInTeamRequestHandler : IRequestHandler<RemoveTeacherInTeamRequest, Guid>
 {
     private readonly IRepositoryWithEvents<TeacherTeam> _teacherTeamRepo;
     private readonly IStringLocalizer _t;
@@ -19,7 +23,7 @@ public class RemoveTeacherInTeamRequestHandler : IRequestHandler<RemoveTeacherIn
         _t = t;
     }
 
-    public async Task<DefaultIdType> Handle(RemoveTeacherInTeamRequest request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(RemoveTeacherInTeamRequest request, CancellationToken cancellationToken)
     {
         var teacherInTeam = await _teacherTeamRepo.GetByIdAsync(request.Id, cancellationToken);
 
