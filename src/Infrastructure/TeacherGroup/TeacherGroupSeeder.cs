@@ -44,20 +44,48 @@ public class TeacherGroupSeeder : ICustomSeeder
             _logger.LogInformation("Seeded GroupTeachers.");
         }
 
+        if (!_db.TeacherTeams.Any())
+        {
+            _logger.LogInformation("Started to Seed TeacherTeams.");
+            string teacherTeamData = await File.ReadAllTextAsync(Path.Combine(path, "TeacherGroup/teacherTeam.json"), cancellationToken);
+            var teacherTeams = _serializerService.Deserialize<List<TeacherTeam>>(teacherTeamData);
+
+            if (teacherTeams != null)
+            {
+                foreach (var teacher in teacherTeams)
+                {
+                    await _db.TeacherTeams.AddAsync(teacher, cancellationToken);
+                }
+            }
+
+            await _db.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Seeded TeacherTeams.");
+        }
+
 
         if (!_db.TeacherInGroups.Any())
         {
             _logger.LogInformation("Started to Seed TeacherInGroups.");
 
+            var teacherTeams = await _db.TeacherTeams.ToListAsync();
             var groupTeachers = await _db.GroupTeachers.ToListAsync();
 
-            if (groupTeachers.Any())
+            if (teacherTeams.Any() && groupTeachers.Any())
             {
-                var teacherInGroups = groupTeachers.Select(groupTeacher => new TeacherInGroup
+                var teacherInGroups = new List<TeacherInGroup>();
+
+                foreach (var groupTeacher in groupTeachers)
                 {
-                    TeacherTeamId = Guid.NewGuid(),
-                    GroupTeacherId = groupTeacher.Id,
-                }).ToList();
+                    var randomTeacherTeam = teacherTeams[new Random().Next(teacherTeams.Count)];
+
+                    var teacherInGroup = new TeacherInGroup
+                    {
+                        TeacherTeamId = randomTeacherTeam.Id,
+                        GroupTeacherId = groupTeacher.Id,
+                    };
+
+                    teacherInGroups.Add(teacherInGroup);
+                }
 
                 await _db.TeacherInGroups.AddRangeAsync(teacherInGroups, cancellationToken);
                 await _db.SaveChangesAsync(cancellationToken);
