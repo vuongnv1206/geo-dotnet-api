@@ -19,12 +19,6 @@ public class TeacherInGroupRepository : ITeacherInGroupRepository
         _context = context;
     }
 
-    public async Task AddTeacherIntoGroup(TeacherInGroup request)
-    {
-        _context.TeacherInGroups.Add(request);
-        await _context.SaveChangesAsync();
-    }
-
     public async Task DeleteTeacherInGroupAsync(TeacherInGroup request)
     {
         _context.TeacherInGroups.Remove(request);

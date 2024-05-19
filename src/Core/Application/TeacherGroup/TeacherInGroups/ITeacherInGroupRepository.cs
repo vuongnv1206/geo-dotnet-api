@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.TeacherGroup.TeacherInGroups;
 public interface ITeacherInGroupRepository : IScopedService
 {
-    Task AddTeacherIntoGroup(TeacherInGroup request);
     Task DeleteTeacherInGroupAsync(TeacherInGroup request);
     Task<TeacherInGroup> GetTeacherInGroup(TeacherInGroup request);
 }

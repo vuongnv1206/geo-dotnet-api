@@ -19,19 +19,22 @@ public class GetTeacherPermissionWithClassRequestHandler : IRequestHandler<GetTe
 {
     private readonly IRepository<TeacherTeam> _teacherTeamRepo;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
 
     public GetTeacherPermissionWithClassRequestHandler(
         IRepository<TeacherTeam> teacherTeamRepo,
-        IStringLocalizer<GetTeacherPermissionWithClassRequestHandler> t)
+        IStringLocalizer<GetTeacherPermissionWithClassRequestHandler> t,
+        ICurrentUser currentUser)
     {
         _teacherTeamRepo = teacherTeamRepo;
         _t = t;
+        _currentUser = currentUser;
     }
 
     public async Task<TeacherTeamDto> Handle(GetTeacherPermissionWithClassRequest request, CancellationToken cancellationToken)
     {
         var teacherTeam = await _teacherTeamRepo.FirstOrDefaultAsync(
-            (ISpecification<TeacherTeam, TeacherTeamDto>) new TeacherTeamByIdSpec(request.TeacherTeamId), cancellationToken);
+            (ISpecification<TeacherTeam, TeacherTeamDto>) new TeacherTeamByIdSpec(request.TeacherTeamId, _currentUser.GetUserId()), cancellationToken);
 
         if (teacherTeam is null)
         {
