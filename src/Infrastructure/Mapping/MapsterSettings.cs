@@ -3,6 +3,7 @@ using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.Class;
@@ -44,6 +45,11 @@ public class MapsterSettings
         TypeAdapterConfig<GroupPermissionInClassDto, GroupPermissionInClass>.NewConfig()
            .Map(dest => dest.PermissionType, src => src.PermissionType);
 
+        TypeAdapterConfig<GroupTeacher, GroupTeacherDto>.NewConfig()
+         .Map(dest => dest.GroupPermissionInClasses, src => src.GroupPermissionInClasses)
+         .Map(dest => dest.TeacherTeams, src => src.TeacherInGroups.Select(tig => tig.TeacherTeam));
+
+        //Paper Folder
         TypeAdapterConfig<PaperFolder, PaperFolderDto>.NewConfig()
            .Map(dest => dest.PaperFolderChildrens, src => src.PaperFolderChildrens);
 
@@ -63,5 +69,8 @@ public class MapsterSettings
             .TwoWays();
 
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
+
+
+
     }
 }

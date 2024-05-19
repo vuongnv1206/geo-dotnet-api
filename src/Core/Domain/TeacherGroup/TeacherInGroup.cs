@@ -7,4 +7,5 @@ public class TeacherInGroup
     public Guid TeacherTeamId { get; set; }
     public Guid GroupTeacherId { get; set; }
     public virtual GroupTeacher GroupTeacher { get; set; }
+    public virtual TeacherTeam TeacherTeam { get; set; }
 }
