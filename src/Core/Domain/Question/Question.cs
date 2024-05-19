@@ -45,6 +45,11 @@ public class Question : AuditableEntity, IAggregateRoot
             Answers.AddRange(answers);
     }
 
+    public bool CanDelete(DefaultIdType userId)
+    {
+        return CreatedBy == userId;
+    }
+    
     public void AddAnswer(Answer answer)
     {
         Answers.Add(answer);
