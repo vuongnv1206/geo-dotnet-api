@@ -40,7 +40,7 @@ public class AddTeacherIntoTeacherTeamRequestHandler : IRequestHandler<AddTeache
         _userService = userService;
     }
 
-    public async Task<DefaultIdType> Handle(AddTeacherIntoTeacherTeamRequest request, CancellationToken cancellationToken)
+    public async Task<DefaultIdType> Handle(AddTeacherIntoTeacherTeamRequest request, CancellationToken cancellationToken)  
     {
         var teacherTeam = new TeacherTeam()
         {

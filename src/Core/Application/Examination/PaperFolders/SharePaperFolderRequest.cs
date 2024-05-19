@@ -55,14 +55,15 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
         var folder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.FolderId), cancellationToken);
         _ = folder ?? throw new NotFoundException(_t["The Folder {0} Not Found", request.FolderId]);
 
-        if (!folder.CanUpdate(_currentUser.GetUserId()))
+        var currentUserId = _currentUser.GetUserId();
+        if (!folder.CanUpdate(currentUserId))
         {
             throw new ForbiddenException(_t["You do not have permission to share this folder."]);
         }
 
         foreach (var userId in request.UserIds)
         {
-            bool isExistUserInTeacherTeam = await _teacherTeamRepo.AnyAsync(new TeacherTeamByIdSpec(userId), cancellationToken);
+            bool isExistUserInTeacherTeam = await _teacherTeamRepo.AnyAsync(new TeacherTeamByIdSpec(userId, currentUserId), cancellationToken);
             if (!isExistUserInTeacherTeam) continue;
             var permissionSet = new PaperFolderPermissionSet
             {
