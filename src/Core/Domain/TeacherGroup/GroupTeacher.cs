@@ -23,6 +23,11 @@ public class GroupTeacher : AuditableEntity,IAggregateRoot
         TeacherInGroups.Add(teacher);
     }
 
+    public void RemoveTeacherInGroup(TeacherInGroup teacher)
+    {
+        TeacherInGroups.Remove(teacher);
+    }
+
     public bool CanUpdate(Guid userId)
     {
         return CreatedBy == userId;
