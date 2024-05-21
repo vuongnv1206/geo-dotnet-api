@@ -19,33 +19,42 @@ public class RemoveTeacherInGroupRequestValidator : CustomValidator<RemoveTeache
 
 public class RemoveTeacherInGroupRequestHandler : IRequestHandler<RemoveTeacherInGroupRequest, Guid>
 {
-    private readonly ITeacherInGroupRepository _repository;
     private readonly IRepository<GroupTeacher> _groupTeacherRepository;
-    private readonly IUserService _userService;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
 
     public RemoveTeacherInGroupRequestHandler(
-        ITeacherInGroupRepository repository,
         IStringLocalizer<RemoveTeacherInGroupRequestHandler> t,
-        IRepository<GroupTeacher> groupTeacherRepository
-        )
+        IRepository<GroupTeacher> groupTeacherRepository,
+        ICurrentUser currentUser)
     {
-        _repository = repository;
         _t = t;
         _groupTeacherRepository = groupTeacherRepository;
+        _currentUser = currentUser;
     }
 
     public async Task<DefaultIdType> Handle(RemoveTeacherInGroupRequest request, CancellationToken cancellationToken)
     {
-        var teacherInGroup = await _repository.GetTeacherInGroup(new TeacherInGroup
-        {
-            TeacherTeamId = request.TeacherId,
-            GroupTeacherId = request.GroupId,
-        });
-        if (teacherInGroup is null)
-            throw new NotFoundException(_t["Teacher or Group {0} Not Found."]);
+        var group = await _groupTeacherRepository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(request.GroupId));
 
-        await _repository.DeleteTeacherInGroupAsync(teacherInGroup);
+        if (group is null)
+            throw new NotFoundException(_t["Group {0} Not Found."]);
+
+        if (!group.CanUpdate(_currentUser.GetUserId()))
+            throw new ForbiddenException(_t["You cannot have permissio update with {0}", request.GroupId]);
+
+        if (group.TeacherInGroups.Any())
+        {
+            var teacherInGroup = group.TeacherInGroups?
+                .FirstOrDefault(x => x.TeacherTeamId == request.TeacherId);
+
+            if (teacherInGroup is null)
+                throw new NotFoundException(_t["Teacher {0} Not Found.", request.TeacherId]);
+
+            group.RemoveTeacherInGroup(teacherInGroup);
+
+            await _groupTeacherRepository.UpdateAsync(group);
+        }
 
         return default(DefaultIdType);
     }
