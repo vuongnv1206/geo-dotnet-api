@@ -60,7 +60,7 @@ public class GroupTeachersController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpDelete("remove-teacher-into-group")]
+    [HttpPost("remove-teacher-into-group")]
     [MustHavePermission(FSHAction.Delete, FSHResource.GroupTeachers)]
     [OpenApiOperation("Remove a teacher in group")]
     public Task RemoveTeacherInGroup(RemoveTeacherInGroupRequest request)
