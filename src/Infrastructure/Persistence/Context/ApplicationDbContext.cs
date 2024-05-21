@@ -48,6 +48,8 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<PaperFolderPermission> PaperFolderPermissions { get; set; }
     public DbSet<PaperLabel> PaperLabels { get; set; }
     public DbSet<PaperQuestion> PaperQuestions { get; set; }
+    public DbSet<SubmitPaper> SubmitPapers { get; set; }
+    public DbSet<SubmitPaperDetail> SubmitPaperDetails { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
