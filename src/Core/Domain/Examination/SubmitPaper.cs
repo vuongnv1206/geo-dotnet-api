@@ -22,4 +22,19 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         PaperId = paperId;
         Status = status;
     }
+
+    public void SubmitAnswerRaw(SubmitPaperDetail submitAnswer)
+    {
+        var answer = SubmitPaperDetails
+            .FirstOrDefault(x => x.SubmitPaperId == submitAnswer.SubmitPaperId
+                                && x.QuestionId == submitAnswer.QuestionId);
+
+        if(answer == null)
+        {
+            SubmitPaperDetails.Add(submitAnswer);
+        }else
+        {
+            answer.AnswerRaw = submitAnswer.AnswerRaw;
+        }
+    }
 }

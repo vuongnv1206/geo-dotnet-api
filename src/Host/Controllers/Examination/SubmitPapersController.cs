@@ -10,4 +10,10 @@ public class SubmitPapersController : VersionedApiController
         return await Mediator.Send(request);
     }
 
+    [HttpPost("submit-answer")]
+    [OpenApiOperation("Create a submit paper detail - when user choose answer for question")]
+    public async Task<Guid> SubmitAnswerForQuestion(SubmitAnswerRawRequest request)
+    {
+        return await Mediator.Send(request);
+    }
 }
