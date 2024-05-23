@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
@@ -12,13 +13,13 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
 {
     public readonly IReadRepository<PaperFolder> _paperFolderRepo;
     public readonly ICurrentUser _currentUser;
+    private readonly IUserService _userService;
 
-    public SearchPaperFolderRequestHandler(
-        ICurrentUser currentUser,
-        IReadRepository<PaperFolder> paperFolderRepo)
+    public SearchPaperFolderRequestHandler(IReadRepository<PaperFolder> paperFolderRepo, ICurrentUser currentUser, IUserService userService)
     {
-        _currentUser = currentUser;
         _paperFolderRepo = paperFolderRepo;
+        _currentUser = currentUser;
+        _userService = userService;
     }
 
     public async Task<List<PaperFolderDto>> Handle(SearchPaperFolderRequest request, CancellationToken cancellationToken)
@@ -27,7 +28,42 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
         var spec = new PaperFolderBySearchRequestSpec(request, currentUserId);
 
         var data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
-        var dtos = data.Adapt<List<PaperFolderDto>>();
+        data = data.Where(x => x.ParentId == request.ParentId).ToList();
+
+        var dtos = new List<PaperFolderDto>();
+        foreach (var folder in data)
+        {
+            var dto = await CustomMappings.MapPaperFolderAsync(folder, _userService, cancellationToken);
+            dtos.Add(dto);
+        }
+
         return dtos;
+
     }
+
+    public static class CustomMappings
+    {
+        public static async Task<PaperFolderDto> MapPaperFolderAsync(PaperFolder paperFolder, IUserService userService, CancellationToken cancellationToken)
+        {
+            var dto = paperFolder.Adapt<PaperFolderDto>();
+
+            // Lấy tên người tạo
+            var creator = await userService.GetAsync(paperFolder.CreatedBy.ToString(), cancellationToken);
+            dto.CreatorName = string.Join(" ", creator.FirstName, creator.LastName);
+
+            // Xử lý các mục con
+            if (paperFolder.PaperFolderChildrens != null && paperFolder.PaperFolderChildrens.Any())
+            {
+                dto.PaperFolderChildrens = new List<PaperFolderDto>();
+                foreach (var child in paperFolder.PaperFolderChildrens)
+                {
+                    var childDto = await MapPaperFolderAsync(child, userService, cancellationToken);
+                    dto.PaperFolderChildrens.Add(childDto);
+                }
+            }
+
+            return dto;
+        }
+    }
+
 }
