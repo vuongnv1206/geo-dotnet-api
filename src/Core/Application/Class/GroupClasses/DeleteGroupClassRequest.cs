@@ -1,6 +1,4 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Application.Catalog.Products;
-using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,23 +10,32 @@ public class DeleteGroupClassRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
 
-    public DeleteGroupClassRequest(Guid id ) => Id = id;
+    public DeleteGroupClassRequest(Guid id) => Id = id;
 }
 
 public class DeleteGroupClassRequestHandler : IRequestHandler<DeleteGroupClassRequest, Guid>
 {
     private readonly IRepositoryWithEvents<GroupClass> _groupClassRepo;
     private readonly IReadRepository<Classes> _classRepo;
+    private readonly IRepositoryWithEvents<Classes> _classEventRepo;
+
     private readonly IStringLocalizer _t;
 
-    public DeleteGroupClassRequestHandler(IRepositoryWithEvents<GroupClass> groupClassRepo, IReadRepository<Classes> classRepo, IStringLocalizer<DeleteGroupClassRequestHandler> localizer) =>
-        (_groupClassRepo, _classRepo, _t) = (groupClassRepo, classRepo, localizer);
+    public DeleteGroupClassRequestHandler(IRepositoryWithEvents<GroupClass> groupClassRepo, IReadRepository<Classes> classRepo,
+                                          IStringLocalizer<DeleteGroupClassRequestHandler> localizer, IRepositoryWithEvents<Classes> classEventRepo) =>
+        (_groupClassRepo, _classRepo, _t, _classEventRepo) = (groupClassRepo, classRepo, localizer, classEventRepo);
 
     public async Task<Guid> Handle(DeleteGroupClassRequest request, CancellationToken cancellationToken)
     {
-        if (await _classRepo.AnyAsync(new ClassByGroupClassSpec(request.Id), cancellationToken))
+
+        var classes = await _classRepo.ListAsync(new ClassByGroupClassSpec(request.Id), cancellationToken);
+        if (classes != null)
         {
-            throw new ConflictException(_t["GroupClass cannot be deleted as it's being used."]);
+            foreach (var c in classes)
+            {
+                c.UpdateGroupClassId(null);
+                await _classEventRepo.UpdateAsync(c, cancellationToken);
+            }
         }
 
         var groupClass = await _groupClassRepo.GetByIdAsync(request.Id, cancellationToken);
