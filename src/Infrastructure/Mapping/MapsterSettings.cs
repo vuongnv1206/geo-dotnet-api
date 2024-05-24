@@ -72,6 +72,8 @@ public class MapsterSettings
             .Ignore(dest => dest.QuestionPassages)
             .TwoWays();
 
+        TypeAdapterConfig<CreateQuestionDto, NewQuestionDto>.NewConfig();
+
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig().TwoWays();
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig()
              .Map(dest => dest.IsCorrect, src => src.IsCorrect)

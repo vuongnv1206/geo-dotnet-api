@@ -3,7 +3,7 @@ using FSH.WebApi.Domain.Question;
 using Mapster;
 
 namespace FSH.WebApi.Application.Questions;
-public class CreateQuestionRequest : IRequest
+public class CreateQuestionRequest : IRequest<List<Guid>>
 {
     public List<CreateQuestionDto> Questions { get; set; }
 }
@@ -16,7 +16,7 @@ public class CreateQuestionRequestValidator : CustomValidator<CreateQuestionRequ
     }
 }
 
-public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionRequest>
+public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionRequest, List<Guid>>
 {
     private readonly IRepositoryWithEvents<Question> _questionRepo;
     private readonly IStringLocalizer _t;
@@ -29,9 +29,9 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         _t = t;
     }
 
-    public async Task<Unit> Handle(CreateQuestionRequest request, CancellationToken cancellationToken)
+    public async Task<List<Guid>> Handle(CreateQuestionRequest request, CancellationToken cancellationToken)
     {
-
+        var createdQuestionIds = new List<Guid>();
         foreach (var questionDto in request.Questions)
         {
             var question = questionDto.Adapt<Question>();
@@ -43,13 +43,13 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
             }
 
             await _questionRepo.AddAsync(question, cancellationToken);
-
+            createdQuestionIds.Add(question.Id);
             if (questionDto.QuestionPassages != null)
             {
                 await AddQuestionPassages(questionDto.QuestionPassages, question.Id, cancellationToken);
             }
         }
-        return Unit.Value;
+        return createdQuestionIds;
 
     }
 

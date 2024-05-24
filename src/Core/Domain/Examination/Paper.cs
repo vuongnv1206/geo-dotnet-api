@@ -41,6 +41,7 @@ public class Paper : AuditableEntity, IAggregateRoot
         Description = description;
         PaperFolderId = paperFolderId;
         Password = password;
+        ExamCode = examName;
     }
 
     public void AddQuestions(List<PaperQuestion> questions)

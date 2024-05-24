@@ -17,7 +17,7 @@ public class QuestionController : VersionedApiController
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Question)]
     [OpenApiOperation("Create question list.", "")]
-    public async Task<Unit> CreateAsync(CreateQuestionRequest request)
+    public async Task<List<Guid>> CreateAsync(CreateQuestionRequest request)
     {
         return await Mediator.Send(request);
     }
