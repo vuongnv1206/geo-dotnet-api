@@ -2,6 +2,7 @@
 
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.TeacherGroup;
+using Mapster;
 
 namespace FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 public class GetGroupTeacherWithPermissionRequest : IRequest<GroupTeacherDto>
@@ -27,12 +28,11 @@ public class GetGroupTeacherWithPermissionHandler : IRequestHandler<GetGroupTeac
 
     public async Task<GroupTeacherDto> Handle(GetGroupTeacherWithPermissionRequest request, CancellationToken cancellationToken)
     {
-        var data = await _repository.FirstOrDefaultAsync(
-             (ISpecification<GroupTeacher, GroupTeacherDto>)new GroupTeacherByIdSpec(request.Id), cancellationToken);
+        var data = await _repository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(request.Id), cancellationToken);
 
         if (data == null)
             throw new NotFoundException(_t["GroupTeacher{0} Not Found.", request.Id]);
 
-        return data;
+        return data.Adapt<GroupTeacherDto>();
     }
 }
