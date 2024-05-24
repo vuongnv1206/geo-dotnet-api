@@ -5,6 +5,10 @@ public class GroupTeacherByIdSpec : Specification<GroupTeacher>,ISingleResultSpe
 {
     public GroupTeacherByIdSpec(Guid id)
     {
-        Query.Include(x => x.TeacherInGroups).ThenInclude(tig => tig.TeacherTeam).Where(x => x.Id == id);
+        Query
+            .Include(x => x.TeacherInGroups)
+                .ThenInclude(tig => tig.TeacherTeam)
+            .Include(x => x.GroupPermissionInClasses)
+            .Where(x => x.Id == id);
     }
 }
