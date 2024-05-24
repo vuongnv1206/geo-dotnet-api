@@ -41,8 +41,11 @@ public class Question : AuditableEntity, IAggregateRoot
 
     public void AddAnswers(List<Answer> answers)
     {
-        if (answers.Any())
-            Answers.AddRange(answers);
+
+        foreach (var answer in answers)
+        {
+            Answers.Add(answer);
+        }
     }
 
     public bool CanDelete(DefaultIdType userId)
@@ -55,9 +58,27 @@ public class Question : AuditableEntity, IAggregateRoot
         Answers.Add(answer);
     }
 
-    public void RemoveAnswer(Answer answer)
+     public void AddPassage(Question passage)
     {
-        Answers.Remove(answer);
+        QuestionPassages.Add(passage);
+    }
+
+    public void UpdateAnswers(List<Answer> answers)
+    {
+        Answers.RemoveAll(a => !answers.Any(x => x.Id == a.Id));
+
+        foreach (var answer in answers)
+        {
+            var existingAnswer = Answers.FirstOrDefault(a => a.Id == answer.Id);
+            if (existingAnswer != null)
+            {
+                existingAnswer.Update(answer.Content, answer.IsCorrect,answer.QuestionId);
+            }
+            else
+            {
+                AddAnswer(answer);
+            }
+        }
     }
 
     public Question Update(string? content, string? image, string? audio, Guid? questionFolderId, QuestionType? questionType, Guid? questionLableId, Guid? parentId)

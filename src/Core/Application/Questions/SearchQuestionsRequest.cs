@@ -8,7 +8,7 @@ namespace FSH.WebApi.Application.Questions;
 
 public class SearchQuestionsRequest : PaginationFilter, IRequest<PaginationResponse<QuestionDto>>
 {
-    public Guid? folderId { get; set; }
+    public Guid? FolderId { get; set; }
     public string? Content { get; set; }
     public QuestionType? QuestionType { get; set; }
     public Guid? QuestionLableId { get; set; }

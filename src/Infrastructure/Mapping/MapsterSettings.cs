@@ -61,14 +61,23 @@ public class MapsterSettings
         // Paper
         TypeAdapterConfig<Paper, PaperDto>.NewConfig()
           .Map(dest => dest.PaperFolder, src => src.PaperFolder)
-          .Map(dest => dest.PaperLable, src => src.PaperLable);
+          .Map(dest => dest.PaperLable, src => src.PaperLable)
+          .Map(dest => dest.Questions, src => src.PaperQuestions.Select(pq => pq.Question));
+
+        TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
+
 
         TypeAdapterConfig<CreateQuestionDto, Domain.Question.Question>.NewConfig()
             .Ignore(dest => dest.Answers)
             .Ignore(dest => dest.QuestionPassages)
             .TwoWays();
 
-        TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
+        TypeAdapterConfig<CreateQuestionDto, NewQuestionDto>.NewConfig();
+
+        TypeAdapterConfig<Answer, AnswerDto>.NewConfig().TwoWays();
+        TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig()
+             .Map(dest => dest.IsCorrect, src => src.IsCorrect)
+             .Map(dest => dest.Content, src => src.Content);
 
 
 
