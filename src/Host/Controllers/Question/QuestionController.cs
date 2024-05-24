@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
+using MediatR;
 
 namespace FSH.WebApi.Host.Controllers.Question;
 
@@ -15,8 +16,8 @@ public class QuestionController : VersionedApiController
 
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Question)]
-    [OpenApiOperation("Create questionn list.", "")]
-    public async Task<List<Guid>> CreateAsync(CreateQuestionRequest request)
+    [OpenApiOperation("Create question list.", "")]
+    public async Task<Unit> CreateAsync(CreateQuestionRequest request)
     {
         return await Mediator.Send(request);
     }
@@ -32,9 +33,9 @@ public class QuestionController : VersionedApiController
     [HttpPut("{id:guid}")]
     [MustHavePermission(FSHAction.Create, FSHResource.Question)]
     [OpenApiOperation("Update a question.", "")]
-    public async Task<ActionResult<Guid>> UpdateAsync(Guid id, UpdateAQuestionRequest request)
+    public async Task<ActionResult<Guid>> UpdateAsync(Guid id, UpdateQuestionRequest request)
     {
-        return id != request.Question.Id
+        return id != request.Id
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }

@@ -13,7 +13,7 @@ public class CreatePaperRequest : IRequest<PaperDto>
     public Guid? PaperFolderId { get; set; }
     public string? Content { get; set; }
     public string? Description { get; set; }
-    public Dictionary<Guid, float> Questions { get; set; }
+    public List<CreateUpdateQuestionInPaperDto> Questions { get; set; }
 }
 
 public class CreatePaperRequestValidator : CustomValidator<CreatePaperRequest>
@@ -60,7 +60,8 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
         if (!request.Questions.Any())
             throw new ConflictException(_t["Create paper must to have question"]);
 
-        newPaper.AddQuestions(request.Questions);
+        var questions = request.Questions.Adapt<List<PaperQuestion>>();
+        newPaper.AddQuestions(questions);
 
         await _paperRepo.AddAsync( newPaper );
         var paperDto = newPaper.Adapt<PaperDto>();
