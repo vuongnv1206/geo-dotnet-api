@@ -13,7 +13,7 @@ public class CreateFolderRequestValidator : CustomValidator<CreateFolderRequest>
 {
     public CreateFolderRequestValidator()
     {
-        RuleFor(p => p.Name)
+        RuleFor(p => p.Name)    
             .NotEmpty()
             .MaximumLength(75);
     }

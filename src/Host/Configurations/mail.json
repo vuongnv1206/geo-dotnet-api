@@ -1,10 +1,10 @@
 {
   "MailSettings": {
-    "DisplayName": "Mukesh Murugan",
-    "From": "mukesh@fullstackhero.net",
-    "Host": "smtp.ethereal.email",
-    "Password": "AdEqEKB4QwWX9Xey82",
+    "DisplayName": "GEO",
+    "From": "admin@guardianexam.com",
+    "Host": "sandbox.smtp.mailtrap.io",
+    "Password": "2f7f49a0e83e55",
     "Port": 587,
-    "UserName": "nestor91@ethereal.email"
+    "UserName": "7da29262081340"
   }
 }
