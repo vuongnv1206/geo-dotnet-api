@@ -49,6 +49,9 @@
         </None>
     </ItemGroup>
     <ItemGroup>
+      <Content Remove="Email Templates\reset-password.cshtml" />
+    </ItemGroup>
+    <ItemGroup>
       <Folder Include="Databases\Host\" />
     </ItemGroup>
     <ItemGroup>

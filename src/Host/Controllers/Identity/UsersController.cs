@@ -117,5 +117,13 @@ public class UsersController : VersionNeutralApiController
         return _userService.ResetPasswordAsync(request);
     }
 
-    private string GetOriginFromRequest() => $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase.Value}";
+    private string GetOriginFromRequest()
+    {
+        if (Request.Headers.TryGetValue("x-from-host", out var values))
+        {
+            return $"{Request.Scheme}://{values.First()}";
+        }
+
+        return $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase.Value}";
+    }
 }
