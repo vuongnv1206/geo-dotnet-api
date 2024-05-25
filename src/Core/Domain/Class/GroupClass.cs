@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FSH.WebApi.Domain.TeacherGroup;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace FSH.WebApi.Domain.Class;
 public class GroupClass : AuditableEntity, IAggregateRoot
 {
     public string Name { get; private set; }
-
+    public virtual IEnumerable<Classes>? Classes{ get; set; }
     public GroupClass(string name)
     {
         Name = name;

@@ -1,26 +1,20 @@
-﻿using FSH.WebApi.Application.Class.GroupClasses;
-using FSH.WebApi.Application.Identity.Users;
+﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserClasses;
 public class UpdateUserInClassRequest : IRequest<Guid>
 {
     public Guid UserId { get; set; }
     public Guid ClassesId { get; set; }
-    public string StudentCode { get; set; }
+    public string? StudentCode { get; set; }
     public bool IsGender { get; set; }
-    public string Email { get; set; }
-    public string PhoneNumber { get; set; }
+    public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
 }
 
 public class UpdateUserInClassRequestValidator : CustomValidator<UpdateUserInClassRequest>
 {
-    public UpdateUserInClassRequestValidator(IRepository<Classes> repository,IUserService userService, IStringLocalizer<UpdateUserInClassRequestValidator> T)
+    public UpdateUserInClassRequestValidator(IRepository<Classes> repository, IUserService userService, IStringLocalizer<UpdateUserInClassRequestValidator> T)
     {
         RuleFor(g => g.ClassesId)
             .NotEmpty()
@@ -28,7 +22,6 @@ public class UpdateUserInClassRequestValidator : CustomValidator<UpdateUserInCla
             .WithMessage((_, classesId) => T["Classes {0} not found.", classesId]);
     }
 }
-
 
 public class UpdateUserInClassRequestHandler : IRequestHandler<UpdateUserInClassRequest, Guid>
 {

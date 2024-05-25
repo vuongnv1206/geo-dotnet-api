@@ -7,7 +7,7 @@ namespace FSH.WebApi.Application.Examination.Papers;
 public class UpdatePaperRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public string ExamName { get; set; }
+    public required string ExamName { get; set; }
     public PaperStatus Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
@@ -28,14 +28,14 @@ public class UpdatePaperRequest : IRequest<Guid>
 
 public class UpdatePaperRequestValidator : CustomValidator<UpdatePaperRequest>
 {
-    public UpdatePaperRequestValidator(IStringLocalizer<UpdatePaperRequestValidator> _t)
+    public UpdatePaperRequestValidator(IStringLocalizer<UpdatePaperRequestValidator> T)
     {
         RuleFor(x => x.ExamName)
             .NotEmpty();
 
         RuleFor(x => x.EndTime)
             .GreaterThan(x => x.StartTime)
-                .WithMessage(_t["End time must to greater than Start time"]);
+                .WithMessage(T["End time must to greater than Start time"]);
     }
 }
 

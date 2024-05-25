@@ -1,11 +1,8 @@
-﻿using System.Security.Claims;
-using FSH.WebApi.Application.Identity.Roles;
-using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Application.Common.Interfaces;
+﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Question;
 using Mapster;
-using FSH.WebApi.Application.Questions.Dtos;
-using FSH.WebApi.Application.Questions;
 namespace FSH.WebApi.Application.Questions;
 
 public class GetFolderTreeRequest : IRequest<QuestionTreeDto>
@@ -60,7 +57,6 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
 
         return await _repository.RawQuerySingleAsync<int>(sql, new { p0 = folderId }, cancellationToken: cancellationToken);
     }
-
 
     public async Task<QuestionTreeDto> Handle(GetFolderTreeRequest request, CancellationToken cancellationToken)
     {

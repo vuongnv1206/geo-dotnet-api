@@ -1,19 +1,12 @@
-﻿using FSH.WebApi.Application.Catalog.Products;
-using FSH.WebApi.Domain.Catalog;
-using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Common.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class;
 public class UpdateClassRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
-    public string SchoolYear { get; set; }
+    public required string Name { get; set; }
+    public required string SchoolYear { get; set; }
     public Guid OwnerId { get; set; }
     public Guid GroupClassId { get; set; }
 }
@@ -36,7 +29,6 @@ public class UpdateClassRequestHandler : IRequestHandler<UpdateClassRequest, Gui
         var gc = await _gcRepository.GetByIdAsync(request.GroupClassId, cancellationToken);
 
         _ = gc ?? throw new NotFoundException(_t["groupClass {0} Not Found.", request.GroupClassId]);
-
 
         var updatedClass = classes.Update(request.Name, request.SchoolYear, request.OwnerId, request.GroupClassId);
 

@@ -10,7 +10,7 @@ public interface IUserService : ITransientService
     Task<bool> ExistsWithNameAsync(string name);
     Task<bool> ExistsWithEmailAsync(string email, string? exceptId = null);
     Task<bool> ExistsWithPhoneNumberAsync(string phoneNumber, string? exceptId = null);
-    Task<string> GetFullName(Guid userId);
+
     Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken);
 
     Task<int> GetCountAsync(CancellationToken cancellationToken);
@@ -39,5 +39,4 @@ public interface IUserService : ITransientService
     Task<UserDetailsDto> GetUserDetailByEmailAsync(string email, CancellationToken cancellationToken);
     Task<UserDetailsDto> GetUserDetailByPhoneAsync(string phoneNumber, CancellationToken cancellationToken);
     Task GetUserByIdAsync(Guid userId, CancellationToken cancellationToken);
-
 }

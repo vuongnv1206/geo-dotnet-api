@@ -1,6 +1,4 @@
-﻿
-using FSH.WebApi.Application.Class.New;
-using Microsoft.AspNetCore.Mvc;
+﻿using FSH.WebApi.Application.Class.New;
 
 namespace FSH.WebApi.Host.Controllers.Class;
 public class NewsReactionController : VersionedApiController

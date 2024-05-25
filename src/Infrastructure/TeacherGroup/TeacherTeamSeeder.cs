@@ -1,10 +1,7 @@
 ﻿using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
-
 
 namespace FSH.WebApi.Infrastructure.TeacherGroup;
 public class TeacherTeamSeeder : ICustomSeeder
@@ -22,14 +19,14 @@ public class TeacherTeamSeeder : ICustomSeeder
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        //string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        //if (!_db.TeacherTeams.Any())
-        //{
+        // string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        // if (!_db.TeacherTeams.Any())
+        // {
         //    _logger.LogInformation("Started to Seed TeacherTeams.");
         //    string teacherTeamData = await File.ReadAllTextAsync(path + "/TeacherGroup/teacherTeam.json", cancellationToken);
         //    var teacherTeams = _serializerService.Deserialize<List<TeacherTeam>>(teacherTeamData);
 
-        //    if (teacherTeams != null)
+        // if (teacherTeams != null)
         //    {
         //        foreach (var team in teacherTeams)
         //        {
@@ -37,8 +34,8 @@ public class TeacherTeamSeeder : ICustomSeeder
         //        }
         //    }
 
-        //    await _db.SaveChangesAsync(cancellationToken);
+        // await _db.SaveChangesAsync(cancellationToken);
         //    _logger.LogInformation("Seeded TeacherTeams.");
-        //}
+        // }
     }
 }

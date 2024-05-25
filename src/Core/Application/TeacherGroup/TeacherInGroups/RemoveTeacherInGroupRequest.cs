@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.TeacherInGroups;

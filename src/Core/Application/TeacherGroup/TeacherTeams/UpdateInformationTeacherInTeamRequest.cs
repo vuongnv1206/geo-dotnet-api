@@ -44,6 +44,7 @@ public class UpdateInformationTeacherInTeamRequestHandler : IRequestHandler<Upda
             default:
                 throw new ConflictException(_t["This Contact is invalid!"]);
         }
+
         await _teacherTeamRepo.UpdateAsync(teacherTeam, cancellationToken);
         return request.Id;
     }

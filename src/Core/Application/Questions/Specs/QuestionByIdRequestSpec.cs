@@ -3,7 +3,7 @@
 namespace FSH.WebApi.Application.Questions;
 public class QuestionByIdSpec : Specification<Question>, ISingleResultSpecification
 {
-    public QuestionByIdSpec(Guid id) =>
+    public QuestionByIdRequestSpec(Guid id) =>
         Query
         .Where(x => x.Id == id)
         .Include(x => x.QuestionFolder)

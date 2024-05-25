@@ -12,5 +12,5 @@ public class CreateQuestionDto
     public Guid? QuestionLableId { get; set; }
     public Guid? ParentId { get; set; }
     public List<CreateQuestionDto>? QuestionPassages { get; set; }
-    public List<CreateAnswerDto>? Answers { get; set; }
+    public List<AnswerDto>? Answers { get; set; }
 }

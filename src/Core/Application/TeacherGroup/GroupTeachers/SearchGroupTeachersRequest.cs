@@ -18,7 +18,7 @@ public class SearchGroupTeachersRequestHandler : IRequestHandler<SearchGroupTeac
     public async Task<PaginationResponse<GroupTeacherDto>> Handle(SearchGroupTeachersRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
-        var spec = new GroupTeachersBySearchSpec(request,currentUserId);
+        var spec = new GroupTeachersBySearchSpec(request, currentUserId);
         var data = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
         return data;
     }

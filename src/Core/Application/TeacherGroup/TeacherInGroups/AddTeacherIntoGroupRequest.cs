@@ -1,7 +1,4 @@
-﻿using Ardalis.Specification;
-using FSH.WebApi.Application.Common.Persistence;
-using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.TeacherGroup;
 
@@ -28,7 +25,6 @@ public class AddTeacherIntoTeamRequestHandler : IRequestHandler<AddTeacherIntoGr
     private readonly ICurrentUser _currentUser;
     private readonly IReadRepository<TeacherTeam> _teacherTeamRepository;
 
-
     public AddTeacherIntoTeamRequestHandler(
         IRepository<GroupTeacher> groupTeacherRepository,
         IUserService userService,
@@ -51,7 +47,7 @@ public class AddTeacherIntoTeamRequestHandler : IRequestHandler<AddTeacherIntoGr
         if (!group.CanUpdate(userId))
             throw new ForbiddenException(_t["You not have this permission"]);
 
-        //note: need to check teacher in my team
+        // note: need to check teacher in my team
         var teacherInTeam = await _teacherTeamRepository
             .FirstOrDefaultAsync(new TeacherTeamByIdSpec(request.TeacherId, userId));
 

@@ -16,12 +16,10 @@ using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Shared.Authorization;
 using Mapster;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using System.Threading;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
@@ -141,7 +139,7 @@ internal partial class UserService : IUserService
 
         _ = user ?? throw new NotFoundException(_t["User Not Found."]);
 
-        bool isAdmin = await _userManager.IsInRoleAsync(user, FSHRoles.Admin);
+        bool isAdmin = await _userManager.IsInRoleAsync(user, FSHRoles.Teacher);
         if (isAdmin)
         {
             throw new ConflictException(_t["Administrators Profile's Status cannot be toggled"]);
@@ -190,11 +188,5 @@ internal partial class UserService : IUserService
            .FirstOrDefaultAsync(cancellationToken);
 
         _ = user ?? throw new NotFoundException(_t["User Not Found."]);
-    }
-
-    public async Task<string> GetFullName(DefaultIdType userId)
-    {
-        var user = await GetAsync(userId.ToString(),CancellationToken.None);
-        return string.Join(" ", user.FirstName, user.LastName);
     }
 }

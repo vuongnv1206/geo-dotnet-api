@@ -1,13 +1,4 @@
-﻿using FSH.WebApi.Application.Common.Persistence;
-using FSH.WebApi.Domain.Catalog;
-using FSH.WebApi.Domain.Class;
-using FSH.WebApi.Domain.Common.Events;
-using FSH.WebApi.Domain.TeacherGroup;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.New;
 public class DeleteNewsReactionRequest : IRequest<Guid>
