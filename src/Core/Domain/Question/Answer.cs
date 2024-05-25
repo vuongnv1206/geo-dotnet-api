@@ -14,11 +14,10 @@ public class Answer : AuditableEntity, IAggregateRoot
         IsCorrect = isCorrect;
     }
 
-    public Answer Update(string? content, bool isCorrect)
+    public void Update(string? content, bool isCorrect, Guid questionId)
     {
         Content = content;
         IsCorrect = isCorrect;
-
-        return this;
+        QuestionId = questionId;
     }
 }
