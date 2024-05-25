@@ -2,11 +2,11 @@ using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Events;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Assignment;
-using FSH.WebApi.Domain.Subjects;
 using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.Subjects;
 using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Persistence.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -43,8 +43,8 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<TeacherPermissionInClass> TeacherPermissionInClasses { get; set; }
     public DbSet<TeacherTeam> TeacherTeams { get; set; }
     public DbSet<GroupPermissionInClass> GroupPermissionInClasses { get; set; }
-    public DbSet<Paper> Papers{ get; set; }
-    public DbSet<PaperFolder> PaperFolders{ get; set; }
+    public DbSet<Paper> Papers { get; set; }
+    public DbSet<PaperFolder> PaperFolders { get; set; }
     public DbSet<PaperFolderPermission> PaperFolderPermissions { get; set; }
     public DbSet<PaperLabel> PaperLabels { get; set; }
     public DbSet<PaperQuestion> PaperQuestions { get; set; }

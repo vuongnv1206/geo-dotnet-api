@@ -7,6 +7,7 @@ public class UpdatePaperLabelRequest : IRequest<Guid>
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
 }
+
 public class UpdatePaperLabelRequestValidator : CustomValidator<UpdatePaperLabelRequest>
 {
     public UpdatePaperLabelRequestValidator(IRepository<PaperLabel> repository, IStringLocalizer<UpdatePaperLabelRequestValidator> T) =>

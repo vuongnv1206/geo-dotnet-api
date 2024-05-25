@@ -27,11 +27,11 @@ public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolder
         var paperFolder = await _repository.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.Id), cancellationToken);
         _ = paperFolder ?? throw new NotFoundException(_t["PaperFolder {0} Not Found."]);
 
-
         if (!paperFolder.CanDelete(_currentUser.GetUserId()))
         {
             throw new ForbiddenException(_t["You do not have permission to delete this folder."]);
         }
+
         await DeleteChildrenPaperFolders(paperFolder.Id, cancellationToken);
 
         await _repository.DeleteAsync(paperFolder);

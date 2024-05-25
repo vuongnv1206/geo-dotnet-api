@@ -2,27 +2,20 @@
 
 namespace FSH.WebApi.Application.Questions.Dtos;
 
-
-public class QuestionPassageDto : IDto
+public class QuestionPassagesDto : IDto
 {
-    public Guid Id { get; set; }
     public string? Content { get; set; }
     public List<AnswerDto>? Answers { get; set; } = new();
 }
 
-public class QuestionDto : IDto
+public class QuestionDto : AuditableEntity, IDto
 {
-    public Guid Id { get; set; }
     public string? Content { get; set; }
     public string? Image { get; set; }
     public string? Audio { get; set; }
-    public Guid CreatedBy { get; set; }
-    public DateTime CreatedOn { get; private set; }
-    public Guid LastModifiedBy { get; set; }
-    public DateTime? LastModifiedOn { get; set; }
-    public QuestionType? QuestionType { get; set; }
     public QuestionFolderDto? QuestionFolder { get; set; }
+    public QuestionType? QuestionType { get; set; }
     public QuestionLableDto? QuestionLable { get; set; }
-    public List<QuestionPassageDto>? QuestionPassages { get; set; } = new();
+    public List<QuestionPassagesDto>? QuestionPassages { get; set; } = new();
     public List<AnswerDto>? Answers { get; set; } = new();
 }

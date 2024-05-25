@@ -1,10 +1,8 @@
 ﻿using FSH.WebApi.Application.Extensions;
-using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace FSH.WebApi.Application.Examination.SubmitPapers;
@@ -56,7 +54,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
         if (question is null)
             throw new NotFoundException(_t["Question {0} Not Found.", request.QuestionId]);
 
-        var answerRaw = FormatAnswerRaw(request.AnswerRaw, question);
+        string answerRaw = FormatAnswerRaw(request.AnswerRaw, question);
 
         submitPaper.SubmitAnswerRaw(new SubmitPaperDetail(
                 request.SubmitPaperId,
@@ -91,7 +89,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
                 return answerRaw;
             case QuestionType.MultipleChoice:
                 var answerList = answerRaw.SplitStringExtension("|");
-                foreach (var ans in answerList)
+                foreach (string ans in answerList)
                 {
                     if (!question.Answers.Any(x => x.Id.ToString() == ans))
                     {
@@ -101,7 +99,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
 
                 return answerRaw;
             case QuestionType.Matching:
-                var pattern = @"^\d+_\d+(\|\d+_\d+)*$";
+                string pattern = @"^\d+_\d+(\|\d+_\d+)*$";
                 if (!Regex.IsMatch(answerRaw, pattern))
                     throw new ConflictException(_t["Wrong format answer submit: number_number|number_number"]);
 

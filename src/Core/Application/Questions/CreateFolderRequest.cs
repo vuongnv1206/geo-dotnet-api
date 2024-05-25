@@ -1,5 +1,5 @@
-﻿using FSH.WebApi.Domain.Question;
-using FSH.WebApi.Application.Questions.Specs;
+﻿using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Domain.Question;
 
 namespace FSH.WebApi.Host.Controllers.Question;
 
@@ -13,7 +13,7 @@ public class CreateFolderRequestValidator : CustomValidator<CreateFolderRequest>
 {
     public CreateFolderRequestValidator()
     {
-        RuleFor(p => p.Name)    
+        RuleFor(p => p.Name)
             .NotEmpty()
             .MaximumLength(75);
     }

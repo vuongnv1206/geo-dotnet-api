@@ -3,11 +3,9 @@ using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
-
 
 namespace FSH.WebApi.Infrastructure.TeacherGroup;
 public class TeacherGroupSeeder : ICustomSeeder
@@ -61,7 +59,6 @@ public class TeacherGroupSeeder : ICustomSeeder
             await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded TeacherTeams.");
         }
-
 
         if (!_db.TeacherInGroups.Any())
         {

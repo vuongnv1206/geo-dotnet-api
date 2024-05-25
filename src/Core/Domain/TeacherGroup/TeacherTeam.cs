@@ -1,7 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-
-
+﻿using System.ComponentModel.DataAnnotations;
 namespace FSH.WebApi.Domain.TeacherGroup;
 public class TeacherTeam : AuditableEntity, IAggregateRoot
 {
@@ -12,7 +9,7 @@ public class TeacherTeam : AuditableEntity, IAggregateRoot
     [Phone]
     public string? Phone { get; set; }
 
-    public virtual IEnumerable<TeacherPermissionInClass> TeacherPermissionInClasses { get; set; }
+    public virtual IEnumerable<TeacherPermissionInClass>? TeacherPermissionInClasses { get; set; }
 
     public TeacherTeam Update(string? teacherName, string? teacherEmail, string? teacherPhone)
     {

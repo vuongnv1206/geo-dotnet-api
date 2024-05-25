@@ -1,18 +1,11 @@
 ﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Class;
-using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.GroupClasses;
 public class UpdateGroupClassRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }
 
 public class UpdateGroupClassRequestValidator : CustomValidator<UpdateGroupClassRequest>
@@ -37,7 +30,7 @@ public class UpdateGroupClassRequestHandler : IRequestHandler<UpdateGroupClassRe
     {
         (_repository, _t) = (repository, localizer);
     }
-    
+
     public async Task<DefaultIdType> Handle(UpdateGroupClassRequest request, CancellationToken cancellationToken)
     {
         var groupClass = await _repository.GetByIdAsync(request.Id, cancellationToken);

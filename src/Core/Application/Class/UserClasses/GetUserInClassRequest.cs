@@ -22,6 +22,7 @@ public class GetUserInClassRequestHandler : IRequestHandler<GetUserInClassReques
     {
         _userClassesRepository = userClassesRepository;
     }
+
     public async Task<List<UserClass>> Handle(GetUserInClassRequest request, CancellationToken cancellationToken)
         => await _userClassesRepository.GetUserInClasses(request.ClassId);
 }

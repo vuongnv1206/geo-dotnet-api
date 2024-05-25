@@ -1,7 +1,4 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Application.Examination.PaperLabels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using FSH.WebApi.Application.Examination.PaperLabels;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class PaperLabelsController : VersionedApiController
@@ -19,7 +16,6 @@ public class PaperLabelsController : VersionedApiController
     {
         return Mediator.Send(new GetPaperLabelRequest(id));
     }
-
 
     [HttpPost]
     [OpenApiOperation("Create paper label")]

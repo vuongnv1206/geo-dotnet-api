@@ -1,23 +1,17 @@
 ﻿using FSH.WebApi.Application.Class.New;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserClasses;
 public class AddUserInClassRequest : IRequest<Guid>
 {
-    public Guid UserId { get; set;}
-    public Guid ClassesId { get; set;}
-    public bool IsGender { get;  set; }
-    public string StudentCode { get;  set; }
-    public string Email { get;  set; }
-    public string PhoneNumber { get;  set; }
+    public Guid UserId { get; set; }
+    public Guid ClassesId { get; set; }
+    public bool IsGender { get; set; }
+    public required string StudentCode { get; set; }
+    public required string Email { get; set; }
+    public required string PhoneNumber { get; set; }
 }
-
 
 public class AddUserInClassRequestValidator : CustomValidator<AddUserInClassRequest>
 {
@@ -29,6 +23,7 @@ public class AddUserInClassRequestValidator : CustomValidator<AddUserInClassRequ
             .WithMessage((_, id) => T["Classes {0} Not Found.", id]);
     }
 }
+
 public class AddUserInClassRequestHandler : IRequestHandler<AddUserInClassRequest, Guid>
 {
     private readonly IUserService _userService;
@@ -37,7 +32,7 @@ public class AddUserInClassRequestHandler : IRequestHandler<AddUserInClassReques
 
     public AddUserInClassRequestHandler(IUserClassesRepository userClassesRepository, IUserService userService,
                                         IStringLocalizer<AddUserInClassRequestHandler> localizer) =>
-        (_userClassesRepository,_userService, _stringLocalizer) = (userClassesRepository,userService, localizer);
+        (_userClassesRepository, _userService, _stringLocalizer) = (userClassesRepository, userService, localizer);
 
     public async Task<Guid> Handle(AddUserInClassRequest request, CancellationToken cancellationToken)
     {

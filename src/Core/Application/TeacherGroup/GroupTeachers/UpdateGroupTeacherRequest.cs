@@ -5,9 +5,8 @@ namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 public class UpdateGroupTeacherRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }
-
 
 public class UpdateGroupTeacherRequestValidator : CustomValidator<UpdateGroupTeacherRequest>
 {
@@ -19,7 +18,6 @@ public class UpdateGroupTeacherRequestValidator : CustomValidator<UpdateGroupTea
                     await repository.FirstOrDefaultAsync(new GroupTeacherByNameSpec(name), ct)
                         is not GroupTeacher existingBrand || existingBrand.Id == group.Id)
                 .WithMessage((_, name) => T["GroupTeacher {0} already Exists.", name]);
- 
 
 }
 

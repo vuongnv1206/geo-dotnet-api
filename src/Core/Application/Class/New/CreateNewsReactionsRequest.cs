@@ -1,11 +1,4 @@
-﻿using FSH.WebApi.Application.Class.GroupClasses;
-using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.New;
 public class CreateNewsReactionsRequest : IRequest<Guid>
@@ -23,7 +16,7 @@ public class CreateNewsReactionHandler : IRequestHandler<CreateNewsReactionsRequ
 
     public CreateNewsReactionHandler(ICurrentUser currentUser, IRepository<News> newRepository,
                                      INewReactionRepository newReactionRepository, IStringLocalizer<CreateNewsReactionHandler> localizer) =>
-        (_currentUser, _newReactionRepository , _newRepository, _t) = (currentUser, newReactionRepository,newRepository, localizer);
+        (_currentUser, _newReactionRepository, _newRepository, _t) = (currentUser, newReactionRepository, newRepository, localizer);
     public async Task<DefaultIdType> Handle(CreateNewsReactionsRequest request, CancellationToken cancellationToken)
     {
         var findNews = await _newRepository.GetByIdAsync(request.NewsId, cancellationToken);

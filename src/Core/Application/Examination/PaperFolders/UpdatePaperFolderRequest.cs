@@ -6,7 +6,7 @@ public class UpdatePaperFolderRequest : IRequest<Guid>
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public Guid? ParentId { get; set; }
-    public Guid? SubjectId { get; set;}
+    public Guid? SubjectId { get; set; }
 }
 
 public class UpdatePaperFolderRequestHandler : IRequestHandler<UpdatePaperFolderRequest, Guid>

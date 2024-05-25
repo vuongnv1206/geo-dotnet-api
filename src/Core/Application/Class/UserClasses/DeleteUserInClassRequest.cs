@@ -1,10 +1,5 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserClasses;
 public class DeleteUserInClassRequest : IRequest<Guid>
@@ -32,7 +27,7 @@ public class DeleteUserInClassRequestHandler : IRequestHandler<DeleteUserInClass
 
     public DeleteUserInClassRequestHandler(IUserClassesRepository userClassesRepository, IUserService userService,
                                            IStringLocalizer<DeleteUserInClassRequestHandler> stringLocalizer) =>
-        (_userClassesRepository,_userService, _stringLocalizer) = (userClassesRepository, userService, stringLocalizer);
+        (_userClassesRepository, _userService, _stringLocalizer) = (userClassesRepository, userService, stringLocalizer);
     public async Task<Guid> Handle(DeleteUserInClassRequest request, CancellationToken cancellationToken)
     {
 

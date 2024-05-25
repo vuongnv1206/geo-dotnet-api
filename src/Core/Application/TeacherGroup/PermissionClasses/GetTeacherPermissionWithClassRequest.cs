@@ -2,18 +2,15 @@
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.TeacherGroup;
 
-
 namespace FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 public class GetTeacherPermissionWithClassRequest : IRequest<TeacherTeamDto>
 {
     public Guid TeacherTeamId { get; set; }
     public GetTeacherPermissionWithClassRequest(Guid id)
     {
-        TeacherTeamId= id;
+        TeacherTeamId = id;
     }
 }
-
-
 
 public class GetTeacherPermissionWithClassRequestHandler : IRequestHandler<GetTeacherPermissionWithClassRequest, TeacherTeamDto>
 {
@@ -34,7 +31,7 @@ public class GetTeacherPermissionWithClassRequestHandler : IRequestHandler<GetTe
     public async Task<TeacherTeamDto> Handle(GetTeacherPermissionWithClassRequest request, CancellationToken cancellationToken)
     {
         var teacherTeam = await _teacherTeamRepo.FirstOrDefaultAsync(
-            (ISpecification<TeacherTeam, TeacherTeamDto>) new TeacherTeamByIdSpec(request.TeacherTeamId, _currentUser.GetUserId()), cancellationToken);
+            (ISpecification<TeacherTeam, TeacherTeamDto>)new TeacherTeamByIdSpec(request.TeacherTeamId, _currentUser.GetUserId()), cancellationToken);
 
         if (teacherTeam is null)
         {

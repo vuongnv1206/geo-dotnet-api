@@ -1,5 +1,4 @@
 using FSH.WebApi.Domain.Question.Enums;
-using System.ComponentModel;
 
 namespace FSH.WebApi.Domain.Question;
 
@@ -41,44 +40,23 @@ public class Question : AuditableEntity, IAggregateRoot
 
     public void AddAnswers(List<Answer> answers)
     {
-
-        foreach (var answer in answers)
-        {
-            Answers.Add(answer);
-        }
+        if (answers.Any())
+            Answers.AddRange(answers);
     }
 
     public bool CanDelete(DefaultIdType userId)
     {
         return CreatedBy == userId;
     }
-    
+
     public void AddAnswer(Answer answer)
     {
         Answers.Add(answer);
     }
 
-     public void AddPassage(Question passage)
+    public void RemoveAnswer(Answer answer)
     {
-        QuestionPassages.Add(passage);
-    }
-
-    public void UpdateAnswers(List<Answer> answers)
-    {
-        Answers.RemoveAll(a => !answers.Any(x => x.Id == a.Id));
-
-        foreach (var answer in answers)
-        {
-            var existingAnswer = Answers.FirstOrDefault(a => a.Id == answer.Id);
-            if (existingAnswer != null)
-            {
-                existingAnswer.Update(answer.Content, answer.IsCorrect,answer.QuestionId);
-            }
-            else
-            {
-                AddAnswer(answer);
-            }
-        }
+        Answers.Remove(answer);
     }
 
     public Question Update(string? content, string? image, string? audio, Guid? questionFolderId, QuestionType? questionType, Guid? questionLableId, Guid? parentId)

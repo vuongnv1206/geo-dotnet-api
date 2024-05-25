@@ -1,10 +1,8 @@
-﻿
-
-namespace FSH.WebApi.Domain.TeacherGroup;
-public class GroupTeacher : AuditableEntity,IAggregateRoot
+﻿namespace FSH.WebApi.Domain.TeacherGroup;
+public class GroupTeacher : AuditableEntity, IAggregateRoot
 {
     public string Name { get; set; } = null!;
-    public virtual List<TeacherInGroup>? TeacherInGroups { get; set; } = new();
+    public virtual List<TeacherInGroup> TeacherInGroups { get; set; } = new();
     public virtual IEnumerable<GroupPermissionInClass> GroupPermissionInClasses { get; set; }
 
     public GroupTeacher(string name)
