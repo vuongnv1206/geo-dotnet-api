@@ -27,7 +27,7 @@ public class AssignmentConfig : IEntityTypeConfiguration<Assignment>
         public void Configure(EntityTypeBuilder<AssignmentClass> builder)
         {
             builder
-                  .HasKey(x => new { x.AssignmentId, x.ClassId });
+                  .HasKey(x => new { x.AssignmentId, x.ClassesId });
 
             builder
                   .ToTable("AssignmentClass", SchemaNames.Assignment)
