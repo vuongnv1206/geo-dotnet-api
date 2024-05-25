@@ -32,9 +32,9 @@ public class QuestionController : VersionedApiController
     [HttpPut("{id:guid}")]
     [MustHavePermission(FSHAction.Create, FSHResource.Question)]
     [OpenApiOperation("Update a question.", "")]
-    public async Task<ActionResult<Guid>> UpdateAsync(Guid id, UpdateAQuestionRequest request)
+    public async Task<ActionResult<Guid>> UpdateAsync(Guid id, UpdateQuestionRequest request)
     {
-        return id != request.Question.Id
+        return id != request.Id
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }
