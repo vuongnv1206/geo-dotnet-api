@@ -1,4 +1,4 @@
-﻿using FSH.WebApi.Application.Questions.Specs;
+﻿using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Domain.Question;
 using MediatR;
 

@@ -1,6 +1,6 @@
 ﻿using FSH.WebApi.Domain.Question;
 
-namespace FSH.WebApi.Application.Questions.Specs;
+namespace FSH.WebApi.Application.Questions;
 public class QuestionFoldersWithPermissionsSpecByUserId : Specification<QuestionFolder>, ISingleResultSpecification
 {
     public QuestionFoldersWithPermissionsSpecByUserId(DefaultIdType userId, DefaultIdType? parentFolderId)

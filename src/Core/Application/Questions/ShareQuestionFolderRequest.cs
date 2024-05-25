@@ -1,5 +1,5 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Domain.Question;
 
 namespace FSH.WebApi.Application.Questions;

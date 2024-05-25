@@ -1,5 +1,5 @@
 ﻿using FSH.WebApi.Application.Questions.Dtos;
-using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
 using Mapster;

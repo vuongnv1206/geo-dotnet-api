@@ -1,5 +1,5 @@
 ﻿using FSH.WebApi.Application.Common.Models;
-using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Domain.Examination;
 namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class CreatePaperFolderRequest : IRequest<DefaultIdType>

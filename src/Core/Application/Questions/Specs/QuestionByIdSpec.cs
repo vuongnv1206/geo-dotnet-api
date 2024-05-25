@@ -1,6 +1,6 @@
 ﻿using FSH.WebApi.Domain.Question;
 
-namespace FSH.WebApi.Application.Questions.Specs;
+namespace FSH.WebApi.Application.Questions;
 public class QuestionByIdSpec : Specification<Question>, ISingleResultSpecification
 {
     public QuestionByIdSpec(Guid id) =>
