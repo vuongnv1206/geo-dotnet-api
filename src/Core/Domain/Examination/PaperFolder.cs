@@ -13,7 +13,7 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
     public virtual PaperFolder? PaperFolderParent { get; set; }
     public virtual List<PaperFolder>? PaperFolderChildrens { get; set; } = new();
     public virtual List<PaperFolderPermission> PaperFolderPermissions { get; set; } = new();
-
+    public virtual List<Paper> Papers { get; set; }
     public PaperFolder(string name, Guid? parentId, Guid? subjectId)
     {
         Name = name;

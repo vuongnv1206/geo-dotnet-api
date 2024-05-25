@@ -7,6 +7,10 @@ public class Answer : AuditableEntity, IAggregateRoot
     public virtual Question? Question { get; set; }
     public bool IsCorrect { get; set; }
 
+    public Answer()
+    {
+        
+    }
     public Answer(string? content, Guid? questionId, bool isCorrect)
     {
         Content = content;
