@@ -24,6 +24,7 @@ internal partial class UserService
         const string route = "auth/reset-password";
         var endpointUri = new Uri(string.Concat($"{origin}/", route));
         string passwordResetUrl = QueryHelpers.AddQueryString(endpointUri.ToString(), "Token", code);
+        passwordResetUrl = QueryHelpers.AddQueryString(passwordResetUrl, "Email", request.Email);
         RegisterUserEmailModel eMailModel = new RegisterUserEmailModel()
         {
             Email = user.Email,
