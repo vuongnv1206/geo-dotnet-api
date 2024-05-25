@@ -59,6 +59,23 @@ public class Question : AuditableEntity, IAggregateRoot
         Answers.Remove(answer);
     }
 
+    public void UpdateAnswers(List<Answer> answers)
+    {
+        Answers.RemoveAll(a => !answers.Any(x => x.Id == a.Id));
+
+        foreach (var answer in answers)
+        {
+            var existingAnswer = Answers.FirstOrDefault(a => a.Id == answer.Id);
+            if (existingAnswer != null)
+            {
+                existingAnswer.Update(answer.Content, answer.IsCorrect, answer.QuestionId.Value);
+            }
+            else
+            {
+                AddAnswer(answer);
+            }
+        }
+    }
     public Question Update(string? content, string? image, string? audio, Guid? questionFolderId, QuestionType? questionType, Guid? questionLableId, Guid? parentId)
     {
         Content = content;

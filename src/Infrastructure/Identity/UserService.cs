@@ -189,4 +189,10 @@ internal partial class UserService : IUserService
 
         _ = user ?? throw new NotFoundException(_t["User Not Found."]);
     }
+
+    public async Task<string> GetFullName(DefaultIdType userId)
+    {
+        var user = await GetAsync(userId.ToString(), CancellationToken.None);
+        return string.Join(" ", user.FirstName, user.LastName);
+    }
 }

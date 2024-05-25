@@ -3,7 +3,7 @@
 namespace FSH.WebApi.Domain.Examination;
 public class Paper : AuditableEntity, IAggregateRoot
 {
-    public string ExamName { get; set; } = null!;
+    public string ExamName { get; set; }
     public PaperStatus Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
@@ -17,7 +17,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public PaperType Type { get; set; }
     public Guid? PaperFolderId { get; set; }
     public bool IsPublish { get; set; }
-    public string ExamCode { get; set; } = "Acb";
+    public string ExamCode { get; set; }
     public string? Content { get; set; }
     public string? Description { get; set; }
     public virtual PaperLabel? PaperLable { get; set; }
@@ -40,21 +40,43 @@ public class Paper : AuditableEntity, IAggregateRoot
         Description = description;
         PaperFolderId = paperFolderId;
         Password = password;
+        ExamCode = examName;
     }
 
-    public void AddQuestions(Dictionary<Guid, float> questions)
+    public void AddQuestions(List<PaperQuestion> questions)
     {
         foreach (var q in questions)
         {
-            if (PaperQuestions.Any(x => x.QuestionId == q.Key))
+            if (PaperQuestions.Any(x => x.QuestionId == q.Question.Id))
                 continue;
 
             PaperQuestions.Add(new PaperQuestion
             {
-                QuestionId = q.Key,
+                QuestionId = q.QuestionId,
                 PaperId = Id,
-                Mark = q.Value
+                Mark = q.Mark
             });
+        }
+    }
+    public void UpdateQuestions(List<PaperQuestion> questions)
+    {
+        PaperQuestions.RemoveAll(pq => !questions.Any(q => q.QuestionId == pq.QuestionId));
+        foreach (var q in questions)
+        {
+            var existingPaperQuestion = PaperQuestions.FirstOrDefault(pq => pq.QuestionId == q.QuestionId);
+            if (existingPaperQuestion != null)
+            {
+                existingPaperQuestion.Mark = q.Mark;
+            }
+            else
+            {
+                PaperQuestions.Add(new PaperQuestion
+                {
+                    QuestionId = q.QuestionId,
+                    PaperId = this.Id,
+                    Mark = q.Mark
+                });
+            }
         }
     }
 
