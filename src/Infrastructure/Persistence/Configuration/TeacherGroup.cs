@@ -3,7 +3,6 @@ using FSH.WebApi.Domain.TeacherGroup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-
 namespace FSH.WebApi.Infrastructure.Persistence.Configuration;
 public class TeacherPermissionConfig : IEntityTypeConfiguration<TeacherPermissionInClass>
 {
@@ -11,7 +10,7 @@ public class TeacherPermissionConfig : IEntityTypeConfiguration<TeacherPermissio
     {
         builder.IsMultiTenant();
         builder.ToTable("TeacherPermissions", SchemaNames.GroupTeacher);
-       
+
     }
 }
 
@@ -48,7 +47,6 @@ public class TeacherTeamConfig : IEntityTypeConfiguration<TeacherTeam>
         builder.Property(b => b.Email).HasMaxLength(20);
     }
 }
-
 
 public class TeacherPermissionInClassConfig : IEntityTypeConfiguration<TeacherPermissionInClass>
 {

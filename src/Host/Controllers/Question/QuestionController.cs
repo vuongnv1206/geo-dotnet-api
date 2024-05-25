@@ -38,5 +38,5 @@ public class QuestionController : VersionedApiController
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }
-    
+
 }

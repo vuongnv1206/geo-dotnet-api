@@ -1,7 +1,4 @@
-﻿
-
-
-using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.Papers;

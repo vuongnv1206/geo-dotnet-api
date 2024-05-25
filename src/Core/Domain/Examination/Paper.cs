@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using FSH.WebApi.Domain.Examination.Enums;
+﻿using FSH.WebApi.Domain.Examination.Enums;
 
 namespace FSH.WebApi.Domain.Examination;
 public class Paper : AuditableEntity, IAggregateRoot
@@ -22,7 +16,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public string? Password { get; set; }
     public PaperType Type { get; set; }
     public Guid? PaperFolderId { get; set; }
-    public bool IsPublish{ get; set; }
+    public bool IsPublish { get; set; }
     public string ExamCode { get; set; } = "Acb";
     public string? Content { get; set; }
     public string? Description { get; set; }
@@ -50,7 +44,7 @@ public class Paper : AuditableEntity, IAggregateRoot
 
     public void AddQuestions(Dictionary<Guid, float> questions)
     {
-        foreach(var q in questions)
+        foreach (var q in questions)
         {
             if (PaperQuestions.Any(x => x.QuestionId == q.Key))
                 continue;
@@ -64,7 +58,8 @@ public class Paper : AuditableEntity, IAggregateRoot
         }
     }
 
-    public Paper Update(string examName,
+    public Paper Update(
+        string examName,
         PaperStatus status,
         DateTime? startTime,
         DateTime? endTime,

@@ -1,5 +1,4 @@
 using FSH.WebApi.Domain.Question.Enums;
-using System.ComponentModel;
 
 namespace FSH.WebApi.Domain.Question;
 
@@ -49,7 +48,7 @@ public class Question : AuditableEntity, IAggregateRoot
     {
         return CreatedBy == userId;
     }
-    
+
     public void AddAnswer(Answer answer)
     {
         Answers.Add(answer);

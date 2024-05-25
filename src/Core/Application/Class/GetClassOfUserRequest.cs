@@ -1,9 +1,4 @@
 ﻿using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class;
 public class GetClassOfUserRequest : IRequest<List<ClassDto>>
@@ -16,8 +11,8 @@ public class GetClassOfUserRequestHandler : IRequestHandler<GetClassOfUserReques
     private readonly IStringLocalizer _t;
     private readonly ICurrentUser _currentUser;
 
-    public GetClassOfUserRequestHandler(IRepository<Classes> repository,ICurrentUser currentUser , IStringLocalizer<GetClassRequestHandler> localizer) =>
-        (_repository,_currentUser, _t) = (repository,currentUser, localizer);
+    public GetClassOfUserRequestHandler(IRepository<Classes> repository, ICurrentUser currentUser, IStringLocalizer<GetClassRequestHandler> localizer) =>
+        (_repository, _currentUser, _t) = (repository, currentUser, localizer);
     public async Task<List<ClassDto>> Handle(GetClassOfUserRequest request, CancellationToken cancellationToken)
     {
 

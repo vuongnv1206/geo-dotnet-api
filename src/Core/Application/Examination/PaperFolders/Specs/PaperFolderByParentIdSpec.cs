@@ -1,6 +1,5 @@
 ﻿using FSH.WebApi.Domain.Examination;
 
-
 namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class PaperFolderByParentIdSpec : Specification<PaperFolder>, ISingleResultSpecification
 {

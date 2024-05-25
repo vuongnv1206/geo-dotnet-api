@@ -1,6 +1,4 @@
-﻿
-
-using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
@@ -13,7 +11,6 @@ public class GetGroupTeacherWithPermissionRequest : IRequest<GroupTeacherDto>
         Id = id;
     }
 }
-
 
 public class GetGroupTeacherWithPermissionHandler : IRequestHandler<GetGroupTeacherWithPermissionRequest, GroupTeacherDto>
 {

@@ -18,6 +18,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
     {
 
     }
+
     public Assignment(string name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool canViewResult, bool requireLoginToSubmit, Guid subjectId)
     {
         Name = name;
@@ -29,6 +30,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
         RequireLoginToSubmit = requireLoginToSubmit;
         SubjectId = subjectId;
     }
+
     public Assignment Update(string? name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool? canViewResult, bool? requireLoginToSubmit, Guid? subjectId)
     {
         if (name is not null && !Name.Equals(name))
@@ -50,7 +52,6 @@ public class Assignment : AuditableEntity, IAggregateRoot
 
         return this;
     }
-
 
     public Assignment ClearAttachmentPath()
     {

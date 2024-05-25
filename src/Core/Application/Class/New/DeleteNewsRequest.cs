@@ -1,10 +1,4 @@
-﻿using FSH.WebApi.Domain.Catalog;
-using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.New;
 public class DeleteNewsRequest : IRequest<Guid>
@@ -20,7 +14,7 @@ public class DeleteNewsRequestHandler : IRequestHandler<DeleteNewsRequest, Guid>
 
     private readonly IStringLocalizer _t;
 
-    public DeleteNewsRequestHandler(IRepository<News> repository,IStringLocalizer<DeleteNewsRequestHandler> t)
+    public DeleteNewsRequestHandler(IRepository<News> repository, IStringLocalizer<DeleteNewsRequestHandler> t)
     {
         _repository = repository;
         _t = t;
@@ -35,7 +29,7 @@ public class DeleteNewsRequestHandler : IRequestHandler<DeleteNewsRequest, Guid>
         var newsComment = await _repository.ListAsync(new NewsCommentByParentIdSpec(request.Id), cancellationToken);
         if (newsComment != null)
         {
-            await _repository.DeleteRangeAsync(newsComment,cancellationToken);
+            await _repository.DeleteRangeAsync(newsComment, cancellationToken);
         }
 
         await _repository.DeleteAsync(news, cancellationToken);

@@ -1,8 +1,3 @@
-﻿
-using FSH.WebApi.Application.Examination.Papers;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 ﻿using FSH.WebApi.Application.Examination.Papers;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
@@ -14,7 +9,7 @@ public class PapersController : VersionedApiController
     {
         return Mediator.Send(request);
     }
-    
+
     [HttpPost]
     [OpenApiOperation("Create a paper.")]
     public Task<PaperDto> CreateAsync(CreatePaperRequest request)
@@ -28,7 +23,7 @@ public class PapersController : VersionedApiController
     {
         return Mediator.Send(new GetPaperByIdRequest(id));
     }
-    
+
     [HttpPut("{id:guid}")]
     [OpenApiOperation("Update information of paper")]
     public async Task<ActionResult<Guid>> UpdateAsync(UpdatePaperRequest request, Guid id)

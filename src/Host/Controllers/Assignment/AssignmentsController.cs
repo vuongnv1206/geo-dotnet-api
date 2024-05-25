@@ -37,6 +37,7 @@ public class AssignmentsController : VersionedApiController
     {
         return Mediator.Send(request);
     }
+
     [HttpPut("{id:guid}")]
     [MustHavePermission(FSHAction.Update, FSHResource.Assignments)]
     [OpenApiOperation("Update a assignment.", "")]
@@ -54,6 +55,5 @@ public class AssignmentsController : VersionedApiController
     {
         return Mediator.Send(new DeleteAssignmentRequest(id));
     }
-
 
 }

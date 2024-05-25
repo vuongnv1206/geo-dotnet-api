@@ -1,14 +1,9 @@
-﻿
-
-
-using FSH.WebApi.Application.Examination.PaperLabels;
-using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.Papers;
-public class SearchPaperRequest : PaginationFilter,IRequest<PaginationResponse<PaperDto>>
+public class SearchPaperRequest : PaginationFilter, IRequest<PaginationResponse<PaperDto>>
 {
 }
-
 
 public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, PaginationResponse<PaperDto>>
 {

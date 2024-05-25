@@ -1,6 +1,5 @@
 ﻿using FSH.WebApi.Domain.TeacherGroup;
 
-
 namespace FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 public class TeacherTeamByIdSpec : Specification<TeacherTeam, TeacherTeamDto>, ISingleResultSpecification
 {

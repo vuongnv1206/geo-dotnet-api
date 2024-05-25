@@ -1,8 +1,4 @@
-﻿
-
-
-using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
-using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
+﻿using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.TeacherTeams;
@@ -14,7 +10,6 @@ public class GetTeacherTeamRequest : IRequest<TeacherTeamDto>
         Id = id;
     }
 }
-
 
 public class GetTeacherTeamRequestHandler : IRequestHandler<GetTeacherTeamRequest, TeacherTeamDto>
 {

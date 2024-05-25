@@ -49,7 +49,7 @@ public class MapsterSettings
          .Map(dest => dest.GroupPermissionInClasses, src => src.GroupPermissionInClasses)
          .Map(dest => dest.TeacherTeams, src => src.TeacherInGroups.Select(tig => tig.TeacherTeam));
 
-        //Paper Folder
+        // Paper Folder
         TypeAdapterConfig<PaperFolder, PaperFolderDto>.NewConfig()
            .Map(dest => dest.PaperFolderChildrens, src => src.PaperFolderChildrens.Adapt<List<PaperFolderDto>>());
 
@@ -69,8 +69,6 @@ public class MapsterSettings
             .TwoWays();
 
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
-
-
 
     }
 }

@@ -9,9 +9,9 @@ namespace FSH.WebApi.Application.Class;
 public class ClassDto : IDto
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = default;
-    public string SchoolYear { get; set; }
+    public string? Name { get; set; } = default;
+    public required string SchoolYear { get; set; }
     public Guid OwnerId { get; set; }
     public Guid GroupClassId { get; set; }
-    public string GroupClassName { get; set; }
+    public required string GroupClassName { get; set; }
 }

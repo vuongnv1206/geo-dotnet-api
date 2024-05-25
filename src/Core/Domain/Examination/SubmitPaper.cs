@@ -29,10 +29,11 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
             .FirstOrDefault(x => x.SubmitPaperId == submitAnswer.SubmitPaperId
                                 && x.QuestionId == submitAnswer.QuestionId);
 
-        if(answer == null)
+        if (answer == null)
         {
             SubmitPaperDetails.Add(submitAnswer);
-        }else
+        }
+        else
         {
             answer.AnswerRaw = submitAnswer.AnswerRaw;
         }

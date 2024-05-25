@@ -1,18 +1,11 @@
 ﻿using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
-using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Questions;
 public class UpdateAQuestionRequest : IRequest<Guid>
 {
-    public UpdateQuestionDto Question { get; set; }
+    public required UpdateQuestionDto Question { get; set; }
 }
 
 public class UpdateQuestionDto
@@ -32,16 +25,16 @@ public class UpdateQuestionDto
 public class UpdateAQuestionRequestValidator : CustomValidator<UpdateAQuestionRequest>
 {
     public UpdateAQuestionRequestValidator(
-        IReadRepository<QuestionFolder> _folderRepo,
-        IReadRepository<QuestionLable> _labelRepo,
-        IStringLocalizer<UpdateAQuestionRequestValidator> _t)
+        IReadRepository<QuestionFolder> FolderRepo,
+        IReadRepository<QuestionLable> LabelRepo,
+        IStringLocalizer<UpdateAQuestionRequestValidator> T)
     {
         RuleFor(x => x.Question.QuestionFolderId)
-            .MustAsync(async (folderId, ct) => !folderId.HasValue || await _folderRepo.FirstOrDefaultAsync(new QuestionFolderByIdSpec(folderId), ct) is not null)
-            .WithMessage((_, folderId) => _t["Folder {0} Not Found.", folderId]);
+            .MustAsync(async (folderId, ct) => !folderId.HasValue || await FolderRepo.FirstOrDefaultAsync(new QuestionFolderByIdSpec(folderId), ct) is not null)
+            .WithMessage((_, folderId) => T["Folder {0} Not Found.", folderId]);
         RuleFor(x => x.Question.QuestionLableId)
-            .MustAsync(async (labelId, ct) => !labelId.HasValue || await _labelRepo.FirstOrDefaultAsync(new QuestionLabelByIdSpec(labelId), ct) is not null)
-            .WithMessage((_, labelId) => _t["Question Label {0} Not Found.", labelId]);
+            .MustAsync(async (labelId, ct) => !labelId.HasValue || await LabelRepo.FirstOrDefaultAsync(new QuestionLabelByIdSpec(labelId), ct) is not null)
+            .WithMessage((_, labelId) => T["Question Label {0} Not Found.", labelId]);
     }
 }
 

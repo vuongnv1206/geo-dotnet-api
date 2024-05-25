@@ -54,8 +54,7 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
             request.Content,
             request.Description,
             request.PaperFolderId,
-            request.Password
-        );
+            request.Password);
 
         if (!request.Questions.Any())
             throw new ConflictException(_t["Create paper must to have question"]);
