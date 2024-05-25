@@ -3,7 +3,7 @@ public class GroupTeacher : AuditableEntity, IAggregateRoot
 {
     public string Name { get; set; } = null!;
     public virtual List<TeacherInGroup> TeacherInGroups { get; set; } = new();
-    public virtual IEnumerable<GroupPermissionInClass> GroupPermissionInClasses { get; set; }
+    public virtual List<GroupPermissionInClass> GroupPermissionInClasses { get; set; } = new();
 
     public GroupTeacher(string name)
     {
@@ -29,5 +29,21 @@ public class GroupTeacher : AuditableEntity, IAggregateRoot
     public bool CanUpdate(Guid userId)
     {
         return CreatedBy == userId;
+    }
+
+    public void AddPermission(GroupPermissionInClass permission)
+    {
+        if (permission is not null)
+        {
+            GroupPermissionInClasses.Add(permission);
+        }
+    }
+
+    public void RemovePermission(GroupPermissionInClass permission)
+    {
+        if (permission is not null)
+        {
+            GroupPermissionInClasses.Remove(permission);
+        }
     }
 }

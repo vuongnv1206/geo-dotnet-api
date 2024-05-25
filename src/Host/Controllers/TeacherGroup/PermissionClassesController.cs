@@ -15,7 +15,7 @@ public class PermissionClassesController : VersionedApiController
 
     [HttpPost("group-permission-in-class")]
     [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
-    [OpenApiOperation("Set a teacher's permissions for class", "")]
+    [OpenApiOperation("Set a group's permissions for class", "")]
     public Task SetTeacherPermissionInClass(BulkUpdateGroupPermissionInClassRequest request)
     {
         return Mediator.Send(request);
