@@ -1,13 +1,16 @@
 ﻿
 using FSH.WebApi.Application.Examination.Papers;
-
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+﻿using FSH.WebApi.Application.Examination.Papers;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class PapersController : VersionedApiController
 {
     [HttpPost("Search")]
     [OpenApiOperation("")]
-    public Task<List<PaperInListDto>> SearchPaperLabel(SearchPaperRequest request)
+    public Task<PaginationResponse<PaperDto>> SearchPaperLabel(SearchPaperRequest request)
     {
         return Mediator.Send(request);
     }
@@ -31,15 +34,6 @@ public class PapersController : VersionedApiController
     public async Task<ActionResult<Guid>> UpdateAsync(UpdatePaperRequest request, Guid id)
     {
         return id != request.Id
-            ? BadRequest()
-            : Ok(await Mediator.Send(request));
-    }
-
-    [HttpPut("{id:guid}/Questions")]
-    [OpenApiOperation("Update list question of paper")]
-    public async Task<ActionResult> UpdateBulkQuestionsAsync(UpdateQuestionsInPaperRequest request, Guid id)
-    {
-        return id != request.PaperId
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }

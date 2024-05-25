@@ -1,5 +1,6 @@
-﻿using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Application.Identity.Users;
+﻿
+
+
 using FSH.WebApi.Domain.Examination;
 using Mapster;
 
@@ -17,12 +18,11 @@ public class GetPaperByIdRequestHandler : IRequestHandler<GetPaperByIdRequest, P
 {
     private readonly IRepository<Paper> _repository;
     private readonly IStringLocalizer _t;
-    private readonly IUserService _userService;
-    public GetPaperByIdRequestHandler(IRepository<Paper> repository, IStringLocalizer<GetPaperByIdRequestHandler> t, IUserService userService)
+
+    public GetPaperByIdRequestHandler(IRepository<Paper> repository, IStringLocalizer<GetPaperByIdRequestHandler> t)
     {
         _repository = repository;
         _t = t;
-        _userService = userService;
     }
 
     public async Task<PaperDto> Handle(GetPaperByIdRequest request, CancellationToken cancellationToken)
@@ -31,10 +31,7 @@ public class GetPaperByIdRequestHandler : IRequestHandler<GetPaperByIdRequest, P
         var paper = await _repository.FirstOrDefaultAsync(spec, cancellationToken);
         _ = paper ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.Id]);
 
-        var paperDto = paper.Adapt<PaperDto>();
-        paperDto.CreatorName = await _userService.GetFullName(paper.CreatedBy);
-
-        return paperDto;
+        return paper.Adapt<PaperDto>();
 
     }
 }

@@ -1,10 +1,15 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using FSH.WebApi.Domain.Examination.Enums;
 
 namespace FSH.WebApi.Domain.Examination;
 public class Paper : AuditableEntity, IAggregateRoot
 {
-    public string ExamName { get; set; }
+    public string ExamName { get; set; } = null!;
     public PaperStatus Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
@@ -18,7 +23,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public PaperType Type { get; set; }
     public Guid? PaperFolderId { get; set; }
     public bool IsPublish{ get; set; }
-    public string ExamCode { get; set; }
+    public string ExamCode { get; set; } = "Acb";
     public string? Content { get; set; }
     public string? Description { get; set; }
     public virtual PaperLabel? PaperLable { get; set; }
@@ -41,21 +46,20 @@ public class Paper : AuditableEntity, IAggregateRoot
         Description = description;
         PaperFolderId = paperFolderId;
         Password = password;
-        ExamCode = examName;
     }
 
-    public void AddQuestions(List<PaperQuestion> questions)
+    public void AddQuestions(Dictionary<Guid, float> questions)
     {
         foreach(var q in questions)
         {
-            if (PaperQuestions.Any(x => x.QuestionId == q.Question.Id))
+            if (PaperQuestions.Any(x => x.QuestionId == q.Key))
                 continue;
 
             PaperQuestions.Add(new PaperQuestion
             {
-                QuestionId = q.QuestionId,
+                QuestionId = q.Key,
                 PaperId = Id,
-                Mark = q.Mark
+                Mark = q.Value
             });
         }
     }
@@ -95,31 +99,8 @@ public class Paper : AuditableEntity, IAggregateRoot
         return this;
     }
 
-    public void UpdateQuestions(List<PaperQuestion> questions)
-    {
-        PaperQuestions.RemoveAll(pq => !questions.Any(q => q.QuestionId == pq.QuestionId));
-        foreach (var q in questions)
-        {
-            var existingPaperQuestion = PaperQuestions.FirstOrDefault(pq => pq.QuestionId == q.QuestionId);
-            if (existingPaperQuestion != null)
-            {
-                existingPaperQuestion.Mark = q.Mark;
-            }
-            else
-            {
-                PaperQuestions.Add(new PaperQuestion
-                {
-                    QuestionId = q.QuestionId,
-                    PaperId = this.Id,
-                    Mark = q.Mark
-                });
-            }
-        }
-    }
-
     public bool CanUpdate(DefaultIdType userId)
     {
         return CreatedBy == userId;
     }
-
 }

@@ -25,19 +25,10 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
     public async Task<List<PaperFolderDto>> Handle(SearchPaperFolderRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
-        var data = new List<PaperFolder>();
+        var spec = new PaperFolderBySearchRequestSpec(request, currentUserId);
 
-        if (!string.IsNullOrEmpty(request.Name)) {
-            var spec = new PaperFolderBySearchRequestWithNameSpec(request.Name, currentUserId);
-            data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
-        }
-        else if(request.ParentId == null || request.ParentId.HasValue)
-        {
-            var spec = new PaperFolderBySearchRequestWithParentIdSpec(currentUserId);
-            data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
-            data = data.Where(x => x.ParentId == request.ParentId).ToList();
-        }
-       
+        var data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
+        data = data.Where(x => x.ParentId == request.ParentId).ToList();
 
         var dtos = new List<PaperFolderDto>();
         foreach (var folder in data)
@@ -56,7 +47,9 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
         {
             var dto = paperFolder.Adapt<PaperFolderDto>();
 
-            dto.CreatorName = await userService.GetFullName(paperFolder.CreatedBy);
+            // Lấy tên người tạo
+            var creator = await userService.GetAsync(paperFolder.CreatedBy.ToString(), cancellationToken);
+            dto.CreatorName = string.Join(" ", creator.FirstName, creator.LastName);
 
             // Xử lý các mục con
             if (paperFolder.PaperFolderChildrens != null && paperFolder.PaperFolderChildrens.Any())
