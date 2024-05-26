@@ -34,7 +34,7 @@ public class BulkUpdateGroupPermissionInClassRequestHandler : IRequestHandler<Bu
             new GroupTeacherByIdWithPermissionSpec(request.GroupTeacherId), cancellationToken)
         ?? throw new NotFoundException(_t["GroupTeacher {0} Not Found."]);
 
-        if (groupTeacher.CanUpdate(_currentUser.GetUserId()))
+        if (!groupTeacher.CanUpdate(_currentUser.GetUserId()))
         {
             throw new ForbiddenException(_t["You don't have this permission."]);
         }
