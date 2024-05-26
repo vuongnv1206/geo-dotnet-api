@@ -858,10 +858,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolderPermission", b =>
                 {
-                    b.Property<Guid>("QuestionFolderId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<bool>("CanAdd")
@@ -888,7 +886,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("Id")
+                    b.Property<Guid?>("GroupTeacherId")
+                        .IsRequired()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("LastModifiedBy")
@@ -897,12 +896,21 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("QuestionFolderId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.HasKey("QuestionFolderId", "UserId");
+                    b.Property<Guid?>("UserId")
+                        .IsRequired()
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("QuestionFolderId", "UserId", "GroupTeacherId");
 
                     b.ToTable("QuestionFolderPermissions", "Question");
 

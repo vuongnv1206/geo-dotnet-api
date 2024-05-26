@@ -454,14 +454,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Question",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GroupTeacherId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuestionFolderId = table.Column<Guid>(type: "uuid", nullable: false),
                     CanView = table.Column<bool>(type: "boolean", nullable: false),
                     CanAdd = table.Column<bool>(type: "boolean", nullable: false),
                     CanUpdate = table.Column<bool>(type: "boolean", nullable: false),
                     CanDelete = table.Column<bool>(type: "boolean", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -471,7 +472,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_QuestionFolderPermissions", x => new { x.QuestionFolderId, x.UserId });
+                    table.PrimaryKey("PK_QuestionFolderPermissions", x => x.Id);
+                    table.UniqueConstraint("AK_QuestionFolderPermissions_QuestionFolderId_UserId_GroupTeac~", x => new { x.QuestionFolderId, x.UserId, x.GroupTeacherId });
                     table.ForeignKey(
                         name: "FK_QuestionFolderPermissions_QuestionFolders_QuestionFolderId",
                         column: x => x.QuestionFolderId,
