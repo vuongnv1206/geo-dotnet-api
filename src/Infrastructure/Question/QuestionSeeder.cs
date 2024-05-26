@@ -1,10 +1,10 @@
-﻿using System.Reflection;
-using FSH.WebApi.Application.Common.Interfaces;
+﻿using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace FSH.WebApi.Infrastructure.Question;
 public class QuestionSeeder : ICustomSeeder
@@ -27,7 +27,7 @@ public class QuestionSeeder : ICustomSeeder
         {
             _logger.LogInformation("Started to Seed Questions.");
 
-            string questionData = await File.ReadAllTextAsync(path + "/Question/question.json", cancellationToken);
+            string questionData = await File.ReadAllTextAsync(path + "/Question/Question.json", cancellationToken);
             var questions = _serializerService.Deserialize<List<Domain.Question.Question>>(questionData);
 
             if (questions != null)
