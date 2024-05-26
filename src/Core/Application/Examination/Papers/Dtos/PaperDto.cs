@@ -12,6 +12,7 @@ public class PaperDto : IDto
     public Guid? PaperLabelId { get; set; }
     public int NumberOfQuestion { get; set; }
     public int? Duration { get; set; }
+    public string Status { get; set; }
     public bool ShowMarkResult { get; set; }
     public bool ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
