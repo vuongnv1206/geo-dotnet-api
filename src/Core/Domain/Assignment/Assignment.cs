@@ -1,5 +1,4 @@
 ﻿using FSH.WebApi.Domain.Subjects;
-
 namespace FSH.WebApi.Domain.Assignment;
 public class Assignment : AuditableEntity, IAggregateRoot
 {
@@ -16,7 +15,6 @@ public class Assignment : AuditableEntity, IAggregateRoot
 
     public Assignment()
     {
-
     }
 
     public Assignment(string name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool canViewResult, bool requireLoginToSubmit, Guid subjectId)
@@ -39,7 +37,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
             StartTime = startTime;
         if (endTime.HasValue && EndTime != endTime)
             EndTime = endTime;
-        if (attachmentPath is not null && !AttachmentPath.Equals(attachmentPath))
+        if (attachmentPath is not null)
             AttachmentPath = attachmentPath;
         if (content is not null && !Content.Equals(content))
             Content = content;

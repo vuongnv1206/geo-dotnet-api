@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.PaperFolders;
+using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Examination.Enums;
 using Mapster;
@@ -13,7 +14,8 @@ public class CreatePaperRequest : IRequest<PaperDto>
     public Guid? PaperFolderId { get; set; }
     public string? Content { get; set; }
     public string? Description { get; set; }
-    public Dictionary<Guid, float> Questions { get; set; }
+    public List<CreateUpdateQuestionInPaperDto>? Questions { get; set; } = new(); // Thêm danh sách câu hỏi đã có
+    public List<NewQuestionDto>? NewQuestions { get; set; } = new();// Thêm danh sách câu hỏi mới
 }
 
 public class CreatePaperRequestValidator : CustomValidator<CreatePaperRequest>
@@ -30,15 +32,17 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
     private readonly IRepositoryWithEvents<Paper> _paperRepo;
     private readonly IStringLocalizer<CreatePaperRequestHandler> _t;
     private readonly IRepository<PaperFolder> _paperFolderRepo;
-
+    private readonly IMediator _mediator;
     public CreatePaperRequestHandler(
         IRepositoryWithEvents<Paper> paperRepo,
         IStringLocalizer<CreatePaperRequestHandler> t,
-        IRepository<PaperFolder> paperFolderRepo)
+        IRepository<PaperFolder> paperFolderRepo,
+        IMediator mediator)
     {
         _paperRepo = paperRepo;
         _t = t;
         _paperFolderRepo = paperFolderRepo;
+        _mediator = mediator;
     }
 
     public async Task<PaperDto> Handle(CreatePaperRequest request, CancellationToken cancellationToken)
@@ -54,14 +58,34 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
             request.Content,
             request.Description,
             request.PaperFolderId,
-            request.Password);
+            request.Password
+        );
 
-        if (!request.Questions.Any())
-            throw new ConflictException(_t["Create paper must to have question"]);
+        if (!request.Questions.Any() && !request.NewQuestions.Any())
+            throw new ConflictException(_t["Create paper must have questions."]);
 
-        newPaper.AddQuestions(request.Questions);
+        if (request.NewQuestions.Any())
+        {
+            var createQuestionRequest = new CreateQuestionRequest { Questions = request.NewQuestions.Adapt<List<CreateQuestionDto>>() };
+            var newQuestionIds = await _mediator.Send(createQuestionRequest, cancellationToken);
 
-        await _paperRepo.AddAsync( newPaper );
+            var newPaperQuestions = request.NewQuestions.Select(q => new PaperQuestion
+            {
+                QuestionId = newQuestionIds[request.NewQuestions.IndexOf(q)],
+                Mark = q.Mark
+            }).ToList();
+            newPaper.AddQuestions(newPaperQuestions);
+        }
+
+
+        if (request.Questions.Any())
+        {
+            var questions = request.Questions.Adapt<List<PaperQuestion>>();
+            newPaper.AddQuestions(questions);
+        }
+
+
+        await _paperRepo.AddAsync(newPaper);
         var paperDto = newPaper.Adapt<PaperDto>();
 
         return paperDto;

@@ -5,7 +5,7 @@ public class PapersController : VersionedApiController
 {
     [HttpPost("Search")]
     [OpenApiOperation("")]
-    public Task<PaginationResponse<PaperDto>> SearchPaperLabel(SearchPaperRequest request)
+    public Task<List<PaperInListDto>> SearchPaperLabel(SearchPaperRequest request)
     {
         return Mediator.Send(request);
     }

@@ -1,6 +1,4 @@
-﻿using FSH.WebApi.Application.Catalog.Products;
-using FSH.WebApi.Application.Questions.Dtos;
-using FSH.WebApi.Domain.Question;
+﻿using FSH.WebApi.Application.Questions.Dtos;
 
 namespace FSH.WebApi.Application.Questions.Specs;
 

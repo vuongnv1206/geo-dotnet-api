@@ -50,7 +50,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
         if (submitPaper is null)
             throw new NotFoundException(_t["Submit Paper {0} Not Found.", request.SubmitPaperId]);
 
-        var question = await _questionRepo.FirstOrDefaultAsync(new QuestionByIdRequestSpec(request.QuestionId));
+        var question = await _questionRepo.FirstOrDefaultAsync(new QuestionByIdSpec(request.QuestionId));
         if (question is null)
             throw new NotFoundException(_t["Question {0} Not Found.", request.QuestionId]);
 

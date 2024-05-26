@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.GroupClasses;
 public class UpdateGroupClassRequest : IRequest<Guid>
@@ -26,7 +25,7 @@ public class UpdateGroupClassRequestHandler : IRequestHandler<UpdateGroupClassRe
     private readonly IRepositoryWithEvents<GroupClass> _repository;
     private readonly IStringLocalizer _t;
 
-    public UpdateGroupClassRequestHandler(IRepositoryWithEvents<GroupClass> repository, IStringLocalizer<UpdateBrandRequestHandler> localizer)
+    public UpdateGroupClassRequestHandler(IRepositoryWithEvents<GroupClass> repository, IStringLocalizer<UpdateGroupClassRequestHandler> localizer)
     {
         (_repository, _t) = (repository, localizer);
     }
