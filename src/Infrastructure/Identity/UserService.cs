@@ -1,6 +1,5 @@
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Finbuckle.MultiTenant;
 using FSH.WebApi.Application.Common.Caching;
 using FSH.WebApi.Application.Common.Events;
@@ -9,6 +8,7 @@ using FSH.WebApi.Application.Common.FileStorage;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Models;
+using FSH.WebApi.Application.Common.ReCaptchaV3;
 using FSH.WebApi.Application.Common.Specification;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Identity;
@@ -39,6 +39,7 @@ internal partial class UserService : IUserService
     private readonly ICacheService _cache;
     private readonly ICacheKeyService _cacheKeys;
     private readonly ITenantInfo _currentTenant;
+    private readonly IReCAPTCHAv3Service _reCAPTCHAv3Service;
 
     public UserService(
         SignInManager<ApplicationUser> signInManager,
@@ -54,6 +55,7 @@ internal partial class UserService : IUserService
         ICacheService cache,
         ICacheKeyService cacheKeys,
         ITenantInfo currentTenant,
+        IReCAPTCHAv3Service reCAPTCHAv3Service,
         IOptions<SecuritySettings> securitySettings)
     {
         _signInManager = signInManager;
@@ -69,6 +71,7 @@ internal partial class UserService : IUserService
         _cache = cache;
         _cacheKeys = cacheKeys;
         _currentTenant = currentTenant;
+        _reCAPTCHAv3Service = reCAPTCHAv3Service;
         _securitySettings = securitySettings.Value;
     }
 
