@@ -42,6 +42,19 @@ internal partial class UserService
 
     public async Task<string> ResetPasswordAsync(ResetPasswordRequest request)
     {
+        try
+        {
+            var res = await _reCAPTCHAv3Service.Verify(request.captchaToken);
+            if (!res.success)
+            {
+                throw new UnauthorizedException(_t["reCAPTCHA Verification Failed."]);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new UnauthorizedException(ex.Message);
+        }
+
         var user = await _userManager.FindByEmailAsync(request.Email?.Normalize()!);
 
         // Don't reveal that the user does not exist
