@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;

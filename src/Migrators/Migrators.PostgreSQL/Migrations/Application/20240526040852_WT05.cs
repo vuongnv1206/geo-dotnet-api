@@ -22,9 +22,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 name: "Auditing");
 
             migrationBuilder.EnsureSchema(
-                name: "Catalog");
-
-            migrationBuilder.EnsureSchema(
                 name: "Classes");
 
             migrationBuilder.EnsureSchema(
@@ -74,27 +71,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AuditTrails", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Brands",
-                schema: "Catalog",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Brands", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -326,37 +302,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Products",
-                schema: "Catalog",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Rate = table.Column<decimal>(type: "numeric", nullable: false),
-                    ImagePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
-                    BrandId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Products_Brands_BrandId",
-                        column: x => x.BrandId,
-                        principalSchema: "Catalog",
-                        principalTable: "Brands",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1109,12 +1054,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "PaperLabelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_BrandId",
-                schema: "Catalog",
-                table: "Products",
-                column: "BrandId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_QuestionFolders_ParentId",
                 schema: "Question",
                 table: "QuestionFolders",
@@ -1256,10 +1195,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Examination");
 
             migrationBuilder.DropTable(
-                name: "Products",
-                schema: "Catalog");
-
-            migrationBuilder.DropTable(
                 name: "QuestionFolderPermissions",
                 schema: "Question");
 
@@ -1306,10 +1241,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
             migrationBuilder.DropTable(
                 name: "News",
                 schema: "Classes");
-
-            migrationBuilder.DropTable(
-                name: "Brands",
-                schema: "Catalog");
 
             migrationBuilder.DropTable(
                 name: "Questions",

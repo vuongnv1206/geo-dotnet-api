@@ -69,9 +69,6 @@
         <ProjectReference Include="..\Core\Domain\Domain.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <None Update="Catalog\*.json" CopyToOutputDirectory="PreserveNewest" />
-    </ItemGroup>
-    <ItemGroup>
         <None Update="Subjects\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
     <ItemGroup>

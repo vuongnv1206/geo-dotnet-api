@@ -1,10 +1,5 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.TeacherInGroups;
-using FSH.WebApi.Domain.TeacherGroup;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.TeacherGroup;
 

@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 public class UpdateGroupTeacherRequest : IRequest<Guid>
@@ -10,7 +9,7 @@ public class UpdateGroupTeacherRequest : IRequest<Guid>
 
 public class UpdateGroupTeacherRequestValidator : CustomValidator<UpdateGroupTeacherRequest>
 {
-    public UpdateGroupTeacherRequestValidator(IRepository<GroupTeacher> repository, IStringLocalizer<UpdateBrandRequestValidator> T) =>
+    public UpdateGroupTeacherRequestValidator(IRepository<GroupTeacher> repository, IStringLocalizer<UpdateGroupTeacherRequestValidator> T) =>
         RuleFor(p => p.Name)
             .NotEmpty()
             .MaximumLength(75)
