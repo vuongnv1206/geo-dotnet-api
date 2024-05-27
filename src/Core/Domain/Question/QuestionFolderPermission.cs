@@ -2,8 +2,8 @@ namespace FSH.WebApi.Domain.Question;
 
 public class QuestionFolderPermission : AuditableEntity, IAggregateRoot
 {
-    public DefaultIdType? UserId { get; private set; } = default!;
-    public DefaultIdType? GroupTeacherId { get; private set; } = default!;
+    public DefaultIdType? UserId { get; private set; } = DefaultIdType.Empty;
+    public DefaultIdType? GroupTeacherId { get; private set; } = DefaultIdType.Empty;
     public DefaultIdType QuestionFolderId { get; private set; }
     public virtual QuestionFolder QuestionFolder { get; private set; } = default!;
     public bool CanView { get; private set; }

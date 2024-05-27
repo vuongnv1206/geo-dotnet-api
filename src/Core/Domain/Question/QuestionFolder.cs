@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace FSH.WebApi.Domain.Question;
 
 public class QuestionFolder : AuditableEntity, IAggregateRoot
@@ -69,8 +67,8 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
 
         foreach (var permission in parentFolder.Permissions)
         {
-            AddPermission(new QuestionFolderPermission(permission.UserId, Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
-            AddPermission(new QuestionFolderPermission(parentFolder.CreatedBy, Id, true, true, true, true));
+            AddPermission(new QuestionFolderPermission(permission.UserId, permission.GroupTeacherId, Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
+            AddPermission(new QuestionFolderPermission(parentFolder.CreatedBy, Guid.Empty, Id, true, true, true, true));
         }
     }
 
