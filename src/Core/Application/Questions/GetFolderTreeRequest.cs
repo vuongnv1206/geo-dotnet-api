@@ -1,7 +1,9 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 namespace FSH.WebApi.Application.Questions;
 
@@ -20,14 +22,16 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
     private readonly IRepository<QuestionFolder> _questionFolderRepository;
+    private readonly IRepository<GroupTeacher> _groupTeacherRepository;
     private readonly IDapperRepository _repository;
     private readonly IStringLocalizer _t;
 
-    public GetFolderTreeRequestHandler(ICurrentUser currentUser, IUserService userService, IRepository<QuestionFolder> questionFolderRepository, IDapperRepository repository, IStringLocalizer<GetFolderTreeRequestHandler> localizer)
+    public GetFolderTreeRequestHandler(ICurrentUser currentUser, IUserService userService, IRepository<QuestionFolder> questionFolderRepository, IRepository<GroupTeacher> groupTeacherRepository, IDapperRepository repository, IStringLocalizer<GetFolderTreeRequestHandler> localizer)
     {
         _currentUser = currentUser;
         _userService = userService;
         _questionFolderRepository = questionFolderRepository;
+        _groupTeacherRepository = groupTeacherRepository;
         _repository = repository;
         _t = localizer;
     }
@@ -78,6 +82,29 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
             // Get total questions in each folder
             int totalQuestions = await countQuestions(tree.Id, cancellationToken);
             tree.TotalQuestions = totalQuestions;
+
+            // loop through permissions and set the current user permissions
+            foreach (var permission in tree.Permission)
+            {
+                if (permission.UserId != Guid.Empty)
+                {
+                    var user_per = await _userService.GetAsync(permission.UserId.ToString(), cancellationToken);
+                    if (user_per != null)
+                    {
+                        permission.User = user_per;
+                    }
+                }
+
+                if (permission.GroupTeacherId != Guid.Empty)
+                {
+                    var groupTeacher = await _groupTeacherRepository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(permission.GroupTeacherId), cancellationToken);
+                    if (groupTeacher != null)
+                    {
+                        permission.GroupTeacher = groupTeacher.Adapt<GroupTeacherDto>();
+                    }
+                }
+
+            }
         }
 
         var result = new QuestionTreeDto();
