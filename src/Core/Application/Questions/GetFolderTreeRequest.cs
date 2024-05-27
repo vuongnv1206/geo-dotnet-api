@@ -69,43 +69,7 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
         var spec = new QuestionFoldersWithPermissionsSpecByUserId(userId, request.ParentId);
         var questionFolders = await _questionFolderRepository.ListAsync(spec, cancellationToken);
         var questionFolderTree = questionFolders.Adapt<List<QuestionTreeDto>>();
-
-        // Get owner details for each folder
-        foreach (var tree in questionFolderTree)
-        {
-            var user = await _userService.GetAsync(tree.CreatedBy.ToString(), cancellationToken);
-            if (user != null)
-            {
-                tree.Owner = user;
-            }
-
-            // Get total questions in each folder
-            int totalQuestions = await countQuestions(tree.Id, cancellationToken);
-            tree.TotalQuestions = totalQuestions;
-
-            // loop through permissions and set the current user permissions
-            foreach (var permission in tree.Permission)
-            {
-                if (permission.UserId != Guid.Empty)
-                {
-                    var user_per = await _userService.GetAsync(permission.UserId.ToString(), cancellationToken);
-                    if (user_per != null)
-                    {
-                        permission.User = user_per;
-                    }
-                }
-
-                if (permission.GroupTeacherId != Guid.Empty)
-                {
-                    var groupTeacher = await _groupTeacherRepository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(permission.GroupTeacherId), cancellationToken);
-                    if (groupTeacher != null)
-                    {
-                        permission.GroupTeacher = groupTeacher.Adapt<GroupTeacherDto>();
-                    }
-                }
-
-            }
-        }
+        await GetDetails(questionFolderTree, cancellationToken);
 
         var result = new QuestionTreeDto();
 
@@ -148,16 +112,56 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
                 newTree = parentTree;
             }
 
+            var listNewTree = new List<QuestionTreeDto> { newTree };
+
             result = new QuestionTreeDto
             {
                 Id = Guid.Empty,
                 Name = "Root",
                 CurrentShow = false,
-                Children = new List<QuestionTreeDto> { newTree }
+                Children = listNewTree
             };
         }
 
         return result;
     }
 
+    private async Task GetDetails(List<QuestionTreeDto> questionFolderTree, CancellationToken cancellationToken)
+    {
+        // Get owner details for each folder
+        foreach (var tree in questionFolderTree)
+        {
+            var user = await _userService.GetAsync(tree.CreatedBy.ToString(), cancellationToken);
+            if (user != null)
+            {
+                tree.Owner = user;
+            }
+
+            // Get total questions in each folder
+            int totalQuestions = await countQuestions(tree.Id, cancellationToken);
+            tree.TotalQuestions = totalQuestions;
+
+            // loop through permissions and set the current user permissions
+            foreach (var permission in tree.Permission)
+            {
+                if (permission.UserId != Guid.Empty)
+                {
+                    var user_per = await _userService.GetAsync(permission.UserId.ToString(), cancellationToken);
+                    if (user_per != null)
+                    {
+                        permission.User = user_per;
+                    }
+                }
+
+                if (permission.GroupTeacherId != Guid.Empty)
+                {
+                    var groupTeacher = await _groupTeacherRepository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(permission.GroupTeacherId), cancellationToken);
+                    if (groupTeacher != null)
+                    {
+                        permission.GroupTeacher = groupTeacher.Adapt<GroupTeacherDto>();
+                    }
+                }
+            }
+        }
+    }
 }
