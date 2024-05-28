@@ -10,48 +10,66 @@ public class BulkUpdateTeacherPermissionInClassRequest : IRequest<Guid>
 
 public class BulkUpdateTeacherPermissionInClassRequestHandler : IRequestHandler<BulkUpdateTeacherPermissionInClassRequest, Guid>
 {
-    private readonly IRepositoryWithEvents<TeacherPermissionInClass> _teacherPermissionRepo;
     private readonly IRepositoryWithEvents<TeacherTeam> _teacherTeamRepo;
     private readonly IReadRepository<Classes> _classRepo;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
 
     public BulkUpdateTeacherPermissionInClassRequestHandler(
-        IRepositoryWithEvents<TeacherPermissionInClass> teacherPermissionRepo,
         IRepositoryWithEvents<TeacherTeam> teacherTeamRepo,
         IReadRepository<Classes> classRepo,
-        IStringLocalizer<BulkUpdateTeacherPermissionInClassRequestHandler> t)
+        IStringLocalizer<BulkUpdateTeacherPermissionInClassRequestHandler> t,
+        ICurrentUser currentUser)
     {
-        _teacherPermissionRepo = teacherPermissionRepo;
         _teacherTeamRepo = teacherTeamRepo;
         _classRepo = classRepo;
         _t = t;
+        _currentUser = currentUser;
     }
 
     public async Task<DefaultIdType> Handle(BulkUpdateTeacherPermissionInClassRequest request, CancellationToken cancellationToken)
     {
         var teacherTeam = await _teacherTeamRepo.FirstOrDefaultAsync(
-            new TeacherTeamByIdWithPermissionSpec(request.TeacherId), cancellationToken);
-        if (teacherTeam is null)
-            throw new NotFoundException(_t["Teacher Not Found."]);
+            new TeacherTeamByIdWithPermissionSpec(request.TeacherId), cancellationToken)
+        ?? throw new NotFoundException(_t["Teacher Not Found."]);
 
-        foreach (var teacher in teacherTeam.TeacherPermissionInClasses)
+        if (!teacherTeam.CanUpdate(_currentUser.GetUserId()))
         {
-            await _teacherPermissionRepo.DeleteAsync(teacher);
+            throw new ForbiddenException(_t["You don't have this permission."]);
         }
 
-        foreach (var permissionInClass in request.PermissionInClassDtos)
-        {
-            var classRoom = _classRepo.GetByIdAsync(permissionInClass.ClassId, cancellationToken);
-            if (classRoom.Result is null) continue;
+        var existingPermissions = teacherTeam.TeacherPermissionInClasses?.ToList();
 
-            await _teacherPermissionRepo.AddAsync(new TeacherPermissionInClass
+        foreach(var existPermission in existingPermissions)
+        {
+            if (!request.PermissionInClassDtos
+                .Any(x => x.ClassId == existPermission.ClassId
+                    && x.PermissionType == existPermission.PermissionType))
             {
-                TeacherTeamId = request.TeacherId,
-                ClassId = permissionInClass.ClassId,
-                PermissionType = permissionInClass.PermissionType
-            });
+                teacherTeam.RemovePermission(existPermission);
+            }
         }
 
-        return default(DefaultIdType);
+        foreach (var item in request.PermissionInClassDtos)
+        {
+            if (!teacherTeam.TeacherPermissionInClasses
+                .Any(x => x.ClassId == item.ClassId
+                    && x.PermissionType == item.PermissionType))
+            {
+                var classroom = _classRepo.GetByIdAsync(item.ClassId, cancellationToken);
+                _ = classroom ?? throw new NotFoundException(_t["Classroom{0} Not Found.", item.ClassId]);
+
+                teacherTeam.AddPermission(new TeacherPermissionInClass
+                {
+                    ClassId = item.ClassId,
+                    TeacherTeamId = request.TeacherId,
+                    PermissionType = item.PermissionType,
+                });
+            }
+        }
+
+        await _teacherTeamRepo.UpdateAsync(teacherTeam);
+
+        return teacherTeam.Id;
     }
 }
