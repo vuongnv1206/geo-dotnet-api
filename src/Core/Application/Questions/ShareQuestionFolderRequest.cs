@@ -11,7 +11,7 @@ public class ShareQuestionFolderRequest : IRequest<DefaultIdType>
     public List<string> Emails { get; set; } = new();
     public List<string> Phones { get; set; } = new();
     public bool CanView { get; set; }
-    public bool CanEdit { get; set; }
+    public bool CanAdd { get; set; }
     public bool CanUpdate { get; set; }
     public bool CanDelete { get; set; }
 }
@@ -98,13 +98,13 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
 
             if (permission == null)
             {
-                permission = new QuestionFolderPermission(userId, Guid.Empty, folder.Id, request.CanView, request.CanEdit, request.CanUpdate, request.CanDelete);
+                permission = new QuestionFolderPermission(userId, Guid.Empty, folder.Id, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete);
                 folder.Permissions.Add(permission);
                 await _repository.UpdateAsync(folder, cancellationToken);
             }
             else
             {
-                permission.SetPermissions(request.CanView, request.CanEdit, request.CanUpdate, request.CanDelete);
+                permission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete);
                 await _permissionRepository.UpdateAsync(permission, cancellationToken);
             }
         }
@@ -115,13 +115,13 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
 
             if (permission == null)
             {
-                permission = new QuestionFolderPermission(Guid.Empty, teacherGroupId, folder.Id, request.CanView, request.CanEdit, request.CanUpdate, request.CanDelete);
+                permission = new QuestionFolderPermission(Guid.Empty, teacherGroupId, folder.Id, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete);
                 folder.Permissions.Add(permission);
                 await _repository.UpdateAsync(folder, cancellationToken);
             }
             else
             {
-                permission.SetPermissions(request.CanView, request.CanEdit, request.CanUpdate, request.CanDelete);
+                permission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete);
                 await _permissionRepository.UpdateAsync(permission, cancellationToken);
             }
         }

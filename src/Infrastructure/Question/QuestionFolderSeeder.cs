@@ -80,6 +80,7 @@ public class QuestionFolderSeeder : ICustomSeeder
             foreach (var folder in folders)
             {
                 await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(basicGuid, Guid.Empty, folder.Id, true, true, true, true), cancellationToken);
+                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(adminGuid, Guid.Empty, folder.Id, true, true, true, true), cancellationToken);
             }
 
             await _db.SaveChangesAsync(cancellationToken);

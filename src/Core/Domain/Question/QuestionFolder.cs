@@ -68,7 +68,6 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
         foreach (var permission in parentFolder.Permissions)
         {
             AddPermission(new QuestionFolderPermission(permission.UserId, permission.GroupTeacherId, Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
-            AddPermission(new QuestionFolderPermission(parentFolder.CreatedBy, Guid.Empty, Id, true, true, true, true));
         }
     }
 

@@ -52,8 +52,13 @@ public class CreateFolderRequestHandler : IRequestHandler<CreateFolderRequest, G
         {
             var parentFolder = await _repository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(request.ParentId), cancellationToken);
             folder.CopyPermissions(parentFolder);
-            await _repository.UpdateAsync(folder, cancellationToken);
         }
+
+        // add owner permission
+        var permission = new QuestionFolderPermission(_currentUser.GetUserId(), folder.Id, true, true, true, true);
+        folder.AddPermission(permission);
+
+        await _repository.UpdateAsync(folder, cancellationToken);
 
         return folder.Id;
     }
