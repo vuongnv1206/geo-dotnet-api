@@ -7,6 +7,7 @@ public class PaperFolderByIdSpec : Specification<PaperFolder>, ISingleResultSpec
     {
         Query
         .Include(b => b.PaperFolderChildrens)
+        .Include(x => x.Papers)
         .Where(b => b.Id == id);
     }
 }

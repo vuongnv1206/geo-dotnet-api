@@ -1,3 +1,5 @@
+using FSH.WebApi.Domain.Examination;
+
 namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class PaperFolderDto : IDto
 {
@@ -11,4 +13,5 @@ public class PaperFolderDto : IDto
     public Guid LastModifiedBy { get; set; }
     public DateTime? LastModifiedOn { get; set; }
     public List<PaperFolderDto>? PaperFolderChildrens { get; set; }
+    public List<PaperFolderParentDto>? Parents { get; set; }
 }

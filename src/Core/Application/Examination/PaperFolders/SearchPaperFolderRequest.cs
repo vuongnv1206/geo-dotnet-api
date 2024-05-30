@@ -29,50 +29,64 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
 
         if (!string.IsNullOrEmpty(request.Name))
         {
-            var spec = new PaperFolderBySearchWithNameSpec(request.Name, currentUserId);
+            // Find all parent IDs
+            var parentIds = new List<Guid>();
+            if (request.ParentId.HasValue)
+            {
+                parentIds.Add(request.ParentId.Value);
+                var parentFolder = await _paperFolderRepo.GetByIdAsync(request.ParentId.Value);
+                if (parentFolder != null)
+                {
+                    parentFolder.ChildPaperFolderIds(null, parentIds);
+                }
+            }
+            var spec = new PaperFolderBySearchSpec(parentIds, request.Name, currentUserId);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
+
         }
-        else if (request.ParentId == null || request.ParentId.HasValue)
+        else
         {
-            var spec = new PaperFolderBySearchWithParentIdSpec(currentUserId);
+            var spec = new PaperFolderTreeSpec(currentUserId);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
             data = data.Where(x => x.ParentId == request.ParentId).ToList();
         }
 
-
         var dtos = new List<PaperFolderDto>();
+
         foreach (var folder in data)
-        {
+        {   
             var dto = await CustomMappings.MapPaperFolderAsync(folder, _userService, cancellationToken);
+            var parents = folder.ListParents();
+            dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
             dtos.Add(dto);
         }
 
+
+
         return dtos;
-
     }
+}
 
-    public static class CustomMappings
+public static class CustomMappings
+{
+    public static async Task<PaperFolderDto> MapPaperFolderAsync(PaperFolder paperFolder, IUserService userService, CancellationToken cancellationToken)
     {
-        public static async Task<PaperFolderDto> MapPaperFolderAsync(PaperFolder paperFolder, IUserService userService, CancellationToken cancellationToken)
+        var dto = paperFolder.Adapt<PaperFolderDto>();
+
+        // Lấy tên người tạo
+        dto.CreatorName = await userService.GetFullName(paperFolder.CreatedBy);
+
+        // Xử lý các mục con
+        if (paperFolder.PaperFolderChildrens != null && paperFolder.PaperFolderChildrens.Any())
         {
-            var dto = paperFolder.Adapt<PaperFolderDto>();
-
-            // Lấy tên người tạo
-            dto.CreatorName = await userService.GetFullName(paperFolder.CreatedBy);
-
-            // Xử lý các mục con
-            if (paperFolder.PaperFolderChildrens != null && paperFolder.PaperFolderChildrens.Any())
+            dto.PaperFolderChildrens = new List<PaperFolderDto>();
+            foreach (var child in paperFolder.PaperFolderChildrens)
             {
-                dto.PaperFolderChildrens = new List<PaperFolderDto>();
-                foreach (var child in paperFolder.PaperFolderChildrens)
-                {
-                    var childDto = await MapPaperFolderAsync(child, userService, cancellationToken);
-                    dto.PaperFolderChildrens.Add(childDto);
-                }
+                var childDto = await MapPaperFolderAsync(child, userService, cancellationToken);
+                dto.PaperFolderChildrens.Add(childDto);
             }
-
-            return dto;
         }
-    }
 
+        return dto;
+    }
 }

@@ -48,7 +48,7 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
     public async Task<PaperDto> Handle(CreatePaperRequest request, CancellationToken cancellationToken)
     {
         if (request.PaperFolderId.HasValue
-            && await _paperFolderRepo.AnyAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value)))
+            && !await _paperFolderRepo.AnyAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value)))
             throw new NotFoundException(_t["Paper folder {0} Not Found.", request.PaperFolderId]);
 
         var newPaper = new Paper(
