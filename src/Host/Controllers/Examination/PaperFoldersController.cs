@@ -43,4 +43,12 @@ public class PaperFoldersController : VersionedApiController
             : Ok(await Mediator.Send(request));
     }
 
+    [HttpGet("{id}/parents")]
+    [OpenApiOperation("Get list parents.")]
+    public async Task<ActionResult<List<PaperFolderDto>>> GetPaperFolderParents(Guid id)
+    {
+        var result = await Mediator.Send(new GetPaperFolderParentsRequest(id));
+        return Ok(result);
+    }
+
 }
