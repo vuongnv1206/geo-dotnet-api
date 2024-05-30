@@ -53,6 +53,8 @@ public class MapsterSettings
         TypeAdapterConfig<PaperFolder, PaperFolderDto>.NewConfig()
            .Map(dest => dest.PaperFolderChildrens, src => src.PaperFolderChildrens.Adapt<List<PaperFolderDto>>());
 
+        TypeAdapterConfig<PaperFolder, PaperFolderParentDto>.NewConfig();
+
         // UserClasses
         TypeAdapterConfig<UserClass, UserClassDto>.NewConfig()
             .Map(dest => dest.ClassesId, src => src.ClassesId)
