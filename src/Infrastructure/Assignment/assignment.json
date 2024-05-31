@@ -1,0 +1,92 @@
+[
+  {
+    "Name": "Assignment 2",
+    "StartTime": "2024-06-01T10:00:00",
+    "EndTime": "2024-06-07T16:00:00",
+    "AttachmentPath": null,
+    "Content": "Solve the following mathematical problems.",
+    "CanViewResult": false,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  },
+  {
+    "Name": "Assignment 3",
+    "StartTime": "2024-06-15T09:00:00",
+    "EndTime": "2024-06-20T17:00:00",
+    "AttachmentPath": "assignment3.pdf",
+    "Content": "Write a program that calculates the factorial of a number.",
+    "CanViewResult": true,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  },
+  {
+    "Name": "Assignment 4",
+    "StartTime": "2024-06-15T09:00:00",
+    "EndTime": "2024-06-20T17:00:00",
+    "AttachmentPath": "assignment4.pdf",
+    "Content": "Write a program that calculates the sum of the first n natural numbers.",
+    "CanViewResult": true,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  },
+  {
+    "Name": "Assignment 5",
+    "StartTime": "2024-06-15T09:00:00",
+    "EndTime": "2024-06-20T17:00:00",
+    "AttachmentPath": "assignment5.pdf",
+    "Content": "Write a program that calculates the sum of the first n even numbers.",
+    "CanViewResult": true,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  },
+  {
+    "Name": "Assignment 6",
+    "StartTime": "2024-06-15T09:00:00",
+    "EndTime": "2024-06-20T17:00:00",
+    "AttachmentPath": "assignment6.pdf",
+    "Content": "Write a program that calculates the sum of the first n odd numbers.",
+    "CanViewResult": true,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  },
+  {
+    "Name": "Assignment 7",
+    "StartTime": "2024-06-15T09:00:00",
+    "EndTime": "2024-06-20T17:00:00",
+    "AttachmentPath": "assignment7.pdf",
+    "Content": "Write a program that calculates the sum of the first n prime numbers.",
+    "CanViewResult": true,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  },
+  {
+    "Name": "Assignment 8",
+    "StartTime": "2024-06-15T09:00:00",
+    "EndTime": "2024-06-20T17:00:00",
+    "AttachmentPath": "assignment8.pdf",
+    "Content": "Write a program that calculates the sum of the first n Fibonacci numbers.",
+    "CanViewResult": true,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  },
+  {
+    "Name": "Assignment 9",
+    "StartTime": "2024-06-15T09:00:00",
+    "EndTime": "2024-06-20T17:00:00",
+    "AttachmentPath": "assignment9.pdf",
+    "Content": "Write a program that calculates the sum of the first n triangular numbers.",
+    "CanViewResult": true,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  },
+  {
+    "Name": "Assignment 10",
+    "StartTime": "2024-06-15T09:00:00",
+    "EndTime": "2024-06-20T17:00:00",
+    "AttachmentPath": "assignment10.pdf",
+    "Content": "Write a program that calculates the sum of the first n square numbers.",
+    "CanViewResult": true,
+    "RequireLoginToSubmit": true,
+    "SubjectId": null
+  }
+]

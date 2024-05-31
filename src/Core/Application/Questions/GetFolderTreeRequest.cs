@@ -1,8 +1,9 @@
-﻿using System.Security.Claims;
-using FSH.WebApi.Application.Identity.Roles;
-using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Application.Common.Interfaces;
+﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 namespace FSH.WebApi.Application.Questions;
 
@@ -19,14 +20,46 @@ public class GetFolderTreeRequest : IRequest<QuestionTreeDto>
 public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest, QuestionTreeDto>
 {
     private readonly ICurrentUser _currentUser;
+    private readonly IUserService _userService;
     private readonly IRepository<QuestionFolder> _questionFolderRepository;
+    private readonly IRepository<GroupTeacher> _groupTeacherRepository;
+    private readonly IDapperRepository _repository;
     private readonly IStringLocalizer _t;
 
-    public GetFolderTreeRequestHandler(ICurrentUser currentUser, IRepository<QuestionFolder> questionFolderRepository, IStringLocalizer<GetFolderTreeRequestHandler> localizer)
+    public GetFolderTreeRequestHandler(ICurrentUser currentUser, IUserService userService, IRepository<QuestionFolder> questionFolderRepository, IRepository<GroupTeacher> groupTeacherRepository, IDapperRepository repository, IStringLocalizer<GetFolderTreeRequestHandler> localizer)
     {
         _currentUser = currentUser;
+        _userService = userService;
         _questionFolderRepository = questionFolderRepository;
+        _groupTeacherRepository = groupTeacherRepository;
+        _repository = repository;
         _t = localizer;
+    }
+
+    public async Task<int> countQuestions(Guid folderId, CancellationToken cancellationToken)
+    {
+        const string sql = @"
+            WITH RECURSIVE RecursiveFolders AS (
+                SELECT
+                    ""Id"",
+                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = ""QuestionFolders"".""Id"") AS question_count
+                FROM ""Question"".""QuestionFolders""
+                WHERE ""Id"" = @p0
+
+                UNION ALL
+
+                SELECT
+                    qf.""Id"",
+                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = qf.""Id"") AS question_count
+                FROM ""Question"".""QuestionFolders"" qf
+                INNER JOIN RecursiveFolders rf ON qf.""ParentId"" = rf.""Id""
+            )
+            SELECT
+                SUM(rf.question_count) AS total_questions
+            FROM RecursiveFolders rf;
+        ";
+
+        return await _repository.RawQuerySingleAsync<int>(sql, new { p0 = folderId }, cancellationToken: cancellationToken);
     }
 
     public async Task<QuestionTreeDto> Handle(GetFolderTreeRequest request, CancellationToken cancellationToken)
@@ -36,10 +69,13 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
         var spec = new QuestionFoldersWithPermissionsSpecByUserId(userId, request.ParentId);
         var questionFolders = await _questionFolderRepository.ListAsync(spec, cancellationToken);
         var questionFolderTree = questionFolders.Adapt<List<QuestionTreeDto>>();
+        await GetDetails(questionFolderTree, cancellationToken);
+
+        var result = new QuestionTreeDto();
 
         if (!request.ParentId.HasValue)
         {
-            return new QuestionTreeDto
+            result = new QuestionTreeDto
             {
                 Id = Guid.Empty,
                 Name = "Root",
@@ -57,6 +93,10 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
             }
 
             var newTree = parentFolder.Adapt<QuestionTreeDto>();
+
+            // Get total questions in each folder
+            int totalQuestions = await countQuestions(newTree.Id, cancellationToken);
+            newTree.TotalQuestions = totalQuestions;
             newTree.Children = questionFolderTree;
             newTree.CurrentShow = true;
             while (newTree.ParentId != null)
@@ -72,8 +112,56 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
                 newTree = parentTree;
             }
 
-            return newTree;
+            var listNewTree = new List<QuestionTreeDto> { newTree };
+
+            result = new QuestionTreeDto
+            {
+                Id = Guid.Empty,
+                Name = "Root",
+                CurrentShow = false,
+                Children = listNewTree
+            };
         }
 
+        return result;
+    }
+
+    private async Task GetDetails(List<QuestionTreeDto> questionFolderTree, CancellationToken cancellationToken)
+    {
+        // Get owner details for each folder
+        foreach (var tree in questionFolderTree)
+        {
+            var user = await _userService.GetAsync(tree.CreatedBy.ToString(), cancellationToken);
+            if (user != null)
+            {
+                tree.Owner = user;
+            }
+
+            // Get total questions in each folder
+            int totalQuestions = await countQuestions(tree.Id, cancellationToken);
+            tree.TotalQuestions = totalQuestions;
+
+            // loop through permissions and set the current user permissions
+            foreach (var permission in tree.Permission)
+            {
+                if (permission.UserId != Guid.Empty)
+                {
+                    var user_per = await _userService.GetAsync(permission.UserId.ToString(), cancellationToken);
+                    if (user_per != null)
+                    {
+                        permission.User = user_per;
+                    }
+                }
+
+                if (permission.GroupTeacherId != Guid.Empty)
+                {
+                    var groupTeacher = await _groupTeacherRepository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(permission.GroupTeacherId), cancellationToken);
+                    if (groupTeacher != null)
+                    {
+                        permission.GroupTeacher = groupTeacher.Adapt<GroupTeacherDto>();
+                    }
+                }
+            }
+        }
     }
 }

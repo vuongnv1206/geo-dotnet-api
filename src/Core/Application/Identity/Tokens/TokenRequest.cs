@@ -1,6 +1,6 @@
 namespace FSH.WebApi.Application.Identity.Tokens;
 
-public record TokenRequest(string Email, string Password);
+public record TokenRequest(string Email, string Password, string captchaToken);
 
 public class TokenRequestValidator : CustomValidator<TokenRequest>
 {
@@ -12,6 +12,9 @@ public class TokenRequestValidator : CustomValidator<TokenRequest>
                 .WithMessage(T["Invalid Email Address."]);
 
         RuleFor(p => p.Password).Cascade(CascadeMode.Stop)
+            .NotEmpty();
+
+        RuleFor(p => p.captchaToken).Cascade(CascadeMode.Stop)
             .NotEmpty();
     }
 }

@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using FSH.WebApi.Application.Identity.Users.Password;
+using System.Security.Claims;
 
 namespace FSH.WebApi.Application.Identity.Users;
 
@@ -10,7 +10,7 @@ public interface IUserService : ITransientService
     Task<bool> ExistsWithNameAsync(string name);
     Task<bool> ExistsWithEmailAsync(string email, string? exceptId = null);
     Task<bool> ExistsWithPhoneNumberAsync(string phoneNumber, string? exceptId = null);
-
+    Task<string> GetFullName(Guid userId);
     Task<List<UserDetailsDto>> GetListAsync(CancellationToken cancellationToken);
 
     Task<int> GetCountAsync(CancellationToken cancellationToken);
@@ -36,5 +36,7 @@ public interface IUserService : ITransientService
     Task<string> ForgotPasswordAsync(ForgotPasswordRequest request, string origin);
     Task<string> ResetPasswordAsync(ResetPasswordRequest request);
     Task ChangePasswordAsync(ChangePasswordRequest request, string userId);
-    Task<UserDetailsDto> GetUserDetailByEmail(string email, CancellationToken cancellationToken);
+    Task<UserDetailsDto> GetUserDetailByEmailAsync(string email, CancellationToken cancellationToken);
+    Task<UserDetailsDto> GetUserDetailByPhoneAsync(string phoneNumber, CancellationToken cancellationToken);
+    Task GetUserByIdAsync(Guid userId, CancellationToken cancellationToken);
 }

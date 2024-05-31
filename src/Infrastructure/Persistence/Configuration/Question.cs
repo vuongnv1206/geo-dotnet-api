@@ -1,5 +1,4 @@
 ﻿using Finbuckle.MultiTenant.EntityFrameworkCore;
-using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Question;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -32,11 +31,41 @@ public class QuestionFolderPermissionConfig : IEntityTypeConfiguration<QuestionF
             .ToTable("QuestionFolderPermissions", SchemaNames.Question)
             .IsMultiTenant();
 
-        builder.HasKey(x => new { x.QuestionFolderId, x.UserId });
+        builder.HasAlternateKey(x => new { x.QuestionFolderId, x.UserId, x.GroupTeacherId });
 
         builder.HasOne(x => x.QuestionFolder)
             .WithMany(x => x.Permissions)
             .HasForeignKey(x => x.QuestionFolderId)
             .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class QuestionConfig : IEntityTypeConfiguration<Domain.Question.Question>
+{
+    public void Configure(EntityTypeBuilder<Domain.Question.Question> builder)
+    {
+        builder
+            .ToTable("Questions", SchemaNames.Question)
+            .IsMultiTenant();
+    }
+}
+
+public class QuestionLabelConfig : IEntityTypeConfiguration<QuestionLable>
+{
+    public void Configure(EntityTypeBuilder<QuestionLable> builder)
+    {
+        builder
+            .ToTable("QuestionLabels", SchemaNames.Question)
+            .IsMultiTenant();
+    }
+}
+
+public class AnswerConfig : IEntityTypeConfiguration<Answer>
+{
+    public void Configure(EntityTypeBuilder<Answer> builder)
+    {
+        builder
+            .ToTable("Answers", SchemaNames.Question)
+            .IsMultiTenant();
     }
 }

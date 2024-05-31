@@ -1,5 +1,4 @@
-﻿
-using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 public class DeleteGroupTeacherRequest : IRequest<Guid>
@@ -15,14 +14,14 @@ public class DeleteGroupTeacherRequestHandler : IRequestHandler<DeleteGroupTeach
 
     private readonly IStringLocalizer _t;
 
-    public DeleteGroupTeacherRequestHandler(IRepositoryWithEvents<GroupTeacher> groupRepo,  IStringLocalizer<DeleteGroupTeacherRequestHandler> localizer) =>
+    public DeleteGroupTeacherRequestHandler(IRepositoryWithEvents<GroupTeacher> groupRepo, IStringLocalizer<DeleteGroupTeacherRequestHandler> localizer) =>
         (_groupRepo, _t) = (groupRepo, localizer);
 
     public async Task<Guid> Handle(DeleteGroupTeacherRequest request, CancellationToken cancellationToken)
     {
         var group = await _groupRepo.GetByIdAsync(request.Id, cancellationToken);
 
-        _ = group ?? throw new NotFoundException(_t["GroupTaacher {0} Not Found."]);
+        _ = group ?? throw new NotFoundException(_t["GroupTeacher {0} Not Found."]);
 
         await _groupRepo.DeleteAsync(group, cancellationToken);
 

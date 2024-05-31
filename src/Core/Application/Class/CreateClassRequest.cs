@@ -1,0 +1,51 @@
+﻿using FSH.WebApi.Application.Class.GroupClasses;
+using FSH.WebApi.Domain.Class;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FSH.WebApi.Application.Class;
+public class CreateClassRequest : IRequest<Guid>
+{
+    public string Name { get; set; }
+    public string SchoolYear { get; set; }
+    public Guid OwnerId { get; set; }
+    public Guid GroupClassId { get; set; }
+}
+
+public class CreateClassRequestValidator : CustomValidator<CreateClassRequest>
+{
+    public CreateClassRequestValidator(IReadRepository<Classes> classRepos, IReadRepository<GroupClass> groupClassRepos, IStringLocalizer<CreateClassRequestValidator> T)
+    {
+        RuleFor(g => g.Name)
+            .NotEmpty()
+            .MaximumLength(256)
+            .MustAsync(async (name, ct) => await classRepos.FirstOrDefaultAsync(new ClassByNameSpec(name), ct) is null)
+            .WithMessage((_, name) => T["Class {0} already Exists.", name]);
+
+        RuleFor(p => p.GroupClassId)
+            .NotEmpty()
+            .MustAsync(async (id, ct) => await groupClassRepos.GetByIdAsync(id, ct) is not null)
+            .WithMessage((_, id) => T["GroupClass {0} Not Found.", id]);
+    }
+}
+
+public class CreateClassRequestHandler : IRequestHandler<CreateClassRequest, Guid>
+{
+    private readonly IRepositoryWithEvents<Classes> _repository;
+
+    public CreateClassRequestHandler(IRepositoryWithEvents<Classes> repository) => _repository = repository;
+
+    public async Task<Guid> Handle(CreateClassRequest request, CancellationToken cancellationToken)
+    {
+        var classes = new Classes(request.Name, request.SchoolYear, request.OwnerId, request.GroupClassId);
+
+        await _repository.AddAsync(classes);
+
+        return classes.Id;
+    }
+}
+
+

@@ -21,13 +21,20 @@ internal partial class UserService
         // For more information on how to enable account confirmation and password reset please
         // visit https://go.microsoft.com/fwlink/?LinkID=532713
         string code = await _userManager.GeneratePasswordResetTokenAsync(user);
-        const string route = "account/reset-password";
+        const string route = "auth/reset-password";
         var endpointUri = new Uri(string.Concat($"{origin}/", route));
         string passwordResetUrl = QueryHelpers.AddQueryString(endpointUri.ToString(), "Token", code);
+        passwordResetUrl = QueryHelpers.AddQueryString(passwordResetUrl, "Email", request.Email);
+        RegisterUserEmailModel eMailModel = new RegisterUserEmailModel()
+        {
+            Email = user.Email,
+            UserName = user.UserName,
+            Url = passwordResetUrl
+        };
         var mailRequest = new MailRequest(
             new List<string> { request.Email },
             _t["Reset Password"],
-            _t[$"Your Password Reset Token is '{code}'. You can reset your password using the {endpointUri} Endpoint."]);
+            _templateService.GenerateEmailTemplate("reset-password", eMailModel));
         _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
 
         return _t["Password Reset Mail has been sent to your authorized Email."];
@@ -35,6 +42,19 @@ internal partial class UserService
 
     public async Task<string> ResetPasswordAsync(ResetPasswordRequest request)
     {
+        try
+        {
+            var res = await _reCAPTCHAv3Service.Verify(request.captchaToken);
+            if (!res.success)
+            {
+                throw new UnauthorizedException(_t["reCAPTCHA Verification Failed."]);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new UnauthorizedException(ex.Message);
+        }
+
         var user = await _userManager.FindByEmailAsync(request.Email?.Normalize()!);
 
         // Don't reveal that the user does not exist

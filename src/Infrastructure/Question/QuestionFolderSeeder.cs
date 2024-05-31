@@ -1,11 +1,10 @@
-using System.Reflection;
 using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace FSH.WebApi.Infrastructure.Question;
 
@@ -80,7 +79,8 @@ public class QuestionFolderSeeder : ICustomSeeder
 
             foreach (var folder in folders)
             {
-                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(basicGuid, folder.Id, true, true, true, true), cancellationToken);
+                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(basicGuid, Guid.Empty, folder.Id, true, true, true, true), cancellationToken);
+                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(adminGuid, Guid.Empty, folder.Id, true, true, true, true), cancellationToken);
             }
 
             await _db.SaveChangesAsync(cancellationToken);
