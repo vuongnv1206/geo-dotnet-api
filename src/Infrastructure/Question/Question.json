@@ -9,7 +9,8 @@
     },
     "QuestionType": 1,
     "QuestionLable": {
-      "Name": "Capital"
+      "Name": "Capital",
+      "Color": "#FF0000"
     },
     "Answers": [
       {
@@ -433,7 +434,8 @@
     },
     "QuestionType": 6,
     "QuestionLable": {
-      "Name": "Reading Comprehension"
+      "Name": "Reading Comprehension",
+      "Color": "#FF0000"
     },
     "QuestionPassages": [
       {
