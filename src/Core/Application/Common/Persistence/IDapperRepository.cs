@@ -42,4 +42,6 @@ public interface IDapperRepository : ITransientService
 
     // Custom methods
     Task<T> RawQuerySingleAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<T>> RawQueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default);
 }
