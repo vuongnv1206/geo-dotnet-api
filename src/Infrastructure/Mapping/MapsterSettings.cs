@@ -1,7 +1,10 @@
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
+using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.Class;
@@ -44,8 +47,15 @@ public class MapsterSettings
         TypeAdapterConfig<GroupPermissionInClassDto, GroupPermissionInClass>.NewConfig()
            .Map(dest => dest.PermissionType, src => src.PermissionType);
 
+        TypeAdapterConfig<GroupTeacher, GroupTeacherDto>.NewConfig()
+         .Map(dest => dest.GroupPermissionInClasses, src => src.GroupPermissionInClasses)
+         .Map(dest => dest.TeacherTeams, src => src.TeacherInGroups.Select(tig => tig.TeacherTeam));
+
+        // Paper Folder
         TypeAdapterConfig<PaperFolder, PaperFolderDto>.NewConfig()
-           .Map(dest => dest.PaperFolderChildrens, src => src.PaperFolderChildrens);
+           .Map(dest => dest.PaperFolderChildrens, src => src.PaperFolderChildrens.Adapt<List<PaperFolderDto>>());
+
+        TypeAdapterConfig<PaperFolder, PaperFolderParentDto>.NewConfig();
 
         // UserClasses
         TypeAdapterConfig<UserClass, UserClassDto>.NewConfig()
@@ -56,5 +66,23 @@ public class MapsterSettings
         TypeAdapterConfig<ApplicationUser, ClassDto>.NewConfig()
             .Map(dest => dest.FirstName, src => src.FirstName)
             .Map(dest => dest.LastName, src => src.LastName);
+
+        // Paper
+        TypeAdapterConfig<Paper, PaperDto>.NewConfig()
+          .Map(dest => dest.PaperFolder, src => src.PaperFolder)
+           .Map(dest => dest.PaperLable, src => src.PaperLable)
+          .Map(dest => dest.Questions, src => src.PaperQuestions.Select(pq => pq.Question));
+
+        TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
+
+        TypeAdapterConfig<CreateQuestionDto, NewQuestionDto>.NewConfig();
+        TypeAdapterConfig<CreateQuestionDto, Domain.Question.Question>.NewConfig()
+            .Ignore(dest => dest.Answers)
+            .Ignore(dest => dest.QuestionPassages)
+            .TwoWays();
+
+        TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
+
+        TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
     }
 }

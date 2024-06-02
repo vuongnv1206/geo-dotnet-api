@@ -1,32 +1,32 @@
 ﻿namespace FSH.WebApi.Application.Assignments;
 
-//public class ExportAssignmentsRequest : BaseFilter, IRequest<Stream>
-//{
+// public class ExportAssignmentsRequest : BaseFilter, IRequest<Stream>
+// {
 //    public Guid? SubjectId { get; set; }
 //    public decimal? MinimumRate { get; set; }
 //    public decimal? MaximumRate { get; set; }
-//}
+// }
 
-//public class ExportAssignmentsRequestHandler : IRequestHandler<ExportAssignmentsRequest, Stream>
-//{
+// public class ExportAssignmentsRequestHandler : IRequestHandler<ExportAssignmentsRequest, Stream>
+// {
 //    private readonly IReadRepository<Assignment> _repository;
 //    private readonly IExcelWriter _excelWriter;
 
-//    public ExportAssignmentsRequestHandler(IReadRepository<Assignment> repository, IExcelWriter excelWriter)
+// public ExportAssignmentsRequestHandler(IReadRepository<Assignment> repository, IExcelWriter excelWriter)
 //    {
 //        _repository = repository;
 //        _excelWriter = excelWriter;
 //    }
 
-//    //public async Task<Stream> Handle(ExportAssignmentsRequest request, CancellationToken cancellationToken)
+// //public async Task<Stream> Handle(ExportAssignmentsRequest request, CancellationToken cancellationToken)
 //    //{
 //    //    var spec = new ExportAssignmentsWithSubjectsSpecification(request);
 
-//    //    var list = await _repository.ListAsync(spec, cancellationToken);
+// //    var list = await _repository.ListAsync(spec, cancellationToken);
 
-//    //    return _excelWriter.WriteToStream(list);
+// //    return _excelWriter.WriteToStream(list);
 //    //}
-//}
+// }
 
 ////public class ExportAssignmentsWithSubjectsSpecification : EntitiesByBaseFilterSpec<Assignment, AssignmentExportDto>
 ////{

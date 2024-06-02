@@ -1,7 +1,5 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
 using FSH.WebApi.Application.Class.GroupClasses;
 using FSH.WebApi.Application.Class.GroupClasses.Dto;
-using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.Class;
 public class GroupClassesController : VersionedApiController

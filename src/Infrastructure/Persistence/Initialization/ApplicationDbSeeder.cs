@@ -30,6 +30,7 @@ internal class ApplicationDbSeeder
     {
         await SeedRolesAsync(dbContext);
         await SeedAdminUserAsync();
+        await SeedAdmin2UserAsync();
         await SeedBasicUserAsync();
         await _seederRunner.RunSeedersAsync(cancellationToken);
     }
@@ -48,13 +49,13 @@ internal class ApplicationDbSeeder
             }
 
             // Assign permissions
-            if (roleName == FSHRoles.Basic)
+            if (roleName == FSHRoles.Student)
             {
-                await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Basic, role);
+                await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Student, role);
             }
-            else if (roleName == FSHRoles.Admin)
+            else if (roleName == FSHRoles.Teacher)
             {
-                await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Admin, role);
+                await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Teacher, role);
 
                 if (_currentTenant.Id == MultitenancyConstants.Root.Id)
                 {
@@ -94,11 +95,11 @@ internal class ApplicationDbSeeder
         if (await _userManager.Users.FirstOrDefaultAsync(u => u.Email == _currentTenant.AdminEmail)
             is not ApplicationUser adminUser)
         {
-            string adminUserName = $"{_currentTenant.Id.Trim()}.{FSHRoles.Admin}".ToLowerInvariant();
+            string adminUserName = $"{_currentTenant.Id.Trim()}.{FSHRoles.Teacher}".ToLowerInvariant();
             adminUser = new ApplicationUser
             {
                 FirstName = _currentTenant.Id.Trim().ToLowerInvariant(),
-                LastName = FSHRoles.Admin,
+                LastName = FSHRoles.Teacher,
                 Email = _currentTenant.AdminEmail,
                 UserName = adminUserName,
                 EmailConfirmed = true,
@@ -115,10 +116,47 @@ internal class ApplicationDbSeeder
         }
 
         // Assign role to user
-        if (!await _userManager.IsInRoleAsync(adminUser, FSHRoles.Admin))
+        if (!await _userManager.IsInRoleAsync(adminUser, FSHRoles.Teacher))
         {
             _logger.LogInformation("Assigning Admin Role to Admin User for '{tenantId}' Tenant.", _currentTenant.Id);
-            await _userManager.AddToRoleAsync(adminUser, FSHRoles.Admin);
+            await _userManager.AddToRoleAsync(adminUser, FSHRoles.Teacher);
+        }
+    }
+
+    private async Task SeedAdmin2UserAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_currentTenant.Id) || string.IsNullOrWhiteSpace("admin2@root.com"))
+        {
+            return;
+        }
+
+        if (await _userManager.Users.FirstOrDefaultAsync(u => u.Email == "admin2@root.com")
+                       is not ApplicationUser admin2User)
+        {
+            admin2User = new ApplicationUser
+            {
+                FirstName = _currentTenant.Id.Trim().ToLowerInvariant(),
+                LastName = FSHRoles.Teacher,
+                Email = "admin2@root.com",
+                UserName = "admin2.root",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                NormalizedEmail = "admin2@root.com"?.ToUpperInvariant(),
+                NormalizedUserName = "admin2.root".ToUpperInvariant(),
+                IsActive = true
+            };
+
+            _logger.LogInformation("Seeding Default Admin 2 User for '{tenantId}' Tenant.", _currentTenant.Id);
+            var password = new PasswordHasher<ApplicationUser>();
+            admin2User.PasswordHash = password.HashPassword(admin2User, MultitenancyConstants.DefaultPassword);
+            await _userManager.CreateAsync(admin2User);
+        }
+
+        // Assign role to user
+        if (!await _userManager.IsInRoleAsync(admin2User, FSHRoles.Teacher))
+        {
+            _logger.LogInformation("Assigning Basic Role to Admin 2 User for '{tenantId}' Tenant.", _currentTenant.Id);
+            await _userManager.AddToRoleAsync(admin2User, FSHRoles.Teacher);
         }
     }
 
@@ -132,11 +170,11 @@ internal class ApplicationDbSeeder
         if (await _userManager.Users.FirstOrDefaultAsync(u => u.Email == "basic@root.com")
                        is not ApplicationUser basicUser)
         {
-            string basicUserName = $"{_currentTenant.Id.Trim()}.{FSHRoles.Basic}".ToLowerInvariant();
+            string basicUserName = $"{_currentTenant.Id.Trim()}.{FSHRoles.Student}".ToLowerInvariant();
             basicUser = new ApplicationUser
             {
                 FirstName = _currentTenant.Id.Trim().ToLowerInvariant(),
-                LastName = FSHRoles.Basic,
+                LastName = FSHRoles.Student,
                 Email = "basic@root.com",
                 UserName = basicUserName,
                 EmailConfirmed = true,
@@ -153,10 +191,10 @@ internal class ApplicationDbSeeder
         }
 
         // Assign role to user
-        if (!await _userManager.IsInRoleAsync(basicUser, FSHRoles.Basic))
+        if (!await _userManager.IsInRoleAsync(basicUser, FSHRoles.Student))
         {
             _logger.LogInformation("Assigning Basic Role to Basic User for '{tenantId}' Tenant.", _currentTenant.Id);
-            await _userManager.AddToRoleAsync(basicUser, FSHRoles.Basic);
+            await _userManager.AddToRoleAsync(basicUser, FSHRoles.Student);
         }
     }
 }

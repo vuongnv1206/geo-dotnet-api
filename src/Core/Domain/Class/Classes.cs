@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FSH.WebApi.Domain.Class;
+﻿namespace FSH.WebApi.Domain.Class;
 public class Classes : AuditableEntity, IAggregateRoot
 {
     public string Name { get; private set; }

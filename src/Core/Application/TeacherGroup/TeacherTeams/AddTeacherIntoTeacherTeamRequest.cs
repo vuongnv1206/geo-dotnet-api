@@ -1,13 +1,5 @@
-﻿using FSH.WebApi.Application.Common.Validation;
-using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.TeacherGroup;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 public class AddTeacherIntoTeacherTeamRequest : IRequest<DefaultIdType>

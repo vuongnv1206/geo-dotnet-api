@@ -1,5 +1,5 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Domain.TeacherGroup;
+using Mapster;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 public class GetGroupTeacherRequest : IRequest<GroupTeacherDto>
@@ -20,12 +20,11 @@ public class GetGroupTeacherRequestHandler : IRequestHandler<GetGroupTeacherRequ
 
     public async Task<GroupTeacherDto> Handle(GetGroupTeacherRequest request, CancellationToken cancellationToken)
     {
-        var data = await _repository.FirstOrDefaultAsync(
-             (ISpecification<GroupTeacher, GroupTeacherDto>)new GroupTeacherByIdSpec(request.Id), cancellationToken);
+        var groupTeacher = await _repository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(request.Id), cancellationToken);
 
-        if (data == null)
+        if (groupTeacher == null)
             throw new NotFoundException(_t["GroupTeacher{0} Not Found.", request.Id]);
 
-        return data;
+        return groupTeacher.Adapt<GroupTeacherDto>();
     }
 }

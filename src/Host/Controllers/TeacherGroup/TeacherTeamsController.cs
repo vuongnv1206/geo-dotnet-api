@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
-using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
+﻿using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 
 namespace FSH.WebApi.Host.Controllers.TeacherGroup;
 
@@ -21,7 +20,6 @@ public class TeacherTeamsController : VersionedApiController
         return Mediator.Send(new GetTeacherTeamRequest(id));
     }
 
-
     [HttpPut("{id:guid}")]
     [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
     [OpenApiOperation("Update a teacherTeam.", "")]
@@ -32,7 +30,6 @@ public class TeacherTeamsController : VersionedApiController
             : Ok(await Mediator.Send(request));
     }
 
-
     [HttpPost("teacher-in-team")]
     [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
     [OpenApiOperation("Add a teacher in my teacher team")]
@@ -41,12 +38,12 @@ public class TeacherTeamsController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpDelete("teacher-in-team")]
+    [HttpDelete("{id:guid}")]
     [MustHavePermission(FSHAction.Delete, FSHResource.GroupTeachers)]
     [OpenApiOperation("Remove a teacher in team")]
-    public Task RemoveTeacherInTeam(RemoveTeacherInTeamRequest request)
+    public Task RemoveTeacherInTeam(Guid id)
     {
-        return Mediator.Send(request);
+        return Mediator.Send(new RemoveTeacherInTeamRequest(id));
     }
 
     [HttpPut("teacher-in-team/{id:guid}")]

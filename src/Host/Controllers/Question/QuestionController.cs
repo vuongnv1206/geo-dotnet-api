@@ -12,4 +12,31 @@ public class QuestionController : VersionedApiController
     {
         return Mediator.Send(request);
     }
+
+    [HttpPost]
+    [MustHavePermission(FSHAction.Create, FSHResource.Question)]
+    [OpenApiOperation("Create questionn list.", "")]
+    public async Task<List<Guid>> CreateAsync(CreateQuestionRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+    [HttpDelete("{id:guid}")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Question)]
+    [OpenApiOperation("Delete a questions.", "")]
+    public async Task<Guid> DeleteAsync(Guid id)
+    {
+        return await Mediator.Send(new DeleteQuestionRequest(id));
+    }
+
+    [HttpPut("{id:guid}")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Question)]
+    [OpenApiOperation("Update a question.", "")]
+    public async Task<ActionResult<Guid>> UpdateAsync(Guid id, UpdateQuestionRequest request)
+    {
+        return id != request.Id
+            ? BadRequest()
+            : Ok(await Mediator.Send(request));
+    }
+
 }

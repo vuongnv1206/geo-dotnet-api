@@ -1,12 +1,8 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.GroupClasses;
-using FSH.WebApi.Application.Class.New;
 using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Domain.Class;
-using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.Class;
 public class ClassController : VersionedApiController
@@ -34,7 +30,6 @@ public class ClassController : VersionedApiController
     {
         return Mediator.Send(new GetClassesRequest(id));
     }
-
 
     [HttpGet("get-class-by-group-class")]
     [MustHavePermission(FSHAction.View, FSHResource.Classes)]

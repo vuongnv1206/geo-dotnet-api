@@ -1,14 +1,7 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
 using FSH.WebApi.Application.Class.GroupClasses.Dto;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.GroupClasses;
-
 
 public class SearchGroupClassRequest : PaginationFilter, IRequest<PaginationResponse<GroupClassDto>>
 {

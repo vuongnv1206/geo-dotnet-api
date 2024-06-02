@@ -1,5 +1,4 @@
-﻿
-using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.PaperLabels;
 public class GetPaperLabelRequest : IRequest<PaperLabelDto>

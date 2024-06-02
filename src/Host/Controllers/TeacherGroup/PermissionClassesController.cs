@@ -1,6 +1,4 @@
-﻿
-
-using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 
@@ -17,8 +15,8 @@ public class PermissionClassesController : VersionedApiController
 
     [HttpPost("group-permission-in-class")]
     [MustHavePermission(FSHAction.Update, FSHResource.GroupTeachers)]
-    [OpenApiOperation("Set a teacher's permissions for class", "")]
-    public Task SetTeacherPermissionInClass(BulkUpdateGroupPermissionInClassRequest request)
+    [OpenApiOperation("Set a group's permissions for class", "")]
+    public Task SetGroupPermissionInClass(BulkUpdateGroupPermissionInClassRequest request)
     {
         return Mediator.Send(request);
     }

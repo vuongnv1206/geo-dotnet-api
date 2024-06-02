@@ -22,8 +22,4 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Examination\Papers\Dtos\" />
-      <Folder Include="Examination\Papers\Specs\" />
-    </ItemGroup>
 </Project>

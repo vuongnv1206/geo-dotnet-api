@@ -1,12 +1,5 @@
-﻿using FSH.WebApi.Application.Catalog.Products;
 using FSH.WebApi.Application.Class.Dto;
-using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class;
 public class SearchClassesRequest : PaginationFilter, IRequest<PaginationResponse<ClassDto>>
@@ -21,7 +14,7 @@ public class SearchClassesRequest : PaginationFilter, IRequest<PaginationRespons
         {
             _currentUser = currentUser;
             _repository = repository;
-        } 
+        }
 
         public async Task<PaginationResponse<ClassDto>> Handle(SearchClassesRequest request, CancellationToken cancellationToken)
         {
@@ -32,7 +25,7 @@ public class SearchClassesRequest : PaginationFilter, IRequest<PaginationRespons
 
             var userId = _currentUser.GetUserId();
             var spec = new ClassesBySearchRequestWithGroupClassSpec(request, userId);
-            return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize,  cancellationToken: cancellationToken);
+            return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
         }
     }
 }

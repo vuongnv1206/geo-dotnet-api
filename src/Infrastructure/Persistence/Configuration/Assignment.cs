@@ -21,12 +21,13 @@ public class AssignmentConfig : IEntityTypeConfiguration<Assignment>
           .Property(p => p.AttachmentPath)
               .HasMaxLength(2048);
     }
+
     public class AssignmentClassConfig : IEntityTypeConfiguration<AssignmentClass>
     {
         public void Configure(EntityTypeBuilder<AssignmentClass> builder)
         {
             builder
-                  .HasKey(x => new { x.AssignmentId, x.ClassId });
+                  .HasKey(x => new { x.AssignmentId, x.ClassesId });
 
             builder
                   .ToTable("AssignmentClass", SchemaNames.Assignment)
