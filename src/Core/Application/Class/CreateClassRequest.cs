@@ -11,7 +11,6 @@ public class CreateClassRequest : IRequest<Guid>
 {
     public string Name { get; set; }
     public string SchoolYear { get; set; }
-    public Guid OwnerId { get; set; }
     public Guid GroupClassId { get; set; }
 }
 
@@ -35,12 +34,16 @@ public class CreateClassRequestValidator : CustomValidator<CreateClassRequest>
 public class CreateClassRequestHandler : IRequestHandler<CreateClassRequest, Guid>
 {
     private readonly IRepositoryWithEvents<Classes> _repository;
+    private readonly ICurrentUser _currentUser;
 
-    public CreateClassRequestHandler(IRepositoryWithEvents<Classes> repository) => _repository = repository;
+    public CreateClassRequestHandler(IRepositoryWithEvents<Classes> repository, ICurrentUser currentUser) =>
+        (_repository, _currentUser) =(repository, currentUser);
 
     public async Task<Guid> Handle(CreateClassRequest request, CancellationToken cancellationToken)
     {
-        var classes = new Classes(request.Name, request.SchoolYear, request.OwnerId, request.GroupClassId);
+        var user = _currentUser.GetUserId();
+
+        var classes = new Classes(request.Name, request.SchoolYear, user ,request.GroupClassId);
 
         await _repository.AddAsync(classes);
 

@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Catalog.Brands;
+using FSH.WebApi.Application.Class.GroupClasses.Spec;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Class;
 using MediatR;

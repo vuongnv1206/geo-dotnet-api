@@ -1,6 +1,7 @@
 ﻿using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.GroupClasses;
 using FSH.WebApi.Application.Class.New;
+using FSH.WebApi.Application.Class.New.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.Class;

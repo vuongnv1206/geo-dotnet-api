@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Catalog.Brands;
+using FSH.WebApi.Application.Class.GroupClasses.Dto;
 using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;

@@ -1,11 +1,12 @@
-﻿using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Application.Class.New.Dto;
+using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FSH.WebApi.Application.Class.New;
+namespace FSH.WebApi.Application.Class.New.Spec;
 public class NewsBySearchRequestWithClass : EntitiesByPaginationFilterSpec<News, NewsDto>
 {
     public NewsBySearchRequestWithClass(GetNewsRequest request)

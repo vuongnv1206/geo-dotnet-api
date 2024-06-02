@@ -61,6 +61,14 @@ public class GroupClassSeeder : ICustomSeeder
             }
 
             await _db.SaveChangesAsync(cancellationToken);
+            // add creator for all classes in the database
+            var classes = await _db.Classes.ToListAsync(cancellationToken);
+            foreach (var c in classes)
+            {
+                c.CreatedBy = adminGuid;
+            }
+
+
             _logger.LogInformation("Seeded Class.");
         }
 
@@ -76,6 +84,14 @@ public class GroupClassSeeder : ICustomSeeder
             }
 
             await _db.SaveChangesAsync(cancellationToken);
+
+            // add creator for all news in the database
+            var news = await _db.News.ToListAsync(cancellationToken);
+            foreach (var c in news)
+            {
+                c.CreatedBy = adminGuid;
+            }
+
             _logger.LogInformation("Seeded News.");
         }
 

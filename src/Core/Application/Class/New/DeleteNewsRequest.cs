@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Catalog;
+﻿using FSH.WebApi.Application.Class.New.Spec;
+using FSH.WebApi.Domain.Catalog;
 using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
