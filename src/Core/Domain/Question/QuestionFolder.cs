@@ -61,13 +61,20 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
         return Permissions.Any(x => x.UserId == guid && x.CanView);
     }
 
+    public bool CanShare(DefaultIdType guid)
+    {
+        if (CreatedBy == guid) return true;
+        if (Permissions == null) return false;
+        return Permissions.Any(x => x.UserId == guid && x.CanShare);
+    }
+
     public void CopyPermissions(QuestionFolder? parentFolder)
     {
         if (parentFolder is null) return;
 
         foreach (var permission in parentFolder.Permissions)
         {
-            AddPermission(new QuestionFolderPermission(permission.UserId, permission.GroupTeacherId, Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
+            AddPermission(new QuestionFolderPermission(permission.UserId, permission.GroupTeacherId, Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete, permission.CanShare));
         }
     }
 

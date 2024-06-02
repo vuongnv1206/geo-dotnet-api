@@ -14,6 +14,8 @@ public class ShareQuestionFolderRequest : IRequest<DefaultIdType>
     public bool CanAdd { get; set; }
     public bool CanUpdate { get; set; }
     public bool CanDelete { get; set; }
+    public bool CanShare { get; set; }
+
 }
 
 public class ShareQuestionFolderRequestValidator : CustomValidator<ShareQuestionFolderRequest>
@@ -51,7 +53,7 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
 
         _ = folder ?? throw new NotFoundException(_t["Folder {0} Not Found.", request.FolderId]);
 
-        if (!folder.CanUpdate(_currentUser.GetUserId()))
+        if (!folder.CanShare(_currentUser.GetUserId()))
         {
             throw new ForbiddenException(_t["You do not have permission to share this folder."]);
         }
@@ -98,13 +100,13 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
 
             if (permission == null)
             {
-                permission = new QuestionFolderPermission(userId, Guid.Empty, folder.Id, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete);
+                permission = new QuestionFolderPermission(userId, Guid.Empty, folder.Id, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
                 folder.Permissions.Add(permission);
                 await _repository.UpdateAsync(folder, cancellationToken);
             }
             else
             {
-                permission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete);
+                permission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
                 await _permissionRepository.UpdateAsync(permission, cancellationToken);
             }
         }
@@ -115,13 +117,13 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
 
             if (permission == null)
             {
-                permission = new QuestionFolderPermission(Guid.Empty, teacherGroupId, folder.Id, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete);
+                permission = new QuestionFolderPermission(Guid.Empty, teacherGroupId, folder.Id, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
                 folder.Permissions.Add(permission);
                 await _repository.UpdateAsync(folder, cancellationToken);
             }
             else
             {
-                permission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete);
+                permission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
                 await _permissionRepository.UpdateAsync(permission, cancellationToken);
             }
         }

@@ -58,7 +58,7 @@ public class CreateFolderRequestHandler : IRequestHandler<CreateFolderRequest, G
         bool isHasOwnerPermission = folder.Permissions.Any(x => x.UserId == _currentUser.GetUserId());
         if (!isHasOwnerPermission)
         {
-            var permission = new QuestionFolderPermission(_currentUser.GetUserId(), Guid.Empty, folder.Id, true, true, true, true);
+            var permission = new QuestionFolderPermission(_currentUser.GetUserId(), Guid.Empty, folder.Id, true, true, true, true, true);
             folder.AddPermission(permission);
         }
 

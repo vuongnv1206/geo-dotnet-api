@@ -9,7 +9,7 @@
     },
     "QuestionType": 1,
     "QuestionLable": {
-      "Name": "Capital",
+      "Name": "Easy",
       "Color": "#FF0000"
     },
     "Answers": [
@@ -40,7 +40,8 @@
     },
     "QuestionType": 1,
     "QuestionLable": {
-      "Name": "Desert"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "Answers": [
       {
@@ -70,7 +71,8 @@
     },
     "QuestionType": 1,
     "QuestionLable": {
-      "Name": "Continent"
+      "Name": "Hard",
+      "Color": "#00FF00"
     },
     "Answers": [
       {

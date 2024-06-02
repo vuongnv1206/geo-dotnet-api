@@ -30,6 +30,7 @@ internal class ApplicationDbSeeder
     {
         await SeedRolesAsync(dbContext);
         await SeedAdminUserAsync();
+        await SeedAdmin2UserAsync();
         await SeedBasicUserAsync();
         await _seederRunner.RunSeedersAsync(cancellationToken);
     }
@@ -119,6 +120,43 @@ internal class ApplicationDbSeeder
         {
             _logger.LogInformation("Assigning Admin Role to Admin User for '{tenantId}' Tenant.", _currentTenant.Id);
             await _userManager.AddToRoleAsync(adminUser, FSHRoles.Teacher);
+        }
+    }
+
+    private async Task SeedAdmin2UserAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_currentTenant.Id) || string.IsNullOrWhiteSpace("admin2@root.com"))
+        {
+            return;
+        }
+
+        if (await _userManager.Users.FirstOrDefaultAsync(u => u.Email == "admin2@root.com")
+                       is not ApplicationUser admin2User)
+        {
+            admin2User = new ApplicationUser
+            {
+                FirstName = _currentTenant.Id.Trim().ToLowerInvariant(),
+                LastName = FSHRoles.Teacher,
+                Email = "admin2@root.com",
+                UserName = "admin2.root",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                NormalizedEmail = "admin2@root.com"?.ToUpperInvariant(),
+                NormalizedUserName = "admin2.root".ToUpperInvariant(),
+                IsActive = true
+            };
+
+            _logger.LogInformation("Seeding Default Admin 2 User for '{tenantId}' Tenant.", _currentTenant.Id);
+            var password = new PasswordHasher<ApplicationUser>();
+            admin2User.PasswordHash = password.HashPassword(admin2User, MultitenancyConstants.DefaultPassword);
+            await _userManager.CreateAsync(admin2User);
+        }
+
+        // Assign role to user
+        if (!await _userManager.IsInRoleAsync(admin2User, FSHRoles.Teacher))
+        {
+            _logger.LogInformation("Assigning Basic Role to Admin 2 User for '{tenantId}' Tenant.", _currentTenant.Id);
+            await _userManager.AddToRoleAsync(admin2User, FSHRoles.Teacher);
         }
     }
 

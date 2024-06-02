@@ -25,9 +25,9 @@ public class QuestionFolderSeeder : ICustomSeeder
     {
         string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         var adminUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "admin@root.com", cancellationToken);
-        var basicUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "basic@root.com", cancellationToken);
+        var admin2User = await _db.Users.FirstOrDefaultAsync(u => u.Email == "admin2@root.com", cancellationToken);
         var adminGuid = Guid.Parse(adminUser.Id);
-        var basicGuid = Guid.Parse(basicUser.Id);
+        var admin2Guid = Guid.Parse(admin2User.Id);
 
         if (!_db.QuestionFolders.Any())
         {
@@ -79,8 +79,8 @@ public class QuestionFolderSeeder : ICustomSeeder
 
             foreach (var folder in folders)
             {
-                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(basicGuid, Guid.Empty, folder.Id, true, true, true, true), cancellationToken);
-                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(adminGuid, Guid.Empty, folder.Id, true, true, true, true), cancellationToken);
+                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(admin2Guid, Guid.Empty, folder.Id, true, true, true, true, false), cancellationToken);
+                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(adminGuid, Guid.Empty, folder.Id, true, true, true, true, true), cancellationToken);
             }
 
             await _db.SaveChangesAsync(cancellationToken);

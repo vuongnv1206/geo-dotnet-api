@@ -77,7 +77,7 @@ public class QuestionSeeder : ICustomSeeder
             // seed question folder permissions
             foreach (var folder in folders)
             {
-                var permission = new QuestionFolderPermission(_adminGuid, Guid.Empty, folder.Id, true, true, true, true);
+                var permission = new QuestionFolderPermission(_adminGuid, Guid.Empty, folder.Id, true, true, true, true, true);
 
                 // check if permission already exists
                 var existingPermission = await _db.QuestionFolderPermissions.FirstOrDefaultAsync(x => x.UserId == _adminGuid && x.QuestionFolderId == folder.Id, cancellationToken);

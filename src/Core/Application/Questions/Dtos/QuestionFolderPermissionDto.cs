@@ -13,4 +13,5 @@ public class QuestionFolderPermissionDto : AuditableEntity, IDto
     public bool CanAdd { get; set; }
     public bool CanUpdate { get; set; }
     public bool CanDelete { get; set; }
+    public bool CanShare { get; set; }
 }
