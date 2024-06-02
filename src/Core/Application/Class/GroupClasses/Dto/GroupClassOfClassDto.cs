@@ -1,14 +1,15 @@
-﻿using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FSH.WebApi.Application.Class.GroupClasses;
+namespace FSH.WebApi.Application.Class.GroupClasses.Dto;
 public class GroupClassOfClassDto : IDto
 {
-    public Guid Id { get; set; }
+    public DefaultIdType Id { get; set; }
     public string? Name { get; set; }
     public List<ClassDto> Classes { get; set; }
 }

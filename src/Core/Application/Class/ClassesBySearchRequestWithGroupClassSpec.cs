@@ -1,9 +1,10 @@
-﻿using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class;
 public class ClassesBySearchRequestWithGroupClassSpec : EntitiesByPaginationFilterSpec<Classes, ClassDto>
 {
-    public ClassesBySearchRequestWithGroupClassSpec(SearchClassesRequest request, Guid userId)
+    public ClassesBySearchRequestWithGroupClassSpec(SearchClassesRequest request, DefaultIdType userId)
         : base(request)
     {
         Query

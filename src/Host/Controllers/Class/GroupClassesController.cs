@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Class.GroupClasses;
+using FSH.WebApi.Application.Class.GroupClasses;
+using FSH.WebApi.Application.Class.GroupClasses.Dto;
 
 namespace FSH.WebApi.Host.Controllers.Class;
 public class GroupClassesController : VersionedApiController

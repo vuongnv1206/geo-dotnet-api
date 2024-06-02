@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240531150453_WT05.1")]
-    partial class WT051
+    [Migration("20240602165652_622024")]
+    partial class _622024
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -869,6 +869,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanDelete")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("CanShare")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanUpdate")

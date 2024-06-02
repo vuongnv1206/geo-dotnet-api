@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Application.Class.GroupClasses.Dto;
+using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.GroupClasses;
 
