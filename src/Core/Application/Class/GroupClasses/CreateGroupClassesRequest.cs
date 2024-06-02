@@ -14,7 +14,8 @@ public class CreateGroupClassesRequest : IRequest<Guid>
 
 public class CreateGroupClassRequestValidator : CustomValidator<CreateGroupClassesRequest>
 {
-    public CreateGroupClassRequestValidator(IReadRepository<GroupClass> repository, IStringLocalizer<CreateGroupClassRequestValidator> T) {
+    public CreateGroupClassRequestValidator(IReadRepository<GroupClass> repository, IStringLocalizer<CreateGroupClassRequestValidator> T)
+    {
         RuleFor(g => g.Name)
             .NotEmpty()
             .MaximumLength(256)

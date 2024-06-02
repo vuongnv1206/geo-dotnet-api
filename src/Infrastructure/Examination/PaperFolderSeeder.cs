@@ -3,12 +3,7 @@ using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Infrastructure.Examination;
 public class PaperFolderSeeder : ICustomSeeder
@@ -56,7 +51,6 @@ public class PaperFolderSeeder : ICustomSeeder
 
         await _db.PaperFolders.AddAsync(paperFolder, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
-
 
     }
 }

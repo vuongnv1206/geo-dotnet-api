@@ -1,13 +1,7 @@
 ﻿using FSH.WebApi.Application.Class.New;
 using FSH.WebApi.Domain.Class;
-using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Infrastructure.Class.News;
 public class NewsReactionRepository : INewReactionRepository

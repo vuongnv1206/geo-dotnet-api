@@ -54,3 +54,22 @@ public class PaperQuestionConfig : IEntityTypeConfiguration<PaperQuestion>
         builder.ToTable("PaperQuestions", SchemaNames.Examination);
     }
 }
+
+public class SubmitPaperConfig : IEntityTypeConfiguration<SubmitPaper>
+{
+    public void Configure(EntityTypeBuilder<SubmitPaper> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("SubmitPapers", SchemaNames.Examination);
+    }
+}
+
+public class SubmitPaperDetailConfig : IEntityTypeConfiguration<SubmitPaperDetail>
+{
+    public void Configure(EntityTypeBuilder<SubmitPaperDetail> builder)
+    {
+        builder.IsMultiTenant();
+        builder.HasKey(tig => new { tig.SubmitPaperId, tig.QuestionId });
+        builder.ToTable("SubmitPaperDetails", SchemaNames.Examination);
+    }
+}

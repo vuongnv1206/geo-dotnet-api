@@ -1,17 +1,15 @@
-﻿using FSH.WebApi.Application.Catalog.Brands;
-using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 public class UpdateGroupTeacherRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }
-
 
 public class UpdateGroupTeacherRequestValidator : CustomValidator<UpdateGroupTeacherRequest>
 {
-    public UpdateGroupTeacherRequestValidator(IRepository<GroupTeacher> repository, IStringLocalizer<UpdateBrandRequestValidator> T) =>
+    public UpdateGroupTeacherRequestValidator(IRepository<GroupTeacher> repository, IStringLocalizer<UpdateGroupTeacherRequestValidator> T) =>
         RuleFor(p => p.Name)
             .NotEmpty()
             .MaximumLength(75)
@@ -19,7 +17,6 @@ public class UpdateGroupTeacherRequestValidator : CustomValidator<UpdateGroupTea
                     await repository.FirstOrDefaultAsync(new GroupTeacherByNameSpec(name), ct)
                         is not GroupTeacher existingBrand || existingBrand.Id == group.Id)
                 .WithMessage((_, name) => T["GroupTeacher {0} already Exists.", name]);
- 
 
 }
 

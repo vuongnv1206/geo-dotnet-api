@@ -21,7 +21,7 @@ public class SearchClassesRequest : PaginationFilter, IRequest<PaginationRespons
         {
             _currentUser = currentUser;
             _repository = repository;
-        } 
+        }
 
         public async Task<PaginationResponse<ClassDto>> Handle(SearchClassesRequest request, CancellationToken cancellationToken)
         {
@@ -32,7 +32,7 @@ public class SearchClassesRequest : PaginationFilter, IRequest<PaginationRespons
 
             var userId = _currentUser.GetUserId();
             var spec = new ClassesBySearchRequestWithGroupClassSpec(request, userId);
-            return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize,  cancellationToken: cancellationToken);
+            return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
         }
     }
 }

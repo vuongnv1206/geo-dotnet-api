@@ -1,5 +1,4 @@
 ﻿using Finbuckle.MultiTenant.EntityFrameworkCore;
-using FSH.WebApi.Domain.Common.Contracts;
 using FSH.WebApi.Domain.Question;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -32,7 +31,7 @@ public class QuestionFolderPermissionConfig : IEntityTypeConfiguration<QuestionF
             .ToTable("QuestionFolderPermissions", SchemaNames.Question)
             .IsMultiTenant();
 
-        builder.HasKey(x => new { x.QuestionFolderId, x.UserId });
+        builder.HasAlternateKey(x => new { x.QuestionFolderId, x.UserId, x.GroupTeacherId });
 
         builder.HasOne(x => x.QuestionFolder)
             .WithMany(x => x.Permissions)

@@ -3,14 +3,14 @@ using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Subjects;
 
 namespace FSH.WebApi.Application.Subjects;
-public class DeleteSubjectRequest : IRequest<Guid>
+public class DeleteSubjectRequest : IRequest<DefaultIdType>
 {
-    public Guid Id { get; set; }
+    public DefaultIdType Id { get; set; }
 
-    public DeleteSubjectRequest(Guid id) => Id = id;
+    public DeleteSubjectRequest(DefaultIdType id) => Id = id;
 }
 
-public class DeleteSubjectRequestHandler : IRequestHandler<DeleteSubjectRequest, Guid>
+public class DeleteSubjectRequestHandler : IRequestHandler<DeleteSubjectRequest, DefaultIdType>
 {
     // Add Domain Events automatically by using IRepositoryWithEvents
     private readonly IRepositoryWithEvents<Subject> _subjectRepo;
@@ -20,7 +20,7 @@ public class DeleteSubjectRequestHandler : IRequestHandler<DeleteSubjectRequest,
     public DeleteSubjectRequestHandler(IRepositoryWithEvents<Subject> subjectRepo, IReadRepository<Assignment> assignmentRepo, IStringLocalizer<DeleteSubjectRequestHandler> localizer) =>
         (_subjectRepo, _assignmentRepo, _t) = (subjectRepo, assignmentRepo, localizer);
 
-    public async Task<Guid> Handle(DeleteSubjectRequest request, CancellationToken cancellationToken)
+    public async Task<DefaultIdType> Handle(DeleteSubjectRequest request, CancellationToken cancellationToken)
     {
         if (await _assignmentRepo.AnyAsync(new AssignmentsBySubjectSpec(request.Id), cancellationToken))
         {

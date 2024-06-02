@@ -119,7 +119,14 @@ internal partial class UserService
             throw new InternalServerException(_t["Validation Errors Occurred."], result.GetErrors(_t));
         }
 
-        await _userManager.AddToRoleAsync(user, FSHRoles.Basic);
+        if (request.Role.Equals(FSHRoles.Teacher))
+        {
+            await _userManager.AddToRoleAsync(user, FSHRoles.Teacher);
+        }
+        else if (request.Role.Equals(FSHRoles.Student))
+        {
+            await _userManager.AddToRoleAsync(user, FSHRoles.Student);
+        }
 
         var messages = new List<string> { string.Format(_t["User {0} Registered."], user.UserName) };
 

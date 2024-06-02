@@ -1,10 +1,10 @@
-using System.Reflection;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace FSH.WebApi.Infrastructure.Question;
 
@@ -25,9 +25,9 @@ public class QuestionFolderSeeder : ICustomSeeder
     {
         string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         var adminUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "admin@root.com", cancellationToken);
-        var basicUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "basic@root.com", cancellationToken);
+        var admin2User = await _db.Users.FirstOrDefaultAsync(u => u.Email == "admin2@root.com", cancellationToken);
         var adminGuid = Guid.Parse(adminUser.Id);
-        var basicGuid = Guid.Parse(basicUser.Id);
+        var admin2Guid = Guid.Parse(admin2User.Id);
 
         if (!_db.QuestionFolders.Any())
         {
@@ -79,7 +79,8 @@ public class QuestionFolderSeeder : ICustomSeeder
 
             foreach (var folder in folders)
             {
-                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(basicGuid, folder.Id, true, true, true, true), cancellationToken);
+                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(admin2Guid, Guid.Empty, folder.Id, true, true, true, true, false), cancellationToken);
+                await _db.QuestionFolderPermissions.AddAsync(new QuestionFolderPermission(adminGuid, Guid.Empty, folder.Id, true, true, true, true, true), cancellationToken);
             }
 
             await _db.SaveChangesAsync(cancellationToken);

@@ -1,9 +1,5 @@
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.ReCaptchaV3;
 using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Auth.Jwt;
@@ -14,7 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace FSH.WebApi.Infrastructure.Identity;
 
@@ -26,6 +25,7 @@ internal class TokenService : ITokenService
     private readonly SecuritySettings _securitySettings;
     private readonly JwtSettings _jwtSettings;
     private readonly FSHTenantInfo? _currentTenant;
+    private readonly IReCAPTCHAv3Service _reCAPTCHAv3Service;
 
     public TokenService(
         UserManager<ApplicationUser> userManager,
@@ -33,6 +33,7 @@ internal class TokenService : ITokenService
         IOptions<JwtSettings> jwtSettings,
         IStringLocalizer<TokenService> localizer,
         FSHTenantInfo? currentTenant,
+        IReCAPTCHAv3Service reCAPTCHAv3Service,
         IOptions<SecuritySettings> securitySettings)
     {
         _userManager = userManager;
@@ -40,11 +41,25 @@ internal class TokenService : ITokenService
         _t = localizer;
         _jwtSettings = jwtSettings.Value;
         _currentTenant = currentTenant;
+        _reCAPTCHAv3Service = reCAPTCHAv3Service;
         _securitySettings = securitySettings.Value;
     }
 
     public async Task<TokenResponse> GetTokenAsync(TokenRequest request, string ipAddress, CancellationToken cancellationToken)
     {
+        try
+        {
+            var res = await _reCAPTCHAv3Service.Verify(request.captchaToken);
+            if (!res.success)
+            {
+                throw new UnauthorizedException(_t["reCAPTCHA Verification Failed."]);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new UnauthorizedException(ex.Message);
+        }
+
         if (string.IsNullOrWhiteSpace(_currentTenant?.Id)
             || await _userManager.FindByEmailAsync(request.Email.Trim().Normalize()) is not { } user
             || !await _userManager.CheckPasswordAsync(user, request.Password))

@@ -1,6 +1,4 @@
-﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
-using FSH.WebApi.Domain.TeacherGroup;
-
+﻿using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.PermissionClasses.Specs;
 public class GroupTeacherByIdWithPermissionSpec : Specification<GroupTeacher>, ISingleResultSpecification

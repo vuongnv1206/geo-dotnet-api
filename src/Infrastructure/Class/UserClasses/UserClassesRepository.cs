@@ -2,11 +2,6 @@
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Infrastructure.Class.UserClasses;
 public class UserClassesRepository : IUserClassesRepository
@@ -17,6 +12,7 @@ public class UserClassesRepository : IUserClassesRepository
     {
         _context = context;
     }
+
     public async Task AddNewUserInClass(UserClass request)
     {
         _context.UserClasses.Add(request);
@@ -26,7 +22,7 @@ public class UserClassesRepository : IUserClassesRepository
     public async Task DeleteUserInClass(Guid userId, Guid classId)
     {
         var userClasses = await _context.UserClasses.FirstOrDefaultAsync(c => c.UserId == userId && c.ClassesId == classId);
-        if(userClasses != null)
+        if (userClasses != null)
         {
             _context.UserClasses.Remove(userClasses);
             await _context.SaveChangesAsync();
@@ -40,9 +36,9 @@ public class UserClassesRepository : IUserClassesRepository
 
     public async Task<List<UserClass>> GetUserInClasses(Guid classesId)
     {
-       return await _context.UserClasses
-        .Where(uc => uc.ClassesId == classesId)
-        .ToListAsync();
+        return await _context.UserClasses
+         .Where(uc => uc.ClassesId == classesId)
+         .ToListAsync();
     }
 
     public async Task UpdateUserInClasses(UserClass request)

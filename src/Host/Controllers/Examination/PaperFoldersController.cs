@@ -1,6 +1,4 @@
-﻿using FSH.WebApi.Application.Examination;
-using FSH.WebApi.Application.Examination.PaperFolders;
-
+﻿using FSH.WebApi.Application.Examination.PaperFolders;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class PaperFoldersController : VersionedApiController
@@ -43,6 +41,14 @@ public class PaperFoldersController : VersionedApiController
         return id != request.FolderId
             ? BadRequest()
             : Ok(await Mediator.Send(request));
+    }
+
+    [HttpGet("{id}/parents")]
+    [OpenApiOperation("Get list parents.")]
+    public async Task<ActionResult<List<PaperFolderDto>>> GetPaperFolderParents(Guid id)
+    {
+        var result = await Mediator.Send(new GetPaperFolderParentsRequest(id));
+        return Ok(result);
     }
 
 }

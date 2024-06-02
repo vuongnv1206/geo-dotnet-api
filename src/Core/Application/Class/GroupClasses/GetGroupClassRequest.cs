@@ -27,4 +27,4 @@ public class GetGroupClassRequestHandler : IRequestHandler<GetGroupClassRequest,
                        (ISpecification<GroupClass, GroupClassOfClassDto>)new GroupClassOfClassSpec(user), cancellationToken)
         ?? throw new NotFoundException(_t["GroupClasses {0} Not Found.", user]);
     }
-}   
+}

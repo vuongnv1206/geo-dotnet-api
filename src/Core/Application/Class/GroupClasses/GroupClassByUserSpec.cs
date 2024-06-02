@@ -10,6 +10,7 @@ public class GroupClassByUserSpec : Specification<GroupClass, GroupClassDto>, IS
 {
     public GroupClassByUserSpec(Guid userId)
     {
-        Query.Where(b => b.CreatedBy == userId);
+        Query.Where(b => b.CreatedBy == userId)
+            .Include(x => x.Classes);
     }
 }

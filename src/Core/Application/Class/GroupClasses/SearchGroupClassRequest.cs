@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.GroupClasses;
 
-
 public class SearchGroupClassRequest : PaginationFilter, IRequest<PaginationResponse<GroupClassDto>>
 {
 }

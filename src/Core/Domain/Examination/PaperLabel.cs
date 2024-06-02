@@ -1,6 +1,4 @@
-﻿
-
-namespace FSH.WebApi.Domain.Examination;
+﻿namespace FSH.WebApi.Domain.Examination;
 public class PaperLabel : AuditableEntity, IAggregateRoot
 {
     public string Name { get; set; } = null!;
@@ -9,9 +7,9 @@ public class PaperLabel : AuditableEntity, IAggregateRoot
         if (name is not null && Name?.Equals(name) is not true) Name = name;
         return this;
     }
+
     public PaperLabel(string name)
     {
         Name = name;
     }
 }
-

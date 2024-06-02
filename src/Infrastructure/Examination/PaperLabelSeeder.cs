@@ -5,7 +5,6 @@ using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 
-
 namespace FSH.WebApi.Infrastructure.Examination;
 public class PaperLabelSeeder : ICustomSeeder
 {
