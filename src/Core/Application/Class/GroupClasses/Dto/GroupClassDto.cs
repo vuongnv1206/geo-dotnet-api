@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FSH.WebApi.Application.Class.GroupClasses;
+namespace FSH.WebApi.Application.Class.GroupClasses.Dto;
 public class GroupClassDto : IDto
 {
-    public Guid Id { get; set; }
+    public DefaultIdType Id { get; set; }
     public string? Name { get; set; }
 }

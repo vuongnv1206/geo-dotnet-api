@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Catalog.Products;
+using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Domain.Class;
 using System;

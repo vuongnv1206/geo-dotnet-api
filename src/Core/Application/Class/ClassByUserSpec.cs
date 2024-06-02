@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Class;
 public class ClassByUserSpec : Specification<Classes, ClassDto>, ISingleResultSpecification
 {
-    public ClassByUserSpec(Guid userId)
+    public ClassByUserSpec(DefaultIdType userId)
     {
         Query.Where(b => b.OwnerId == userId);
     }

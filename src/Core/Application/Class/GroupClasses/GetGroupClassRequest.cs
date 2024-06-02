@@ -1,4 +1,6 @@
-﻿using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Application.Class.GroupClasses.Dto;
+using FSH.WebApi.Application.Class.GroupClasses.Spec;
+using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
 using System.Linq;
