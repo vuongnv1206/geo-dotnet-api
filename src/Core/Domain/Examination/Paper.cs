@@ -47,7 +47,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     {
         foreach (var q in questions)
         {
-            if (PaperQuestions.Any(x => x.QuestionId == q.Question.Id))
+            if (PaperQuestions.Any(x => x.QuestionId == q.QuestionId))
                 continue;
 
             PaperQuestions.Add(new PaperQuestion
