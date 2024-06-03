@@ -10,8 +10,10 @@ public class ClassesBySearchRequestWithGroupClassSpec : EntitiesByPaginationFilt
         Query
             .Include(p => p.GroupClass)
             .OrderBy(c => c.Name, !request.HasOrderBy())
-            .Where(p => p.GroupClassId.Equals(request.GroupClassId!.Value), request.GroupClassId.HasValue);
-
-        Query.Where(p => p.OwnerId == userId);
+            .Where(p => p.GroupClassId.Equals(request.GroupClassId!.Value), request.GroupClassId.HasValue)
+            .Where(x => string.IsNullOrEmpty(request.Keyword)
+                        || x.Name.Contains(request.Keyword, StringComparison.OrdinalIgnoreCase)
+                        || x.SchoolYear.Equals(request.Keyword, StringComparison.OrdinalIgnoreCase))
+            .Where(p => p.CreatedBy == userId);
     }
 }
