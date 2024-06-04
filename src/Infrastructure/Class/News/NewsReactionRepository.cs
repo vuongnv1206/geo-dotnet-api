@@ -20,6 +20,17 @@ public class NewsReactionRepository : INewReactionRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<int> CountLikeOfUserInNews(DefaultIdType classId)
+    {
+        var data = await _context.News.Where(p => p.Id.Equals(classId)).ToListAsync();
+        foreach (var item in data)
+        {
+            var count = await _context.NewsReactions.Where(p => p.NewsId.Equals(item.Id)).ToListAsync();
+            return count.Count();
+        }
+        return 0;
+    }
+
     public async Task DeleteNewsReactionAsync(NewsReaction request)
     {
         _context.NewsReactions.Remove(request);

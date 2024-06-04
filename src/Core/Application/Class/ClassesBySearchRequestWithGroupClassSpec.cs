@@ -1,17 +1,17 @@
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.Examination;
+using System.Xml.Linq;
 
 namespace FSH.WebApi.Application.Class;
-public class ClassesBySearchRequestWithGroupClassSpec : EntitiesByPaginationFilterSpec<Classes, ClassDto>
+public class ClassesBySearchRequestWithGroupClassSpec : Specification<Classes, ClassDto>
 {
-    public ClassesBySearchRequestWithGroupClassSpec(SearchClassesRequest request, DefaultIdType userId)
-        : base(request)
+    public ClassesBySearchRequestWithGroupClassSpec(string? name, DefaultIdType userId)
     {
         Query
             .Include(p => p.GroupClass)
-            .OrderBy(c => c.Name, !request.HasOrderBy())
-            .Where(p => p.GroupClassId.Equals(request.GroupClassId!.Value), request.GroupClassId.HasValue);
+            .Where(p => (string.IsNullOrEmpty(name) || p.Name.ToLower().Contains(name.ToLower())));
 
-        Query.Where(p => p.OwnerId == userId);
+        Query.Where(p => p.CreatedBy == userId);
     }
 }

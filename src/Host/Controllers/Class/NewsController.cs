@@ -11,7 +11,7 @@ public class NewsController : VersionedApiController
     [HttpPost("search")]
     [MustHavePermission(FSHAction.Search, FSHResource.Classes)]
     [OpenApiOperation("Get all news in the class.", "")]
-    public Task<PaginationResponse<NewsDto>> SearchAsync(GetNewsRequest request)
+    public Task<List<NewsDto>> SearchAsync(GetNewsRequest request)
     {
         return Mediator.Send(request);
     }

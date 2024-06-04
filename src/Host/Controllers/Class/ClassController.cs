@@ -10,7 +10,7 @@ public class ClassController : VersionedApiController
     [HttpPost("search")]
     [MustHavePermission(FSHAction.Search, FSHResource.Classes)]
     [OpenApiOperation("Search class using available filters.", "")]
-    public Task<PaginationResponse<ClassDto>> SearchAsync(SearchClassesRequest request)
+    public Task<List<ClassDto>> SearchAsync(SearchClassesRequest request)
     {
         return Mediator.Send(request);
     }

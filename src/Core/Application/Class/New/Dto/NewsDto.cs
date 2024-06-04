@@ -14,4 +14,5 @@ public class NewsDto : IDto
     public bool IsLockComment { get; set; }
     public DefaultIdType ParentId { get; set; }
     public string? ClassesName { get; set; }
+    public int? NumberLikeInTheNews { get; set; }
 }

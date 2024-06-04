@@ -1,28 +1,58 @@
+using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.GroupClasses.Dto;
 using FSH.WebApi.Domain.Class;
+using MapsterMapper;
 
 namespace FSH.WebApi.Application.Class.GroupClasses;
 
-public class SearchGroupClassRequest : PaginationFilter, IRequest<PaginationResponse<GroupClassDto>>
+public class SearchGroupClassRequest : IRequest<List<GroupClassDto>>
 {
+    public string? Name { get; set; }
 }
 
-public class GroupClassBySearchRequestSpec : EntitiesByPaginationFilterSpec<GroupClass, GroupClassDto>
+public class GroupClassBySearchRequestSpec : Specification<GroupClass, GroupClassDto>
 {
-    public GroupClassBySearchRequestSpec(SearchGroupClassRequest request)
-       : base(request) =>
-       Query.OrderBy(c => c.Name, !request.HasOrderBy());
+    public GroupClassBySearchRequestSpec(string? name, DefaultIdType userId)
+    {
+        Query
+            .Include(c => c.Classes)
+            .OrderBy(c => c.Name)
+            .Where(c => string.IsNullOrEmpty(name) || c.Name.ToLower().Contains(name.ToLower()));
+
+        Query.Where(x => x.CreatedBy == userId);
+    }
+}
+public class GroupClassByUserSpec : Specification<GroupClass, GroupClassDto>
+{
+    public GroupClassByUserSpec(DefaultIdType userId)
+    {
+        Query
+            .Include(c => c.Classes)
+            .OrderBy(c => c.Name)
+            .Where(x => x.CreatedBy == userId);
+    }
 }
 
-public class SearchGroupClassesRequestHandler : IRequestHandler<SearchGroupClassRequest, PaginationResponse<GroupClassDto>>
+public class SearchGroupClassesRequestHandler : IRequestHandler<SearchGroupClassRequest, List<GroupClassDto>>
 {
     private readonly IReadRepository<GroupClass> _repository;
+    private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
 
-    public SearchGroupClassesRequestHandler(IReadRepository<GroupClass> repository) => _repository = repository;
+    public SearchGroupClassesRequestHandler(IReadRepository<GroupClass> repository, ICurrentUser currentUser,
+                                            IStringLocalizer<SearchClassesRequestHandler> localizer) =>
+        (_repository, _currentUser, _t) = (repository, currentUser, localizer);
 
-    public async Task<PaginationResponse<GroupClassDto>> Handle(SearchGroupClassRequest request, CancellationToken cancellationToken)
+    public async Task<List<GroupClassDto>> Handle(SearchGroupClassRequest request, CancellationToken cancellationToken)
     {
-        var spec = new GroupClassBySearchRequestSpec(request);
-        return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
+        var userId = _currentUser.GetUserId();
+        if (!string.IsNullOrEmpty(request.Name))
+        {
+            return await _repository.ListAsync((ISpecification<GroupClass, GroupClassDto>)new GroupClassBySearchRequestSpec(request.Name, userId), cancellationToken);
+        }
+        else
+        {
+            return await _repository.ListAsync((ISpecification<GroupClass, GroupClassDto>)new GroupClassByUserSpec(userId), cancellationToken);
+        }
     }
 }

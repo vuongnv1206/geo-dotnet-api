@@ -1,3 +1,5 @@
+using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.GroupClasses;
 using FSH.WebApi.Application.Class.GroupClasses.Dto;
 
@@ -5,6 +7,13 @@ namespace FSH.WebApi.Host.Controllers.Class;
 public class GroupClassesController : VersionedApiController
 {
 
+    [HttpPost("search")]
+    [MustHavePermission(FSHAction.Search, FSHResource.GroupClasses)]
+    [OpenApiOperation("Search groupClass using available filters.", "")]
+    public Task<List<GroupClassDto>> SearchAsync(SearchGroupClassRequest request)
+    {
+        return Mediator.Send(request);
+    }
     [HttpGet]
     [MustHavePermission(FSHAction.View, FSHResource.GroupClasses)]
     [OpenApiOperation("Get list GroupClasses of user.", "")]

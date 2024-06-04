@@ -7,14 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New.Spec;
-public class NewsBySearchRequestWithClass : EntitiesByPaginationFilterSpec<News, NewsDto>
+public class NewsBySearchRequestWithClass : Specification<News, NewsDto>
 {
-    public NewsBySearchRequestWithClass(GetNewsRequest request)
-        : base(request)
+    public NewsBySearchRequestWithClass(Guid? classId)
     {
         Query
             .Include(p => p.Classes)
-            .OrderBy(c => c.CreatedOn, !request.HasOrderBy())
-            .Where(p => p.ClassesId.Equals(request.ClassesId!.Value), request.ClassesId.HasValue);
+            .Where(p => p.ClassesId.Equals(classId));
     }
 }

@@ -12,4 +12,5 @@ public interface INewReactionRepository : IScopedService
     Task AddNewsReaction(NewsReaction request);
     Task DeleteNewsReactionAsync(NewsReaction request);
     Task<NewsReaction> GetUserLikeTheNews(NewsReaction request);
+    Task<int> CountLikeOfUserInNews(Guid classId);
 }
