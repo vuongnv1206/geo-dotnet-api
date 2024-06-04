@@ -8,7 +8,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public Guid? PaperLabelId { get; set; }
-    public int NumberOfQuestion { get; set; }
+    public int NumberOfQuestion => PaperQuestions.Count;
     public int? Duration { get; set; }
     public bool Shuffle { get; set; }
     public bool ShowMarkResult { get; set; }
@@ -86,7 +86,6 @@ public class Paper : AuditableEntity, IAggregateRoot
         DateTime? startTime,
         DateTime? endTime,
         Guid? paperLabelId,
-        int numberOfQuestion,
         int? duration,
         bool shuffle,
         bool showMarkResult,
@@ -102,7 +101,6 @@ public class Paper : AuditableEntity, IAggregateRoot
         StartTime = startTime;
         EndTime = endTime;
         PaperLabelId = paperLabelId;
-        NumberOfQuestion = numberOfQuestion;
         Duration = duration;
         Shuffle = shuffle;
         ShowMarkResult = showMarkResult;
