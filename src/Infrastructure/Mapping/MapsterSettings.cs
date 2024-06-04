@@ -62,11 +62,6 @@ public class MapsterSettings
             .Map(dest => dest.ClassesId, src => src.ClassesId)
             .Map(dest => dest.UserId, src => src.UserId);
 
-        // Class
-        TypeAdapterConfig<ApplicationUser, ClassDto>.NewConfig()
-            .Map(dest => dest.FirstName, src => src.FirstName)
-            .Map(dest => dest.LastName, src => src.LastName);
-
         // Paper
         TypeAdapterConfig<Paper, PaperDto>.NewConfig()
           .Map(dest => dest.PaperFolder, src => src.PaperFolder)
