@@ -1,4 +1,6 @@
-﻿using FSH.WebApi.Application.Examination.SubmitPapers;
+﻿using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.Papers.ByStudents;
+using FSH.WebApi.Application.Examination.SubmitPapers;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class SubmitPapersController : VersionedApiController
@@ -16,4 +18,12 @@ public class SubmitPapersController : VersionedApiController
     {
         return await Mediator.Send(request);
     }
+
+    [HttpGet("paper/{id:guid}")]
+    [OpenApiOperation("get information of paper by role student")]
+    public async Task<PaperStudentDto> GetPapperByRoleStudent(Guid id)
+    {
+        return await Mediator.Send(new GetPaperByIdRoleStudentRequest(id));
+    }
+
 }

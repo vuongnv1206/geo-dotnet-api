@@ -12,7 +12,6 @@ public class UpdatePaperRequest : IRequest<Guid>
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public Guid? PaperLabelId { get; set; }
-    public int NumberOfQuestion { get; set; }
     public int? Duration { get; set; }
     public bool Shuffle { get; set; }
     public bool ShowMarhResult { get; set; }
@@ -85,7 +84,6 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             request.StartTime,
             request.EndTime,
             request.PaperLabelId,
-            request.NumberOfQuestion,
             request.Duration,
             request.Shuffle,
             request.ShowMarhResult,

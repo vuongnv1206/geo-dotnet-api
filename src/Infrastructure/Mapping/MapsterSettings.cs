@@ -2,6 +2,7 @@ using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
@@ -67,6 +68,8 @@ public class MapsterSettings
           .Map(dest => dest.PaperFolder, src => src.PaperFolder)
            .Map(dest => dest.PaperLable, src => src.PaperLable)
           .Map(dest => dest.Questions, src => src.PaperQuestions.Select(pq => pq.Question));
+
+        TypeAdapterConfig<Paper, PaperStudentDto>.NewConfig();
 
         TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
 
