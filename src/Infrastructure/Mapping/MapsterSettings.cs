@@ -1,4 +1,5 @@
-using FSH.WebApi.Application.Class.UserClasses;
+using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Questions;
@@ -10,6 +11,7 @@ using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.TeacherGroup;
+using FSH.WebApi.Infrastructure.Identity;
 using Mapster;
 
 namespace FSH.WebApi.Infrastructure.Mapping;
@@ -53,6 +55,8 @@ public class MapsterSettings
         TypeAdapterConfig<PaperFolder, PaperFolderDto>.NewConfig()
            .Map(dest => dest.PaperFolderChildrens, src => src.PaperFolderChildrens.Adapt<List<PaperFolderDto>>());
 
+        TypeAdapterConfig<PaperFolder, PaperFolderParentDto>.NewConfig();
+
         // UserClasses
         TypeAdapterConfig<UserClass, UserClassDto>.NewConfig()
             .Map(dest => dest.ClassesId, src => src.ClassesId)
@@ -75,6 +79,5 @@ public class MapsterSettings
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
-
     }
 }

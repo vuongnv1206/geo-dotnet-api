@@ -21,7 +21,7 @@ public class QuestionController : VersionedApiController
         return await Mediator.Send(request);
     }
 
-    [HttpDelete("id:guid")]
+    [HttpDelete("{id:guid}")]
     [MustHavePermission(FSHAction.Delete, FSHResource.Question)]
     [OpenApiOperation("Delete a questions.", "")]
     public async Task<Guid> DeleteAsync(Guid id)

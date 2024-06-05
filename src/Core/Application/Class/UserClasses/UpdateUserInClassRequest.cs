@@ -18,7 +18,7 @@ public class UpdateUserInClassRequestValidator : CustomValidator<UpdateUserInCla
     {
         RuleFor(g => g.ClassesId)
             .NotEmpty()
-            .MustAsync(async (classesId, ct) => await repository.FirstOrDefaultAsync(new ClassByIdWithGroupClass(classesId), ct) is not null)
+            .MustAsync(async (classesId, ct) => await repository.FirstOrDefaultAsync(new ClassByIdWithGroupClassSpec(classesId), ct) is not null)
             .WithMessage((_, classesId) => T["Classes {0} not found.", classesId]);
     }
 }

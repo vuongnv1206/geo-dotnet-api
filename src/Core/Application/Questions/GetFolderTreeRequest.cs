@@ -1,7 +1,9 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 namespace FSH.WebApi.Application.Questions;
 
@@ -20,14 +22,16 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
     private readonly IRepository<QuestionFolder> _questionFolderRepository;
+    private readonly IRepository<GroupTeacher> _groupTeacherRepository;
     private readonly IDapperRepository _repository;
     private readonly IStringLocalizer _t;
 
-    public GetFolderTreeRequestHandler(ICurrentUser currentUser, IUserService userService, IRepository<QuestionFolder> questionFolderRepository, IDapperRepository repository, IStringLocalizer<GetFolderTreeRequestHandler> localizer)
+    public GetFolderTreeRequestHandler(ICurrentUser currentUser, IUserService userService, IRepository<QuestionFolder> questionFolderRepository, IRepository<GroupTeacher> groupTeacherRepository, IDapperRepository repository, IStringLocalizer<GetFolderTreeRequestHandler> localizer)
     {
         _currentUser = currentUser;
         _userService = userService;
         _questionFolderRepository = questionFolderRepository;
+        _groupTeacherRepository = groupTeacherRepository;
         _repository = repository;
         _t = localizer;
     }
@@ -38,7 +42,7 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
             WITH RECURSIVE RecursiveFolders AS (
                 SELECT
                     ""Id"",
-                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = ""QuestionFolders"".""Id"") AS question_count
+                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = ""QuestionFolders"".""Id"" AND ""DeletedOn"" IS NULL) AS question_count
                 FROM ""Question"".""QuestionFolders""
                 WHERE ""Id"" = @p0
 
@@ -46,7 +50,7 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
 
                 SELECT
                     qf.""Id"",
-                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = qf.""Id"") AS question_count
+                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = qf.""Id"" AND ""DeletedOn"" IS NULL) AS question_count
                 FROM ""Question"".""QuestionFolders"" qf
                 INNER JOIN RecursiveFolders rf ON qf.""ParentId"" = rf.""Id""
             )
@@ -65,20 +69,7 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
         var spec = new QuestionFoldersWithPermissionsSpecByUserId(userId, request.ParentId);
         var questionFolders = await _questionFolderRepository.ListAsync(spec, cancellationToken);
         var questionFolderTree = questionFolders.Adapt<List<QuestionTreeDto>>();
-
-        // Get owner details for each folder
-        foreach (var tree in questionFolderTree)
-        {
-            var user = await _userService.GetAsync(tree.CreatedBy.ToString(), cancellationToken);
-            if (user != null)
-            {
-                tree.Owner = user;
-            }
-
-            // Get total questions in each folder
-            int totalQuestions = await countQuestions(tree.Id, cancellationToken);
-            tree.TotalQuestions = totalQuestions;
-        }
+        await GetDetails(questionFolderTree, cancellationToken);
 
         var result = new QuestionTreeDto();
 
@@ -121,16 +112,56 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
                 newTree = parentTree;
             }
 
+            var listNewTree = new List<QuestionTreeDto> { newTree };
+
             result = new QuestionTreeDto
             {
                 Id = Guid.Empty,
                 Name = "Root",
                 CurrentShow = false,
-                Children = new List<QuestionTreeDto> { newTree }
+                Children = listNewTree
             };
         }
 
         return result;
     }
 
+    private async Task GetDetails(List<QuestionTreeDto> questionFolderTree, CancellationToken cancellationToken)
+    {
+        // Get owner details for each folder
+        foreach (var tree in questionFolderTree)
+        {
+            var user = await _userService.GetAsync(tree.CreatedBy.ToString(), cancellationToken);
+            if (user != null)
+            {
+                tree.Owner = user;
+            }
+
+            // Get total questions in each folder
+            int totalQuestions = await countQuestions(tree.Id, cancellationToken);
+            tree.TotalQuestions = totalQuestions;
+
+            // loop through permissions and set the current user permissions
+            foreach (var permission in tree.Permission)
+            {
+                if (permission.UserId != Guid.Empty)
+                {
+                    var user_per = await _userService.GetAsync(permission.UserId.ToString(), cancellationToken);
+                    if (user_per != null)
+                    {
+                        permission.User = user_per;
+                    }
+                }
+
+                if (permission.GroupTeacherId != Guid.Empty)
+                {
+                    var groupTeacher = await _groupTeacherRepository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(permission.GroupTeacherId), cancellationToken);
+                    if (groupTeacher != null)
+                    {
+                        permission.GroupTeacher = groupTeacher.Adapt<GroupTeacherDto>();
+                    }
+                }
+            }
+        }
+    }
 }

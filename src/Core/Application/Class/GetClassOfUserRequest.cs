@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class;
 public class GetClassOfUserRequest : IRequest<List<ClassDto>>

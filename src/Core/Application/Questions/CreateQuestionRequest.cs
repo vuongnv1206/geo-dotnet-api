@@ -4,7 +4,7 @@ using Mapster;
 namespace FSH.WebApi.Application.Questions;
 public class CreateQuestionRequest : IRequest<List<Guid>>
 {
-    public List<CreateQuestionDto> Questions { get; set; }
+    public required List<CreateQuestionDto> Questions { get; set; }
 }
 
 public class CreateQuestionRequestValidator : CustomValidator<CreateQuestionRequest>
@@ -48,6 +48,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
                 await AddQuestionPassages(questionDto.QuestionPassages, question.Id, cancellationToken);
             }
         }
+
         return createdQuestionIds;
 
     }

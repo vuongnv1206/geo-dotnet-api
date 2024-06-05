@@ -4,6 +4,7 @@ namespace FSH.WebApi.Application.Questions.Dtos;
 
 public class QuestionPassagesDto : IDto
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string? Content { get; set; }
     public List<AnswerDto>? Answers { get; set; } = new();
 }

@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class;
 public class GetClassesRequest : IRequest<ClassDto>
@@ -18,7 +19,7 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
     public async Task<ClassDto> Handle(GetClassesRequest request, CancellationToken cancellationToken)
     {
         return await _repository.FirstOrDefaultAsync(
-            (ISpecification<Classes, ClassDto>)new ClassByIdWithGroupClass(request.Id), cancellationToken)
+            (ISpecification<Classes, ClassDto>)new ClassByIdWithGroupClassSpec(request.Id), cancellationToken)
         ?? throw new NotFoundException(_t["Classes {0} Not Found.", request.Id]);
     }
 }

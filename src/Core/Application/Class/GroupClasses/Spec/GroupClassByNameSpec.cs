@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FSH.WebApi.Application.Class.GroupClasses;
+namespace FSH.WebApi.Application.Class.GroupClasses.Spec;
 public class GroupClassByNameSpec : Specification<GroupClass>, ISingleResultSpecification
 {
     public GroupClassByNameSpec(string name)

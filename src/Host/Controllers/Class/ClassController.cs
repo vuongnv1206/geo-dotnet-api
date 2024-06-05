@@ -1,4 +1,6 @@
-﻿using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.GroupClasses;
 using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Domain.Class;
 
@@ -8,7 +10,7 @@ public class ClassController : VersionedApiController
     [HttpPost("search")]
     [MustHavePermission(FSHAction.Search, FSHResource.Classes)]
     [OpenApiOperation("Search class using available filters.", "")]
-    public Task<PaginationResponse<ClassDto>> SearchAsync(SearchClassesRequest request)
+    public Task<List<ClassDto>> SearchAsync(SearchClassesRequest request)
     {
         return Mediator.Send(request);
     }
@@ -29,6 +31,14 @@ public class ClassController : VersionedApiController
         return Mediator.Send(new GetClassesRequest(id));
     }
 
+    [HttpGet("get-class-by-group-class")]
+    [MustHavePermission(FSHAction.View, FSHResource.Classes)]
+    [OpenApiOperation("Get class by group class.", "")]
+    public Task<List<Classes>> GetClassByGroupClassAsync(Guid groupClassId)
+    {
+        return Mediator.Send(new GetClassByGroupClassRequest(groupClassId));
+    }
+
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
     [OpenApiBodyParameter("Create new classes.", "")]
@@ -43,6 +53,15 @@ public class ClassController : VersionedApiController
     public async Task<ActionResult<Guid>> UpdateAsync(UpdateClassRequest request, Guid id)
     {
         return id != request.Id ? BadRequest() : Ok(await Mediator.Send(request));
+    }
+
+
+    [HttpDelete("{id:guid}")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
+    [OpenApiOperation("Delete a Class.", "")]
+    public Task<Guid> DeleteAsync(Guid id)
+    {
+        return Mediator.Send(new DeleteClassRequest(id));
     }
 
     [HttpGet("getall-user-in-class")]

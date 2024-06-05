@@ -42,4 +42,8 @@ public class DapperRepository : IDapperRepository
 
     public async Task<T> RawQuerySingleAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default) =>
         await _dbContext.Connection.QuerySingleAsync<T>(sql, param, transaction);
+
+    public async Task<IReadOnlyList<T>> RawQueryAsync<T>(string sql, object? param = null, IDbTransaction? transaction = null, CancellationToken cancellationToken = default) =>
+        (await _dbContext.Connection.QueryAsync<T>(sql, param, transaction))
+            .AsList();
 }
