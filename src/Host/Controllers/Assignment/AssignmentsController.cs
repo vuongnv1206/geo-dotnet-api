@@ -2,8 +2,7 @@
 using FSH.WebApi.Application.Assignments.Dtos;
 
 namespace FSH.WebApi.Host.Controllers.Assignment;
-[Route("api/[controller]")]
-[ApiController]
+
 public class AssignmentsController : VersionedApiController
 {
     [HttpPost("search")]
