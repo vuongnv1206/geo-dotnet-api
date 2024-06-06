@@ -8,7 +8,6 @@ public class Paper : AuditableEntity, IAggregateRoot
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public Guid? PaperLabelId { get; set; }
-    public int NumberOfQuestion => PaperQuestions.Count;
     public int? Duration { get; set; }
     public bool Shuffle { get; set; }
     public bool ShowMarkResult { get; set; }
@@ -23,6 +22,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public virtual PaperLabel? PaperLable { get; set; }
     public virtual PaperFolder? PaperFolder { get; set; }
     public virtual List<PaperQuestion> PaperQuestions { get; set; } = new();
+    public virtual List<SubmitPaper> SubmitPapers { get; set; } = new();
 
     public Paper(
         string examName,

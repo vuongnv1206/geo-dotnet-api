@@ -66,10 +66,14 @@ public class MapsterSettings
         // Paper
         TypeAdapterConfig<Paper, PaperDto>.NewConfig()
           .Map(dest => dest.PaperFolder, src => src.PaperFolder)
-           .Map(dest => dest.PaperLable, src => src.PaperLable)
-          .Map(dest => dest.Questions, src => src.PaperQuestions.Select(pq => pq.Question));
+          .Map(dest => dest.PaperLable, src => src.PaperLable)
+          .Map(dest => dest.Questions, src => src.PaperQuestions.Select(pq => pq.Question))
+          .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
+          .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
 
-        TypeAdapterConfig<Paper, PaperStudentDto>.NewConfig();
+        TypeAdapterConfig<Paper, PaperStudentDto>.NewConfig()
+             .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
+          .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
 
         TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
 

@@ -8,6 +8,7 @@ public class PaperByIdSpec : Specification<Paper>, ISingleResultSpecification
         Query.Where(p => p.Id == id)
             .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.Answers)
             .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionPassages).ThenInclude(qp => qp.Answers)
-            .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionLable);
+            .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionLable)
+            .Include(x => x.SubmitPapers);
     }
 }
