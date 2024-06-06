@@ -94,7 +94,8 @@ public class Paper : AuditableEntity, IAggregateRoot
         Guid? paperFolderId,
         bool isPublish,
         string? content,
-        string? description)
+        string? description,
+        string? password)
     {
         ExamName = examName;
         Status = status;
@@ -110,6 +111,7 @@ public class Paper : AuditableEntity, IAggregateRoot
         IsPublish = isPublish;
         Content = content;
         Description = description;
+        Password = password;
 
         return this;
     }

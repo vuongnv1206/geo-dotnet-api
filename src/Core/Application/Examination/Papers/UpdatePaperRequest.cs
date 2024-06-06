@@ -92,7 +92,8 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             request.FolderId,
             request.IsPublish,
             request.Content,
-            request.Description);
+            request.Description,
+            request.Password);
 
         await _paperRepo.UpdateAsync(paper, cancellationToken);
 
