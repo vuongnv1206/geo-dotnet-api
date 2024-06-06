@@ -12,7 +12,7 @@ public class Question : AuditableEntity, IAggregateRoot
     public virtual QuestionType? QuestionType { get; set; }
     public Guid? QuestionLableId { get; set; }
     public virtual QuestionLable? QuestionLable { get; set; }
-    public Guid? ParentId { get; set; }
+    public Guid? QuestionParentId { get; set; }
     public virtual Question? QuestionParent { get; set; }
     public virtual List<Question> QuestionPassages { get; set; } = new();
     public virtual List<Answer> Answers { get; set; } = new();
@@ -76,6 +76,7 @@ public class Question : AuditableEntity, IAggregateRoot
             }
         }
     }
+
     public Question Update(string? content, string? image, string? audio, Guid? questionFolderId, QuestionType? questionType, Guid? questionLableId, Guid? parentId)
     {
         Content = content;
@@ -84,7 +85,7 @@ public class Question : AuditableEntity, IAggregateRoot
         QuestionFolderId = questionFolderId;
         QuestionType = questionType;
         QuestionLableId = questionLableId;
-        ParentId = parentId;
+        QuestionParentId = parentId;
 
         return this;
     }
