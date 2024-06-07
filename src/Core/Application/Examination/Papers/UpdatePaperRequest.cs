@@ -14,7 +14,7 @@ public class UpdatePaperRequest : IRequest<Guid>
     public Guid? PaperLabelId { get; set; }
     public int? Duration { get; set; }
     public bool Shuffle { get; set; }
-    public bool ShowMarhResult { get; set; }
+    public bool ShowMarkResult { get; set; }
     public bool ShowQUestionAnswer { get; set; }
     public string? Password { get; set; }
     public PaperType Type { get; set; }
@@ -86,13 +86,14 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             request.PaperLabelId,
             request.Duration,
             request.Shuffle,
-            request.ShowMarhResult,
+            request.ShowMarkResult,
             request.ShowQUestionAnswer,
             request.Type,
             request.FolderId,
             request.IsPublish,
             request.Content,
-            request.Description);
+            request.Description,
+            request.Password);
 
         await _paperRepo.UpdateAsync(paper, cancellationToken);
 

@@ -9,6 +9,8 @@ public class PaperStudentDto : IDto
     public int NumberOfQuestion { get; set; }
     public int TotalAttended { get; set; }
     public int? Duration { get; set; }
+    public DateTime? StartTime { get; set; }
+    public DateTime? EndTime { get; set; }
     public bool ShowMarkResult { get; set; }
     public bool ShowQuestionAnswer { get; set; }
     public string Type { get; set; }
