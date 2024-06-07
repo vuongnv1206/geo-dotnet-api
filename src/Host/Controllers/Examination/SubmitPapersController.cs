@@ -26,7 +26,7 @@ public class SubmitPapersController : VersionedApiController
         return await Mediator.Send(new GetPaperByIdRoleStudentRequest(paperId));
     }
 
-    [HttpGet("paper/{paperId:guid}/students-submitted")]
+    [HttpPost("paper/{paperId:guid}/students-submitted")]
     [OpenApiOperation("get student have submitted a paper yet")]
     public async Task<ActionResult<List<SubmitPaperDto>>> GetSubmittedPaper(Guid paperId, GetSubmittedPaperRequest request)
     {
