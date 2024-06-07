@@ -19,11 +19,20 @@ public class SubmitPapersController : VersionedApiController
         return await Mediator.Send(request);
     }
 
-    [HttpGet("paper/{id:guid}")]
+    [HttpGet("paper/{paperId:guid}")]
     [OpenApiOperation("get information of paper by role student")]
-    public async Task<PaperStudentDto> GetPapperByRoleStudent(Guid id)
+    public async Task<PaperStudentDto> GetPapperByRoleStudent(Guid paperId)
     {
-        return await Mediator.Send(new GetPaperByIdRoleStudentRequest(id));
+        return await Mediator.Send(new GetPaperByIdRoleStudentRequest(paperId));
+    }
+
+    [HttpGet("paper/{paperId:guid}/students-submitted")]
+    [OpenApiOperation("get student have submitted a paper yet")]
+    public async Task<ActionResult<List<SubmitPaperDto>>> GetSubmittedPaper(Guid paperId, GetSubmittedPaperRequest request)
+    {
+        return paperId == request.PaperId
+            ? Ok(await Mediator.Send(request))
+            : BadRequest();
     }
 
 }
