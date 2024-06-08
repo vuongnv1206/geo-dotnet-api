@@ -37,8 +37,8 @@ public class SubmitPapersController : VersionedApiController
     }
 
 
-    [HttpGet("last-result")]
-    public async Task<ActionResult<LastResultExamDto>> GetLastResult([FromQuery] GetLastResultExamRequest request)
+    [HttpPost("last-result")]
+    public async Task<ActionResult<LastResultExamDto>> GetLastResult(GetLastResultExamRequest request)
     {
         var result = await Mediator.Send(request);
         return Ok(result);
