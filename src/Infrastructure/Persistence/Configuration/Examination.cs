@@ -69,7 +69,6 @@ public class SubmitPaperDetailConfig : IEntityTypeConfiguration<SubmitPaperDetai
     public void Configure(EntityTypeBuilder<SubmitPaperDetail> builder)
     {
         builder.IsMultiTenant();
-        builder.HasKey(tig => new { tig.SubmitPaperId, tig.QuestionId });
         builder.ToTable("SubmitPaperDetails", SchemaNames.Examination);
     }
 }
