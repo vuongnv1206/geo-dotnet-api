@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.ByStudents;
+using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
@@ -33,6 +34,14 @@ public class SubmitPapersController : VersionedApiController
         return paperId == request.PaperId
             ? Ok(await Mediator.Send(request))
             : BadRequest();
+    }
+
+
+    [HttpPost("last-result")]
+    public async Task<ActionResult<LastResultExamDto>> GetLastResult(GetLastResultExamRequest request)
+    {
+        var result = await Mediator.Send(request);
+        return Ok(result);
     }
 
 }
