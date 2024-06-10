@@ -72,7 +72,8 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
             var newPaperQuestions = request.NewQuestions.Select(q => new PaperQuestion
             {
                 QuestionId = newQuestionIds[request.NewQuestions.IndexOf(q)],
-                Mark = q.Mark
+                Mark = q.Mark,
+                RawIndex = q.RawIndex
             }).ToList();
             newPaper.AddQuestions(newPaperQuestions);
         }
