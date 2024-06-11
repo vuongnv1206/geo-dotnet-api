@@ -21,14 +21,6 @@ public class AssignmentsController : VersionedApiController
         return Mediator.Send(new GetAssignmentRequest(id));
     }
 
-    [HttpGet("dapper")]
-    [MustHavePermission(FSHAction.View, FSHResource.Assignments)]
-    [OpenApiOperation("Get assignment details via dapper.", "")]
-    public Task<AssignmentDto> GetDapperAsync(Guid id)
-    {
-        return Mediator.Send(new GetAssignmentViaDapperRequest(id));
-    }
-
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Assignments)]
     [OpenApiOperation("Create a new assignment.", "")]
@@ -56,3 +48,4 @@ public class AssignmentsController : VersionedApiController
     }
 
 }
+

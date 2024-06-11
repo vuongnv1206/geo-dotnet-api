@@ -4,13 +4,10 @@ namespace FSH.WebApi.Domain.Assignment;
 
 public class AssignmentClass
 {
-    public Guid AssignmentId { get; private set; }
-    public Guid ClassesId { get; private set; }
-    public virtual Classes Classes { get; private set; }
-    public virtual Assignment Assignment { get; private set; }
-    public Guid ClassId { get; private set; }
-
-    // public virtual Class Class { get; private set; } = default!;
+    public DefaultIdType AssignmentId { get; set; }
+    public DefaultIdType ClassesId { get; set; }
+    public virtual Classes Classes { get; set; }
+    public virtual Assignment Assignment { get; set; }
 
     public AssignmentClass()
     {
@@ -22,4 +19,5 @@ public class AssignmentClass
         AssignmentId = assignmentId;
         ClassesId = classesId;
     }
+
 }

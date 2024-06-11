@@ -79,5 +79,13 @@ public class MapsterSettings
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
+
+        TypeAdapterConfig<Classes, ClassDto>.NewConfig()
+          .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
+          .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment));
+
+
+
+
     }
 }
