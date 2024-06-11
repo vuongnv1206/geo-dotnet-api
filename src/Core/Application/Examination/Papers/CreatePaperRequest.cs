@@ -5,7 +5,7 @@ using FSH.WebApi.Domain.Examination.Enums;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.Papers;
-public class CreatePaperRequest : IRequest<PaperDto>
+public class CreatePaperRequest : IRequest<Guid>
 {
     public string ExamName { get; set; } = null!;
     public PaperStatus Status { get; set; }
@@ -27,7 +27,7 @@ public class CreatePaperRequestValidator : CustomValidator<CreatePaperRequest>
     }
 }
 
-public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, PaperDto>
+public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Guid>
 {
     private readonly IRepositoryWithEvents<Paper> _paperRepo;
     private readonly IStringLocalizer<CreatePaperRequestHandler> _t;
@@ -45,7 +45,7 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
         _mediator = mediator;
     }
 
-    public async Task<PaperDto> Handle(CreatePaperRequest request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreatePaperRequest request, CancellationToken cancellationToken)
     {
         if (request.PaperFolderId.HasValue
             && !await _paperFolderRepo.AnyAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value)))
@@ -87,8 +87,7 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Pap
 
 
         await _paperRepo.AddAsync(newPaper);
-        var paperDto = newPaper.Adapt<PaperDto>();
 
-        return paperDto;
+        return newPaper.Id;
     }
 }
