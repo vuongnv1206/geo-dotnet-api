@@ -3,4 +3,5 @@ public class CreateUpdateQuestionInPaperDto : IDto
 {
     public Guid QuestionId { get; set; }
     public float Mark { get; set; }
+    public int? RawIndex { get; set; }
 }

@@ -58,7 +58,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
 
         foreach (var passageDto in passages)
         {
-            passageDto.ParentId = parentId;
+            passageDto.QuestionParentId = parentId;
             var passage = passageDto.Adapt<Question>();
             var answers = passageDto.Answers?.Adapt<List<Answer>>();
 
@@ -67,6 +67,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
                 passage.AddAnswers(answers);
             }
 
+            passage.QuestionType = Domain.Question.Enums.QuestionType.ReadingQuestionPassage;
             await _questionRepo.AddAsync(passage, cancellationToken);
 
             if (passageDto.QuestionPassages != null)
