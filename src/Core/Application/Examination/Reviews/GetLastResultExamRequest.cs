@@ -1,7 +1,4 @@
-﻿
-
-
-using FSH.WebApi.Application.Extensions;
+﻿using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 using Mapster;
@@ -11,7 +8,7 @@ public class GetLastResultExamRequest : IRequest<LastResultExamDto>
 {
     public Guid PaperId { get; set; }
     public Guid UserId { get; set;}
-    public Guid PaperSubmitId { get; set; }
+    public Guid SubmitPaperId { get; set; }
 
 }
 
@@ -32,7 +29,7 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
 
     public async Task<LastResultExamDto> Handle(GetLastResultExamRequest request, CancellationToken cancellationToken)
     {
-        var spec = new ExamResultSpec(request.PaperSubmitId,request.PaperId, request.UserId);
+        var spec = new ExamResultSpec(request.SubmitPaperId,request.PaperId, request.UserId);
         var submitPaper = await _repositorySubmitPaper.FirstOrDefaultAsync(spec,cancellationToken);
 
         var student = await _userService.GetAsync(request.UserId.ToString(),cancellationToken);
@@ -43,14 +40,6 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
        
         var examResultDto = submitPaper.Adapt<LastResultExamDto>();
         examResultDto.Student = student;
-        examResultDto.RightAnswer = 0;
-        foreach (var detail in submitPaper.SubmitPaperDetails)
-        {
-            if (detail.IsAnswerCorrect(detail.Question, detail.Question.Answers))
-            {
-                examResultDto.RightAnswer++;
-            }
-        }
 
 
 

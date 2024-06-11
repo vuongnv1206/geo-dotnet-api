@@ -39,4 +39,18 @@ public class PapersController : VersionedApiController
     {
         return await Mediator.Send(new DeletePaperRequest(id));
     }
+
+    [HttpPut("{id:guid}/questions")]
+    [OpenApiOperation("Update questions in a paper")]
+    public async Task<IActionResult> UpdateQuestionsInPaperAsync(Guid id, [FromBody] UpdateQuestionsInPaperRequest request)
+    {
+        if (id != request.PaperId)
+        {
+            return BadRequest("Paper ID in the request does not match the ID in the route.");
+        }
+
+        return Ok(await Mediator.Send(request));
+    }
+
+
 }

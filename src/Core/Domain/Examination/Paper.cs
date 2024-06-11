@@ -54,7 +54,8 @@ public class Paper : AuditableEntity, IAggregateRoot
             {
                 QuestionId = q.QuestionId,
                 PaperId = Id,
-                Mark = q.Mark
+                Mark = q.Mark,
+                RawIndex = q.RawIndex
             });
         }
     }
@@ -67,6 +68,7 @@ public class Paper : AuditableEntity, IAggregateRoot
             if (existingPaperQuestion != null)
             {
                 existingPaperQuestion.Mark = q.Mark;
+                existingPaperQuestion.RawIndex = q.RawIndex;
             }
             else
             {
@@ -74,7 +76,8 @@ public class Paper : AuditableEntity, IAggregateRoot
                 {
                     QuestionId = q.QuestionId,
                     PaperId = this.Id,
-                    Mark = q.Mark
+                    Mark = q.Mark,
+                    RawIndex = q.RawIndex
                 });
             }
         }
