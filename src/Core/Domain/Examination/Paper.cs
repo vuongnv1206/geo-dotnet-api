@@ -1,25 +1,33 @@
 ﻿using FSH.WebApi.Domain.Examination.Enums;
+using FSH.WebApi.Domain.Subjects;
 
 namespace FSH.WebApi.Domain.Examination;
 public class Paper : AuditableEntity, IAggregateRoot
 {
+    //General config
     public string ExamName { get; set; }
-    public PaperStatus Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public Guid? PaperLabelId { get; set; }
     public int? Duration { get; set; }
+    public PaperType Type { get; set; }
+    public bool IsPublish { get; set; }
+    public string? Content { get; set; }
+    public string? Description { get; set; }
+    public PaperStatus Status { get; set; }
+    //Security
     public bool Shuffle { get; set; }
     public bool ShowMarkResult { get; set; }
     public bool ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
-    public PaperType Type { get; set; }
-    public Guid? PaperFolderId { get; set; }
-    public bool IsPublish { get; set; }
     public string ExamCode { get; set; }
-    public string? Content { get; set; }
-    public string? Description { get; set; }
-    public virtual PaperLabel? PaperLable { get; set; }
+    public int NumberAttempt { get; set; }
+
+    //Navigation
+    public Guid? PaperLabelId { get; set; }
+    public Guid? PaperFolderId { get; set; }
+    public Guid? SubjectId { get; set; }
+    public virtual Subject? Subject { get; set; }
+    public virtual PaperLabel? PaperLabel { get; set; }
     public virtual PaperFolder? PaperFolder { get; set; }
     public virtual List<PaperQuestion> PaperQuestions { get; set; } = new();
     public virtual List<SubmitPaper> SubmitPapers { get; set; } = new();
@@ -30,8 +38,10 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperType type,
         string? content,
         string? description,
+        string? password,
         Guid? paperFolderId,
-        string? password)
+        Guid? paperLabelId,
+        Guid? subjectId)
     {
         ExamName = examName;
         Status = status;
@@ -39,6 +49,8 @@ public class Paper : AuditableEntity, IAggregateRoot
         Content = content;
         Description = description;
         PaperFolderId = paperFolderId;
+        PaperLabelId = paperLabelId;
+        SubjectId = subjectId;
         Password = password;
         ExamCode = examName;
     }
@@ -88,34 +100,35 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperStatus status,
         DateTime? startTime,
         DateTime? endTime,
-        Guid? paperLabelId,
         int? duration,
         bool shuffle,
         bool showMarkResult,
         bool showQuestionAnswer,
         PaperType type,
-        Guid? paperFolderId,
         bool isPublish,
         string? content,
         string? description,
-        string? password)
+        string? password,
+        Guid? paperFolderId,
+        Guid? paperLabelId,
+        Guid? subjectId)
     {
         ExamName = examName;
         Status = status;
         StartTime = startTime;
         EndTime = endTime;
-        PaperLabelId = paperLabelId;
         Duration = duration;
         Shuffle = shuffle;
         ShowMarkResult = showMarkResult;
         ShowQuestionAnswer = showQuestionAnswer;
         Type = type;
-        PaperFolderId = paperFolderId;
         IsPublish = isPublish;
         Content = content;
         Description = description;
         Password = password;
-
+        PaperLabelId = paperLabelId;
+        SubjectId = subjectId;
+        PaperFolderId = paperFolderId;
         return this;
     }
 

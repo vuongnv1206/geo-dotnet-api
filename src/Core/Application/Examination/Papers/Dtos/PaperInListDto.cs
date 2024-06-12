@@ -8,7 +8,7 @@ public class PaperInListDto : IDto
 {
     public Guid Id { get; set; }
     public string ExamName { get; set; }
-    public Guid? PaperLabelId { get; set; }
+   
     public int NumberOfQuestion { get; set; }
     public int? Duration { get; set; }
     public bool ShowMarkResult { get; set; }
@@ -16,11 +16,13 @@ public class PaperInListDto : IDto
     public string? Password { get; set; }
     public string Type { get; set; }
     public string Status { get; set; }
-    public Guid? PaperFolderId { get; set; }
     public bool IsPublish { get; set; }
     public string ExamCode { get; set; }
     public string? Content { get; set; }
     public string? Description { get; set; }
+    public Guid? PaperFolderId { get; set; }
+    public Guid? SubjectId { get; set; }
+    public Guid? PaperLabelId { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime CreatedOn { get; private set; }
     public Guid? LastModifiedBy { get; set; }

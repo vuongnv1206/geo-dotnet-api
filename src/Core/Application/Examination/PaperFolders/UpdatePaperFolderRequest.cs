@@ -6,7 +6,6 @@ public class UpdatePaperFolderRequest : IRequest<Guid>
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public Guid? ParentId { get; set; }
-    public Guid? SubjectId { get; set; }
 }
 
 public class UpdatePaperFolderRequestHandler : IRequestHandler<UpdatePaperFolderRequest, Guid>
@@ -36,7 +35,7 @@ public class UpdatePaperFolderRequestHandler : IRequestHandler<UpdatePaperFolder
             throw new ForbiddenException(_t["You do not have permission to edit this folder."]);
         }
 
-        var updatedFolder = folder.Update(request.Name, request.ParentId, request.SubjectId);
+        var updatedFolder = folder.Update(request.Name, request.ParentId);
 
         await _paperFolderRepo.UpdateAsync(updatedFolder);
 

@@ -11,9 +11,11 @@ public class CreatePaperRequest : IRequest<Guid>
     public PaperStatus Status { get; set; }
     public string? Password { get; set; }
     public PaperType Type { get; set; }
-    public Guid? PaperFolderId { get; set; }
     public string? Content { get; set; }
     public string? Description { get; set; }
+    public Guid? PaperLabelId { get; set; }
+    public Guid? PaperFolderId { get; set; }
+    public Guid? SubjectId { get; set; }
     public List<CreateUpdateQuestionInPaperDto>? Questions { get; set; } = new(); // Thêm danh sách câu hỏi đã có
     public List<NewQuestionDto>? NewQuestions { get; set; } = new();// Thêm danh sách câu hỏi mới
 }
@@ -57,9 +59,10 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Gui
             request.Type,
             request.Content,
             request.Description,
+            request.Password,
             request.PaperFolderId,
-            request.Password
-        );
+            request.PaperLabelId,
+            request.SubjectId);
 
         if (!request.Questions.Any() && !request.NewQuestions.Any())
             throw new ConflictException(_t["Create paper must have questions."]);
