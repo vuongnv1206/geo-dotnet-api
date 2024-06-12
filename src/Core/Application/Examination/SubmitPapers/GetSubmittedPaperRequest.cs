@@ -1,5 +1,4 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
-using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 

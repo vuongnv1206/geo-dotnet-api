@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Extensions;
+﻿using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 using Mapster;
@@ -19,7 +20,11 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
     private readonly IReadRepository<Paper> _repositoryPaper;
     private readonly IStringLocalizer _t;
 
-    public GetLastResultExamRequestHandler(IReadRepository<SubmitPaper> repositorySubmitPaper, IUserService userService, IReadRepository<Paper> repositoryPaper, IStringLocalizer<GetLastResultExamRequestHandler> t)
+    public GetLastResultExamRequestHandler(
+        IReadRepository<SubmitPaper> repositorySubmitPaper,
+        IUserService userService,
+        IReadRepository<Paper> repositoryPaper,
+        IStringLocalizer<GetLastResultExamRequestHandler> t)
     {
         _repositorySubmitPaper = repositorySubmitPaper;
         _userService = userService;
@@ -30,18 +35,22 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
     public async Task<LastResultExamDto> Handle(GetLastResultExamRequest request, CancellationToken cancellationToken)
     {
         var spec = new ExamResultSpec(request.SubmitPaperId,request.PaperId, request.UserId);
-        var submitPaper = await _repositorySubmitPaper.FirstOrDefaultAsync(spec,cancellationToken);
+        var submitPaper = await _repositorySubmitPaper.FirstOrDefaultAsync(spec,cancellationToken)
+            ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
+
+        var paper = await _repositoryPaper.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
 
         var student = await _userService.GetAsync(request.UserId.ToString(),cancellationToken);
 
-        _ = submitPaper ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
-
-    
-       
         var examResultDto = submitPaper.Adapt<LastResultExamDto>();
+        float totalMark = 0;
+
+        submitPaper.SubmitPaperDetails.ForEach(submit =>
+        {
+            totalMark += submit.GetPointQuestion(paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId));
+        });
+        examResultDto.TotalMark = totalMark;
         examResultDto.Student = student;
-
-
 
         return examResultDto;
     }
