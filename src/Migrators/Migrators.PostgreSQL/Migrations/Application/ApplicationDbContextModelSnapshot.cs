@@ -1399,6 +1399,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<DateOnly?>("BirthDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -1412,6 +1415,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
+
+                    b.Property<bool?>("Gender")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");

@@ -278,6 +278,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Id = table.Column<string>(type: "text", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: true),
                     LastName = table.Column<string>(type: "text", nullable: true),
+                    Gender = table.Column<bool>(type: "boolean", nullable: true),
+                    BirthDate = table.Column<DateOnly>(type: "date", nullable: true),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     RefreshToken = table.Column<string>(type: "text", nullable: true),
