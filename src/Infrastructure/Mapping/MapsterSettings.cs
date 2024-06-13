@@ -2,7 +2,9 @@ using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
+using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
@@ -66,12 +68,24 @@ public class MapsterSettings
         // Paper
         TypeAdapterConfig<Paper, PaperDto>.NewConfig()
           .Map(dest => dest.PaperFolder, src => src.PaperFolder)
-           .Map(dest => dest.PaperLable, src => src.PaperLable)
-          .Map(dest => dest.Questions, src => src.PaperQuestions.Select(pq => pq.Question));
+          .Map(dest => dest.PaperLable, src => src.PaperLabel)
+          .Map(dest => dest.Questions, src => CustomMappingExtensions.MapQuestions(src.PaperQuestions))
+          .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
+          .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
 
-        TypeAdapterConfig<Paper, PaperStudentDto>.NewConfig();
+        TypeAdapterConfig<Paper, PaperStudentDto>.NewConfig()
+             .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
+          .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
 
         TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
+
+
+        TypeAdapterConfig<SubmitPaper, LastResultExamDto>.NewConfig()
+               .Map(dest => dest.Paper, src => src.Paper)
+               .Map(dest => dest.TotalQuestion, src => src.Paper.PaperQuestions.Count());
+
+        TypeAdapterConfig<SubmitPaperDetail, SubmitPaperDetailDto>.NewConfig()
+           .Map(dest => dest.IsCorrect, src => src.IsAnswerCorrect(src.Question, src.Question.Answers.ToList()));
 
         TypeAdapterConfig<CreateQuestionDto, NewQuestionDto>.NewConfig();
         TypeAdapterConfig<CreateQuestionDto, Domain.Question.Question>.NewConfig()

@@ -7,21 +7,22 @@ namespace FSH.WebApi.Application.Examination.Papers;
 public class UpdatePaperRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public required string ExamName { get; set; }
+    public string ExamName { get; set; }
     public PaperStatus Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public Guid? PaperLabelId { get; set; }
     public int? Duration { get; set; }
     public bool Shuffle { get; set; }
-    public bool ShowMarhResult { get; set; }
-    public bool ShowQUestionAnswer { get; set; }
+    public bool ShowMarkResult { get; set; }
+    public bool ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
     public PaperType Type { get; set; }
-    public Guid? FolderId { get; set; }
     public bool IsPublish { get; set; }
     public string? Content { get; set; }
     public string? Description { get; set; }
+    public Guid? PaperLabelId { get; set; }
+    public Guid? SubjectId { get; set; }
+    public Guid? PaperFolderId { get; set; }
 
 }
 
@@ -70,9 +71,9 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         if (!paper.CanUpdate(userId))
             throw new ForbiddenException(_t["You can not Update paper."]);
 
-        if (request.FolderId.HasValue
-            && !await _folderRepo.AnyAsync(new PaperFolderByIdSpec(request.FolderId.Value), cancellationToken))
-            throw new NotFoundException(_t["Paper folder {0} Not Found.", request.FolderId]);
+        if (request.PaperFolderId.HasValue
+            && !await _folderRepo.AnyAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value), cancellationToken))
+            throw new NotFoundException(_t["Paper folder {0} Not Found.", request.PaperFolderId]);
 
         if (request.PaperLabelId.HasValue
             && !await _labelRepo.AnyAsync(new PaperLabelByIdSpec(request.PaperLabelId.Value), cancellationToken))
@@ -83,16 +84,19 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             request.Status,
             request.StartTime,
             request.EndTime,
-            request.PaperLabelId,
             request.Duration,
             request.Shuffle,
-            request.ShowMarhResult,
-            request.ShowQUestionAnswer,
+            request.ShowMarkResult,
+            request.ShowQuestionAnswer,
             request.Type,
-            request.FolderId,
             request.IsPublish,
             request.Content,
-            request.Description);
+            request.Description,
+            request.Password,
+            request.PaperFolderId,
+            request.PaperLabelId,
+            request.SubjectId
+            );
 
         await _paperRepo.UpdateAsync(paper, cancellationToken);
 

@@ -15,6 +15,8 @@ public class QuestionDto : AuditableEntity, IDto
     public string? Content { get; set; }
     public string? Image { get; set; }
     public string? Audio { get; set; }
+    public int? RawIndex { get; set; }
+    public float? Mark { get; set; }
     public QuestionFolderDto? QuestionFolder { get; set; }
     public QuestionType? QuestionType { get; set; }
     public QuestionLableDto? QuestionLable { get; set; }
