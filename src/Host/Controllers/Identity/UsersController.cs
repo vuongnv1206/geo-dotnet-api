@@ -1,5 +1,6 @@
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Password;
+using System.Security.Claims;
 
 namespace FSH.WebApi.Host.Controllers.Identity;
 
@@ -91,11 +92,16 @@ public class UsersController : VersionNeutralApiController
     }
 
     [HttpGet("confirm-phone-number")]
-    [AllowAnonymous]
+    [MustHavePermission(FSHAction.Update, FSHResource.Users)]
     [OpenApiOperation("Confirm phone number for a user.", "")]
     [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Search))]
-    public Task<string> ConfirmPhoneNumberAsync([FromQuery] string userId, [FromQuery] string code)
+    public Task<string> ConfirmPhoneNumberAsync([FromQuery] string code)
     {
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         return _userService.ConfirmPhoneNumberAsync(userId, code);
     }
 

@@ -10,6 +10,10 @@ public class UserDetailsDto
 
     public string? LastName { get; set; }
 
+    public bool? Gender { get; set; }
+
+    public DateOnly? BirthDate { get; set; }
+
     public string? Email { get; set; }
 
     public bool IsActive { get; set; } = true;
@@ -18,5 +22,6 @@ public class UserDetailsDto
 
     public string? PhoneNumber { get; set; }
 
+    public bool? PhoneNumberConfirmed { get; set; }
     public string? ImageUrl { get; set; }
 }

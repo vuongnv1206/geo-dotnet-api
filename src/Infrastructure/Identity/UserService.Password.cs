@@ -1,6 +1,8 @@
-﻿using FSH.WebApi.Application.Common.Exceptions;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Identity.Users.Password;
+using FSH.WebApi.Application.Identity.Users.Profile;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace FSH.WebApi.Infrastructure.Identity;
@@ -79,5 +81,14 @@ internal partial class UserService
         {
             throw new InternalServerException(_t["Change password failed"], result.GetErrors(_t));
         }
+    }
+
+    public async Task<bool> VerifyCurrentPassword(string userId, string password)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        _ = user ?? throw new NotFoundException(_t["User Not Found."]);
+
+        return await _userManager.CheckPasswordAsync(user, password);
     }
 }

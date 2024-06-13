@@ -1,6 +1,8 @@
 ﻿using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Mailing;
+using FSH.WebApi.Application.Common.SpeedSMS;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Identity.Users.Profile;
 using FSH.WebApi.Domain.Common;
 using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Shared.Authorization;
@@ -153,31 +155,16 @@ internal partial class UserService
         return string.Join(Environment.NewLine, messages);
     }
 
-    public async Task UpdateAsync(UpdateUserRequest request, string userId)
+    public async Task UpdateAsync(UpdateUserRequest request)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(request.UserId!);
 
         _ = user ?? throw new NotFoundException(_t["User Not Found."]);
 
-        string currentImage = user.ImageUrl ?? string.Empty;
-        if (request.Image != null || request.DeleteCurrentImage)
-        {
-            user.ImageUrl = await _fileStorage.UploadAsync<ApplicationUser>(request.Image, FileType.Image);
-            if (request.DeleteCurrentImage && !string.IsNullOrEmpty(currentImage))
-            {
-                string root = Directory.GetCurrentDirectory();
-                _fileStorage.Remove(Path.Combine(root, currentImage));
-            }
-        }
-
-        user.FirstName = request.FirstName;
-        user.LastName = request.LastName;
-        user.PhoneNumber = request.PhoneNumber;
-        string? phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-        if (request.PhoneNumber != phoneNumber)
-        {
-            await _userManager.SetPhoneNumberAsync(user, request.PhoneNumber);
-        }
+        user.FirstName = request.FirstName ?? user.FirstName;
+        user.LastName = request.LastName ?? user.LastName;
+        user.Gender = request.Gender ?? user.Gender;
+        user.BirthDate = request.BirthDate ?? user.BirthDate;
 
         var result = await _userManager.UpdateAsync(user);
 
@@ -189,5 +176,92 @@ internal partial class UserService
         {
             throw new InternalServerException(_t["Update profile failed"], result.GetErrors(_t));
         }
+    }
+
+    public async Task UpdateEmailAsync(UpdateEmailRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId);
+
+        _ = user ?? throw new NotFoundException(_t["User Not Found."]);
+
+        var result = await _userManager.SetEmailAsync(user, request.Email);
+        if (!result.Succeeded)
+        {
+            throw new InternalServerException(_t["Update email failed"], result.GetErrors(_t));
+        }
+
+        if (_securitySettings.RequireConfirmedAccount)
+        {
+            string emailVerificationUri = await GetEmailVerificationUriAsync(user, request.Origin);
+            RegisterUserEmailModel eMailModel = new RegisterUserEmailModel()
+            {
+                Email = user.Email,
+                UserName = user.UserName,
+                Url = emailVerificationUri
+            };
+            var mailRequest = new MailRequest(
+                               new List<string> { user.Email },
+                                             _t["Confirm Registration"],
+                                                             _templateService.GenerateEmailTemplate("email-confirmation", eMailModel));
+            _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
+        }
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+    }
+
+    public async Task UpdatePhoneNumberAsync(UpdatePhoneNumberRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId!);
+
+        _ = user ?? throw new NotFoundException(_t["User Not Found."]);
+
+        var result = await _userManager.SetPhoneNumberAsync(user, request.PhoneNumber);
+
+        string code = await _userManager.GenerateChangePhoneNumberTokenAsync(user, request.PhoneNumber);
+        _speedSMSService.sendSMS(new string[] { request.PhoneNumber }, $"Your verification code is: {code}", SpeedSMSType.TYPE_CSKH);
+
+        if (!result.Succeeded)
+        {
+            throw new InternalServerException(_t["Update phone number failed"], result.GetErrors(_t));
+        }
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+    }
+
+    public async Task UpdateAvatarAsync(UpdateAvatarRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId);
+
+        _ = user ?? throw new NotFoundException(_t["User Not Found."]);
+
+        string currentImage = user.ImageUrl ?? string.Empty;
+
+        if (request.Image != null)
+        {
+            RemoveCurrentAvatar(currentImage);
+            user.ImageUrl = await _fileStorage.UploadAsync<ApplicationUser>(request.Image, FileType.Image);
+        }
+        else if (request.DeleteCurrentImage)
+        {
+            RemoveCurrentAvatar(currentImage);
+            user.ImageUrl = null;
+        }
+
+
+        var result = await _userManager.UpdateAsync(user);
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+
+        if (!result.Succeeded)
+        {
+            throw new InternalServerException(_t["Update profile failed"], result.GetErrors(_t));
+        }
+    }
+
+    private void RemoveCurrentAvatar(string currentImage)
+    {
+        if (string.IsNullOrEmpty(currentImage)) return;
+        string root = Directory.GetCurrentDirectory();
+        _fileStorage.Remove(Path.Combine(root, currentImage));
     }
 }
