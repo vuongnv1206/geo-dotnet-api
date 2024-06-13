@@ -8,7 +8,6 @@ public class Paper : AuditableEntity, IAggregateRoot
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public Guid? PaperLabelId { get; set; }
-    public int NumberOfQuestion { get; set; }
     public int? Duration { get; set; }
     public bool Shuffle { get; set; }
     public bool ShowMarkResult { get; set; }
@@ -23,6 +22,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public virtual PaperLabel? PaperLable { get; set; }
     public virtual PaperFolder? PaperFolder { get; set; }
     public virtual List<PaperQuestion> PaperQuestions { get; set; } = new();
+    public virtual List<SubmitPaper> SubmitPapers { get; set; } = new();
 
     public Paper(
         string examName,
@@ -47,14 +47,15 @@ public class Paper : AuditableEntity, IAggregateRoot
     {
         foreach (var q in questions)
         {
-            if (PaperQuestions.Any(x => x.QuestionId == q.Question.Id))
+            if (PaperQuestions.Any(x => x.QuestionId == q.QuestionId))
                 continue;
 
             PaperQuestions.Add(new PaperQuestion
             {
                 QuestionId = q.QuestionId,
                 PaperId = Id,
-                Mark = q.Mark
+                Mark = q.Mark,
+                RawIndex = q.RawIndex
             });
         }
     }
@@ -67,6 +68,7 @@ public class Paper : AuditableEntity, IAggregateRoot
             if (existingPaperQuestion != null)
             {
                 existingPaperQuestion.Mark = q.Mark;
+                existingPaperQuestion.RawIndex = q.RawIndex;
             }
             else
             {
@@ -74,7 +76,8 @@ public class Paper : AuditableEntity, IAggregateRoot
                 {
                     QuestionId = q.QuestionId,
                     PaperId = this.Id,
-                    Mark = q.Mark
+                    Mark = q.Mark,
+                    RawIndex = q.RawIndex
                 });
             }
         }
@@ -86,7 +89,6 @@ public class Paper : AuditableEntity, IAggregateRoot
         DateTime? startTime,
         DateTime? endTime,
         Guid? paperLabelId,
-        int numberOfQuestion,
         int? duration,
         bool shuffle,
         bool showMarkResult,
@@ -95,14 +97,14 @@ public class Paper : AuditableEntity, IAggregateRoot
         Guid? paperFolderId,
         bool isPublish,
         string? content,
-        string? description)
+        string? description,
+        string? password)
     {
         ExamName = examName;
         Status = status;
         StartTime = startTime;
         EndTime = endTime;
         PaperLabelId = paperLabelId;
-        NumberOfQuestion = numberOfQuestion;
         Duration = duration;
         Shuffle = shuffle;
         ShowMarkResult = showMarkResult;
@@ -112,6 +114,7 @@ public class Paper : AuditableEntity, IAggregateRoot
         IsPublish = isPublish;
         Content = content;
         Description = description;
+        Password = password;
 
         return this;
     }

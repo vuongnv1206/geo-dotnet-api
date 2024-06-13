@@ -17,4 +17,6 @@ public interface IUserClassesRepository : IScopedService
     Task<List<UserClass>> GetUserInClasses(Guid classId);
 
     Task<UserClass> GetUserDetailInClasses(Guid userId, Guid classesId);
+
+    Task<int> GetNumberUserOfClasses(Guid classesId);
 }

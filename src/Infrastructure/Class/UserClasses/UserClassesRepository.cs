@@ -29,6 +29,12 @@ public class UserClassesRepository : IUserClassesRepository
         }
     }
 
+    public async Task<int> GetNumberUserOfClasses(DefaultIdType classesId)
+    {
+       var listUser = await _context.UserClasses.Where(p => p.ClassesId.Equals(classesId)).ToListAsync();
+       return listUser.Count();
+    }
+
     public async Task<UserClass> GetUserDetailInClasses(Guid userId, Guid classesId)
     {
         return await _context.UserClasses.FirstOrDefaultAsync(t => t.UserId == userId && t.ClassesId == classesId);

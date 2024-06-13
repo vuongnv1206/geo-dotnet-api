@@ -11,7 +11,10 @@ public class PaperDto : IDto
     public string ExamName { get; set; }
     public Guid? PaperLabelId { get; set; }
     public int NumberOfQuestion { get; set; }
+    public int TotalAttended { get; set; }
     public int? Duration { get; set; }
+    public DateTime? StartTime { get; set; }
+    public DateTime? EndTime { get; set; }
     public bool ShowMarkResult { get; set; }
     public bool ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }

@@ -55,8 +55,12 @@ public class CreateFolderRequestHandler : IRequestHandler<CreateFolderRequest, G
         }
 
         // add owner permission
-        var permission = new QuestionFolderPermission(_currentUser.GetUserId(), folder.Id, true, true, true, true);
-        folder.AddPermission(permission);
+        bool isHasOwnerPermission = folder.Permissions.Any(x => x.UserId == _currentUser.GetUserId());
+        if (!isHasOwnerPermission)
+        {
+            var permission = new QuestionFolderPermission(_currentUser.GetUserId(), Guid.Empty, folder.Id, true, true, true, true, true);
+            folder.AddPermission(permission);
+        }
 
         await _repository.UpdateAsync(folder, cancellationToken);
 

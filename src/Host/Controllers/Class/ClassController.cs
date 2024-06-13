@@ -1,5 +1,8 @@
-﻿using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.GroupClasses;
 using FSH.WebApi.Application.Class.UserClasses;
+using FSH.WebApi.Application.Assignments.AssignmentClasses;
 using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Host.Controllers.Class;
@@ -29,6 +32,14 @@ public class ClassController : VersionedApiController
         return Mediator.Send(new GetClassesRequest(id));
     }
 
+    [HttpGet("get-class-by-group-class")]
+    [MustHavePermission(FSHAction.View, FSHResource.Classes)]
+    [OpenApiOperation("Get class by group class.", "")]
+    public Task<List<Classes>> GetClassByGroupClassAsync(Guid groupClassId)
+    {
+        return Mediator.Send(new GetClassByGroupClassRequest(groupClassId));
+    }
+
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
     [OpenApiBodyParameter("Create new classes.", "")]
@@ -43,6 +54,15 @@ public class ClassController : VersionedApiController
     public async Task<ActionResult<Guid>> UpdateAsync(UpdateClassRequest request, Guid id)
     {
         return id != request.Id ? BadRequest() : Ok(await Mediator.Send(request));
+    }
+
+
+    [HttpDelete("{id:guid}")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
+    [OpenApiOperation("Delete a Class.", "")]
+    public Task<Guid> DeleteAsync(Guid id)
+    {
+        return Mediator.Send(new DeleteClassRequest(id));
     }
 
     [HttpGet("getall-user-in-class")]
@@ -73,6 +93,22 @@ public class ClassController : VersionedApiController
     [MustHavePermission(FSHAction.Delete, FSHResource.UserClasses)]
     [OpenApiOperation("Delete user in class.", "")]
     public Task DeleteUserInClass(DeleteUserInClassRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("assign-assignment-to-class")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
+    [OpenApiOperation("Assign assignment to class")]
+    public Task AssignAssignmentToClass(AssignAssignmentToClassRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpDelete("remove-assignment-from-class")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
+    [OpenApiOperation("Remove assignment from class")]
+    public Task RemoveAssignmentFromClass(RemoveAssignmentFromClassRequest request)
     {
         return Mediator.Send(request);
     }

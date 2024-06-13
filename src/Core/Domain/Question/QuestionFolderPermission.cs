@@ -10,8 +10,9 @@ public class QuestionFolderPermission : AuditableEntity, IAggregateRoot
     public bool CanAdd { get; private set; }
     public bool CanUpdate { get; private set; }
     public bool CanDelete { get; private set; }
+    public bool CanShare { get; private set; }
 
-    public QuestionFolderPermission(DefaultIdType? userId, DefaultIdType? groupTeacherId, DefaultIdType questionFolderId, bool canView, bool canAdd, bool canUpdate, bool canDelete)
+    public QuestionFolderPermission(DefaultIdType? userId, DefaultIdType? groupTeacherId, DefaultIdType questionFolderId, bool canView, bool canAdd, bool canUpdate, bool canDelete, bool canShare)
     {
         UserId = userId;
         GroupTeacherId = groupTeacherId;
@@ -20,9 +21,10 @@ public class QuestionFolderPermission : AuditableEntity, IAggregateRoot
         CanAdd = canAdd;
         CanUpdate = canUpdate;
         CanDelete = canDelete;
+        CanShare = canShare;
     }
 
-    public QuestionFolderPermission(DefaultIdType? userId, DefaultIdType questionFolderId, bool canView, bool canAdd, bool canUpdate, bool canDelete)
+    public QuestionFolderPermission(DefaultIdType? userId, DefaultIdType questionFolderId, bool canView, bool canAdd, bool canUpdate, bool canDelete, bool canShare)
     {
         UserId = userId;
         QuestionFolderId = questionFolderId;
@@ -30,6 +32,7 @@ public class QuestionFolderPermission : AuditableEntity, IAggregateRoot
         CanAdd = canAdd;
         CanUpdate = canUpdate;
         CanDelete = canDelete;
+        CanShare = canShare;
     }
 
     public QuestionFolderPermission(DefaultIdType id, DefaultIdType userId, DefaultIdType groupTeacherId)
@@ -45,11 +48,12 @@ public class QuestionFolderPermission : AuditableEntity, IAggregateRoot
         UserId = userId;
     }
 
-    public void SetPermissions(bool canView, bool canAdd, bool canUpdate, bool canDelete)
+    public void SetPermissions(bool canView, bool canAdd, bool canUpdate, bool canDelete, bool canShare)
     {
         CanView = canView;
         CanAdd = canAdd;
         CanUpdate = canUpdate;
         CanDelete = canDelete;
+        CanShare = canShare;
     }
 }

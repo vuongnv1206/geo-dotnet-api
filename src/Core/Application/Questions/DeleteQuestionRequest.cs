@@ -1,9 +1,4 @@
 ﻿using FSH.WebApi.Domain.Question;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Questions;
 public class DeleteQuestionRequest : IRequest<Guid>
@@ -24,6 +19,15 @@ public class DeleteQuestionRequestValidator : CustomValidator<DeleteQuestionRequ
     }
 }
 
+public class QuestionByIdSpec : Specification<Question>, ISingleResultSpecification
+{
+    public QuestionByIdSpec(Guid id) =>
+        Query
+        .Include(b => b.QuestionFolder)
+        .ThenInclude(b => b.Permissions)
+        .Where(b => b.Id == id);
+}
+
 public class DeleteQuestionRequestHandler : IRequestHandler<DeleteQuestionRequest, Guid>
 {
     private readonly IRepositoryWithEvents<Question> _questionRepo;
@@ -42,12 +46,16 @@ public class DeleteQuestionRequestHandler : IRequestHandler<DeleteQuestionReques
 
     public async Task<Guid> Handle(DeleteQuestionRequest request, CancellationToken cancellationToken)
     {
-        var question = await _questionRepo.GetByIdAsync(request.Id);
+        var question = await _questionRepo.FirstOrDefaultAsync(new QuestionByIdSpec(request.Id), cancellationToken);
         _ = question ?? throw new NotFoundException(_t["Question {0} Not Found.", request.Id]);
 
         if (!question.CanDelete(_currentUser.GetUserId()))
         {
-            throw new ForbiddenException(_t["You do not have permission to delete this Question."]);
+            // if folder owner is not the current user, throw an exception
+            if (!question.QuestionFolder.Permissions.Any(p => p.CanDelete && p.UserId == _currentUser.GetUserId()))
+            {
+                throw new ForbiddenException(_t["You do not have permission to delete this question."]);
+            }
         }
 
         await _questionRepo.DeleteAsync(question, cancellationToken);

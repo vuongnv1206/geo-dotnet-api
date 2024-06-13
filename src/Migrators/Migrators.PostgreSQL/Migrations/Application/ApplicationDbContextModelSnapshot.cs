@@ -868,6 +868,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<bool>("CanDelete")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("CanShare")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("CanUpdate")
                         .HasColumnType("boolean");
 
