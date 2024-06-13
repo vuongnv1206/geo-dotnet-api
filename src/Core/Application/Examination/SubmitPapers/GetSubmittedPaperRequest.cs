@@ -1,5 +1,4 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
-using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 
@@ -38,7 +37,7 @@ public class GetSubmittedPaperRequestHandler : IRequestHandler<GetSubmittedPaper
 
         var currentUserId = _currentUser.GetUserId();
 
-        var spec = new SubmitPaperByPaperId(request, paper, currentUserId);
+        var spec = new SubmitPaperByPaperIdPaging(request, paper, currentUserId);
         var submitPapers = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
         foreach(var submitter in submitPapers.Data)
         {
