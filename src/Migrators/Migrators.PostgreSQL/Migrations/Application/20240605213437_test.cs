@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class _622024 : Migration
+    public partial class test : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -901,7 +901,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     AssignmentId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClassesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>

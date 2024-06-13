@@ -35,7 +35,6 @@ public class RemoveTeacherInGroupRequestHandler : IRequestHandler<RemoveTeacherI
     public async Task<DefaultIdType> Handle(RemoveTeacherInGroupRequest request, CancellationToken cancellationToken)
     {
         var group = await _groupTeacherRepository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(request.GroupId));
-
         if (group is null)
             throw new NotFoundException(_t["Group {0} Not Found."]);
 

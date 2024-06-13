@@ -36,8 +36,7 @@ public class AddTeacherIntoTeamRequestHandler : IRequestHandler<AddTeacherIntoGr
 
     public async Task<DefaultIdType> Handle(AddTeacherIntoGroupRequest request, CancellationToken cancellationToken)
     {
-        var group = await _groupTeacherRepository
-           .GetByIdAsync(request.GroupId);
+        var group = await _groupTeacherRepository.GetByIdAsync(request.GroupId);
         if (group is null)
         {
             throw new NotFoundException(_t["Group {0} Not Found.", request.GroupId]);

@@ -2,8 +2,7 @@
 using FSH.WebApi.Application.Assignments.Dtos;
 
 namespace FSH.WebApi.Host.Controllers.Assignment;
-[Route("api/[controller]")]
-[ApiController]
+
 public class AssignmentsController : VersionedApiController
 {
     [HttpPost("search")]
@@ -20,14 +19,6 @@ public class AssignmentsController : VersionedApiController
     public Task<AssignmentDetailsDto> GetAsync(Guid id)
     {
         return Mediator.Send(new GetAssignmentRequest(id));
-    }
-
-    [HttpGet("dapper")]
-    [MustHavePermission(FSHAction.View, FSHResource.Assignments)]
-    [OpenApiOperation("Get assignment details via dapper.", "")]
-    public Task<AssignmentDto> GetDapperAsync(Guid id)
-    {
-        return Mediator.Send(new GetAssignmentViaDapperRequest(id));
     }
 
     [HttpPost]
@@ -57,3 +48,4 @@ public class AssignmentsController : VersionedApiController
     }
 
 }
+
