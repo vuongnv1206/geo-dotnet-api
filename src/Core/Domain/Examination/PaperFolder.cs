@@ -5,33 +5,26 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
 {
     public string Name { get; set; }
     public Guid? ParentId { get; set; }
-    public Guid? SubjectId { get; set; }
-
-    // public virtual Subject Subject { get; set; }
 
     [ForeignKey(nameof(ParentId))]
     public virtual PaperFolder? PaperFolderParent { get; set; }
     public virtual List<PaperFolder>? PaperFolderChildrens { get; set; } = new();
     public virtual List<PaperFolderPermission> PaperFolderPermissions { get; set; } = new();
     public virtual List<Paper> Papers { get; set; } = new();
-    public PaperFolder(string name, Guid? parentId, Guid? subjectId)
+    public PaperFolder(string name, Guid? parentId)
     {
         Name = name;
         ParentId = parentId;
-        SubjectId = subjectId;
     }
 
     public PaperFolder()
     {
-        
     }
 
-    public PaperFolder Update(string name, Guid? parentId, Guid? subjectId)
+    public PaperFolder Update(string name, Guid? parentId)
     {
         Name = name;
         ParentId = parentId;
-        SubjectId = subjectId;
-
         return this;
     }
 

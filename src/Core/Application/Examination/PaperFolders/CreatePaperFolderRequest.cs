@@ -4,7 +4,6 @@ public class CreatePaperFolderRequest : IRequest<DefaultIdType>
 {
     public required string Name { get; set; }
     public DefaultIdType? ParentId { get; set; }
-    public DefaultIdType? SubjectId { get; set; }
 }
 
 public class CreatePaperFolderRequestValidator : CustomValidator<CreatePaperFolderRequest>
@@ -43,7 +42,7 @@ public class CreatePaperFolderRequestHandler : IRequestHandler<CreatePaperFolder
             }
         }
 
-        var paperFolder = new PaperFolder(request.Name, request.ParentId, request.SubjectId);
+        var paperFolder = new PaperFolder(request.Name, request.ParentId);
         await _repository.AddAsync(paperFolder, cancellationToken);
 
         if (request.ParentId.HasValue)

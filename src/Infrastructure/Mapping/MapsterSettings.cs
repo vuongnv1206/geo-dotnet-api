@@ -68,7 +68,7 @@ public class MapsterSettings
         // Paper
         TypeAdapterConfig<Paper, PaperDto>.NewConfig()
           .Map(dest => dest.PaperFolder, src => src.PaperFolder)
-          .Map(dest => dest.PaperLable, src => src.PaperLable)
+          .Map(dest => dest.PaperLable, src => src.PaperLabel)
           .Map(dest => dest.Questions, src => CustomMappingExtensions.MapQuestions(src.PaperQuestions))
           .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
           .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());

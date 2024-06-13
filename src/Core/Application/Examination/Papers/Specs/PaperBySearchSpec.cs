@@ -7,7 +7,7 @@ public class PaperBySearchSpec : Specification<Paper>
     public PaperBySearchSpec(IEnumerable<Guid>? parentIds, string? name)
     {
         Query
-            .Include(x => x.PaperLable)
+            .Include(x => x.PaperLabel)
             .Include(x => x.PaperFolder).ThenInclude(x => x.PaperFolderParent)
             .OrderBy(x => x.CreatedOn);
 
