@@ -72,3 +72,12 @@ public class SubmitPaperDetailConfig : IEntityTypeConfiguration<SubmitPaperDetai
         builder.ToTable("SubmitPaperDetails", SchemaNames.Examination);
     }
 }
+
+public class PaperAccessQuestionConfig : IEntityTypeConfiguration<PaperAccess>
+{
+    public void Configure(EntityTypeBuilder<PaperAccess> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("PaperAccesses", SchemaNames.Examination);
+    }
+}

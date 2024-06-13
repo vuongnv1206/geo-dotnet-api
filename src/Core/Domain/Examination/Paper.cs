@@ -31,6 +31,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public virtual PaperFolder? PaperFolder { get; set; }
     public virtual List<PaperQuestion> PaperQuestions { get; set; } = new();
     public virtual List<SubmitPaper> SubmitPapers { get; set; } = new();
+    public virtual List<PaperAccess> PaperAccesses { get; set; } = new();
 
     public Paper(
         string examName,
