@@ -44,7 +44,7 @@ public class CreateSubmitPaperRequestHandler : IRequestHandler<CreateSubmitPaper
         var paper = await _paperRepo.FirstOrDefaultAsync(new PaperByIdSpec(request.PaperId))
             ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.PaperId]);
 
-        if (paper.Password != request.Password)
+        if (!string.IsNullOrEmpty(paper.Password) && paper.Password != request.Password)
         {
             throw new ConflictException(_t["Password wrong"]);
         }
@@ -53,10 +53,10 @@ public class CreateSubmitPaperRequestHandler : IRequestHandler<CreateSubmitPaper
 
         var submitPapers = await _repo.ListAsync(new SubmitPaperByPaperId(paper, userId));
 
-        if (submitPapers.Count > 0)
-        {
-            // miss paper.submittedTimes
-        }
+        //if (submitPapers.Count >= paper.NumberAttempt)
+        //{
+        //    throw new ConflictException(_t["Have used up all your attempts"]);
+        //}
 
         var timeNow = DateTime.Now;
         if ((paper.StartTime.HasValue && paper.StartTime < timeNow)

@@ -29,6 +29,7 @@ public class PaperDto : IDto
     public DateTime CreatedOn { get; private set; }
     public Guid LastModifiedBy { get; set; }
     public DateTime? LastModifiedOn { get; set; }
+    public float? MaxPoint => Questions.Sum(x => x.Mark);
     public PaperLabelDto PaperLable { get; set; }
     public PaperFolderDto PaperFolder { get; set; }
     public List<QuestionDto> Questions { get; set; }

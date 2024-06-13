@@ -53,6 +53,9 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
         if (submitPaper.Status == SubmitPaperStatus.end)
         {
             throw new ConflictException(_t["This {0} paper is over"]);
+        } else
+        {
+            submitPaper.Status = SubmitPaperStatus.doing;
         }
 
         var question = await _questionRepo.FirstOrDefaultAsync(new QuestionByIdSpec(request.QuestionId));

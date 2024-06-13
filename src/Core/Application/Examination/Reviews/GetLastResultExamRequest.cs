@@ -43,13 +43,18 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
         var student = await _userService.GetAsync(request.UserId.ToString(),cancellationToken);
 
         var examResultDto = submitPaper.Adapt<LastResultExamDto>();
-        float totalMark = 0;
 
-        submitPaper.SubmitPaperDetails.ForEach(submit =>
+        if (submitPaper.TotalMark == 0)
         {
-            totalMark += submit.GetPointQuestion(paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId));
-        });
-        examResultDto.TotalMark = totalMark;
+            float totalMark = 0;
+
+            submitPaper.SubmitPaperDetails.ForEach(submit =>
+            {
+                totalMark += submit.GetPointQuestion(paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId));
+            });
+            examResultDto.TotalMark = totalMark;
+        }
+
         examResultDto.Student = student;
 
         return examResultDto;

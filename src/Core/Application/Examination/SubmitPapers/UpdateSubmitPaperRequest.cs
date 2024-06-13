@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.SubmitPapers;
@@ -61,6 +62,21 @@ public class UpdateSubmitPaperRequestHandler : IRequestHandler<UpdateSubmitPaper
         {
             throw new ConflictException(_t["The Paper {0} has ever done.", request.PaperId]);
         }
+
+        if (request.Status == SubmitPaperStatus.end)
+        {
+            float totalMark = 0;
+
+            submitPaper.SubmitPaperDetails.ForEach(submit =>
+            {
+                totalMark += submit.GetPointQuestion(paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId));
+            });
+
+            submitPaper.TotalMark = totalMark;
+        } else {
+            submitPaper.TotalMark = 0;
+        }
+
 
         submitPaper.Status = request.Status;
         await _paperRepo.UpdateAsync(paper);
