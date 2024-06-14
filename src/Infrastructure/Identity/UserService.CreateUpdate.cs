@@ -178,7 +178,7 @@ internal partial class UserService
         }
     }
 
-    public async Task UpdateEmailAsync(UpdateEmailRequest request)
+    public async Task<string> UpdateEmailAsync(UpdateEmailRequest request)
     {
         var user = await _userManager.FindByIdAsync(request.UserId);
 
@@ -195,18 +195,20 @@ internal partial class UserService
             string emailVerificationUri = await GetEmailVerificationUriAsync(user, request.Origin);
             RegisterUserEmailModel eMailModel = new RegisterUserEmailModel()
             {
-                Email = user.Email,
-                UserName = user.UserName,
+                Email = user.Email!,
+                UserName = user.UserName!,
                 Url = emailVerificationUri
             };
             var mailRequest = new MailRequest(
                                new List<string> { user.Email },
-                                             _t["Confirm Registration"],
-                                                             _templateService.GenerateEmailTemplate("email-confirmation", eMailModel));
+                               _t["Confirm Registration"],
+                               _templateService.GenerateEmailTemplate("email-confirmation", eMailModel));
             _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
+            return emailVerificationUri;
         }
 
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+        return _t["Email updated successfully."];
     }
 
     public async Task UpdatePhoneNumberAsync(UpdatePhoneNumberRequest request)
@@ -240,13 +242,16 @@ internal partial class UserService
         {
             RemoveCurrentAvatar(currentImage);
             user.ImageUrl = await _fileStorage.UploadAsync<ApplicationUser>(request.Image, FileType.Image);
+            if (string.IsNullOrEmpty(user.ImageUrl))
+            {
+                throw new InternalServerException(_t["Image upload failed"]);
+            }
         }
         else if (request.DeleteCurrentImage)
         {
             RemoveCurrentAvatar(currentImage);
             user.ImageUrl = null;
         }
-
 
         var result = await _userManager.UpdateAsync(user);
 
