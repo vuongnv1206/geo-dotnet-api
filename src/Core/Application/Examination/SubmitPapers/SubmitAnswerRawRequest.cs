@@ -50,12 +50,12 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
         if (submitPaper is null)
             throw new NotFoundException(_t["Submit Paper {0} Not Found.", request.SubmitPaperId]);
 
-        if (submitPaper.Status == SubmitPaperStatus.end)
+        if (submitPaper.Status == SubmitPaperStatus.End)
         {
             throw new ConflictException(_t["This {0} paper is over"]);
         } else
         {
-            submitPaper.Status = SubmitPaperStatus.doing;
+            submitPaper.Status = SubmitPaperStatus.Doing;
         }
 
         var question = await _questionRepo.FirstOrDefaultAsync(new QuestionByIdSpec(request.QuestionId));

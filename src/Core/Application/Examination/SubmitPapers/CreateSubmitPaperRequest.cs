@@ -53,10 +53,10 @@ public class CreateSubmitPaperRequestHandler : IRequestHandler<CreateSubmitPaper
 
         var submitPapers = await _repo.ListAsync(new SubmitPaperByPaperId(paper, userId));
 
-        //if (submitPapers.Count >= paper.NumberAttempt)
-        //{
-        //    throw new ConflictException(_t["Have used up all your attempts"]);
-        //}
+        if (submitPapers.Count >= paper.NumberAttempt)
+        {
+            throw new ConflictException(_t["Have used up all your attempts"]);
+        }
 
         var timeNow = DateTime.Now;
         if ((paper.StartTime.HasValue && paper.StartTime < timeNow)

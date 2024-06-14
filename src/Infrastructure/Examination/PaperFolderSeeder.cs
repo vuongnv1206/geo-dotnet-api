@@ -36,8 +36,6 @@ public class PaperFolderSeeder : ICustomSeeder
                     await SeedPaperFolder(paperFolder, null, cancellationToken);
                 }
             }
-
-            await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded PaperFolders.");
         }
     }
@@ -49,8 +47,19 @@ public class PaperFolderSeeder : ICustomSeeder
             paperFolder.ParentId = parentId;
         }
 
+        paperFolder.CreatedBy = Guid.Parse(_db.Users.FirstOrDefault(u => u.Email == "admin@root.com").Id);
+
+
+        if (paperFolder.PaperFolderChildrens != null)
+        {
+            foreach (var child in paperFolder.PaperFolderChildrens)
+            {
+                await SeedPaperFolder(child, paperFolder.Id, cancellationToken);
+            }
+        }
+
         await _db.PaperFolders.AddAsync(paperFolder, cancellationToken);
-        await _db.SaveChangesAsync(cancellationToken);
+        _db.SaveChanges();
 
     }
 }
