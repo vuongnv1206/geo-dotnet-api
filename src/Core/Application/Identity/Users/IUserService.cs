@@ -33,7 +33,7 @@ public interface IUserService : ITransientService
     Task UpdateAsync(UpdateUserRequest request);
     Task<string> UpdateEmailAsync(UpdateEmailRequest request);
     Task UpdatePhoneNumberAsync(UpdatePhoneNumberRequest request);
-    Task UpdateAvatarAsync(UpdateAvatarRequest request);
+    Task UpdateAvatarAsync(UpdateAvatarRequest request, CancellationToken cancellationToken);
     Task<string> ConfirmEmailAsync(string userId, string code, string tenant, CancellationToken cancellationToken);
     Task<string> ConfirmPhoneNumberAsync(string userId, string code);
 
