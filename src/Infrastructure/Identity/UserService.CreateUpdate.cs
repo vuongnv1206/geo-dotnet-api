@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Identity.Users.Profile;
 using FSH.WebApi.Domain.Common;
 using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Shared.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -230,7 +231,7 @@ internal partial class UserService
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
     }
 
-    public async Task UpdateAvatarAsync(UpdateAvatarRequest request)
+    public async Task UpdateAvatarAsync(UpdateAvatarRequest request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(request.UserId);
 
@@ -241,7 +242,7 @@ internal partial class UserService
         if (request.Image != null)
         {
             RemoveCurrentAvatar(currentImage);
-            user.ImageUrl = await _fileStorage.UploadAsync<ApplicationUser>(request.Image, FileType.Image);
+            user.ImageUrl = await _fileStorage.SaveFileAsync(request.Image, cancellationToken);
             if (string.IsNullOrEmpty(user.ImageUrl))
             {
                 throw new InternalServerException(_t["Image upload failed"]);
