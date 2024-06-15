@@ -1,5 +1,6 @@
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Password;
+using FSH.WebApi.Application.Identity.Users.Verify;
 using System.Security.Claims;
 
 namespace FSH.WebApi.Host.Controllers.Identity;
@@ -103,6 +104,23 @@ public class UsersController : VersionNeutralApiController
         }
 
         return _userService.ConfirmPhoneNumberAsync(userId, code);
+    }
+
+    [HttpGet("resend-phone-number-code")]
+    [MustHavePermission(FSHAction.Update, FSHResource.Users)]
+    [OpenApiOperation("Resend phone number confirmation code.", "")]
+    public Task<string> ResendPhoneNumberCodeConfirmAsync()
+    {
+        return Mediator.Send(new ResendPhoneCodeRequest());
+    }
+
+    [HttpGet("resend-email-confirm")]
+    [MustHavePermission(FSHAction.Update, FSHResource.Users)]
+    [OpenApiOperation("Resend email confirmation code.", "")]
+    public Task<string> ResendEmailConfirmAsync()
+    {
+        var request = new ResendEmailConfirmRequest { Origin = GetOriginFromRequest() };
+        return Mediator.Send(request);
     }
 
     [HttpPost("forgot-password")]
