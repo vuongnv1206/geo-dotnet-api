@@ -1,4 +1,7 @@
+using DocumentFormat.OpenXml.Spreadsheet;
 using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Common.Mailing;
+using FSH.WebApi.Application.Common.SpeedSMS;
 using FSH.WebApi.Infrastructure.Common;
 using FSH.WebApi.Shared.Multitenancy;
 using Microsoft.AspNetCore.WebUtilities;
@@ -57,5 +60,48 @@ internal partial class UserService
                 ? string.Format(_t["Account Confirmed for Phone Number {0}. You can now use the /api/tokens endpoint to generate JWT."], user.PhoneNumber)
                 : string.Format(_t["Account Confirmed for Phone Number {0}. You should confirm your E-mail before using the /api/tokens endpoint to generate JWT."], user.PhoneNumber)
             : throw new InternalServerException(string.Format(_t["An error occurred while confirming {0}"], user.PhoneNumber));
+    }
+
+    public async Task<string> ResendPhoneNumberCodeConfirm(string userId)
+    {
+        EnsureValidTenant();
+
+        var user = await _userManager.FindByIdAsync(userId);
+
+        _ = user ?? throw new InternalServerException(_t["An error occurred while resending Mobile Phone confirmation code."]);
+        if (string.IsNullOrEmpty(user.PhoneNumber) || user.PhoneNumberConfirmed) throw new InternalServerException(_t["An error occurred while resending Mobile Phone confirmation code."]);
+
+        var code = await _userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+
+        _speedSMSService.sendSMS(new string[] { user.PhoneNumber }, $"Your verification code is: {code}", SpeedSMSType.TYPE_CSKH);
+
+        return "Send code successfully!";
+    }
+
+    public async Task<string> ResendEmailCodeConfirm(string userId, string origin)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        _ = user ?? throw new InternalServerException(_t["An error occurred while resending Email confirmation."]);
+
+        if (user.Email == null || user.EmailConfirmed)
+        {
+            throw new InternalServerException(_t["An error occurred while resending Email confirmation."]);
+        }
+
+        string emailVerificationUri = await GetEmailVerificationUriAsync(user, origin);
+        RegisterUserEmailModel eMailModel = new RegisterUserEmailModel()
+        {
+            Email = user.Email,
+            UserName = user.UserName,
+            Url = emailVerificationUri
+        };
+        var mailRequest = new MailRequest(
+                new List<string> { user.Email },
+                _t["Confirm Registration"],
+                _templateService.GenerateEmailTemplate("email-confirmation", eMailModel));
+        _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
+
+        return $"Please check {user.Email} to verify your account!";
     }
 }
