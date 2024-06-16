@@ -7,7 +7,7 @@ public class UpdateSubmitPaperRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
     public Guid PaperId { get; set; }
-    public SubmitPaperStatus Status { get; set; } = SubmitPaperStatus.end;
+    public SubmitPaperStatus Status { get; set; } = SubmitPaperStatus.End;
 }
 
 public class UpdateSubmitPaperRequestVAlidator : CustomValidator<UpdateSubmitPaperRequest>
@@ -57,13 +57,13 @@ public class UpdateSubmitPaperRequestHandler : IRequestHandler<UpdateSubmitPaper
             throw new ForbiddenException(_t["Can't update this submit."]);
         }
 
-        if (request.Status == SubmitPaperStatus.end
-            && submitPaper.Status == SubmitPaperStatus.start)
+        if (request.Status == SubmitPaperStatus.End
+            && submitPaper.Status == SubmitPaperStatus.Start)
         {
             throw new ConflictException(_t["The Paper {0} has ever done.", request.PaperId]);
         }
 
-        if (request.Status == SubmitPaperStatus.end)
+        if (request.Status == SubmitPaperStatus.End)
         {
             float totalMark = 0;
 

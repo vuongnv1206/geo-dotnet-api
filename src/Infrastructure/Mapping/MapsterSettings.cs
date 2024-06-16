@@ -94,6 +94,7 @@ public class MapsterSettings
             .TwoWays();
 
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
+        TypeAdapterConfig<PaperAccess, PaperAccessDto>.NewConfig();
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
 
