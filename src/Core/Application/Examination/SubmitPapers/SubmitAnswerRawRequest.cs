@@ -34,14 +34,17 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
     private readonly IRepository<SubmitPaper> _submitPaperRepo;
     private readonly IRepository<Question> _questionRepo;
     private readonly IStringLocalizer _t;
+    private readonly ISerializerService _serializerService;
     public SubmitAnswerRawRequestHandler(
         IRepository<SubmitPaper> submitPaperRepo,
         IStringLocalizer<SubmitAnswerRawRequestHandler> t,
-        IRepository<Question> questionRepo)
+        IRepository<Question> questionRepo,
+        ISerializerService serializerService)
     {
         _submitPaperRepo = submitPaperRepo;
         _t = t;
         _questionRepo = questionRepo;
+        _serializerService = serializerService;
     }
 
     public async Task<DefaultIdType> Handle(SubmitAnswerRawRequest request, CancellationToken cancellationToken)
@@ -53,7 +56,8 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
         if (submitPaper.Status == SubmitPaperStatus.End)
         {
             throw new ConflictException(_t["This {0} paper is over"]);
-        } else
+        }
+        else
         {
             submitPaper.Status = SubmitPaperStatus.Doing;
         }
@@ -91,6 +95,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
         switch (question.QuestionType)
         {
             case QuestionType.SingleChoice:
+            case QuestionType.ReadingQuestionPassage:
                 if (!question.Answers.Any(x => x.Id.ToString() == answerRaw))
                     throw new NotFoundException(_t["Answer {0} Not Found.", answerRaw]);
 
@@ -113,6 +118,9 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
 
                 return answerRaw;
             case QuestionType.FillBlank:
+                var answers = _serializerService.Deserialize<List<Dictionary<string, string>>>(answerRaw);
+
+                return answerRaw;
             case QuestionType.Writing:
                 return answerRaw;
             default:
