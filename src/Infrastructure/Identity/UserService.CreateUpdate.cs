@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Identity.Users.Profile;
 using FSH.WebApi.Domain.Common;
 using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Shared.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -178,7 +179,7 @@ internal partial class UserService
         }
     }
 
-    public async Task UpdateEmailAsync(UpdateEmailRequest request)
+    public async Task<string> UpdateEmailAsync(UpdateEmailRequest request)
     {
         var user = await _userManager.FindByIdAsync(request.UserId);
 
@@ -195,18 +196,20 @@ internal partial class UserService
             string emailVerificationUri = await GetEmailVerificationUriAsync(user, request.Origin);
             RegisterUserEmailModel eMailModel = new RegisterUserEmailModel()
             {
-                Email = user.Email,
-                UserName = user.UserName,
+                Email = user.Email!,
+                UserName = user.UserName!,
                 Url = emailVerificationUri
             };
             var mailRequest = new MailRequest(
                                new List<string> { user.Email },
-                                             _t["Confirm Registration"],
-                                                             _templateService.GenerateEmailTemplate("email-confirmation", eMailModel));
+                               _t["Confirm Registration"],
+                               _templateService.GenerateEmailTemplate("email-confirmation", eMailModel));
             _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
+            return emailVerificationUri;
         }
 
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
+        return _t["Email updated successfully."];
     }
 
     public async Task UpdatePhoneNumberAsync(UpdatePhoneNumberRequest request)
@@ -228,7 +231,7 @@ internal partial class UserService
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
     }
 
-    public async Task UpdateAvatarAsync(UpdateAvatarRequest request)
+    public async Task UpdateAvatarAsync(UpdateAvatarRequest request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(request.UserId);
 
@@ -239,14 +242,17 @@ internal partial class UserService
         if (request.Image != null)
         {
             RemoveCurrentAvatar(currentImage);
-            user.ImageUrl = await _fileStorage.UploadAsync<ApplicationUser>(request.Image, FileType.Image);
+            user.ImageUrl = await _fileStorage.SaveFileAsync(request.Image, cancellationToken);
+            if (string.IsNullOrEmpty(user.ImageUrl))
+            {
+                throw new InternalServerException(_t["Image upload failed"]);
+            }
         }
         else if (request.DeleteCurrentImage)
         {
             RemoveCurrentAvatar(currentImage);
             user.ImageUrl = null;
         }
-
 
         var result = await _userManager.UpdateAsync(user);
 

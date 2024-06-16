@@ -91,7 +91,7 @@ public class PersonalController : VersionNeutralApiController
 
     [HttpPut("update-avatar")]
     [OpenApiOperation("Update avatar of currently logged in user.", "")]
-    public Task<string> UpdateAvatarAsync(UpdateAvatarRequest request)
+    public Task<string> UpdateAvatarAsync([FromForm] UpdateAvatarRequest request)
     {
         if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
         {

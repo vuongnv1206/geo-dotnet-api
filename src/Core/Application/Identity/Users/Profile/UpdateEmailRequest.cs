@@ -45,7 +45,6 @@ public class UpdateEmailRequestHandler : IRequestHandler<UpdateEmailRequest, str
             throw new NotFoundException(_t["User not found."]);
         }
 
-        await _userService.UpdateEmailAsync(request);
-        return _t["Email updated successfully."];
+        return await _userService.UpdateEmailAsync(request);
     }
 }
