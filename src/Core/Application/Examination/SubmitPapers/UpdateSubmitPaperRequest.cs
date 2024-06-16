@@ -69,11 +69,31 @@ public class UpdateSubmitPaperRequestHandler : IRequestHandler<UpdateSubmitPaper
 
             submitPaper.SubmitPaperDetails.ForEach(submit =>
             {
-                totalMark += submit.GetPointQuestion(paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId));
+                float markOfQuestion = 0;
+                if (submit.Question.QuestionParentId is null
+                    || submit.Question.QuestionParentId == Guid.Empty)
+                {
+                    markOfQuestion = submit.GetPointQuestion(submit.Question,
+                        paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+                }
+                else
+                {
+                    var paperQuestionParent = paper.PaperQuestions
+                   .FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
+
+                    float avgMark = paperQuestionParent.Mark / paperQuestionParent.Question.QuestionPassages.Count;
+
+                    markOfQuestion = submit.GetPointQuestion(submit.Question, avgMark);
+                }
+
+                submit.Mark = markOfQuestion;
+                totalMark += markOfQuestion;
             });
 
             submitPaper.TotalMark = totalMark;
-        } else {
+        }
+        else
+        {
             submitPaper.TotalMark = 0;
         }
 
