@@ -1,17 +1,19 @@
 ﻿
 
 using FSH.WebApi.Domain.Examination;
+using MediatR;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class PaperFolderBySearchSpec : Specification<PaperFolder>
+public class PaperFolderBySearchSpec : EntitiesByPaginationFilterSpec<PaperFolder>
 {
-    public PaperFolderBySearchSpec(IEnumerable<Guid> parentIds, string name, DefaultIdType currentUserId)
+    public PaperFolderBySearchSpec(IEnumerable<Guid> parentIds, SearchPaperFolderRequest request, DefaultIdType currentUserId)
+        : base(request)
     {
             Query
             .Include(x => x.PaperFolderParent)
             .Include(x => x.PaperFolderChildrens)
             .Where(x => (x.CreatedBy == currentUserId || x.PaperFolderPermissions.Any(x => x.CanView))
-                  && (string.IsNullOrEmpty(name) || x.Name.ToLower().Contains(name.ToLower())));
+                  && (string.IsNullOrEmpty(request.Keyword) || x.Name.ToLower().Contains(request.Keyword.ToLower())));
 
             if (parentIds.Any())
             {
@@ -19,7 +21,7 @@ public class PaperFolderBySearchSpec : Specification<PaperFolder>
                 Query.Where(x => nullableParentIds.Contains(x.ParentId) || nullableParentIds.Contains(x.Id));
             }
 
-            Query.OrderBy(x => x.CreatedOn);
+            Query.OrderBy(x => x.CreatedOn, !request.HasOrderBy());
         
     }
 }

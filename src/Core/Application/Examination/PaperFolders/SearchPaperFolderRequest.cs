@@ -1,15 +1,16 @@
-﻿using FSH.WebApi.Application.Identity.Users;
+﻿using FSH.WebApi.Application.Common.Models;
+using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class SearchPaperFolderRequest : IRequest<List<PaperFolderDto>>
+public class SearchPaperFolderRequest : PaginationFilter,IRequest<PaginationResponse<PaperFolderDto>>
 {
     public Guid? ParentId { get; set; }
-    public string? Name { get; set; }
 }
 
-public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolderRequest, List<PaperFolderDto>>
+public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolderRequest, PaginationResponse<PaperFolderDto>>
 {
     public readonly IReadRepository<PaperFolder> _paperFolderRepo;
     public readonly ICurrentUser _currentUser;
@@ -22,12 +23,12 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
         _userService = userService;
     }
 
-    public async Task<List<PaperFolderDto>> Handle(SearchPaperFolderRequest request, CancellationToken cancellationToken)
+    public async Task<PaginationResponse<PaperFolderDto>> Handle(SearchPaperFolderRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
         var data = new List<PaperFolder>();
 
-        if (!string.IsNullOrEmpty(request.Name))
+        if (!string.IsNullOrEmpty(request.Keyword))
         {
             // Find all parent IDs
             var parentIds = new List<Guid>();
@@ -40,15 +41,15 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
                     parentFolder.ChildPaperFolderIds(null, parentIds);
                 }
             }
-            var spec = new PaperFolderBySearchSpec(parentIds, request.Name, currentUserId);
+            var spec = new PaperFolderBySearchSpec(parentIds,request,currentUserId);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
-
         }
         else
         {
-            var spec = new PaperFolderTreeSpec(currentUserId);
+            var spec = new PaperFolderTreeSpec(currentUserId,request);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
             data = data.Where(x => x.ParentId == request.ParentId).ToList();
+
         }
 
         var dtos = new List<PaperFolderDto>();
@@ -60,10 +61,7 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
             dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
             dtos.Add(dto);
         }
-
-
-
-        return dtos;
+        return new PaginationResponse<PaperFolderDto>(dtos, dtos.Count(), request.PageNumber, request.PageSize); 
     }
 }
 
