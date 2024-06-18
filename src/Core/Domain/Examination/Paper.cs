@@ -32,7 +32,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public virtual List<PaperQuestion> PaperQuestions { get; set; } = new();
     public virtual List<SubmitPaper> SubmitPapers { get; set; } = new();
     public virtual List<PaperAccess> PaperAccesses { get; set; } = new();
-
+    public virtual List<PaperPermission> PaperPermissions { get; set; } = new();
     public Paper(
         string examName,
         PaperStatus status,
@@ -137,12 +137,6 @@ public class Paper : AuditableEntity, IAggregateRoot
         return this;
     }
 
-    public bool CanUpdate(DefaultIdType userId)
-    {
-        return CreatedBy == userId;
-    }
-
-
     //public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
     //{
     //    if (shareType == PaperShareType.AssignToStudent)
@@ -176,5 +170,35 @@ public class Paper : AuditableEntity, IAggregateRoot
             PaperAccesses.AddRange(toAdd);
         }
     }
+
+    public void AddPermission(PaperPermission permission)
+    {
+        PaperPermissions.Add(permission);
+    }
+
+    public bool CanDelete(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperPermissions.Any(x => x.UserId == userId && x.CanDelete);
+    }
+
+    public bool CanUpdate(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperPermissions.Any(x => x.UserId == userId && x.CanUpdate);
+    }
+
+    public bool CanAdd(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperPermissions.Any(x => x.UserId == userId && x.CanAdd);
+    }
+
+    public bool CanView(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperPermissions.Any(x => x.UserId == userId && x.CanView);
+    }
+
 
 }
