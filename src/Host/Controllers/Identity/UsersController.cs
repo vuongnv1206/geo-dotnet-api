@@ -107,7 +107,6 @@ public class UsersController : VersionNeutralApiController
     }
 
     [HttpGet("resend-phone-number-code")]
-    [MustHavePermission(FSHAction.Update, FSHResource.Users)]
     [OpenApiOperation("Resend phone number confirmation code.", "")]
     public Task<string> ResendPhoneNumberCodeConfirmAsync()
     {
