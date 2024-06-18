@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.New.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
@@ -79,5 +80,8 @@ public class MapsterSettings
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
+
+        TypeAdapterConfig<News, NewsDto>.NewConfig()
+            .Map(dest => dest.NumberLikeInTheNews, src => src.NewsReactions.Count());
     }
 }

@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class;
@@ -10,16 +11,27 @@ public class GetClassOfUserRequestHandler : IRequestHandler<GetClassOfUserReques
 {
     private readonly IRepository<Classes> _repository;
     private readonly IStringLocalizer _t;
+    private readonly IUserClassesRepository _userClassesRepository;
     private readonly ICurrentUser _currentUser;
 
-    public GetClassOfUserRequestHandler(IRepository<Classes> repository, ICurrentUser currentUser, IStringLocalizer<GetClassRequestHandler> localizer) =>
-        (_repository, _currentUser, _t) = (repository, currentUser, localizer);
+    public GetClassOfUserRequestHandler(IRepository<Classes> repository, ICurrentUser currentUser,
+                                        IStringLocalizer<GetClassRequestHandler> localizer, IUserClassesRepository userClassesRepository) =>
+        (_repository, _currentUser, _t, _userClassesRepository) = (repository, currentUser, localizer, userClassesRepository);
     public async Task<List<ClassDto>> Handle(GetClassOfUserRequest request, CancellationToken cancellationToken)
     {
 
-        var user = _currentUser.GetUserId();
-        return await _repository.ListAsync(
-            (ISpecification<Classes, ClassDto>)new ClassByUserSpec(user), cancellationToken)
-        ?? throw new NotFoundException(_t["Classes {0} Not Found.", user]);
+        var userId = _currentUser.GetUserId();
+        List<ClassDto> classes;
+
+        classes = await _repository.ListAsync((ISpecification<Classes, ClassDto>)new ClassByUserSpec(userId), cancellationToken);
+
+        // Count the number of users for each class and update the DTO
+        foreach (var classDto in classes)
+        {
+            var userCount = await _userClassesRepository.GetNumberUserOfClasses(classDto.Id);
+            classDto.NumberUserOfClass = userCount;
+        }
+        return classes;
+
     }
 }

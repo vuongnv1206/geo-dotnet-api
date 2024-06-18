@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New.Spec;
-public class NewsBySearchRequestWithClass : Specification<News, NewsDto>
+public class NewsBySearchRequestWithClass : Specification<News>
 {
     public NewsBySearchRequestWithClass(Guid? classId)
     {
