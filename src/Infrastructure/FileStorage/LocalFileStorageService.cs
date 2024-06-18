@@ -74,6 +74,9 @@ public class LocalFileStorageService : IFileStorageService
         string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
 
         string fileName = RemoveSpecialCharactersInFileName(file.FileName);
+
+        fileName = $"{DateTime.Now:yyyyMMddHHmmssfff}_{fileName}";
+
         string dbPath = Path.Combine(folderName, fileName);
         string fullPath = Path.Combine(pathToSave, fileName);
 
@@ -194,6 +197,7 @@ public class LocalFileStorageService : IFileStorageService
         string fileExtension = Path.GetExtension(fileName);
         string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
         string fileNameWithoutSpecialCharacters = RemoveSpecialCharacters(fileNameWithoutExtension);
+
         return fileNameWithoutSpecialCharacters + fileExtension;
     }
 
