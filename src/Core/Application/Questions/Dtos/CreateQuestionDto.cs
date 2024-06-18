@@ -9,7 +9,7 @@ public class CreateQuestionDto
     public Guid? QuestionFolderId { get; set; }
     public QuestionType? QuestionType { get; set; }
     public Guid? QuestionLabelId { get; set; }
-    public Guid? ParentId { get; set; }
+    public Guid? QuestionParentId { get; set; }
     public List<CreateQuestionDto>? QuestionPassages { get; set; }
     public List<CreateAnswerDto>? Answers { get; set; }
 }

@@ -21,15 +21,18 @@ public class AddTeacherIntoTeacherTeamRequestHandler : IRequestHandler<AddTeache
     private readonly IRepositoryWithEvents<TeacherTeam> _repository;
     private readonly IStringLocalizer _t;
     private readonly IUserService _userService;
+    private readonly ICurrentUser _currentUser;
 
     public AddTeacherIntoTeacherTeamRequestHandler(
         IRepositoryWithEvents<TeacherTeam> repository,
         IStringLocalizer<AddTeacherIntoTeacherTeamRequestHandler> t,
-        IUserService userService)
+        IUserService userService,
+        ICurrentUser currentUser)
     {
         _repository = repository;
         _t = t;
         _userService = userService;
+        _currentUser = currentUser;
     }
 
     public async Task<DefaultIdType> Handle(AddTeacherIntoTeacherTeamRequest request, CancellationToken cancellationToken)
@@ -38,6 +41,13 @@ public class AddTeacherIntoTeacherTeamRequestHandler : IRequestHandler<AddTeache
         {
             TeacherName = request.TeacherName,
         };
+
+        var existDuplicateContact = await _repository.AnyAsync(
+            new TeacherTeamByContactSpec(request.Contact, _currentUser.GetUserId()), cancellationToken);
+        if (existDuplicateContact)
+        {
+            throw new ConflictException(_t["Teacher's contact exist in team"]);
+        }
 
         switch (request.Contact.CheckType())
         {

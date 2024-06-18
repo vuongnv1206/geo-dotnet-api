@@ -16,6 +16,10 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
     {
 
     }
+    public SubmitPaper(Guid paperId)
+    {
+        PaperId = paperId;
+    }
 
     public SubmitPaper(Guid paperId, SubmitPaperStatus status)
     {

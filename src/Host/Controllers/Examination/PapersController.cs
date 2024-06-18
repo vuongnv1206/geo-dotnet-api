@@ -12,7 +12,7 @@ public class PapersController : VersionedApiController
 
     [HttpPost]
     [OpenApiOperation("Create a paper.")]
-    public Task<PaperDto> CreateAsync(CreatePaperRequest request)
+    public Task<Guid> CreateAsync(CreatePaperRequest request)
     {
         return Mediator.Send(request);
     }
@@ -39,4 +39,18 @@ public class PapersController : VersionedApiController
     {
         return await Mediator.Send(new DeletePaperRequest(id));
     }
+
+    [HttpPut("{id:guid}/questions")]
+    [OpenApiOperation("Update questions in a paper")]
+    public async Task<IActionResult> UpdateQuestionsInPaperAsync(Guid id, [FromBody] UpdateQuestionsInPaperRequest request)
+    {
+        if (id != request.PaperId)
+        {
+            return BadRequest("Paper ID in the request does not match the ID in the route.");
+        }
+
+        return Ok(await Mediator.Send(request));
+    }
+
+
 }

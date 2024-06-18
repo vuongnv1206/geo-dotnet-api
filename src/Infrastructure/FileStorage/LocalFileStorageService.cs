@@ -1,6 +1,7 @@
 using FSH.WebApi.Application.Common.FileStorage;
 using FSH.WebApi.Domain.Common;
 using FSH.WebApi.Infrastructure.Common.Extensions;
+using Microsoft.AspNetCore.Http;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
@@ -16,7 +17,7 @@ public class LocalFileStorageService : IFileStorageService
             return string.Empty;
         }
 
-        if (request.Extension is null || !supportedFileType.GetDescriptionList().Contains(request.Extension.ToLower()))
+        if (request.Extension is null || !supportedFileType.GetExtentionList().Contains(request.Extension.ToLower()))
             throw new InvalidOperationException("File Format Not Supported.");
         if (request.Name is null)
             throw new InvalidOperationException("Name is required.");
@@ -60,6 +61,53 @@ public class LocalFileStorageService : IFileStorageService
         {
             return string.Empty;
         }
+    }
+
+    public async Task<string> SaveFileAsync(IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file == null)
+        {
+            return string.Empty;
+        }
+
+        string folderName = GetDirectoryFromExtension(Path.GetExtension(file.FileName));
+        string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+        string fileName = RemoveSpecialCharactersInFileName(file.FileName);
+
+        fileName = $"{DateTime.Now:yyyyMMddHHmmssfff}_{fileName}";
+
+        string dbPath = Path.Combine(folderName, fileName);
+        string fullPath = Path.Combine(pathToSave, fileName);
+
+        if (File.Exists(dbPath))
+        {
+            dbPath = NextAvailableFilename(dbPath);
+            fullPath = NextAvailableFilename(fullPath);
+        }
+
+        Directory.CreateDirectory(pathToSave);
+
+        using var stream = new FileStream(fullPath, FileMode.Create);
+        await file.CopyToAsync(stream, cancellationToken);
+
+        return dbPath.Replace("\\", "/");
+    }
+
+    public async Task<string[]> SaveFilesAsync(IFormFile[] files, CancellationToken cancellationToken)
+    {
+        if (files == null || files.Length == 0)
+        {
+            return Array.Empty<string>();
+        }
+
+        List<string> dbPaths = new List<string>();
+        foreach (IFormFile file in files)
+        {
+            dbPaths.Add(await SaveFileAsync(file, cancellationToken));
+        }
+
+        return dbPaths.ToArray();
     }
 
     public static string RemoveSpecialCharacters(string str)
@@ -123,5 +171,44 @@ public class LocalFileStorageService : IFileStorageService
         }
 
         return string.Format(pattern, max);
+    }
+
+    private static string GetDirectoryFromExtension(string extension)
+    {
+        string path = string.Empty;
+        foreach (var fileType in (FileType[])Enum.GetValues(typeof(FileType)))
+        {
+            if (fileType.GetExtentionList().Contains(extension))
+            {
+                path = Path.Combine(fileType.ToString(), extension.Replace(".", string.Empty));
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(path))
+        {
+            path = Path.Combine("Others", extension.Replace(".", string.Empty));
+        }
+        return Path.Combine("Files", path);
+    }
+
+    private static string RemoveSpecialCharactersInFileName(string fileName)
+    {
+        string fileExtension = Path.GetExtension(fileName);
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+        string fileNameWithoutSpecialCharacters = RemoveSpecialCharacters(fileNameWithoutExtension);
+
+        return fileNameWithoutSpecialCharacters + fileExtension;
+    }
+
+    public void RemoveAll(string[] paths)
+    {
+        if (paths != null && paths.Length > 0)
+        {
+            foreach (string path in paths)
+            {
+                Remove(path);
+            }
+        }
     }
 }

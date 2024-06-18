@@ -2,6 +2,7 @@
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 
@@ -31,26 +32,33 @@ public class PaperFolderSeeder : ICustomSeeder
 
             if (paperFolders != null)
             {
+                var adminUser = _db.Users.FirstOrDefault(u => u.Email == "admin@root.com");
+                
                 foreach (var paperFolder in paperFolders)
                 {
-                    await SeedPaperFolder(paperFolder, null, cancellationToken);
+                    if (adminUser != null)
+                    {
+                        paperFolder.CreatedBy = Guid.Parse(adminUser.Id);
+                    }
+                    else
+                    {
+                        // Xử lý trường hợp không tìm thấy admin user
+                        _logger.LogWarning("Admin user not found. PaperFolder CreatedBy not set.");
+                    }
+                    await _db.PaperFolders.AddAsync(paperFolder, cancellationToken);
+                    _db.SaveChanges();
                 }
+
+                var paperFoldersSeeded = await _db.PaperFolders.ToListAsync(cancellationToken);
+                //update creadted by for all paperFoldersSeeded
+                paperFoldersSeeded.ForEach(p => p.CreatedBy = Guid.Parse(adminUser.Id));
+                _db.SaveChanges();
+
             }
 
-            await _db.SaveChangesAsync(cancellationToken);
+
             _logger.LogInformation("Seeded PaperFolders.");
         }
     }
 
-    private async Task SeedPaperFolder(PaperFolder paperFolder, DefaultIdType? parentId, CancellationToken cancellationToken)
-    {
-        if (parentId.HasValue)
-        {
-            paperFolder.ParentId = parentId;
-        }
-
-        await _db.PaperFolders.AddAsync(paperFolder, cancellationToken);
-        await _db.SaveChangesAsync(cancellationToken);
-
-    }
 }

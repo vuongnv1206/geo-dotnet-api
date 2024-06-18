@@ -1,4 +1,7 @@
-﻿using FSH.WebApi.Application.Examination.SubmitPapers;
+﻿using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.Papers.ByStudents;
+using FSH.WebApi.Application.Examination.Reviews;
+using FSH.WebApi.Application.Examination.SubmitPapers;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class SubmitPapersController : VersionedApiController
@@ -16,4 +19,38 @@ public class SubmitPapersController : VersionedApiController
     {
         return await Mediator.Send(request);
     }
+
+    [HttpPut("{id}")]
+    [OpenApiOperation("Update ending status submit paper")]
+    public async Task<ActionResult<Guid>> EndingSubmitPaper(UpdateSubmitPaperRequest request, Guid id)
+    {
+        return id == request.Id
+            ? Ok(await Mediator.Send(request))
+            : BadRequest();
+    }
+
+    [HttpGet("paper/{paperId:guid}")]
+    [OpenApiOperation("get information of paper by role student")]
+    public async Task<PaperStudentDto> GetPapperByRoleStudent(Guid paperId)
+    {
+        return await Mediator.Send(new GetPaperByIdRoleStudentRequest(paperId));
+    }
+
+    [HttpPost("paper/{paperId:guid}/students-submitted")]
+    [OpenApiOperation("get student have submitted a paper yet")]
+    public async Task<ActionResult<List<SubmitPaperDto>>> GetSubmittedPaper(Guid paperId, GetSubmittedPaperRequest request)
+    {
+        return paperId == request.PaperId
+            ? Ok(await Mediator.Send(request))
+            : BadRequest();
+    }
+
+
+    [HttpPost("last-result")]
+    public async Task<ActionResult<LastResultExamDto>> GetLastResult(GetLastResultExamRequest request)
+    {
+        var result = await Mediator.Send(request);
+        return Ok(result);
+    }
+
 }

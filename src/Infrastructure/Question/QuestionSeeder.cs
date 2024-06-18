@@ -91,7 +91,9 @@ public class QuestionSeeder : ICustomSeeder
 
         }
 
+        question.CreatedBy = _adminGuid;
         await _db.Questions.AddAsync(question, cancellationToken);
+
         await _db.SaveChangesAsync(cancellationToken);
     }
 }

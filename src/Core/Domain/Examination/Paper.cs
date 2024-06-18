@@ -1,28 +1,37 @@
 ﻿using FSH.WebApi.Domain.Examination.Enums;
+using FSH.WebApi.Domain.Subjects;
 
 namespace FSH.WebApi.Domain.Examination;
 public class Paper : AuditableEntity, IAggregateRoot
 {
+    //General config
     public string ExamName { get; set; }
-    public PaperStatus Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public Guid? PaperLabelId { get; set; }
-    public int NumberOfQuestion { get; set; }
     public int? Duration { get; set; }
+    public PaperType Type { get; set; }
+    public bool IsPublish { get; set; }
+    public string? Content { get; set; }
+    public string? Description { get; set; }
+    public PaperStatus Status { get; set; }
+    //Security
     public bool Shuffle { get; set; }
     public bool ShowMarkResult { get; set; }
     public bool ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
-    public PaperType Type { get; set; }
-    public Guid? PaperFolderId { get; set; }
-    public bool IsPublish { get; set; }
     public string ExamCode { get; set; }
-    public string? Content { get; set; }
-    public string? Description { get; set; }
-    public virtual PaperLabel? PaperLable { get; set; }
+    public int? NumberAttempt { get; set; }
+    public PaperShareType ShareType { get; set; }
+    //Navigation
+    public Guid? PaperLabelId { get; set; }
+    public Guid? PaperFolderId { get; set; }
+    public Guid? SubjectId { get; set; }
+    public virtual Subject? Subject { get; set; }
+    public virtual PaperLabel? PaperLabel { get; set; }
     public virtual PaperFolder? PaperFolder { get; set; }
     public virtual List<PaperQuestion> PaperQuestions { get; set; } = new();
+    public virtual List<SubmitPaper> SubmitPapers { get; set; } = new();
+    public virtual List<PaperAccess> PaperAccesses { get; set; } = new();
 
     public Paper(
         string examName,
@@ -30,8 +39,10 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperType type,
         string? content,
         string? description,
+        string? password,
         Guid? paperFolderId,
-        string? password)
+        Guid? paperLabelId,
+        Guid? subjectId)
     {
         ExamName = examName;
         Status = status;
@@ -39,6 +50,8 @@ public class Paper : AuditableEntity, IAggregateRoot
         Content = content;
         Description = description;
         PaperFolderId = paperFolderId;
+        PaperLabelId = paperLabelId;
+        SubjectId = subjectId;
         Password = password;
         ExamCode = examName;
     }
@@ -54,7 +67,8 @@ public class Paper : AuditableEntity, IAggregateRoot
             {
                 QuestionId = q.QuestionId,
                 PaperId = Id,
-                Mark = q.Mark
+                Mark = q.Mark,
+                RawIndex = q.RawIndex
             });
         }
     }
@@ -67,6 +81,7 @@ public class Paper : AuditableEntity, IAggregateRoot
             if (existingPaperQuestion != null)
             {
                 existingPaperQuestion.Mark = q.Mark;
+                existingPaperQuestion.RawIndex = q.RawIndex;
             }
             else
             {
@@ -74,7 +89,8 @@ public class Paper : AuditableEntity, IAggregateRoot
                 {
                     QuestionId = q.QuestionId,
                     PaperId = this.Id,
-                    Mark = q.Mark
+                    Mark = q.Mark,
+                    RawIndex = q.RawIndex
                 });
             }
         }
@@ -85,34 +101,39 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperStatus status,
         DateTime? startTime,
         DateTime? endTime,
-        Guid? paperLabelId,
-        int numberOfQuestion,
         int? duration,
         bool shuffle,
         bool showMarkResult,
         bool showQuestionAnswer,
         PaperType type,
-        Guid? paperFolderId,
         bool isPublish,
         string? content,
-        string? description)
+        string? description,
+        string? password,
+        int? numberAttempt,
+        PaperShareType shareType,
+        Guid? paperFolderId,
+        Guid? paperLabelId,
+        Guid? subjectId)
     {
         ExamName = examName;
         Status = status;
         StartTime = startTime;
         EndTime = endTime;
-        PaperLabelId = paperLabelId;
-        NumberOfQuestion = numberOfQuestion;
         Duration = duration;
         Shuffle = shuffle;
         ShowMarkResult = showMarkResult;
         ShowQuestionAnswer = showQuestionAnswer;
         Type = type;
-        PaperFolderId = paperFolderId;
+        NumberAttempt = numberAttempt;
+        ShareType = shareType;
         IsPublish = isPublish;
         Content = content;
         Description = description;
-
+        Password = password;
+        PaperLabelId = paperLabelId;
+        SubjectId = subjectId;
+        PaperFolderId = paperFolderId;
         return this;
     }
 
@@ -120,4 +141,40 @@ public class Paper : AuditableEntity, IAggregateRoot
     {
         return CreatedBy == userId;
     }
+
+
+    //public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
+    //{
+    //    if (shareType == PaperShareType.AssignToStudent)
+    //    {
+    //        PaperAccesses.RemoveAll(pa => pa.UserId != null);
+    //        PaperAccesses.AddRange(newPaperAccesses.Where(pa => pa.UserId != null));
+    //    }
+    //    else if (shareType == PaperShareType.AssignToClass)
+    //    {
+    //        PaperAccesses.RemoveAll(pa => pa.ClassId != null);
+    //        PaperAccesses.AddRange(newPaperAccesses.Where(pa => pa.ClassId != null));
+    //    }
+    //}
+
+    public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
+    {
+        if (shareType == PaperShareType.AssignToStudent)
+        {
+            // Xác định các PaperAccess mới cần thêm
+            var toAdd = newPaperAccesses.Where(npa => !PaperAccesses.Any(pa => pa.UserId == npa.UserId)).ToList();
+            // Xóa các PaperAccess không có trong danh sách mới
+            PaperAccesses.RemoveAll(pa => !newPaperAccesses.Any(npa => npa.UserId == pa.UserId));
+            // Thêm các PaperAccess mới
+            PaperAccesses.AddRange(toAdd);
+        }
+        else if (shareType == PaperShareType.AssignToClass)
+        {
+
+            var toAdd = newPaperAccesses.Where(npa => !PaperAccesses.Any(pa => pa.ClassId == npa.ClassId)).ToList();
+            PaperAccesses.RemoveAll(pa => !newPaperAccesses.Any(npa => npa.ClassId == pa.ClassId));
+            PaperAccesses.AddRange(toAdd);
+        }
+    }
+
 }

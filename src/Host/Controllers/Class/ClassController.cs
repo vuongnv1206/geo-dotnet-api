@@ -2,6 +2,7 @@ using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.GroupClasses;
 using FSH.WebApi.Application.Class.UserClasses;
+using FSH.WebApi.Application.Assignments.AssignmentClasses;
 using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Host.Controllers.Class;
@@ -10,7 +11,7 @@ public class ClassController : VersionedApiController
     [HttpPost("search")]
     [MustHavePermission(FSHAction.Search, FSHResource.Classes)]
     [OpenApiOperation("Search class using available filters.", "")]
-    public Task<List<ClassDto>> SearchAsync(SearchClassesRequest request)
+    public Task<PaginationResponse<ClassDto>> SearchAsync(SearchClassesRequest request)
     {
         return Mediator.Send(request);
     }
@@ -92,6 +93,22 @@ public class ClassController : VersionedApiController
     [MustHavePermission(FSHAction.Delete, FSHResource.UserClasses)]
     [OpenApiOperation("Delete user in class.", "")]
     public Task DeleteUserInClass(DeleteUserInClassRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("assign-assignment-to-class")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
+    [OpenApiOperation("Assign assignment to class")]
+    public Task AssignAssignmentToClass(AssignAssignmentToClassRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpDelete("remove-assignment-from-class")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
+    [OpenApiOperation("Remove assignment from class")]
+    public Task RemoveAssignmentFromClass(RemoveAssignmentFromClassRequest request)
     {
         return Mediator.Send(request);
     }
