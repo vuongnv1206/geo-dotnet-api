@@ -10,7 +10,7 @@ public class GroupClassesController : VersionedApiController
     [HttpPost("search")]
     [MustHavePermission(FSHAction.Search, FSHResource.GroupClasses)]
     [OpenApiOperation("Search groupClass using available filters.", "")]
-    public Task<List<GroupClassDto>> SearchAsync(SearchGroupClassRequest request)
+    public Task<PaginationResponse<GroupClassDto>> SearchAsync(SearchGroupClassRequest request)
     {
         return Mediator.Send(request);
     }

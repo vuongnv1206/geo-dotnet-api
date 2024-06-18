@@ -1,4 +1,5 @@
 using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.New.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
@@ -79,7 +80,6 @@ public class MapsterSettings
 
         TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
 
-
         TypeAdapterConfig<SubmitPaper, LastResultExamDto>.NewConfig()
                .Map(dest => dest.Paper, src => src.Paper)
                .Map(dest => dest.TotalQuestion, src => src.Paper.PaperQuestions.Count());
@@ -98,12 +98,10 @@ public class MapsterSettings
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
 
+        TypeAdapterConfig<News, NewsDto>.NewConfig()
+            .Map(dest => dest.NumberLikeInTheNews, src => src.NewsReactions.Count());
         TypeAdapterConfig<Classes, ClassDto>.NewConfig()
           .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
           .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment));
-
-
-
-
     }
 }
