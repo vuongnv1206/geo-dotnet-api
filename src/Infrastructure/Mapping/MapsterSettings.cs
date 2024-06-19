@@ -1,3 +1,4 @@
+using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.New.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
@@ -12,6 +13,7 @@ using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -103,5 +105,11 @@ public class MapsterSettings
         TypeAdapterConfig<Classes, ClassDto>.NewConfig()
           .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
           .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment));
+
+        TypeAdapterConfig<Assignment, AssignmentDetailsDto>.NewConfig()
+                .Map(dest => dest.ClassesId, src => src.AssignmentClasses.Select(pq => pq.ClassesId));
+
+
+
     }
 }
