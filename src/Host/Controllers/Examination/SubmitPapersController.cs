@@ -20,6 +20,15 @@ public class SubmitPapersController : VersionedApiController
         return await Mediator.Send(request);
     }
 
+    [HttpPut("{id}")]
+    [OpenApiOperation("Update ending status submit paper")]
+    public async Task<ActionResult<Guid>> EndingSubmitPaper(UpdateSubmitPaperRequest request, Guid id)
+    {
+        return id == request.Id
+            ? Ok(await Mediator.Send(request))
+            : BadRequest();
+    }
+
     [HttpGet("paper/{paperId:guid}")]
     [OpenApiOperation("get information of paper by role student")]
     public async Task<PaperStudentDto> GetPapperByRoleStudent(Guid paperId)

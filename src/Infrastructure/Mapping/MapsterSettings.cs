@@ -1,5 +1,6 @@
 using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.New.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
@@ -70,7 +71,7 @@ public class MapsterSettings
         // Paper
         TypeAdapterConfig<Paper, PaperDto>.NewConfig()
           .Map(dest => dest.PaperFolder, src => src.PaperFolder)
-          .Map(dest => dest.PaperLable, src => src.PaperLable)
+          .Map(dest => dest.PaperLable, src => src.PaperLabel)
           .Map(dest => dest.Questions, src => CustomMappingExtensions.MapQuestions(src.PaperQuestions))
           .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
           .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
@@ -80,7 +81,6 @@ public class MapsterSettings
           .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
 
         TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
-
 
         TypeAdapterConfig<SubmitPaper, LastResultExamDto>.NewConfig()
                .Map(dest => dest.Paper, src => src.Paper)
@@ -96,9 +96,12 @@ public class MapsterSettings
             .TwoWays();
 
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
+        TypeAdapterConfig<PaperAccess, PaperAccessDto>.NewConfig();
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
 
+        TypeAdapterConfig<News, NewsDto>.NewConfig()
+            .Map(dest => dest.NumberLikeInTheNews, src => src.NewsReactions.Count());
         TypeAdapterConfig<Classes, ClassDto>.NewConfig()
           .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
           .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment));

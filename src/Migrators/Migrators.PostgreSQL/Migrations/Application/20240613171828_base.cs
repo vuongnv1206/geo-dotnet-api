@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class test : Migration
+    public partial class @base : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -121,7 +121,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
-                    SubjectId = table.Column<Guid>(type: "uuid", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -279,6 +278,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Id = table.Column<string>(type: "text", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: true),
                     LastName = table.Column<string>(type: "text", nullable: true),
+                    Gender = table.Column<bool>(type: "boolean", nullable: true),
+                    BirthDate = table.Column<DateOnly>(type: "date", nullable: true),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     RefreshToken = table.Column<string>(type: "text", nullable: true),
@@ -403,54 +404,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "Papers",
-                schema: "Examination",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ExamName = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    PaperLabelId = table.Column<Guid>(type: "uuid", nullable: true),
-                    NumberOfQuestion = table.Column<int>(type: "integer", nullable: false),
-                    Duration = table.Column<int>(type: "integer", nullable: true),
-                    Shuffle = table.Column<bool>(type: "boolean", nullable: false),
-                    ShowMarkResult = table.Column<bool>(type: "boolean", nullable: false),
-                    ShowQuestionAnswer = table.Column<bool>(type: "boolean", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: true),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    PaperFolderId = table.Column<Guid>(type: "uuid", nullable: true),
-                    IsPublish = table.Column<bool>(type: "boolean", nullable: false),
-                    ExamCode = table.Column<string>(type: "text", nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Papers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Papers_PaperFolders_PaperFolderId",
-                        column: x => x.PaperFolderId,
-                        principalSchema: "Examination",
-                        principalTable: "PaperFolders",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Papers_PaperLabels_PaperLabelId",
-                        column: x => x.PaperLabelId,
-                        principalSchema: "Examination",
-                        principalTable: "PaperLabels",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "QuestionFolderPermissions",
                 schema: "Question",
                 columns: table => new
@@ -497,7 +450,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     QuestionFolderId = table.Column<Guid>(type: "uuid", nullable: true),
                     QuestionType = table.Column<int>(type: "integer", nullable: true),
                     QuestionLableId = table.Column<Guid>(type: "uuid", nullable: true),
-                    ParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     QuestionParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -583,6 +535,61 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     table.PrimaryKey("PK_Assignment", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Assignment_Subject_SubjectId",
+                        column: x => x.SubjectId,
+                        principalSchema: "Subject",
+                        principalTable: "Subject",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Papers",
+                schema: "Examination",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExamName = table.Column<string>(type: "text", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Duration = table.Column<int>(type: "integer", nullable: true),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    IsPublish = table.Column<bool>(type: "boolean", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Shuffle = table.Column<bool>(type: "boolean", nullable: false),
+                    ShowMarkResult = table.Column<bool>(type: "boolean", nullable: false),
+                    ShowQuestionAnswer = table.Column<bool>(type: "boolean", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: true),
+                    ExamCode = table.Column<string>(type: "text", nullable: false),
+                    NumberAttempt = table.Column<int>(type: "integer", nullable: false),
+                    PaperLabelId = table.Column<Guid>(type: "uuid", nullable: true),
+                    PaperFolderId = table.Column<Guid>(type: "uuid", nullable: true),
+                    SubjectId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Papers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Papers_PaperFolders_PaperFolderId",
+                        column: x => x.PaperFolderId,
+                        principalSchema: "Examination",
+                        principalTable: "PaperFolders",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Papers_PaperLabels_PaperLabelId",
+                        column: x => x.PaperLabelId,
+                        principalSchema: "Examination",
+                        principalTable: "PaperLabels",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Papers_Subject_SubjectId",
                         column: x => x.SubjectId,
                         principalSchema: "Subject",
                         principalTable: "Subject",
@@ -807,37 +814,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "SubmitPapers",
-                schema: "Examination",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PaperId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    TotalMark = table.Column<float>(type: "real", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SubmitPapers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SubmitPapers_Papers_PaperId",
-                        column: x => x.PaperId,
-                        principalSchema: "Examination",
-                        principalTable: "Papers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Answers",
                 schema: "Question",
                 columns: table => new
@@ -863,35 +839,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         principalSchema: "Question",
                         principalTable: "Questions",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PaperQuestions",
-                schema: "Examination",
-                columns: table => new
-                {
-                    PaperId = table.Column<Guid>(type: "uuid", nullable: false),
-                    QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Mark = table.Column<float>(type: "real", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PaperQuestions", x => new { x.PaperId, x.QuestionId });
-                    table.ForeignKey(
-                        name: "FK_PaperQuestions_Papers_PaperId",
-                        column: x => x.PaperId,
-                        principalSchema: "Examination",
-                        principalTable: "Papers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PaperQuestions_Questions_QuestionId",
-                        column: x => x.QuestionId,
-                        principalSchema: "Question",
-                        principalTable: "Questions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -923,6 +870,97 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaperAccesses",
+                schema: "Examination",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PaperId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaperAccesses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaperAccesses_Classes_ClassId",
+                        column: x => x.ClassId,
+                        principalSchema: "Classes",
+                        principalTable: "Classes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PaperAccesses_Papers_PaperId",
+                        column: x => x.PaperId,
+                        principalSchema: "Examination",
+                        principalTable: "Papers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaperQuestions",
+                schema: "Examination",
+                columns: table => new
+                {
+                    PaperId = table.Column<Guid>(type: "uuid", nullable: false),
+                    QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Mark = table.Column<float>(type: "real", nullable: false),
+                    RawIndex = table.Column<int>(type: "integer", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaperQuestions", x => new { x.PaperId, x.QuestionId });
+                    table.ForeignKey(
+                        name: "FK_PaperQuestions_Papers_PaperId",
+                        column: x => x.PaperId,
+                        principalSchema: "Examination",
+                        principalTable: "Papers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PaperQuestions_Questions_QuestionId",
+                        column: x => x.QuestionId,
+                        principalSchema: "Question",
+                        principalTable: "Questions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubmitPapers",
+                schema: "Examination",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PaperId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    TotalMark = table.Column<float>(type: "real", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubmitPapers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubmitPapers_Papers_PaperId",
+                        column: x => x.PaperId,
+                        principalSchema: "Examination",
+                        principalTable: "Papers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "NewsReactions",
                 schema: "Classes",
                 columns: table => new
@@ -948,14 +986,22 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Examination",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     SubmitPaperId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
                     AnswerRaw = table.Column<string>(type: "text", nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                    Mark = table.Column<float>(type: "real", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SubmitPaperDetails", x => new { x.SubmitPaperId, x.QuestionId });
+                    table.PrimaryKey("PK_SubmitPaperDetails", x => x.Id);
                     table.ForeignKey(
                         name: "FK_SubmitPaperDetails_Questions_QuestionId",
                         column: x => x.QuestionId,
@@ -1021,6 +1067,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "NewsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PaperAccesses_ClassId",
+                schema: "Examination",
+                table: "PaperAccesses",
+                column: "ClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaperAccesses_PaperId",
+                schema: "Examination",
+                table: "PaperAccesses",
+                column: "PaperId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PaperFolderPermissions_FolderId",
                 schema: "Examination",
                 table: "PaperFolderPermissions",
@@ -1055,6 +1113,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Examination",
                 table: "Papers",
                 column: "PaperLabelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Papers_SubjectId",
+                schema: "Examination",
+                table: "Papers",
+                column: "SubjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionFolders_ParentId",
@@ -1098,6 +1162,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Examination",
                 table: "SubmitPaperDetails",
                 column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubmitPaperDetails_SubmitPaperId",
+                schema: "Examination",
+                table: "SubmitPaperDetails",
+                column: "SubmitPaperId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubmitPapers_PaperId",
@@ -1190,6 +1260,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Classes");
 
             migrationBuilder.DropTable(
+                name: "PaperAccesses",
+                schema: "Examination");
+
+            migrationBuilder.DropTable(
                 name: "PaperFolderPermissions",
                 schema: "Examination");
 
@@ -1270,10 +1344,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Identity");
 
             migrationBuilder.DropTable(
-                name: "Subject",
-                schema: "Subject");
-
-            migrationBuilder.DropTable(
                 name: "Classes",
                 schema: "Classes");
 
@@ -1300,6 +1370,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
             migrationBuilder.DropTable(
                 name: "PaperLabels",
                 schema: "Examination");
+
+            migrationBuilder.DropTable(
+                name: "Subject",
+                schema: "Subject");
         }
     }
 }

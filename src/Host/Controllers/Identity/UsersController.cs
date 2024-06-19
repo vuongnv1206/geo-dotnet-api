@@ -1,5 +1,7 @@
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Password;
+using FSH.WebApi.Application.Identity.Users.Verify;
+using System.Security.Claims;
 
 namespace FSH.WebApi.Host.Controllers.Identity;
 
@@ -91,12 +93,31 @@ public class UsersController : VersionNeutralApiController
     }
 
     [HttpGet("confirm-phone-number")]
-    [AllowAnonymous]
     [OpenApiOperation("Confirm phone number for a user.", "")]
     [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Search))]
-    public Task<string> ConfirmPhoneNumberAsync([FromQuery] string userId, [FromQuery] string code)
+    public Task<string> ConfirmPhoneNumberAsync([FromQuery] string code)
     {
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+        {
+            throw new UnauthorizedAccessException();
+        }
+
         return _userService.ConfirmPhoneNumberAsync(userId, code);
+    }
+
+    [HttpGet("resend-phone-number-code")]
+    [OpenApiOperation("Resend phone number confirmation code.", "")]
+    public Task<string> ResendPhoneNumberCodeConfirmAsync()
+    {
+        return Mediator.Send(new ResendPhoneCodeRequest());
+    }
+
+    [HttpGet("resend-email-confirm")]
+    [OpenApiOperation("Resend email confirmation code.", "")]
+    public Task<string> ResendEmailConfirmAsync()
+    {
+        var request = new ResendEmailConfirmRequest { Origin = GetOriginFromRequest() };
+        return Mediator.Send(request);
     }
 
     [HttpPost("forgot-password")]

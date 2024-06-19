@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Extensions;
+﻿using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 using Mapster;
@@ -7,7 +8,7 @@ namespace FSH.WebApi.Application.Examination.Reviews;
 public class GetLastResultExamRequest : IRequest<LastResultExamDto>
 {
     public Guid PaperId { get; set; }
-    public Guid UserId { get; set;}
+    public Guid UserId { get; set; }
     public Guid SubmitPaperId { get; set; }
 
 }
@@ -19,7 +20,11 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
     private readonly IReadRepository<Paper> _repositoryPaper;
     private readonly IStringLocalizer _t;
 
-    public GetLastResultExamRequestHandler(IReadRepository<SubmitPaper> repositorySubmitPaper, IUserService userService, IReadRepository<Paper> repositoryPaper, IStringLocalizer<GetLastResultExamRequestHandler> t)
+    public GetLastResultExamRequestHandler(
+        IReadRepository<SubmitPaper> repositorySubmitPaper,
+        IUserService userService,
+        IReadRepository<Paper> repositoryPaper,
+        IStringLocalizer<GetLastResultExamRequestHandler> t)
     {
         _repositorySubmitPaper = repositorySubmitPaper;
         _userService = userService;
@@ -29,20 +34,44 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
 
     public async Task<LastResultExamDto> Handle(GetLastResultExamRequest request, CancellationToken cancellationToken)
     {
-        var spec = new ExamResultSpec(request.SubmitPaperId,request.PaperId, request.UserId);
-        var submitPaper = await _repositorySubmitPaper.FirstOrDefaultAsync(spec,cancellationToken);
+        var spec = new ExamResultSpec(request.SubmitPaperId, request.PaperId, request.UserId);
+        var submitPaper = await _repositorySubmitPaper.FirstOrDefaultAsync(spec, cancellationToken)
+            ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
 
-        var student = await _userService.GetAsync(request.UserId.ToString(),cancellationToken);
+        var paper = await _repositoryPaper.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
 
-        _ = submitPaper ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
+        var student = await _userService.GetAsync(request.UserId.ToString(), cancellationToken);
 
-    
-       
         var examResultDto = submitPaper.Adapt<LastResultExamDto>();
-        examResultDto.Student = student;
 
+        if (submitPaper.TotalMark == 0)
+        {
+            float totalMark = 0;
 
+            foreach (var submit in submitPaper.SubmitPaperDetails)
+            {
+                if (submit.Question.QuestionParentId is null
+                    || submit.Question.QuestionParentId == Guid.Empty)
+                {
+                    totalMark += submit.GetPointQuestion(submit.Question,
+                        paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+                }
+                else
+                {
+                    var paperQuestionParent = paper.PaperQuestions
+                    .FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
 
+                    float avgMark = paperQuestionParent.Mark / paperQuestionParent.Question.QuestionPassages.Count;
+
+                    totalMark += submit.GetPointQuestion(submit.Question, avgMark);
+                }
+
+                examResultDto.TotalMark = totalMark;
+            }
+
+            examResultDto.Student = student;
+
+        }
         return examResultDto;
     }
 }

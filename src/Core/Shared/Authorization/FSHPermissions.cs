@@ -13,6 +13,7 @@ public static class FSHAction
     public const string Generate = nameof(Generate);
     public const string Clean = nameof(Clean);
     public const string UpgradeSubscription = nameof(UpgradeSubscription);
+    public const string Upload = nameof(Upload);
 }
 
 public static class FSHResource
@@ -36,6 +37,7 @@ public static class FSHResource
     public const string News = nameof(News);
     public const string NewsReaction = nameof(NewsReaction);
     public const string UserClasses = nameof(UserClasses);
+    public const string Files = nameof(Files);
 }
 
 public static class FSHPermissions
@@ -146,6 +148,9 @@ public static class FSHPermissions
         new("Create UserClasses", FSHAction.Create, FSHResource.UserClasses),
         new("Update UserClasses", FSHAction.Update, FSHResource.UserClasses),
         new("Delete UserClasses", FSHAction.Delete, FSHResource.UserClasses),
+
+        // FILES
+        new("Upload files", FSHAction.Upload, FSHResource.Files, IsRoot: true),
 
     };
 

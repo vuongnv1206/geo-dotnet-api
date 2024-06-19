@@ -93,6 +93,9 @@
       <None Update="Assignment\assignment.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Notifications\NotificationData.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Update="Roslynator.Analyzers" Version="4.2.0">

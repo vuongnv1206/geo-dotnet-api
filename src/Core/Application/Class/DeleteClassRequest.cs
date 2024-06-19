@@ -31,7 +31,7 @@ public class DeleteClassRequestHandler : IRequestHandler<DeleteClassRequest, Gui
         var classes = await _repository.FirstOrDefaultAsync(new ClassByIdSpec(request.Id), cancellationToken);
         _ = classes ?? throw new NotFoundException(_t["Classes {0} Not Found."]);
 
-        var news = await _newRepository.ListAsync(new NewByClassIdSpec(request.Id), cancellationToken);
+        var news = await _newRepository.ListAsync(new NewsBySearchRequestWithClass(request.Id), cancellationToken);
         await _newRepository.DeleteRangeAsync(news, cancellationToken);
 
         await _repository.DeleteAsync(classes, cancellationToken);

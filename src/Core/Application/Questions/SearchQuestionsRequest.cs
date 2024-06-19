@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Questions.Dtos;
+﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
@@ -17,11 +18,13 @@ public class SearchQuestionsRequestHandler : IRequestHandler<SearchQuestionsRequ
 {
     private readonly IReadRepository<Question> _repository;
     private readonly IDapperRepository _dapperRepository;
+    private readonly IUserService _userService;
 
-    public SearchQuestionsRequestHandler(IReadRepository<Question> repository, IDapperRepository dapperRepository)
+    public SearchQuestionsRequestHandler(IReadRepository<Question> repository, IDapperRepository dapperRepository, IUserService userService)
     {
         _repository = repository;
         _dapperRepository = dapperRepository;
+        _userService = userService;
     }
 
     public async Task<List<Guid>> GetFolderIds(Guid folderId, CancellationToken cancellationToken)
@@ -51,6 +54,25 @@ public class SearchQuestionsRequestHandler : IRequestHandler<SearchQuestionsRequ
         var folderIds = await GetFolderIds(request.folderId!.Value, cancellationToken);
 
         var spec = new QuestionsBySearchRequestSpec(request, folderIds);
-        return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
+        var res = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
+
+        // Get owner details for each Question
+        foreach (var question in res.Data)
+        {
+            try
+            {
+                var user = await _userService.GetAsync(question.CreatedBy.ToString(), cancellationToken);
+                if (user != null)
+                {
+                    question.Owner = user;
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
+        return res;
     }
 }

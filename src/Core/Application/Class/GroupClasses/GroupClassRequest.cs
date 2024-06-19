@@ -1,5 +1,7 @@
-﻿using FSH.WebApi.Application.Class.GroupClasses.Dto;
+﻿using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.GroupClasses.Dto;
 using FSH.WebApi.Application.Class.GroupClasses.Spec;
+using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,6 @@ public class GroupClassRequestHandler : IRequestHandler<GroupClassRequest, List<
         var user = _currentUser.GetUserId();
         return await _repository.ListAsync(
             (ISpecification<GroupClass, GroupClassDto>)new GroupClassByUserSpec(user), cancellationToken)
-        ?? throw new NotFoundException(_t["GroupClass {0} Not Found.", user]);
+        ?? throw new NotFoundException(_t["GroupClass {0} Not Found."]);
     }
 }

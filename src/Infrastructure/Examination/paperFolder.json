@@ -1,10 +1,10 @@
 ﻿[
   {
     "Name": "Main Folder 1",
-    "ChildrenPaperFolders": [
+    "PaperFolderChildrens": [
       {
         "Name": "Subfolder 1.1",
-        "ChildrenPaperFolders": [
+        "PaperFolderChildrens": [
           {
             "Name": "Sub-subfolder 1.1.1"
           },
@@ -20,13 +20,13 @@
   },
   {
     "Name": "Main Folder 2",
-    "ChildrenPaperFolders": [
+    "PaperFolderChildrens": [
       {
         "Name": "Subfolder 2.1"
       },
       {
         "Name": "Subfolder 2.2",
-        "ChildrenPaperFolders": [
+        "PaperFolderChildrens": [
           {
             "Name": "Sub-subfolder 2.2.1"
           },
