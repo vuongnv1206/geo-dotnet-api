@@ -16,9 +16,9 @@ public class UpdateAssignmentRequestValidator : CustomValidator<UpdateAssignment
 
         RuleFor(p => p.Attachment);
 
-        RuleFor(p => p.SubjectId)
-            .NotEmpty()
-            .MustAsync(async (id, ct) => await subjectRepo.GetByIdAsync(id, ct) is not null)
-                .WithMessage((_, id) => T["Subject {0} Not Found.", id]);
+        //RuleFor(p => p.SubjectId)
+        //    .NotEmpty()
+        //    .MustAsync(async (id, ct) => await subjectRepo.GetByIdAsync(id, ct) is not null)
+        //        .WithMessage((_, id) => T["Subject {0} Not Found.", id]);
     }
 }

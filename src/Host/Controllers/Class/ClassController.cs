@@ -97,15 +97,7 @@ public class ClassController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpPost("assign-assignment-to-class")]
-    [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
-    [OpenApiOperation("Assign assignment to class")]
-    public Task AssignAssignmentToClass(AssignAssignmentToClassRequest request)
-    {
-        return Mediator.Send(request);
-    }
-
-    [HttpDelete("remove-assignment-from-class")]
+    [HttpPost("remove-assignment-from-class")]
     [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
     [OpenApiOperation("Remove assignment from class")]
     public Task RemoveAssignmentFromClass(RemoveAssignmentFromClassRequest request)

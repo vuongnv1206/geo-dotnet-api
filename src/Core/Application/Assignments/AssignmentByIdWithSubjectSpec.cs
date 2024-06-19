@@ -7,6 +7,7 @@ public class AssignmentByIdWithSubjectSpec : Specification<Assignment, Assignmen
 {
     public AssignmentByIdWithSubjectSpec(Guid id) =>
         Query
-            .Where(p => p.Id == id)
-            .Include(p => p.Subject);
+           .Include(a => a.AssignmentClasses).ThenInclude(a => a.Classes)
+           .Include(a => a.Subject)
+           .Where(a => a.Id == id);
 }
