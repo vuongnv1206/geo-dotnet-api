@@ -29,10 +29,10 @@ public class CreateNewsReactionHandler : IRequestHandler<CreateNewsReactionsRequ
         _ = findNews ?? throw new NotFoundException(_t["News {0} Not Found.", request.NewsId]);
 
         var findUser = _currentUser.GetUserId();
-        if (findUser == Guid.Empty || findUser != request.UserId)
-        {
-            throw new NotFoundException(_t["User {0} Not Found.", request.UserId]);
-        }
+        //if (findUser == Guid.Empty || findUser != request.UserId)
+        //{
+        //    throw new NotFoundException(_t["User {0} Not Found.", request.UserId]);
+        //}
 
         await _newReactionRepository.AddNewsReaction(new NewsReaction(request.UserId, request.NewsId));
 
