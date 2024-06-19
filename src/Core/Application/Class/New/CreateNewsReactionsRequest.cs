@@ -14,9 +14,15 @@ public class CreateNewsReactionHandler : IRequestHandler<CreateNewsReactionsRequ
     private readonly INewReactionRepository _newReactionRepository;
     private readonly IStringLocalizer _t;
 
-    public CreateNewsReactionHandler(ICurrentUser currentUser, IRepository<News> newRepository,
-                                     INewReactionRepository newReactionRepository, IStringLocalizer<CreateNewsReactionHandler> localizer) =>
+    public CreateNewsReactionHandler(
+        ICurrentUser currentUser,
+        IRepository<News> newRepository,
+        INewReactionRepository newReactionRepository,
+        IStringLocalizer<CreateNewsReactionHandler> localizer)
+    {
         (_currentUser, _newReactionRepository, _newRepository, _t) = (currentUser, newReactionRepository, newRepository, localizer);
+    }
+
     public async Task<DefaultIdType> Handle(CreateNewsReactionsRequest request, CancellationToken cancellationToken)
     {
         var findNews = await _newRepository.GetByIdAsync(request.NewsId, cancellationToken);
