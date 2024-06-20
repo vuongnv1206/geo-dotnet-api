@@ -1,11 +1,12 @@
-﻿using FSH.WebApi.Application.Examination.Papers;
+﻿using FSH.WebApi.Application.Examination.PaperFolders;
+using FSH.WebApi.Application.Examination.Papers;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class PapersController : VersionedApiController
 {
     [HttpPost("Search")]
     [OpenApiOperation("")]
-    public Task<PaginationResponse<PaperInListDto>> SearchPaperLabel(SearchPaperRequest request)
+    public Task<PaginationResponse<PaperInListDto>> SearchPaper(SearchPaperRequest request)
     {
         return Mediator.Send(request);
     }
@@ -50,6 +51,22 @@ public class PapersController : VersionedApiController
         }
 
         return Ok(await Mediator.Send(request));
+    }
+
+    [HttpPost("Shared")]
+    [OpenApiOperation("")]
+    public Task<PaginationResponse<PaperInListDto>> SearchSharedPaper(SearchSharedPaperRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("{id:guid}/share-paper")]
+    [OpenApiOperation("Share paper.")]
+    public async Task<ActionResult<Guid>> ShareFolder(Guid id, SharePaperRequest request)
+    {
+        return id != request.PaperId
+            ? BadRequest()
+            : Ok(await Mediator.Send(request));
     }
 
 

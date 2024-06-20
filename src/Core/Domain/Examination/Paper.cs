@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Domain.Examination.Enums;
+using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Subjects;
 
 namespace FSH.WebApi.Domain.Examination;
@@ -171,6 +172,24 @@ public class Paper : AuditableEntity, IAggregateRoot
         }
     }
 
+    public void UpdatePermissions(List<PaperPermission> permissions)
+    {
+        PaperPermissions.RemoveAll(a => !permissions.Any(x => x.Id == a.Id));
+
+        foreach (var permission in permissions)
+        {
+            var existingPermission = PaperPermissions.FirstOrDefault(a => a.Id == permission.Id);
+            if (existingPermission != null)
+            {
+                existingPermission.SetPermission(permission.CanView,permission.CanAdd,permission.CanUpdate,permission.CanDelete,permission.CanShare);
+            }
+            else
+            {
+                AddPermission(permission);
+            }
+        }
+    }
+
     public void AddPermission(PaperPermission permission)
     {
         PaperPermissions.Add(permission);
@@ -198,6 +217,14 @@ public class Paper : AuditableEntity, IAggregateRoot
     {
         if (CreatedBy == userId) return true;
         return PaperPermissions.Any(x => x.UserId == userId && x.CanView);
+    }
+
+
+
+    public bool CanShare(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperPermissions.Any(x => x.UserId == userId && x.CanShare);
     }
 
 

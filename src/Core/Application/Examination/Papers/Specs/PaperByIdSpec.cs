@@ -10,6 +10,8 @@ public class PaperByIdSpec : Specification<Paper>, ISingleResultSpecification
             .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionPassages).ThenInclude(qp => qp.Answers)
             .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionLable)
             .Include(x => x.SubmitPapers)
-            .Include(x => x.PaperAccesses);
+            .Include(x => x.PaperAccesses)
+            .Include(x => x.PaperPermissions)
+            ;
     }
 }

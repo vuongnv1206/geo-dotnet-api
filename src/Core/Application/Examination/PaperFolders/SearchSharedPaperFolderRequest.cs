@@ -29,7 +29,7 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
     {
         var currentUserId = _currentUser.GetUserId();
 
-        var accessibleFolders = await _paperFolderPermissionRepo.ListAsync(new PaperFolderPermissionByUserSpec(currentUserId,request), cancellationToken);
+        var accessibleFolders = await _paperFolderPermissionRepo.ListAsync(new PaperFolderPermissionByUserSpec(currentUserId), cancellationToken);
         var accessibleFolderIds = accessibleFolders.Select(p => p.FolderId).Distinct();
 
         var data = new List<PaperFolder>();
