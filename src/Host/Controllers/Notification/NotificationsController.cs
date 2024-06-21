@@ -5,9 +5,17 @@ namespace FSH.WebApi.Host.Controllers.Notification;
 public class NotificationsController : VersionedApiController
 {
     // API Just for testing purposes, it'll be removed in the future
-    [HttpPost("send-to-all")]
+    [HttpGet("test-send-notification")]
     [OpenApiOperation("Test notification", "")]
-    public Task<string> TestNotification(TestNotificationRequest request)
+    public Task<string> TestNotification()
+    {
+        return Mediator.Send(new TestNotificationRequest());
+    }
+
+    [HttpPost("send-to-all")]
+    [OpenApiOperation("Send notification to all users", "")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Notifications)]
+    public Task<string> SendNotificationToAllUsers(SendNotificationRequestToAllUsersRequest request)
     {
         return Mediator.Send(request);
     }
