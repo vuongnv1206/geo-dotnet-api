@@ -1,28 +1,31 @@
 ﻿namespace FSH.WebApi.Application.Notifications;
 public class TestNotificationRequest : IRequest<string>
 {
-    public string[] userIds { get; set; }
-    public string? Message { get; set; }
 }
 
 public class TestNotificationHandler : IRequestHandler<TestNotificationRequest, string>
 {
-    private readonly INotificationSender _notifications;
+    private readonly INotificationService _notificationService;
+    private readonly ICurrentUser _currentUser;
 
-    public TestNotificationHandler(INotificationSender notifications)
+    public TestNotificationHandler(INotificationService notificationService, ICurrentUser currentUser)
     {
-        _notifications = notifications;
+        _notificationService = notificationService;
+        _currentUser = currentUser;
     }
 
     public async Task<string> Handle(TestNotificationRequest request, CancellationToken cancellationToken)
     {
+        string userId = _currentUser.GetUserId().ToString();
         var notification = new BasicNotification
         {
-            Message = request.Message,
-            Label = BasicNotification.LabelType.Information
+            Message = "Hello, World!",
+            Label = BasicNotification.LabelType.Information,
+            Title = "Test Notification",
+            Url = "/test"
         };
 
-        await _notifications.SendToUsersAsync(notification, request.userIds, cancellationToken);
+        _ = _notificationService.SendNotificationToUser(userId, notification, null, cancellationToken);
 
         return "Notification sent";
     }
