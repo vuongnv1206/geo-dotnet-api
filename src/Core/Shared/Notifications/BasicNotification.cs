@@ -7,7 +7,8 @@ public class BasicNotification : INotificationMessage
         Information,
         Success,
         Warning,
-        Error
+        Error,
+        Reminder
     }
 
     public string? Message { get; set; }

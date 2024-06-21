@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Subjects;
+﻿using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Subjects;
 namespace FSH.WebApi.Domain.Assignment;
 public class Assignment : AuditableEntity, IAggregateRoot
 {
@@ -12,6 +13,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
     public bool RequireLoginToSubmit { get; set; }
     public Guid? SubjectId { get; set; }
     public virtual Subject Subject { get; set; } = default!;
+    public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
 
     public Assignment()
     {
@@ -57,4 +59,24 @@ public class Assignment : AuditableEntity, IAggregateRoot
         return this;
     }
 
+    //public void AssignAssignmentToClass(AssignmentClass assignmentClass)
+    //{
+    //    AssignmentClasses.Add(assignmentClass);
+    //}
+
+
+
+
+    public void UpdateAssignmentFromClass(List<AssignmentClass> aClass)
+    {
+        AssignmentClasses.RemoveAll(ac => !aClass.Any(c => c.AssignmentId == ac.AssignmentId));
+        foreach (var ac in aClass)
+        {
+            AssignmentClasses.Add(new AssignmentClass
+            {
+                AssignmentId = this.Id,
+                ClassesId = ac.ClassesId
+            });
+        }
+    }
 }

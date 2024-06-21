@@ -9,11 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Assignments;
-public class AssignmentByIdSpec : Specification<Assignment, AssignmentDto>, ISingleResultSpecification
+public class AssignmentByIdSpec : Specification<Assignment>, ISingleResultSpecification
 {
-    public AssignmentByIdSpec(Guid id, Guid userId)
+    public AssignmentByIdSpec(Guid id)
     {
         Query
-            .Where(x => x.Id == id && x.CreatedBy == userId);
+            .Include(a => a.AssignmentClasses)
+            .Where(x => x.Id == id);
     }
 }

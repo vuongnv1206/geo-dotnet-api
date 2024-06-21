@@ -36,31 +36,34 @@ public static class GetResultAnswerExtensions
         }
     }
 
-    public static float GetPointQuestion(this SubmitPaperDetail submitDetail, PaperQuestion paperQuestion)
+    public static float GetPointQuestion(this SubmitPaperDetail submitDetail, Question question, float mark)
     {
-        var question = paperQuestion.Question;
         switch (question.QuestionType)
         {
-            case QuestionType.SingleChoice:
-                return CalculateSingleChoiceScore(submitDetail, question, paperQuestion.Mark);
-
-            case QuestionType.MultipleChoice:
-                return CalculateMultipleChoiceScore(submitDetail, question, paperQuestion.Mark);
-
-            case QuestionType.FillBlank:
             case QuestionType.ReadingQuestionPassage:
-            case QuestionType.Writing:
+            case QuestionType.SingleChoice:
+                return CalculateSingleChoiceScore(submitDetail, question, mark);
+            case QuestionType.MultipleChoice:
+                return CalculateMultipleChoiceScore(submitDetail, question, mark);
+            case QuestionType.FillBlank:
+                return CalculateFillBlankScore(submitDetail, question, mark);
             case QuestionType.Reading:
+                return CalculateReadingScore(submitDetail, question, mark);
+            case QuestionType.Matching:
+                return CalculateMatchingScore(submitDetail, question, mark);
+            case QuestionType.Writing:
             case QuestionType.Other:
                 return 0;
-
-            case QuestionType.Matching:
-                return CalculateMatchingScore(submitDetail, question, paperQuestion.Mark);
-
             default:
                 throw new NotImplementedException($"Question type {question.QuestionType} is not supported.");
         }
     }
+
+    private static float CalculateReadingScore(SubmitPaperDetail submitDetail, Question question, float mark)
+    {
+        throw new NotImplementedException();
+    }
+
     private static float CalculateSingleChoiceScore(SubmitPaperDetail submitDetail, Question question, float mark)
     {
         if (Guid.TryParse(submitDetail.AnswerRaw, out var answerIdRaw) &&
@@ -93,11 +96,18 @@ public static class GetResultAnswerExtensions
                                                     .Select(ma => ma.Split('_'))
                                                     .ToDictionary(ma => ma[0], ma => ma[1]);
 
-        var correctMatchings = question.Answers.ToDictionary(a => a.Id.ToString(), a => a.Content);
+        var correctMatchings = question.Answers[0].Content.Split('|')
+                                                    .Select(ma => ma.Split('_'))
+                                                    .ToDictionary(ma => ma[0], ma => ma[1]);
 
         float averageScore = mark / correctMatchings.Count;
         int numberCorrectAnswer = matchingAnswers.Count(raw => correctMatchings.TryGetValue(raw.Key, out var correctValue) && correctValue == raw.Value);
 
         return numberCorrectAnswer * averageScore;
+    }
+
+    private static float CalculateFillBlankScore(SubmitPaperDetail submitDetail, Question question, float mark)
+    {
+        return 0;
     }
 }

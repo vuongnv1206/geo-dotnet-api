@@ -39,4 +39,12 @@ public class QuestionController : VersionedApiController
             : Ok(await Mediator.Send(request));
     }
 
+    [HttpPost("read-from-file")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Question)]
+    [OpenApiOperation("read questions from .docx, .txt file.", "")]
+    public async Task<string[]> ImportAsync([FromForm] ReadQuestionsFromFileRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
 }

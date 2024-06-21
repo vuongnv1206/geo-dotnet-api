@@ -96,9 +96,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("ClassesId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClassId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -399,6 +396,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("NumberAttempt")
+                        .HasColumnType("integer");
+
                     b.Property<Guid?>("PaperFolderId")
                         .HasColumnType("uuid");
 
@@ -407,6 +407,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.Property<string>("Password")
                         .HasColumnType("text");
+
+                    b.Property<int>("ShareType")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("ShowMarkResult")
                         .HasColumnType("boolean");
@@ -423,6 +426,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("SubjectId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -437,7 +443,41 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("PaperLabelId");
 
+                    b.HasIndex("SubjectId");
+
                     b.ToTable("Papers", "Examination");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperAccess", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ClassId")
+                        .IsRequired()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PaperId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("PaperId");
+
+                    b.ToTable("PaperAccesses", "Examination");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -471,9 +511,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("text");
 
                     b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("SubjectId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("TenantId")
@@ -720,6 +757,68 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasIndex("SubmitPaperId");
 
                     b.ToTable("SubmitPaperDetails", "Examination");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Notification.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notification", "Notification");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -1365,6 +1464,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<DateOnly?>("BirthDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -1378,6 +1480,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
+
+                    b.Property<bool?>("Gender")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
@@ -1580,13 +1685,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Assignment.AssignmentClass", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Assignment.Assignment", "Assignment")
-                        .WithMany()
+                        .WithMany("AssignmentClasses")
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classes")
-                        .WithMany()
+                        .WithMany("AssignmentClasses")
                         .HasForeignKey("ClassesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1625,7 +1730,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Class.NewsReaction", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.News", "News")
-                        .WithMany()
+                        .WithMany("NewsReactions")
                         .HasForeignKey("NewsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1636,7 +1741,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Class.UserClass", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classes")
-                        .WithMany()
+                        .WithMany("UserClasses")
                         .HasForeignKey("ClassesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1650,13 +1755,38 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .WithMany("Papers")
                         .HasForeignKey("PaperFolderId");
 
-                    b.HasOne("FSH.WebApi.Domain.Examination.PaperLabel", "PaperLable")
+                    b.HasOne("FSH.WebApi.Domain.Examination.PaperLabel", "PaperLabel")
                         .WithMany()
                         .HasForeignKey("PaperLabelId");
 
+                    b.HasOne("FSH.WebApi.Domain.Subjects.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId");
+
                     b.Navigation("PaperFolder");
 
-                    b.Navigation("PaperLable");
+                    b.Navigation("PaperLabel");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperAccess", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.Examination.Paper", "Paper")
+                        .WithMany("PaperAccesses")
+                        .HasForeignKey("PaperId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Paper");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperFolder", b =>
@@ -1877,13 +2007,32 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Assignment.Assignment", b =>
+                {
+                    b.Navigation("AssignmentClasses");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Classes", b =>
+                {
+                    b.Navigation("AssignmentClasses");
+
+                    b.Navigation("UserClasses");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Class.GroupClass", b =>
                 {
                     b.Navigation("Classes");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
+                {
+                    b.Navigation("NewsReactions");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
                 {
+                    b.Navigation("PaperAccesses");
+
                     b.Navigation("PaperQuestions");
 
                     b.Navigation("SubmitPapers");

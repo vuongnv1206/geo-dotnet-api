@@ -6,8 +6,7 @@ namespace FSH.WebApi.Application.Examination.SubmitPapers;
 public class UpdateSubmitPaperRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public Guid PaperId { get; set; }
-    public SubmitPaperStatus Status { get; set; } = SubmitPaperStatus.end;
+    public SubmitPaperStatus Status { get; set; } = SubmitPaperStatus.End;
 }
 
 public class UpdateSubmitPaperRequestVAlidator : CustomValidator<UpdateSubmitPaperRequest>
@@ -17,10 +16,6 @@ public class UpdateSubmitPaperRequestVAlidator : CustomValidator<UpdateSubmitPap
         IRepository<SubmitPaper> submitPaperRepo,
         IStringLocalizer<CreateSubmitPaperRequestValidator> T)
     {
-        RuleFor(x => x.PaperId)
-            .MustAsync(async (paperId, ct) => await paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(paperId), ct) is not null)
-            .WithMessage((_, paperId) => T["Paper {0} Not Found.", paperId]);
-
         RuleFor(x => x.Id)
             .MustAsync(async (submitId, ct) => await submitPaperRepo.FirstOrDefaultAsync(new SubmitPaperByIdSpec(submitId), ct) is not null)
             .WithMessage((_, submitId) => T["SubmitPaper {0} Not Found.", submitId]);
@@ -29,57 +24,74 @@ public class UpdateSubmitPaperRequestVAlidator : CustomValidator<UpdateSubmitPap
 
 public class UpdateSubmitPaperRequestHandler : IRequestHandler<UpdateSubmitPaperRequest, Guid>
 {
-    private readonly IRepository<Paper> _paperRepo;
+    private readonly IRepository<SubmitPaper> _submitPaperRepo;
     private readonly ICurrentUser _currentUser;
     private readonly IStringLocalizer _t;
 
     public UpdateSubmitPaperRequestHandler(
-        IRepository<Paper> paperRepo,
+        IRepository<SubmitPaper> submitPaperRepo,
         ICurrentUser currentUser,
         IStringLocalizer<UpdateSubmitPaperRequestHandler> t)
     {
-        _paperRepo = paperRepo;
+        _submitPaperRepo = submitPaperRepo;
         _currentUser = currentUser;
         _t = t;
     }
 
     public async Task<DefaultIdType> Handle(UpdateSubmitPaperRequest request, CancellationToken cancellationToken)
     {
-        var paper = await _paperRepo.FirstOrDefaultAsync(new PaperByIdSpec(request.PaperId), cancellationToken)
-            ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.PaperId]);
-
-        var submitPaper = paper.SubmitPapers.FirstOrDefault(x => x.Id == request.Id)
+        var submitPaper = await _submitPaperRepo.FirstOrDefaultAsync(new SubmitPaperByIdSpec(request.Id), cancellationToken)
             ?? throw new NotFoundException(_t["Submit Paper {0} Not Found.", request.Id]);
 
         var userId = _currentUser.GetUserId();
-        if (paper.CreatedBy != userId && submitPaper.CreatedBy != userId)
+        if (submitPaper.Paper.CreatedBy != userId && submitPaper.CreatedBy != userId)
         {
             throw new ForbiddenException(_t["Can't update this submit."]);
         }
 
-        if (request.Status == SubmitPaperStatus.end
-            && submitPaper.Status == SubmitPaperStatus.start)
+        if (request.Status == SubmitPaperStatus.End
+            && submitPaper.Status == SubmitPaperStatus.Start)
         {
-            throw new ConflictException(_t["The Paper {0} has ever done.", request.PaperId]);
+            throw new ConflictException(_t["The Paper {0} has ever done.", submitPaper.Paper.Id]);
         }
 
-        if (request.Status == SubmitPaperStatus.end)
+        if (request.Status == SubmitPaperStatus.End)
         {
             float totalMark = 0;
 
-            submitPaper.SubmitPaperDetails.ForEach(submit =>
+            foreach (var submit in submitPaper.SubmitPaperDetails)
             {
-                totalMark += submit.GetPointQuestion(paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId));
-            });
+                float markOfQuestion = 0;
+                if (submit.Question.QuestionParentId is null
+                    || submit.Question.QuestionParentId == Guid.Empty)
+                {
+                    markOfQuestion = submit.GetPointQuestion(submit.Question,
+                        submitPaper.Paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+                }
+                else
+                {
+                    var paperQuestionParent = submitPaper.Paper.PaperQuestions
+                   .FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
+
+                    float avgMark = paperQuestionParent.Mark / paperQuestionParent.Question.QuestionPassages.Count;
+
+                    markOfQuestion = submit.GetPointQuestion(submit.Question, avgMark);
+                }
+
+                submit.Mark = markOfQuestion;
+                totalMark += markOfQuestion;
+            }
 
             submitPaper.TotalMark = totalMark;
-        } else {
+        }
+        else
+        {
             submitPaper.TotalMark = 0;
         }
 
 
         submitPaper.Status = request.Status;
-        await _paperRepo.UpdateAsync(paper);
+        await _submitPaperRepo.UpdateAsync(submitPaper);
 
         return submitPaper.Id;
     }

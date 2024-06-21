@@ -1,4 +1,6 @@
-﻿namespace FSH.WebApi.Application.Assignments.Dtos;
+﻿using FSH.WebApi.Application.Class.Dto;
+
+namespace FSH.WebApi.Application.Assignments.Dtos;
 
 public class AssignmentDto : IDto
 {
@@ -11,6 +13,6 @@ public class AssignmentDto : IDto
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }
     public Guid SubjectId { get; set; }
-    public string SubjectName { get; set; } = default!;
+    public DateTime CreatedOn { get; set; }
 
 }

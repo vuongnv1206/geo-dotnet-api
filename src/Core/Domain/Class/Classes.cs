@@ -34,19 +34,13 @@ public class Classes : AuditableEntity, IAggregateRoot
         GroupClassId = newGroupClassId;
     }
 
-    public void AssignAssignmentToClass(AssignmentClass assignmentClass)
+    public bool CanUpdate(Guid userId)
     {
-        AssignmentClasses.Add(assignmentClass);
+        return CreatedBy == userId;
     }
 
     public void RemoveAssignmentFromClass(AssignmentClass assignmentClass)
     {
         AssignmentClasses.Remove(assignmentClass);
     }
-
-    public bool CanUpdate(Guid userId)
-    {
-        return CreatedBy == userId;
-    }
-
 }

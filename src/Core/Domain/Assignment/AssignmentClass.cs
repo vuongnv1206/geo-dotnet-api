@@ -19,5 +19,4 @@ public class AssignmentClass
         AssignmentId = assignmentId;
         ClassesId = classesId;
     }
-
 }

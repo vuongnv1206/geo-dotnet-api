@@ -15,6 +15,7 @@ using FSH.WebApi.Infrastructure.Persistence;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Infrastructure.reCAPTCHAv3;
 using FSH.WebApi.Infrastructure.SecurityHeaders;
+using FSH.WebApi.Infrastructure.SpeedSMS;
 using FSH.WebApi.Infrastructure.Validations;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -47,6 +48,7 @@ public static class Startup
             .AddPOLocalization(config)
             .AddMailing(config)
             .AddReCaptchav3(config)
+            .AddSpeedSMS(config)
             .AddMediatR(Assembly.GetExecutingAssembly())
             .AddMultitenancy()
             .AddNotifications(config)

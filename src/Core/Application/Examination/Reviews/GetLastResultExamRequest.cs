@@ -8,7 +8,7 @@ namespace FSH.WebApi.Application.Examination.Reviews;
 public class GetLastResultExamRequest : IRequest<LastResultExamDto>
 {
     public Guid PaperId { get; set; }
-    public Guid UserId { get; set;}
+    public Guid UserId { get; set; }
     public Guid SubmitPaperId { get; set; }
 
 }
@@ -34,13 +34,13 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
 
     public async Task<LastResultExamDto> Handle(GetLastResultExamRequest request, CancellationToken cancellationToken)
     {
-        var spec = new ExamResultSpec(request.SubmitPaperId,request.PaperId, request.UserId);
-        var submitPaper = await _repositorySubmitPaper.FirstOrDefaultAsync(spec,cancellationToken)
+        var spec = new ExamResultSpec(request.SubmitPaperId, request.PaperId, request.UserId);
+        var submitPaper = await _repositorySubmitPaper.FirstOrDefaultAsync(spec, cancellationToken)
             ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
 
         var paper = await _repositoryPaper.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
 
-        var student = await _userService.GetAsync(request.UserId.ToString(),cancellationToken);
+        var student = await _userService.GetAsync(request.UserId.ToString(), cancellationToken);
 
         var examResultDto = submitPaper.Adapt<LastResultExamDto>();
 
@@ -48,15 +48,30 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
         {
             float totalMark = 0;
 
-            submitPaper.SubmitPaperDetails.ForEach(submit =>
+            foreach (var submit in submitPaper.SubmitPaperDetails)
             {
-                totalMark += submit.GetPointQuestion(paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId));
-            });
-            examResultDto.TotalMark = totalMark;
+                if (submit.Question.QuestionParentId is null
+                    || submit.Question.QuestionParentId == Guid.Empty)
+                {
+                    totalMark += submit.GetPointQuestion(submit.Question,
+                        paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+                }
+                else
+                {
+                    var paperQuestionParent = paper.PaperQuestions
+                    .FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
+
+                    float avgMark = paperQuestionParent.Mark / paperQuestionParent.Question.QuestionPassages.Count;
+
+                    totalMark += submit.GetPointQuestion(submit.Question, avgMark);
+                }
+
+                examResultDto.TotalMark = totalMark;
+            }
+
+            examResultDto.Student = student;
+
         }
-
-        examResultDto.Student = student;
-
         return examResultDto;
     }
 }

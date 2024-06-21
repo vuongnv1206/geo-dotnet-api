@@ -1,0 +1,35 @@
+﻿[
+  {
+    "PaperId": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "Status": 0,
+    "StartTime": "2023-04-01T09:00:00Z",
+    "EndTime": "2023-04-01T11:00:00Z",
+    "TotalMark": 85.5,
+  },
+  {
+    "PaperId": "2f4a6c8e-0a1b-2c3d-4e5f-6a7b8c9d0e1f",
+    "Status": 1,
+    "StartTime": "2023-04-02T10:00:00Z",
+    "EndTime": null,
+    "TotalMark": 0,
+  },
+  {
+    "PaperId": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+    "Status": 0,
+    "StartTime": "2023-04-01T09:00:00Z",
+    "EndTime": "2023-04-01T11:00:00Z",
+    "TotalMark": 85.5,
+  },
+  {
+    "Status": 1,
+    "StartTime": "2023-04-02T10:00:00Z",
+    "EndTime": "2023-04-02T12:00:00Z",
+    "TotalMark": 92
+  },
+  {
+    "Status": 2,
+    "StartTime": "2023-04-03T08:30:00Z",
+    "EndTime": "2023-04-03T10:30:00Z",
+    "TotalMark": 75
+  }
+]
