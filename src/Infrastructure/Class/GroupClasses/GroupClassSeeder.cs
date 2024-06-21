@@ -23,6 +23,12 @@ public class GroupClassSeeder : ICustomSeeder
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
         string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        var adminUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "admin@root.com", cancellationToken);
+        var basicUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "basic@root.com", cancellationToken);
+        var adminGuid = Guid.Parse(adminUser.Id);
+        var basicGuid = Guid.Parse(basicUser.Id);
+
         if (!_db.GroupClasses.Any())
         {
             _logger.LogInformation("Started to Seed GroupClass.");
@@ -41,13 +47,15 @@ public class GroupClassSeeder : ICustomSeeder
             }
 
             await _db.SaveChangesAsync(cancellationToken);
+
+            var groupClasses = await _db.GroupClasses.ToListAsync(cancellationToken);
+            foreach (var g in groupClasses)
+            {
+                g.CreatedBy = adminGuid;
+            }
+
             _logger.LogInformation("Seeded GroupClasses.");
         }
-
-        var adminUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "admin@root.com", cancellationToken);
-        var basicUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == "basic@root.com", cancellationToken);
-        var adminGuid = Guid.Parse(adminUser.Id);
-        var basicGuid = Guid.Parse(basicUser.Id);
 
         if (!_db.Classes.Any())
         {
