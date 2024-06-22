@@ -25,7 +25,7 @@ public class TestNotificationHandler : IRequestHandler<TestNotificationRequest, 
             Url = "/test"
         };
 
-        _ = _notificationService.SendNotificationToUser(userId, notification, null, cancellationToken);
+        await _notificationService.SendNotificationToUser(userId, notification, null, cancellationToken);
 
         return "Notification sent";
     }
