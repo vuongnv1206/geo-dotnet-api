@@ -93,7 +93,6 @@ public class UsersController : VersionNeutralApiController
     }
 
     [HttpGet("confirm-phone-number")]
-    [MustHavePermission(FSHAction.Update, FSHResource.Users)]
     [OpenApiOperation("Confirm phone number for a user.", "")]
     [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Search))]
     public Task<string> ConfirmPhoneNumberAsync([FromQuery] string code)
@@ -107,7 +106,6 @@ public class UsersController : VersionNeutralApiController
     }
 
     [HttpGet("resend-phone-number-code")]
-    [MustHavePermission(FSHAction.Update, FSHResource.Users)]
     [OpenApiOperation("Resend phone number confirmation code.", "")]
     public Task<string> ResendPhoneNumberCodeConfirmAsync()
     {
@@ -115,7 +113,6 @@ public class UsersController : VersionNeutralApiController
     }
 
     [HttpGet("resend-email-confirm")]
-    [MustHavePermission(FSHAction.Update, FSHResource.Users)]
     [OpenApiOperation("Resend email confirmation code.", "")]
     public Task<string> ResendEmailConfirmAsync()
     {

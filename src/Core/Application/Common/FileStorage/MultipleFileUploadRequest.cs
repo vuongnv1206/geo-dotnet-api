@@ -3,10 +3,10 @@
 namespace FSH.WebApi.Application.Common.FileStorage;
 public class MultipleFileUploadRequest : IRequest<string[]>
 {
-    //[AllowedExtensions(FileType.Document)]
-    //or
-    //[AllowedExtensions(".jpg", ".png")]
-    //[MaxFileSize(5 * 1024 * 1024)]
+    // [AllowedExtensions(FileType.Document)]
+    // or
+    // [AllowedExtensions(".jpg", ".png")]
+    // [MaxFileSize(5 * 1024 * 1024)]
     public IFormFile[] Files { get; set; }
 }
 

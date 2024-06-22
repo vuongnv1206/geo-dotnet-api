@@ -10,6 +10,7 @@ public class News : AuditableEntity, IAggregateRoot
     public virtual Classes Classes { get; private set; }
     [ForeignKey(nameof(ParentId))]
     public virtual News? NewsParent { get; private set; }
+    public virtual ICollection<NewsReaction> NewsReactions { get; private set; }
 
     public News(string content, bool isLockComment, Guid? parentId, Guid classesId)
     {

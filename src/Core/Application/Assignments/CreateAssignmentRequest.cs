@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Domain.Assignment;
+using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Common.Events;
 
 namespace FSH.WebApi.Application.Assignments;
@@ -13,6 +14,8 @@ public class CreateAssignmentRequest : IRequest<Guid>
     public Guid SubjectId { get; set; }
     public FileUploadRequest? Attachment { get; set; }
     //public List<FileUploadRequest>? Attachments { get; set; }
+
+    public List<Guid>? ClassIds { get; set; }
 }
 
 public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRequest, Guid>
@@ -28,11 +31,17 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
         string productAttachmentPath = await _file.UploadAsync<Assignment>(request.Attachment, FileType.Image, cancellationToken);
 
         var assignment = new Assignment(request.Name, request.StartTime, request.EndTime, productAttachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
+        if (request.ClassIds != null)
+        {
 
-        // Add Domain Events to be raised after the commit
-        assignment.DomainEvents.Add(EntityCreatedEvent.WithEntity(assignment));
+            foreach (var classId in request.ClassIds)
+            {
+                var assignmentClass = new AssignmentClass(assignment.Id, classId);
+                assignment.AssignmentClasses.Add(assignmentClass);
+            }
 
-        await _repository.AddAsync(assignment, cancellationToken);
+            await _repository.AddAsync(assignment, cancellationToken);
+        }
 
         return assignment.Id;
     }

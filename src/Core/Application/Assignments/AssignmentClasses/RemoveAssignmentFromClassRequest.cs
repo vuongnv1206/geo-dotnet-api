@@ -51,7 +51,7 @@ public class RemoveAssignmentFromClassRequestHandler : IRequestHandler<RemoveAss
 
         if (classes.AssignmentClasses.Any())
         {
-            var assignmentInClass = classes.AssignmentClasses?.FirstOrDefault(x => x.AssignmentId == request.AssignmentId);
+            var assignmentInClass = classes.AssignmentClasses?.FirstOrDefault(x => x.AssignmentId == request.AssignmentId && x.ClassesId == request.ClassesdId);
 
             if (assignmentInClass is null)
             {

@@ -1,11 +1,12 @@
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.GroupClasses.Dto;
+using FSH.WebApi.Application.Class.New.Spec;
 using FSH.WebApi.Domain.Class;
 using MapsterMapper;
 
 namespace FSH.WebApi.Application.Class.GroupClasses;
 
-public class SearchGroupClassRequest : IRequest<List<GroupClassDto>>
+public class SearchGroupClassRequest : PaginationFilter,IRequest<PaginationResponse<GroupClassDto>>
 {
     public string? Name { get; set; }
 }
@@ -33,7 +34,7 @@ public class GroupClassByUserSpec : Specification<GroupClass, GroupClassDto>
     }
 }
 
-public class SearchGroupClassesRequestHandler : IRequestHandler<SearchGroupClassRequest, List<GroupClassDto>>
+public class SearchGroupClassesRequestHandler : IRequestHandler<SearchGroupClassRequest, PaginationResponse<GroupClassDto>>
 {
     private readonly IReadRepository<GroupClass> _repository;
     private readonly IStringLocalizer _t;
@@ -43,16 +44,10 @@ public class SearchGroupClassesRequestHandler : IRequestHandler<SearchGroupClass
                                             IStringLocalizer<SearchClassesRequestHandler> localizer) =>
         (_repository, _currentUser, _t) = (repository, currentUser, localizer);
 
-    public async Task<List<GroupClassDto>> Handle(SearchGroupClassRequest request, CancellationToken cancellationToken)
+    public async Task<PaginationResponse<GroupClassDto>> Handle(SearchGroupClassRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
-        if (!string.IsNullOrEmpty(request.Name))
-        {
-            return await _repository.ListAsync((ISpecification<GroupClass, GroupClassDto>)new GroupClassBySearchRequestSpec(request.Name, userId), cancellationToken);
-        }
-        else
-        {
-            return await _repository.ListAsync((ISpecification<GroupClass, GroupClassDto>)new GroupClassByUserSpec(userId), cancellationToken);
-        }
+        var spec = new GroupClassBySearchRequestSpec(request.Name, userId);
+        return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
     }
 }
