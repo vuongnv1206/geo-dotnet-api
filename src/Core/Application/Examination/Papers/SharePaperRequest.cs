@@ -62,6 +62,7 @@ public class SharePaperRequestHandler : IRequestHandler<SharePaperRequest, Guid>
             var existingPermission = paper.PaperPermissions.FirstOrDefault(pp => pp.UserId == userId);
             if (existingPermission != null)
             {
+                existingPermission.SetPermission(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
                 permissionsToUpdate.Add(existingPermission);
             }
             else

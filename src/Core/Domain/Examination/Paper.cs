@@ -178,7 +178,7 @@ public class Paper : AuditableEntity, IAggregateRoot
 
         foreach (var permission in permissions)
         {
-            var existingPermission = PaperPermissions.FirstOrDefault(a => a.Id == permission.Id);
+            var existingPermission = PaperPermissions.FirstOrDefault(a => a.Id == permission.Id && a.Id != Guid.Empty);
             if (existingPermission != null)
             {
                 existingPermission.SetPermission(permission.CanView,permission.CanAdd,permission.CanUpdate,permission.CanDelete,permission.CanShare);

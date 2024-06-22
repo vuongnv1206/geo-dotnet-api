@@ -13,4 +13,5 @@ public class PaperFolderDto : IDto
     public DateTime? LastModifiedOn { get; set; }
     public List<PaperFolderDto>? PaperFolderChildrens { get; set; }
     public List<PaperFolderParentDto>? Parents { get; set; }
+    public List<PaperFolderPermissionDto> PaperFolderPermissions { get; set; }
 }

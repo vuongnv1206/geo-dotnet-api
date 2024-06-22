@@ -38,4 +38,5 @@ public class PaperDto : IDto
     public PaperFolderDto PaperFolder { get; set; }
     public List<QuestionDto> Questions { get; set; }
     public List<PaperAccessDto> PaperAccesses { get; set; }
+    public List<PaperPermissionDto> PaperPermissions { get; set; }
 }

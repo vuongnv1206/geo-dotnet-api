@@ -10,6 +10,7 @@ internal class AccessiblePapersSpec : EntitiesByPaginationFilterSpec<Paper>
         : base(request)
     {
         Query
+             .Include(x => x.PaperPermissions)
             .Include(x => x.PaperLabel)
             .Include(x => x.PaperFolder).ThenInclude(x => x.PaperFolderParent)
             .OrderBy(x => x.CreatedOn, !request.HasOrderBy());
