@@ -112,6 +112,29 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
         if (CreatedBy == userId) return true;
         return PaperFolderPermissions.Any(x => x.UserId == userId && x.CanView);
     }
+    public bool CanShare(Guid userId)
+    {
+        if (CreatedBy == userId) return true;
+        return PaperFolderPermissions.Any(x => x.UserId == userId && x.CanShare);
+    }
+
+    public void UpdatePermissions(List<PaperFolderPermission> permissions)
+    {
+        PaperFolderPermissions.RemoveAll(a => !permissions.Any(x => x.Id == a.Id));
+
+        foreach (var permission in permissions)
+        {
+            var existingPermission = PaperFolderPermissions.FirstOrDefault(a => a.Id == permission.Id && a.Id != Guid.Empty);
+            if (existingPermission != null)
+            {
+                existingPermission.SetPermissions(permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete, permission.CanShare);
+            }
+            else
+            {
+                AddPermission(permission);
+            }
+        }
+    }
 
     public void CopyPermissions(PaperFolder? paperFolderParent)
     {
@@ -119,8 +142,8 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
 
         foreach (var permission in paperFolderParent.PaperFolderPermissions)
         {
-            AddPermission(new PaperFolderPermission(permission.UserId, Id, permission.GroupTeacherId, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete));
-            AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true));
+            AddPermission(new PaperFolderPermission(permission.UserId, Id, permission.GroupTeacherId, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete,permission.CanShare));
+            AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true,true));
         }
     }
 }

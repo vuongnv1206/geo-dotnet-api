@@ -761,68 +761,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Notification.Notification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRead")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<Guid>("LastModifiedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(2048)
-                        .HasColumnType("character varying(2048)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Notification", "Notification");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Answer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1685,7 +1623,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Assignment.AssignmentClass", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Assignment.Assignment", "Assignment")
-                        .WithMany("AssignmentClasses")
+                        .WithMany()
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1730,7 +1668,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Class.NewsReaction", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.News", "News")
-                        .WithMany("NewsReactions")
+                        .WithMany()
                         .HasForeignKey("NewsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2007,11 +1945,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Assignment.Assignment", b =>
-                {
-                    b.Navigation("AssignmentClasses");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Classes", b =>
                 {
                     b.Navigation("AssignmentClasses");
@@ -2022,11 +1955,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Class.GroupClass", b =>
                 {
                     b.Navigation("Classes");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
-                {
-                    b.Navigation("NewsReactions");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
