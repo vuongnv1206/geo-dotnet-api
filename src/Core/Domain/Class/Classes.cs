@@ -34,6 +34,11 @@ public class Classes : AuditableEntity, IAggregateRoot
         GroupClassId = newGroupClassId;
     }
 
+    public void AddUserToClass(UserClass userClass)
+    {
+        UserClasses.Add(userClass); 
+    }
+
     public void AssignAssignmentToClass(AssignmentClass assignmentClass)
     {
         AssignmentClasses.Add(assignmentClass);
