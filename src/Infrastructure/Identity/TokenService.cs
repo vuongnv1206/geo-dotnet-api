@@ -64,7 +64,7 @@ internal class TokenService : ITokenService
             || await _userManager.FindByEmailAsync(request.Email.Trim().Normalize()) is not { } user
             || !await _userManager.CheckPasswordAsync(user, request.Password))
         {
-            throw new UnauthorizedException(_t["Authentication Failed."]);
+            throw new UnauthorizedException(_t["Authentication Failed, Invalid Email or Password."]);
         }
 
         if (!user.IsActive)
@@ -100,7 +100,7 @@ internal class TokenService : ITokenService
         var user = await _userManager.FindByEmailAsync(userEmail!);
         if (user is null)
         {
-            throw new UnauthorizedException(_t["Authentication Failed."]);
+            throw new UnauthorizedException(_t["Authentication Failed, user not found."]);
         }
 
         if (user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)

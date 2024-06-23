@@ -11,9 +11,11 @@ public class UpdateAssignmentRequest : IRequest<Guid>
     public string? Content { get; set; }
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }
-    public DefaultIdType SubjectId { get; set; }
+    public DefaultIdType? SubjectId { get; set; }
     public bool DeleteCurrentAttachment { get; set; } = false;
     public FileUploadRequest? Attachment { get; set; }
+    public List<Guid>? ClassIds { get; set; }
+
 }
 
 public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRequest, Guid>
@@ -27,7 +29,7 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
 
     public async Task<Guid> Handle(UpdateAssignmentRequest request, CancellationToken cancellationToken)
     {
-        var assignment = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var assignment = await _repository.FirstOrDefaultAsync(new AssignmentByIdSpec(request.Id), cancellationToken);
 
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
 
@@ -48,10 +50,23 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             ? await _file.UploadAsync<Assignment>(request.Attachment, FileType.Image, cancellationToken)
             : null;
 
-        var updatedAssignment = assignment.Update(request.Name, request.StartTime, request.EndTime, assignmentAttachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
+        var updatedAssignment = assignment.Update(
+            request.Name,
+            request.StartTime,
+            request.EndTime,
+            assignmentAttachmentPath,
+            request.Content,
+            request.CanViewResult,
+            request.RequireLoginToSubmit,
+            request.SubjectId
+            );
 
-        // Add Domain Events to be raised after the commit
-        assignment.DomainEvents.Add(EntityUpdatedEvent.WithEntity(assignment));
+        if (request.ClassIds != null)
+        {
+            updatedAssignment.AssignmentClasses.Clear();
+            updatedAssignment.UpdateAssignmentFromClass(request.ClassIds.Select(x => new AssignmentClass(updatedAssignment.Id, x)).ToList());
+
+        }
 
         await _repository.UpdateAsync(updatedAssignment, cancellationToken);
 

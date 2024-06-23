@@ -1,4 +1,4 @@
-﻿using FSH.WebApi.Domain.Assignment;
+using FSH.WebApi.Domain.Assignment;
 
 namespace FSH.WebApi.Domain.Class;
 public class Classes : AuditableEntity, IAggregateRoot
@@ -44,14 +44,13 @@ public class Classes : AuditableEntity, IAggregateRoot
         AssignmentClasses.Add(assignmentClass);
     }
 
-    public void RemoveAssignmentFromClass(AssignmentClass assignmentClass)
-    {
-        AssignmentClasses.Remove(assignmentClass);
-    }
-
     public bool CanUpdate(Guid userId)
     {
         return CreatedBy == userId;
     }
 
+    public void RemoveAssignmentFromClass(AssignmentClass assignmentClass)
+    {
+        AssignmentClasses.Remove(assignmentClass);
+    }
 }

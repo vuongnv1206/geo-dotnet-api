@@ -38,6 +38,7 @@ public static class FSHResource
     public const string NewsReaction = nameof(NewsReaction);
     public const string UserClasses = nameof(UserClasses);
     public const string Files = nameof(Files);
+    public const string Notifications = nameof(Notifications);
 }
 
 public static class FSHPermissions
@@ -151,6 +152,9 @@ public static class FSHPermissions
 
         // FILES
         new("Upload files", FSHAction.Upload, FSHResource.Files, IsRoot: true),
+
+        // NOTIFICATIONS
+        new("Send Notifications", FSHAction.Create, FSHResource.Notifications, IsRoot: true),
 
     };
 

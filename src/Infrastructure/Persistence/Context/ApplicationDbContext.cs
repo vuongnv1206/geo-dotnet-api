@@ -4,6 +4,7 @@ using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Notification;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Subjects;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -46,6 +47,9 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<PaperQuestion> PaperQuestions { get; set; }
     public DbSet<SubmitPaper> SubmitPapers { get; set; }
     public DbSet<SubmitPaperDetail> SubmitPaperDetails { get; set; }
+    public DbSet<PaperAccess> PaperAccesses { get; set; }
+    public DbSet<PaperPermission> PaperPermissions { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
