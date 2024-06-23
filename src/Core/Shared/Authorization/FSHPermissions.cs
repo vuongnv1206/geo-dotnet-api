@@ -66,23 +66,9 @@ public static class FSHPermissions
         new("View RoleClaims", FSHAction.View, FSHResource.RoleClaims),
         new("Update RoleClaims", FSHAction.Update, FSHResource.RoleClaims),
 
-        new("View Products", FSHAction.View, FSHResource.Products, IsStudent: true),
-        new("Search Products", FSHAction.Search, FSHResource.Products, IsStudent: true),
-        new("Create Products", FSHAction.Create, FSHResource.Products),
-        new("Update Products", FSHAction.Update, FSHResource.Products),
-        new("Delete Products", FSHAction.Delete, FSHResource.Products),
-        new("Export Products", FSHAction.Export, FSHResource.Products),
-        new("View Brands", FSHAction.View, FSHResource.Brands, IsStudent: true),
-        new("Search Brands", FSHAction.Search, FSHResource.Brands, IsStudent: true),
-        new("Create Brands", FSHAction.Create, FSHResource.Brands),
-        new("Update Brands", FSHAction.Update, FSHResource.Brands),
-        new("Delete Brands", FSHAction.Delete, FSHResource.Brands),
-        new("Generate Brands", FSHAction.Generate, FSHResource.Brands),
-        new("Clean Brands", FSHAction.Clean, FSHResource.Brands),
-
         // TEACHERS
-        new("View GroupTeachers", FSHAction.View, FSHResource.GroupTeachers, IsStudent: true),
-        new("Search GroupTeachers", FSHAction.Search, FSHResource.GroupTeachers, IsStudent: true),
+        new("View GroupTeachers", FSHAction.View, FSHResource.GroupTeachers),
+        new("Search GroupTeachers", FSHAction.Search, FSHResource.GroupTeachers),
         new("Create GroupTeachers", FSHAction.Create, FSHResource.GroupTeachers),
         new("Update GroupTeachers", FSHAction.Update, FSHResource.GroupTeachers),
         new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
@@ -102,8 +88,8 @@ public static class FSHPermissions
         new("Export Assignments", FSHAction.Export, FSHResource.Assignments),
 
         // SUBJECTS
-        new("View Subjects", FSHAction.View, FSHResource.Subjects, IsStudent: true),
-        new("Search Subjects", FSHAction.Search, FSHResource.Subjects, IsStudent: true),
+        new("View Subjects", FSHAction.View, FSHResource.Subjects),
+        new("Search Subjects", FSHAction.Search, FSHResource.Subjects),
         new("Create Subjects", FSHAction.Create, FSHResource.Subjects),
         new("Update Subjects", FSHAction.Update, FSHResource.Subjects),
         new("Delete Subjects", FSHAction.Delete, FSHResource.Subjects),
