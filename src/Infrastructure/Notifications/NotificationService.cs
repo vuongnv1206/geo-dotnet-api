@@ -29,18 +29,18 @@ public class NotificationService : INotificationService
 
     public async Task SendNotificationToAllUsers(BasicNotification notification, DateTime? sendTime, CancellationToken cancellationToken)
     {
-        if (sendTime != null)
+        if (sendTime != null && sendTime > DateTime.Now)
         {
             TimeSpan timeSpan = sendTime.Value - DateTime.Now;
             _jobService.Schedule(() => ExcuteSendNotificationToAllUsers(notification, cancellationToken), timeSpan);
         }
         else
         {
-            await ExcuteSendNotificationToAllUsers(notification, cancellationToken);
+            _jobService.Enqueue(() => ExcuteSendNotificationToAllUsers(notification, cancellationToken));
         }
     }
 
-    private async Task ExcuteSendNotificationToAllUsers(BasicNotification notification, CancellationToken cancellationToken)
+    public async Task ExcuteSendNotificationToAllUsers(BasicNotification notification, CancellationToken cancellationToken)
     {
         List<string> userIds = await _userManager.Users.Select(u => u.Id).ToListAsync(cancellationToken);
         await ExcuteSendNotificationToUsers(userIds, notification, cancellationToken);
@@ -48,18 +48,18 @@ public class NotificationService : INotificationService
 
     public async Task SendNotificationToUser(string userId, BasicNotification notification, DateTime? sendTime, CancellationToken cancellationToken)
     {
-        if (sendTime != null)
+        if (sendTime != null && sendTime > DateTime.Now)
         {
             TimeSpan timeSpan = sendTime.Value - DateTime.Now;
             _jobService.Schedule(() => ExcuteSendNotificationToUser(userId, notification, cancellationToken), timeSpan);
         }
         else
         {
-            await ExcuteSendNotificationToUser(userId, notification, cancellationToken);
+            _jobService.Enqueue(() => ExcuteSendNotificationToUser(userId, notification, cancellationToken));
         }
     }
 
-    private async Task ExcuteSendNotificationToUser(string userId, BasicNotification notification, CancellationToken cancellationToken)
+    public async Task ExcuteSendNotificationToUser(string userId, BasicNotification notification, CancellationToken cancellationToken)
     {
         Notification addNoti = new Notification(
              Guid.Parse(userId),
@@ -73,18 +73,18 @@ public class NotificationService : INotificationService
 
     public async Task SendNotificationToUsers(List<string> userIds, BasicNotification notification, DateTime? sendTime, CancellationToken cancellationToken)
     {
-        if (sendTime != null)
+        if (sendTime != null && sendTime > DateTime.Now)
         {
             TimeSpan timeSpan = sendTime.Value - DateTime.Now;
             _jobService.Schedule(() => ExcuteSendNotificationToUsers(userIds, notification, cancellationToken), timeSpan);
         }
         else
         {
-            await ExcuteSendNotificationToUsers(userIds, notification, cancellationToken);
+            _jobService.Enqueue(() => ExcuteSendNotificationToUsers(userIds, notification, cancellationToken));
         }
     }
 
-    private async Task ExcuteSendNotificationToUsers(List<string> userIds, BasicNotification notification, CancellationToken cancellationToken)
+    public async Task ExcuteSendNotificationToUsers(List<string> userIds, BasicNotification notification, CancellationToken cancellationToken)
     {
         List<Notification> addNotis = new List<Notification>();
         foreach (string userId in userIds)
