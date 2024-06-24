@@ -42,4 +42,16 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
             answer.AnswerRaw = submitAnswer.AnswerRaw;
         }
     }
+
+    public void MarkAnswer(SubmitPaperDetail submitPaperDetail)
+    {
+        var answer = SubmitPaperDetails
+            .FirstOrDefault(x => x.SubmitPaperId == submitPaperDetail.SubmitPaperId
+                                && x.QuestionId == submitPaperDetail.QuestionId);
+
+        if (answer == null) return;
+        else answer.Mark = submitPaperDetail.Mark;
+    }
+
+
 }

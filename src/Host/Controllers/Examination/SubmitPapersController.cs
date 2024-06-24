@@ -1,4 +1,4 @@
-﻿using FSH.WebApi.Application.Examination.Papers;
+﻿
 using FSH.WebApi.Application.Examination.Papers.ByStudents;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
@@ -52,5 +52,12 @@ public class SubmitPapersController : VersionedApiController
         var result = await Mediator.Send(request);
         return Ok(result);
     }
+
+    [HttpPost("mark-answer")]
+    [OpenApiOperation("Mark answer")]
+    public async Task<Guid> MarkAnswer(MarkAnswerRequest request)
+    {
+        return await Mediator.Send(request);
+    }   
 
 }
