@@ -51,20 +51,22 @@ public class MarkAnswerRequestHandler : IRequestHandler<MarkAnswerRequest, Guid>
         if (submitPaper is null)
             throw new NotFoundException(_t["Submit Paper {0} Not Found.", request.SubmitPaperId]);
 
-            var question = await _questionRepo.GetByIdAsync(request.QuestionId);
-            if (question is null)
-                throw new NotFoundException(_t["Question {0} Not Found.", request.QuestionId]);
+        var question = await _questionRepo.GetByIdAsync(request.QuestionId);
+        if (question is null)
+            throw new NotFoundException(_t["Question {0} Not Found.", request.QuestionId]);
         if (question.QuestionType != Domain.Question.Enums.QuestionType.Writing)
             throw new ConflictException(_t["Cannot mark this question. Question ID: {0} is not of type 'Writing'.", request.QuestionId]);
         var answer = submitPaper.SubmitPaperDetails
                 .FirstOrDefault(x => x.SubmitPaperId == request.SubmitPaperId
                                                    && x.QuestionId == request.QuestionId);
+        if (answer is null)
+            throw new NotFoundException(_t["Answer for this question not found."]);
 
-            submitPaper.MarkAnswer(new SubmitPaperDetail(submitPaper.Id, question.Id, request.Mark));
+        submitPaper.MarkAnswer(answer, request.Mark);
 
-            await _submitPaperRepo.UpdateAsync(submitPaper);
-            return submitPaper.Id;
-        
+        await _submitPaperRepo.UpdateAsync(submitPaper);
+        return submitPaper.Id;
+
     }
 }
 

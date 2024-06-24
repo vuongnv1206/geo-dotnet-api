@@ -17,10 +17,4 @@ public class SubmitPaperDetail : AuditableEntity, IAggregateRoot
         AnswerRaw = answerRaw;
     }
 
-    public SubmitPaperDetail(Guid submitPaperId, Guid questionId, float? mark)
-    {
-        SubmitPaperId = submitPaperId;
-        QuestionId = questionId;
-        Mark = mark;
-    }
 }

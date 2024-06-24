@@ -43,14 +43,14 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         }
     }
 
-    public void MarkAnswer(SubmitPaperDetail submitPaperDetail)
+    public void MarkAnswer(SubmitPaperDetail submitPaperDetail,float mark)
     {
         var answer = SubmitPaperDetails
             .FirstOrDefault(x => x.SubmitPaperId == submitPaperDetail.SubmitPaperId
                                 && x.QuestionId == submitPaperDetail.QuestionId);
 
         if (answer == null) return;
-        else answer.Mark = submitPaperDetail.Mark;
+        else answer.Mark = mark;
     }
 
 
