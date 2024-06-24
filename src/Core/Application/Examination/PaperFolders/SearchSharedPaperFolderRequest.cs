@@ -5,12 +5,13 @@ using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class SearchSharedPaperFolderRequest : PaginationFilter, IRequest<PaginationResponse<PaperFolderDto>>
+public class SearchSharedPaperFolderRequest : IRequest<List<PaperFolderDto>>
 {
     public Guid? ParentId { get; set; }
+    public string? Name { get; set; }
 }
 
-public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchSharedPaperFolderRequest, PaginationResponse<PaperFolderDto>>
+public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchSharedPaperFolderRequest, List<PaperFolderDto>>
 {
     private readonly IReadRepository<PaperFolder> _paperFolderRepo;
     private readonly IReadRepository<PaperFolderPermission> _paperFolderPermissionRepo;
@@ -25,7 +26,7 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
         _paperFolderPermissionRepo = paperFolderPermissionRepo;
     }
 
-    public async Task<PaginationResponse<PaperFolderDto>> Handle(SearchSharedPaperFolderRequest request, CancellationToken cancellationToken)
+    public async Task<List<PaperFolderDto>> Handle(SearchSharedPaperFolderRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
 
@@ -34,7 +35,7 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
 
         var data = new List<PaperFolder>();
 
-        if (!string.IsNullOrEmpty(request.Keyword))
+        if (!string.IsNullOrEmpty(request.Name))
         {
             // Find all parent IDs
             var parentIds = new List<Guid>();
@@ -56,7 +57,7 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
         {
             var spec = new AccessibleFoldersTreeSpec(accessibleFolderIds,request);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
-            data = data.Where(x => x.ParentId == request.ParentId).ToList();
+           
         }
 
         var dtos = new List<PaperFolderDto>();
@@ -68,7 +69,7 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
             dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
             dtos.Add(dto);
         }
-        return new PaginationResponse<PaperFolderDto>(dtos, dtos.Count(), request.PageNumber, request.PageSize);
+        return dtos;
     }
 }
   
