@@ -45,7 +45,7 @@ public class PaperFoldersController : VersionedApiController
 
     [HttpPost("shared")]
     [OpenApiOperation("Search shared paper folder using available folder", "")]
-    public Task<PaginationResponse<PaperFolderDto>> SearchShared(SearchSharedPaperFolderRequest request)
+    public Task<List<PaperFolderDto>> SearchShared(SearchSharedPaperFolderRequest request)
     {
         return Mediator.Send(request);
     }

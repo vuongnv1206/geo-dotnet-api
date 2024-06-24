@@ -1,18 +1,17 @@
 ﻿
-
-using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers.Specs;
 using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.Papers;
-public class SearchSharedPaperRequest : PaginationFilter, IRequest<PaginationResponse<PaperInListDto>>
+public class SearchSharedPaperRequest : IRequest<List<PaperInListDto>>
 {
     public Guid? PaperFolderId { get; set; }
+    public string? Name { get; set; }
 }
 
-public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaperRequest, PaginationResponse<PaperInListDto>>
+public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaperRequest, List<PaperInListDto>>
 {
     private readonly IReadRepository<Paper> _repository;
     public readonly IReadRepository<PaperFolder> _paperFolderRepo;
@@ -28,7 +27,7 @@ public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaper
         _currentUser = currentUser;
     }
 
-    public async Task<PaginationResponse<PaperInListDto>> Handle(SearchSharedPaperRequest request, CancellationToken cancellationToken)
+    public async Task<List<PaperInListDto>> Handle(SearchSharedPaperRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
 
@@ -66,7 +65,7 @@ public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaper
             }
             dtos.Add(dto);
         }
-        return new PaginationResponse<PaperInListDto>(dtos, dtos.Count(), request.PageNumber, request.PageSize);
+        return dtos;
 
     }
 }
