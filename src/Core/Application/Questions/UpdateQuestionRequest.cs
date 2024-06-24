@@ -61,15 +61,31 @@ public class UpdateQuestionRequestHandler : IRequestHandler<UpdateQuestionReques
         var question = await _questionRepo.FirstOrDefaultAsync(new QuestionByIdSpec(request.Id));
         _ = question ?? throw new NotFoundException(_t["Question {0} Not Found.", request.Id]);
 
-        if (!question.CanUpdate(_currentUser.GetUserId()))
-            throw new ForbiddenException(_t["You can not edit."]);
+        //if (!question.CanUpdate(_currentUser.GetUserId()))
+        //    throw new ForbiddenException(_t["You can not edit."]);
 
         question.Update(request.Content, request.Image, request.Audio, request.QuestionFolderId, request.QuestionType, request.QuestionLabelId, request.ParentId);
+        question.RemoveAnswers();
+        await _questionRepo.UpdateAsync(question);
 
         if (request.Answers != null)
         {
-            var answers = request.Answers.Adapt<List<Answer>>();
-            question.UpdateAnswers(answers);
+            var newAnswers = request.Answers.Adapt<List<Answer>>();
+
+            // Kiểm tra và thêm các câu trả lời mới vào danh sách hiện tại
+            foreach (var newAnswer in newAnswers)
+            {
+                var existingAnswer = question.Answers.FirstOrDefault(a => a.Id == newAnswer.Id);
+                if (existingAnswer == null)
+                {
+                    question.AddAnswer(newAnswer);
+                }
+                else
+                {
+                    existingAnswer.Content = newAnswer.Content;
+                    existingAnswer.IsCorrect = newAnswer.IsCorrect;
+                }
+            }
         }
 
         await _questionRepo.UpdateAsync(question);

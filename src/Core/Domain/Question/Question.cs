@@ -61,19 +61,11 @@ public class Question : AuditableEntity, IAggregateRoot
 
     public void UpdateAnswers(List<Answer> answers)
     {
-        Answers.RemoveAll(a => !answers.Any(x => x.Id == a.Id));
-
+        Answers.Clear();
         foreach (var answer in answers)
         {
-            var existingAnswer = Answers.FirstOrDefault(a => a.Id == answer.Id);
-            if (existingAnswer != null)
-            {
-                existingAnswer.Update(answer.Content, answer.IsCorrect, answer.QuestionId.Value);
-            }
-            else
-            {
-                AddAnswer(answer);
-            }
+            var newAnswer = new Answer(answer.Content, answer.IsCorrect);
+            AddAnswer(newAnswer);
         }
     }
 
@@ -93,5 +85,10 @@ public class Question : AuditableEntity, IAggregateRoot
     public bool CanUpdate(Guid userId)
     {
         return CreatedBy == userId;
+    }
+
+    public void RemoveAnswers()
+    {
+        Answers.Clear();
     }
 }
