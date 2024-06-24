@@ -27,7 +27,7 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
     {
         var currentUserId = _currentUser.GetUserId();
         var data = new List<PaperFolder>();
-
+        var count = 0;
         if (!string.IsNullOrEmpty(request.Keyword))
         {
             // Find all parent IDs
@@ -42,13 +42,15 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
                 }
             }
             var spec = new PaperFolderBySearchSpec(parentIds,request,currentUserId);
+            count = await _paperFolderRepo.CountAsync(spec, cancellationToken);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
         }
         else
         {
             var spec = new PaperFolderTreeSpec(currentUserId,request);
+            count = await _paperFolderRepo.CountAsync(spec, cancellationToken);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
-            data = data.Where(x => x.ParentId == request.ParentId).ToList();
+           
 
         }
 
@@ -61,7 +63,7 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
             dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
             dtos.Add(dto);
         }
-        return new PaginationResponse<PaperFolderDto>(dtos, dtos.Count(), request.PageNumber, request.PageSize); 
+        return new PaginationResponse<PaperFolderDto>(dtos, count, request.PageNumber, request.PageSize); 
     }
 }
 

@@ -25,6 +25,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
 
         var data = new List<Paper>();
         var parentIds = new List<Guid>();
+        var count = 0;
         if (request.PaperFolderId.HasValue)
         {
             parentIds.Add(request.PaperFolderId.Value);
@@ -34,11 +35,13 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
                 parentFolder.ChildPaperFolderIds(null, parentIds);
             }
             var spec = new PaperBySearchSpec(parentIds, request);
+            count = await _repository.CountAsync(spec, cancellationToken);
             data = await _repository.ListAsync(spec, cancellationToken);
         }
         else
         {
             var spec = new PaperBySearchSpec(null, request);
+            count = await _repository.CountAsync(spec, cancellationToken);
             data = await _repository.ListAsync(spec, cancellationToken);
         }
 
@@ -53,7 +56,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
             }
             dtos.Add(dto);
         }
-        return new PaginationResponse<PaperInListDto>(dtos, dtos.Count(), request.PageNumber, request.PageSize);
+        return new PaginationResponse<PaperInListDto>(dtos, count, request.PageNumber, request.PageSize);
 
     }
 }

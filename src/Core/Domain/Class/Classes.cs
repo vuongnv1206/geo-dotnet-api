@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.TeacherGroup;
+using FSH.WebApi.Domain.Assignment;
 
 namespace FSH.WebApi.Domain.Class;
 public class Classes : AuditableEntity, IAggregateRoot
@@ -40,6 +41,16 @@ public class Classes : AuditableEntity, IAggregateRoot
     public void UpdateGroupClassId(Guid? newGroupClassId)
     {
         GroupClassId = newGroupClassId;
+    }
+
+    public void AddUserToClass(UserClass userClass)
+    {
+        UserClasses.Add(userClass); 
+    }
+
+    public void AssignAssignmentToClass(AssignmentClass assignmentClass)
+    {
+        AssignmentClasses.Add(assignmentClass);
     }
 
     public bool CanUpdate(Guid userId)
