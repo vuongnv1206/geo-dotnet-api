@@ -18,6 +18,12 @@ public class Answer : AuditableEntity, IAggregateRoot
         IsCorrect = isCorrect;
     }
 
+    public Answer(string? content, bool isCorrect)
+    {
+        Content = content;
+        IsCorrect = isCorrect;
+    }
+
     public void Update(string? content, bool isCorrect, Guid questionId)
     {
         Content = content;
