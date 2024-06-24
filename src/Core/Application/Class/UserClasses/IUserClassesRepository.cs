@@ -12,8 +12,6 @@ public interface IUserClassesRepository : IScopedService
 
     Task DeleteUserInClass(Guid userId, Guid classId);
 
-    Task UpdateUserInClasses(UserClass request);
-
     Task<List<UserClass>> GetUserInClasses(Guid classId);
 
     Task<UserClass> GetUserDetailInClasses(Guid userId, Guid classesId);

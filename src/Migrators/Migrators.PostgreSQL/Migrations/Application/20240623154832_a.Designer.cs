@@ -3,6 +3,7 @@ using System;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240623154832_a")]
+    partial class a
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -337,9 +340,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ClassesId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -387,8 +387,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassesId");
 
                     b.ToTable("UserStudent", "Classes");
 
@@ -1870,13 +1868,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("UserStudent");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserStudent", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Class.Classes", null)
-                        .WithMany("UserStudents")
-                        .HasForeignKey("ClassesId");
-                });
-
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Examination.PaperFolder", "PaperFolder")
@@ -2162,8 +2153,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("AssignmentClasses");
 
                     b.Navigation("UserClasses");
-
-                    b.Navigation("UserStudents");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.GroupClass", b =>

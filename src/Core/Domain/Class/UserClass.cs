@@ -9,30 +9,19 @@ using System.Xml.Linq;
 namespace FSH.WebApi.Domain.Class;
 public class UserClass
 {
-    public Guid ClassesId { get; private set; }
-    public Guid UserId { get; private set; }
-    public bool IsGender { get; private set; }
-    public string StudentCode { get; private set; }
-    public string Email { get; private set; }
-    public string PhoneNumber { get; private set; }
-    public virtual Classes Classes { get; private set; }
+    public Guid ClassesId { get; set; }
+    public Guid UserStudentId { get; set; }
+    public virtual UserStudent UserStudent { get;  set; }
+    public virtual Classes Classes { get; set; }
 
-    public UserClass(Guid classesId, Guid userId, bool isGender, string studentCode, string email, string phoneNumber)
+    public UserClass()
+    {
+    }
+
+    public UserClass(Guid classesId, Guid userStudentId)
     {
         ClassesId = classesId;
-        UserId = userId;
-        IsGender = isGender;
-        StudentCode = studentCode;
-        Email = email;
-        PhoneNumber = phoneNumber;
+        UserStudentId = userStudentId;
     }
 
-    public UserClass Update(bool? isGender, string? studentCode, string? email, string? phoneNumber)
-    {
-        if (email is not null && Email?.Equals(email) is not true) Email = email;
-        if (isGender.HasValue) IsGender = isGender.Value;
-        if (phoneNumber is not null && PhoneNumber?.Equals(phoneNumber) is not true) PhoneNumber = phoneNumber;
-        if (studentCode is not null && StudentCode?.Equals(studentCode) is not true) StudentCode = studentCode;
-        return this;
-    }
 }

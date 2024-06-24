@@ -50,6 +50,7 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<PaperAccess> PaperAccesses { get; set; }
     public DbSet<PaperPermission> PaperPermissions { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<UserStudent> UserStudents { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

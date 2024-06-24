@@ -52,10 +52,16 @@ public class UserClassConfig : IEntityTypeConfiguration<UserClass>
     public void Configure(EntityTypeBuilder<UserClass> builder)
     {
         builder.IsMultiTenant();
-        builder.HasKey(b => new { b.UserId, b.ClassesId });
-        builder.Property(b => b.Email).HasMaxLength(256);
-        builder.Property(b => b.StudentCode).HasMaxLength(256);
-        builder.Property(b => b.PhoneNumber).HasMaxLength(256);
+        builder.HasKey(b => new { b.UserStudentId, b.ClassesId });
         builder.ToTable("UserClasses", SchemaNames.Classes);
+    }
+}
+
+public class UserStudentConfig : IEntityTypeConfiguration<UserStudent>
+{
+    public void Configure(EntityTypeBuilder<UserStudent> builder)
+    {
+        builder.ToTable("UserStudent", SchemaNames.Classes).IsMultiTenant();
+
     }
 }

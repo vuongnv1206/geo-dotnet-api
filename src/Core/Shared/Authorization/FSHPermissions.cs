@@ -110,12 +110,12 @@ public static class FSHPermissions
 
         // CLASSES
         new("View Classes", FSHAction.View, FSHResource.Classes, IsStudent: true),
-        new("Search Classes", FSHAction.Search, FSHResource.Classes, IsStudent: true),
+        new("Search Classes", FSHAction.Search, FSHResource.Classes),
         new("Create Classes", FSHAction.Create, FSHResource.Classes),
         new("Update Classes", FSHAction.Update, FSHResource.Classes),
         new("Delete Classes", FSHAction.Delete, FSHResource.Classes),
         new("View GroupClasses", FSHAction.View, FSHResource.GroupClasses, IsStudent: true),
-        new("Search GroupClasses", FSHAction.Search, FSHResource.GroupClasses, IsStudent: true),
+        new("Search GroupClasses", FSHAction.Search, FSHResource.GroupClasses),
         new("Create GroupClasses", FSHAction.Create, FSHResource.GroupClasses),
         new("Update GroupClasses", FSHAction.Update, FSHResource.GroupClasses),
         new("Delete GroupClasses", FSHAction.Delete, FSHResource.GroupClasses),
@@ -145,7 +145,7 @@ public static class FSHPermissions
 
         // USER CLASSES
         new("View UserClasses", FSHAction.View, FSHResource.UserClasses, IsStudent: true),
-        new("Search UserClasses", FSHAction.Search, FSHResource.UserClasses, IsStudent: true),
+        new("Search UserClasses", FSHAction.Search, FSHResource.UserClasses),
         new("Create UserClasses", FSHAction.Create, FSHResource.UserClasses),
         new("Update UserClasses", FSHAction.Update, FSHResource.UserClasses),
         new("Delete UserClasses", FSHAction.Delete, FSHResource.UserClasses),
