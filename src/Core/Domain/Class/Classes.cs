@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Domain.Assignment;
+using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Domain.Class;
 public class Classes : AuditableEntity, IAggregateRoot
@@ -7,10 +8,17 @@ public class Classes : AuditableEntity, IAggregateRoot
     public string SchoolYear { get; private set; }
     public Guid OwnerId { get; private set; }
     public Guid? GroupClassId { get; private set; }
-    public virtual GroupClass GroupClass { get; private set; }
+    public virtual GroupClass? GroupClass { get; private set; }
 
-    public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
-    public virtual List<UserClass> UserClasses { get; set; } = new();
+    public virtual List<AssignmentClass>? AssignmentClasses { get; set; } = new();
+    public virtual List<UserClass>? UserClasses { get; set; } = new();
+    public virtual IEnumerable<TeacherPermissionInClass>? TeacherPermissionInClasses { get; set; }
+    public virtual IEnumerable<GroupPermissionInClass>? GroupPermissionInClasses { get; set; }
+
+    public Classes()
+    {
+
+    }
 
     public Classes(string? name, string? schoolYear, Guid ownerId, Guid? groupClassId)
     {
