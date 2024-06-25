@@ -28,6 +28,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 name: "GroupTeacher");
 
             migrationBuilder.EnsureSchema(
+                name: "Notification");
+
+            migrationBuilder.EnsureSchema(
                 name: "Examination");
 
             migrationBuilder.EnsureSchema(
@@ -111,6 +114,31 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GroupTeachers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notification",
+                schema: "Notification",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Label = table.Column<string>(type: "varchar(50)", nullable: false),
+                    Message = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
+                    Url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    IsRead = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notification", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -336,35 +364,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "GroupPermissionInClasses",
-                schema: "GroupTeacher",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    GroupTeacherId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PermissionType = table.Column<int>(type: "integer", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GroupPermissionInClasses", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_GroupPermissionInClasses_GroupTeachers_GroupTeacherId",
-                        column: x => x.GroupTeacherId,
-                        principalSchema: "GroupTeacher",
-                        principalTable: "GroupTeachers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PaperFolderPermissions",
                 schema: "Examination",
                 columns: table => new
@@ -377,6 +376,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     CanAdd = table.Column<bool>(type: "boolean", nullable: false),
                     CanUpdate = table.Column<bool>(type: "boolean", nullable: false),
                     CanDelete = table.Column<bool>(type: "boolean", nullable: false),
+                    CanShare = table.Column<bool>(type: "boolean", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -561,7 +561,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     ShowQuestionAnswer = table.Column<bool>(type: "boolean", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: true),
                     ExamCode = table.Column<string>(type: "text", nullable: false),
-                    NumberAttempt = table.Column<int>(type: "integer", nullable: false),
+                    NumberAttempt = table.Column<int>(type: "integer", nullable: true),
+                    ShareType = table.Column<int>(type: "integer", nullable: false),
                     PaperLabelId = table.Column<Guid>(type: "uuid", nullable: true),
                     PaperFolderId = table.Column<Guid>(type: "uuid", nullable: true),
                     SubjectId = table.Column<Guid>(type: "uuid", nullable: true),
@@ -617,35 +618,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TeacherInGroups_TeacherTeams_TeacherTeamId",
-                        column: x => x.TeacherTeamId,
-                        principalSchema: "GroupTeacher",
-                        principalTable: "TeacherTeams",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TeacherPermissionInClasses",
-                schema: "GroupTeacher",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TeacherTeamId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PermissionType = table.Column<int>(type: "integer", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TeacherPermissionInClasses", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TeacherPermissionInClasses_TeacherTeams_TeacherTeamId",
                         column: x => x.TeacherTeamId,
                         principalSchema: "GroupTeacher",
                         principalTable: "TeacherTeams",
@@ -753,6 +725,42 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "GroupPermissionInClasses",
+                schema: "GroupTeacher",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    GroupTeacherId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PermissionType = table.Column<int>(type: "integer", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupPermissionInClasses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GroupPermissionInClasses_Classes_ClassId",
+                        column: x => x.ClassId,
+                        principalSchema: "Classes",
+                        principalTable: "Classes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupPermissionInClasses_GroupTeachers_GroupTeacherId",
+                        column: x => x.GroupTeacherId,
+                        principalSchema: "GroupTeacher",
+                        principalTable: "GroupTeachers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "News",
                 schema: "Classes",
                 columns: table => new
@@ -789,16 +797,52 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "TeacherPermissionInClasses",
+                schema: "GroupTeacher",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TeacherTeamId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PermissionType = table.Column<int>(type: "integer", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeacherPermissionInClasses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TeacherPermissionInClasses_Classes_ClassId",
+                        column: x => x.ClassId,
+                        principalSchema: "Classes",
+                        principalTable: "Classes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TeacherPermissionInClasses_TeacherTeams_TeacherTeamId",
+                        column: x => x.TeacherTeamId,
+                        principalSchema: "GroupTeacher",
+                        principalTable: "TeacherTeams",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserClasses",
                 schema: "Classes",
                 columns: table => new
                 {
                     ClassesId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsGender = table.Column<bool>(type: "boolean", nullable: false),
-                    StudentCode = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    IsGender = table.Column<bool>(type: "boolean", nullable: true),
+                    StudentCode = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
@@ -822,7 +866,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Content = table.Column<string>(type: "text", nullable: true),
                     QuestionId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsCorrect = table.Column<bool>(type: "boolean", nullable: false),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -892,6 +935,46 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PaperAccesses_Papers_PaperId",
+                        column: x => x.PaperId,
+                        principalSchema: "Examination",
+                        principalTable: "Papers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaperPermissions",
+                schema: "Examination",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PaperId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GroupTeacherId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CanView = table.Column<bool>(type: "boolean", nullable: false),
+                    CanAdd = table.Column<bool>(type: "boolean", nullable: false),
+                    CanUpdate = table.Column<bool>(type: "boolean", nullable: false),
+                    CanDelete = table.Column<bool>(type: "boolean", nullable: false),
+                    CanShare = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaperPermissions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaperPermissions_GroupTeachers_GroupTeacherId",
+                        column: x => x.GroupTeacherId,
+                        principalSchema: "GroupTeacher",
+                        principalTable: "GroupTeachers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PaperPermissions_Papers_PaperId",
                         column: x => x.PaperId,
                         principalSchema: "Examination",
                         principalTable: "Papers",
@@ -1043,6 +1126,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "GroupClassId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GroupPermissionInClasses_ClassId",
+                schema: "GroupTeacher",
+                table: "GroupPermissionInClasses",
+                column: "ClassId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GroupPermissionInClasses_GroupTeacherId",
                 schema: "GroupTeacher",
                 table: "GroupPermissionInClasses",
@@ -1095,6 +1184,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Examination",
                 table: "PaperFolders",
                 column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaperPermissions_GroupTeacherId",
+                schema: "Examination",
+                table: "PaperPermissions",
+                column: "GroupTeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaperPermissions_PaperId",
+                schema: "Examination",
+                table: "PaperPermissions",
+                column: "PaperId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PaperQuestions_QuestionId",
@@ -1182,6 +1283,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "GroupTeacherId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TeacherPermissionInClasses_ClassId",
+                schema: "GroupTeacher",
+                table: "TeacherPermissionInClasses",
+                column: "ClassId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TeacherPermissionInClasses_TeacherTeamId",
                 schema: "GroupTeacher",
                 table: "TeacherPermissionInClasses",
@@ -1260,11 +1367,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Classes");
 
             migrationBuilder.DropTable(
+                name: "Notification",
+                schema: "Notification");
+
+            migrationBuilder.DropTable(
                 name: "PaperAccesses",
                 schema: "Examination");
 
             migrationBuilder.DropTable(
                 name: "PaperFolderPermissions",
+                schema: "Examination");
+
+            migrationBuilder.DropTable(
+                name: "PaperPermissions",
                 schema: "Examination");
 
             migrationBuilder.DropTable(

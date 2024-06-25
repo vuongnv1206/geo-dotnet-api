@@ -1228,6 +1228,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClassId");
+
                     b.HasIndex("GroupTeacherId");
 
                     b.ToTable("GroupPermissionInClasses", "GroupTeacher");
@@ -1337,6 +1339,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("TeacherTeamId");
 
@@ -1991,11 +1995,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupPermissionInClass", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classroom")
+                        .WithMany("GroupPermissionInClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
                         .WithMany("GroupPermissionInClasses")
                         .HasForeignKey("GroupTeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Classroom");
 
                     b.Navigation("GroupTeacher");
                 });
@@ -2021,11 +2033,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherPermissionInClass", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classroom")
+                        .WithMany("TeacherPermissionInClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FSH.WebApi.Domain.TeacherGroup.TeacherTeam", "TeacherTeam")
                         .WithMany("TeacherPermissionInClasses")
                         .HasForeignKey("TeacherTeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Classroom");
 
                     b.Navigation("TeacherTeam");
                 });
@@ -2089,6 +2109,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Classes", b =>
                 {
                     b.Navigation("AssignmentClasses");
+
+                    b.Navigation("GroupPermissionInClasses");
+
+                    b.Navigation("TeacherPermissionInClasses");
 
                     b.Navigation("UserClasses");
                 });
