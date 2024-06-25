@@ -16,4 +16,5 @@ public class SubmitPaperDetail : AuditableEntity, IAggregateRoot
         QuestionId = questionId;
         AnswerRaw = answerRaw;
     }
+
 }

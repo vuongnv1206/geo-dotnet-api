@@ -81,3 +81,12 @@ public class PaperAccessQuestionConfig : IEntityTypeConfiguration<PaperAccess>
         builder.ToTable("PaperAccesses", SchemaNames.Examination);
     }
 }
+
+public class PaperPermissionConfig : IEntityTypeConfiguration<PaperPermission>
+{
+    public void Configure(EntityTypeBuilder<PaperPermission> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("PaperPermissions", SchemaNames.Examination);
+    }
+}

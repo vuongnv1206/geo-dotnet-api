@@ -30,5 +30,7 @@ public class PaperInListDto : IDto
     public PaperLabelDto PaperLabel { get; set; }
     public PaperFolderDto PaperFolder { get; set; }
     public List<PaperFolderParentDto>? Parents { get; set; }
+    public List<PaperPermissionDto> PaperPermissions { get; set; }
+
 
 }

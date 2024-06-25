@@ -22,7 +22,7 @@ internal class NotificationConfig : IEntityTypeConfiguration<Notification>
             .HasMaxLength(2048);
 
         builder
-            .Property(b => b.Type)
+            .Property(b => b.Label)
             .HasConversion<string>()
             .HasColumnType("varchar(50)");
 

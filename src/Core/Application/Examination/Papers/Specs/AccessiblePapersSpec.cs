@@ -1,0 +1,36 @@
+﻿
+
+using FSH.WebApi.Domain.Examination;
+using System.Linq;
+
+namespace FSH.WebApi.Application.Examination.Papers.Specs;
+internal class AccessiblePapersSpec : Specification<Paper>
+{
+    public AccessiblePapersSpec(IEnumerable<Guid> parentIds, IEnumerable<Guid> accessiblePaperIds, SearchSharedPaperRequest request)
+    {
+        Query
+             .Include(x => x.PaperPermissions)
+            .Include(x => x.PaperLabel)
+            .Include(x => x.PaperFolder).ThenInclude(x => x.PaperFolderParent)
+            .OrderBy(x => x.CreatedOn);
+
+        if (parentIds != null && parentIds.Any())
+        {
+            var nullableIds = parentIds.Select(id => (Guid?)id).ToList();
+            Query.Where(x => nullableIds.Contains(x.PaperFolderId) || nullableIds.Contains(x.Id));
+        }
+        if (accessiblePaperIds != null && accessiblePaperIds.Any())
+        {
+            Query.Where(x => accessiblePaperIds.Contains(x.Id));
+        }
+        else
+        {
+            Query.Where(x => false);
+        }
+
+        if (!string.IsNullOrEmpty(request.Name))
+        {
+            Query.Where(x => x.ExamName.ToLower().Contains(request.Name.ToLower()));
+        }
+    }
+}

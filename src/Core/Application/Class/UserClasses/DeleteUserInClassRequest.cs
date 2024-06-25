@@ -23,16 +23,26 @@ public class DeleteUserInClassRequestHandler : IRequestHandler<DeleteUserInClass
 {
     private readonly IUserClassesRepository _userClassesRepository;
     private readonly IStringLocalizer _stringLocalizer;
+    public readonly IRepository<Classes> _classRepository;
     private readonly IUserService _userService;
 
     public DeleteUserInClassRequestHandler(IUserClassesRepository userClassesRepository, IUserService userService,
-                                           IStringLocalizer<DeleteUserInClassRequestHandler> stringLocalizer) =>
-        (_userClassesRepository, _userService, _stringLocalizer) = (userClassesRepository, userService, stringLocalizer);
+                                           IStringLocalizer<DeleteUserInClassRequestHandler> stringLocalizer, IRepository<Classes> classRepository) =>
+        (_userClassesRepository, _userService,_classRepository , _stringLocalizer) = (userClassesRepository, userService,classRepository ,stringLocalizer);
     public async Task<Guid> Handle(DeleteUserInClassRequest request, CancellationToken cancellationToken)
     {
 
-        var user = _userService.GetUserByIdAsync(request.UserId, cancellationToken);
+        string userIdString = request.UserId.ToString();
+
+        var classes = await _classRepository.GetByIdAsync(request.ClassesId);
+
+        var user = await _userService.GetAsync(userIdString, cancellationToken);
         if (user == null)
+        {
+            throw new NotFoundException(_stringLocalizer["User {0} Not Found.", request.UserId]);
+        }
+
+        if (classes == null)
         {
             throw new NotFoundException(_stringLocalizer["User {0} Not Found.", request.UserId]);
         }

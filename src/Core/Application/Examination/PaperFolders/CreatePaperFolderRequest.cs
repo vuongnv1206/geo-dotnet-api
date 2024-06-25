@@ -12,8 +12,12 @@ public class CreatePaperFolderRequestValidator : CustomValidator<CreatePaperFold
         RuleFor(p => p.Name)
             .NotEmpty()
             .MaximumLength(75)
-            .MustAsync(async (name, ct) => await repository.FirstOrDefaultAsync(new PaperFolderByNameSpec(name), ct) is null)
-                .WithMessage((_, name) => T["PaperFolder {0} already Exists.", name]);
+        .MustAsync(async (request, name, context, ct) =>
+        {
+            var parentId = request.ParentId;
+            return await repository.FirstOrDefaultAsync(new PaperFolderByNameSpec(name, parentId), ct) is null;
+        })
+            .WithMessage((request, name) => T["PaperFolder {0} already Exists.", name]);
 }
 
 public class CreatePaperFolderRequestHandler : IRequestHandler<CreatePaperFolderRequest, DefaultIdType>

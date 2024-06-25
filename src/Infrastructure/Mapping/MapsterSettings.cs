@@ -109,7 +109,8 @@ public class MapsterSettings
         TypeAdapterConfig<Assignment, AssignmentDetailsDto>.NewConfig()
                 .Map(dest => dest.ClassesId, src => src.AssignmentClasses.Select(pq => pq.ClassesId));
 
-
+        TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
+        TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();
 
     }
 }

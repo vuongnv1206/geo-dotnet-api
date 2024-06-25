@@ -43,6 +43,21 @@ public class CreateFolderRequestHandler : IRequestHandler<CreateFolderRequest, G
             {
                 throw new ForbiddenException(_t["You do not have permission to create a folder in this folder."]);
             }
+
+            // check if folder name is unique
+            bool isFolderNameUnique = await _repository.AnyAsync(new QuestionFolderByNameAndParentIdSpec(request.Name, request.ParentId), cancellationToken);
+            if (isFolderNameUnique)
+            {
+                throw new BadRequestException(_t["Folder with name {0} already exists in this folder.", request.Name]);
+            }
+        } else
+        {
+            // check if folder name is unique
+            bool isFolderNameUnique = await _repository.AnyAsync(new QuestionFolderByNameAndParentIdSpec(request.Name, null), cancellationToken);
+            if (isFolderNameUnique)
+            {
+                throw new BadRequestException(_t["Folder with name {0} already exists in root folder.", request.Name]);
+            }
         }
 
         var folder = new QuestionFolder(request.Name, request.ParentId);

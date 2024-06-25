@@ -11,6 +11,8 @@ public class BasicNotification : INotificationMessage
         Reminder
     }
 
-    public string? Message { get; set; }
+    public string Title { get; set; }
+    public string Message { get; set; }
     public LabelType Label { get; set; }
+    public string? Url { get; set; }
 }

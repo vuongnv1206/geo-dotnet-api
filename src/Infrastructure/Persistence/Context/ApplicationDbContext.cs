@@ -47,6 +47,8 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<PaperQuestion> PaperQuestions { get; set; }
     public DbSet<SubmitPaper> SubmitPapers { get; set; }
     public DbSet<SubmitPaperDetail> SubmitPaperDetails { get; set; }
+    public DbSet<PaperAccess> PaperAccesses { get; set; }
+    public DbSet<PaperPermission> PaperPermissions { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

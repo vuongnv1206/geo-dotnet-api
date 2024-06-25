@@ -9,22 +9,16 @@ using System.Xml.Linq;
 namespace FSH.WebApi.Domain.Class;
 public class UserClass
 {
-    public Guid ClassesId { get; private set; }
-    public Guid UserId { get; private set; }
-    public bool IsGender { get; private set; }
-    public string StudentCode { get; private set; }
-    public string Email { get; private set; }
-    public string PhoneNumber { get; private set; }
+    public DefaultIdType ClassesId { get;  set; }
+    public DefaultIdType UserId { get;  set; }
+    public bool? IsGender { get;  set; }
+    public string? StudentCode { get;  set; }
+    public string? Email { get;  set; }
+    public string? PhoneNumber { get;  set; }
     public virtual Classes Classes { get; private set; }
 
-    public UserClass(Guid classesId, Guid userId, bool isGender, string studentCode, string email, string phoneNumber)
+    public UserClass()
     {
-        ClassesId = classesId;
-        UserId = userId;
-        IsGender = isGender;
-        StudentCode = studentCode;
-        Email = email;
-        PhoneNumber = phoneNumber;
     }
 
     public UserClass Update(bool? isGender, string? studentCode, string? email, string? phoneNumber)

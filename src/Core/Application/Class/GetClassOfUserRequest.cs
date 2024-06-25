@@ -21,11 +21,9 @@ public class GetClassOfUserRequestHandler : IRequestHandler<GetClassOfUserReques
     {
 
         var userId = _currentUser.GetUserId();
-        List<ClassDto> classes;
 
-        classes = await _repository.ListAsync((ISpecification<Classes, ClassDto>)new ClassByUserSpec(userId), cancellationToken);
+        var classes = await _repository.ListAsync((ISpecification<Classes, ClassDto>)new ClassByUserSpec(userId), cancellationToken);
 
-        // Count the number of users for each class and update the DTO
         foreach (var classDto in classes)
         {
             var userCount = await _userClassesRepository.GetNumberUserOfClasses(classDto.Id);

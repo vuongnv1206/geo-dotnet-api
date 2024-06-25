@@ -12,8 +12,8 @@ public class PaperFoldersController : VersionedApiController
 
     [HttpPost("search")]
     [MustHavePermission(FSHAction.View, FSHResource.GroupTeachers)]
-    [OpenApiOperation("Search paper folder using available filder", "")]
-    public Task<List<PaperFolderDto>> SearchAsync(SearchPaperFolderRequest request)
+    [OpenApiOperation("Search paper folder using available folder", "")]
+    public Task<PaginationResponse<PaperFolderDto>> SearchAsync(SearchPaperFolderRequest request)
     {
         return Mediator.Send(request);
     }
@@ -43,6 +43,12 @@ public class PaperFoldersController : VersionedApiController
             : Ok(await Mediator.Send(request));
     }
 
+    [HttpPost("shared")]
+    [OpenApiOperation("Search shared paper folder using available folder", "")]
+    public Task<List<PaperFolderDto>> SearchShared(SearchSharedPaperFolderRequest request)
+    {
+        return Mediator.Send(request);
+    }
     [HttpGet("{id}/parents")]
     [OpenApiOperation("Get list parents.")]
     public async Task<ActionResult<List<PaperFolderDto>>> GetPaperFolderParents(Guid id)
