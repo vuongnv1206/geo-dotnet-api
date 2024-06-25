@@ -15,13 +15,11 @@ public class SearchClassesRequestHandler : IRequestHandler<SearchClassesRequest,
     private readonly IStringLocalizer _t;
     private readonly IUserClassesRepository _userClassesRepository;
     public SearchClassesRequestHandler(IReadRepository<Classes> repository, ICurrentUser currentUser,
-                                       IStringLocalizer<SearchClassesRequestHandler> localizer,
-                                       IUserClassesRepository userClassesRepository)
+                                       IStringLocalizer<SearchClassesRequestHandler> localizer)
     {
         _repository = repository;
         _currentUser = currentUser;
         _t = localizer;
-        _userClassesRepository = userClassesRepository;
     }
 
     public async Task<PaginationResponse<ClassDto>> Handle(SearchClassesRequest request, CancellationToken cancellationToken)
