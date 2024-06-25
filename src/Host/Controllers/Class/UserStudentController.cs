@@ -1,5 +1,3 @@
-﻿using FSH.WebApi.Application.Class.Dto;
-using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Application.Class.UserStudents;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
@@ -36,9 +34,9 @@ public class UserStudentController : VersionedApiController
             : Ok(await Mediator.Send(request));
     }
 
-    [HttpDelete("remove-user-in-class")]
+    [HttpDelete("remove-user-student")]
     [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
-    [OpenApiOperation("Delete user in class.", "")]
+    [OpenApiOperation("Delete a userStudent.", "")]
     public Task DeleteUserInClass(Guid id)
     {
         return Mediator.Send(new DeleteStudentRequest(id));
@@ -46,7 +44,7 @@ public class UserStudentController : VersionedApiController
 
     [HttpPut("student-in-class/{id:guid}")]
     [MustHavePermission(FSHAction.Update, FSHResource.Classes)]
-    [OpenApiOperation("Update information of teacher in team")]
+    [OpenApiOperation("Update information of student in class")]
     public async Task<ActionResult<Guid>> UpdateInformationStudentInClass(UpdateInformationStudentRequest request, Guid id)
     {
         return id != request.Id
