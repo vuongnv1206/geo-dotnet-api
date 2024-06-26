@@ -1,7 +1,9 @@
 ﻿
 
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
@@ -14,6 +16,7 @@ public class SearchSharedPaperFolderRequest : IRequest<List<PaperFolderDto>>
 public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchSharedPaperFolderRequest, List<PaperFolderDto>>
 {
     private readonly IReadRepository<PaperFolder> _paperFolderRepo;
+    private readonly IReadRepository<GroupTeacher> _groupTeacherRepo;
     private readonly IReadRepository<PaperFolderPermission> _paperFolderPermissionRepo;
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
@@ -30,7 +33,12 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
     {
         var currentUserId = _currentUser.GetUserId();
 
-        var accessibleFolders = await _paperFolderPermissionRepo.ListAsync(new PaperFolderPermissionByUserSpec(currentUserId), cancellationToken);
+        // Lấy các nhóm mà người dùng hiện tại thuộc về
+        var accessibleGroups = await _groupTeacherRepo.ListAsync(new GroupTeacherByUserSpec(currentUserId), cancellationToken);
+        var groupIds = accessibleGroups.Select(g => g.Id).ToList();
+
+
+        var accessibleFolders = await _paperFolderPermissionRepo.ListAsync(new PaperFolderPermissionByUserOrGroupSpec(currentUserId,groupIds), cancellationToken);
         var accessibleFolderIds = accessibleFolders.Select(p => p.FolderId).Distinct();
 
         var data = new List<PaperFolder>();

@@ -1,11 +1,7 @@
-﻿using FSH.WebApi.Application.Common.Models;
-using FSH.WebApi.Application.Examination.PaperFolders.Specs;
-using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
+﻿
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
-using Mapster;
-using MapsterMapper;
-using System.Threading;
+
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class SharePaperFolderRequest : IRequest<Guid>

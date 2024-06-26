@@ -1,7 +1,9 @@
 ﻿
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers.Specs;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.Papers;
@@ -15,14 +17,16 @@ public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaper
 {
     private readonly IReadRepository<Paper> _repository;
     public readonly IReadRepository<PaperFolder> _paperFolderRepo;
+    private readonly IReadRepository<GroupTeacher> _groupTeacherRepo;
     private readonly IReadRepository<PaperPermission> _paperPermissionRepo;
 
     private readonly ICurrentUser _currentUser;
 
-    public SearchSharedPaperRequestHandler(IReadRepository<Paper> repository, IReadRepository<PaperFolder> paperFolderRepo, IReadRepository<PaperPermission> paperPermissionRepo, ICurrentUser currentUser)
+    public SearchSharedPaperRequestHandler(IReadRepository<Paper> repository, IReadRepository<PaperFolder> paperFolderRepo, IReadRepository<GroupTeacher> groupTeacherRepo, IReadRepository<PaperPermission> paperPermissionRepo, ICurrentUser currentUser)
     {
         _repository = repository;
         _paperFolderRepo = paperFolderRepo;
+        _groupTeacherRepo = groupTeacherRepo;
         _paperPermissionRepo = paperPermissionRepo;
         _currentUser = currentUser;
     }
@@ -31,7 +35,11 @@ public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaper
     {
         var currentUserId = _currentUser.GetUserId();
 
-        var accessiblePapers = await _paperPermissionRepo.ListAsync(new PaperPermissionByUserSpec(currentUserId),cancellationToken);
+        // Lấy các nhóm mà người dùng hiện tại thuộc về
+        var accessibleGroups = await _groupTeacherRepo.ListAsync(new GroupTeacherByUserSpec(currentUserId), cancellationToken);
+        var groupIds = accessibleGroups.Select(g => g.Id).ToList();
+
+        var accessiblePapers = await _paperPermissionRepo.ListAsync(new PaperPermissionByUserOrGroupSpec(currentUserId,groupIds),cancellationToken);
         var accessiblePaperIds = accessiblePapers.Select(p => p.PaperId).Distinct();
 
 
