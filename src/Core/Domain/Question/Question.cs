@@ -91,4 +91,9 @@ public class Question : AuditableEntity, IAggregateRoot
     {
         Answers.Clear();
     }
+
+    public void AddPassage(Question newPassage)
+    {
+        QuestionPassages.Add(newPassage);
+    }
 }
