@@ -13,6 +13,11 @@ public class UserClass
     public Guid UserStudentId { get; set; }
     public virtual UserStudent UserStudent { get;  set; }
     public virtual Classes Classes { get; set; }
+    public DefaultIdType UserId { get; set; }
+    public bool? IsGender { get; set; }
+    public string? StudentCode { get; set; }
+    public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
 
     public UserClass()
     {

@@ -15,6 +15,8 @@ public class Classes : AuditableEntity, IAggregateRoot
     public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
     public virtual List<UserStudent> UserStudents { get; set; } = new();
     public virtual List<UserClass> UserClasses{ get; set; } = new();
+    public virtual IEnumerable<TeacherPermissionInClass>? TeacherPermissionInClasses { get; set; }
+    public virtual IEnumerable<GroupPermissionInClass>? GroupPermissionInClasses { get; set; }
 
 
     public Classes(string? name, string? schoolYear, Guid ownerId, Guid? groupClassId)

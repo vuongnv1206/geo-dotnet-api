@@ -11,14 +11,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserClasses;
-public class GetUserInClassRequest : IRequest<List<UserClassDto>>
+public class GetUserInClassRequest : IRequest<List<UserClass>>
 {
     public Guid ClassId { get; set; }
 
     public GetUserInClassRequest(Guid classId) => ClassId = classId;
 }
 
-public class GetUserInClassRequestHandler : IRequestHandler<GetUserInClassRequest, List<UserClassDto>>
+public class GetUserInClassRequestHandler : IRequestHandler<GetUserInClassRequest, List<UserClass>>
 {
     private readonly IUserClassesRepository _userClassesRepository;
     public GetUserInClassRequestHandler(IUserClassesRepository userClassesRepository)
@@ -26,15 +26,6 @@ public class GetUserInClassRequestHandler : IRequestHandler<GetUserInClassReques
         _userClassesRepository = userClassesRepository;
     }
 
-    public async Task<List<UserClassDto>> Handle(GetUserInClassRequest request, CancellationToken cancellationToken)
-    {
-        return default;
-        //var data = await (request.ClassId, cancellationToken);
-        //var data= await _repository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(request.Id), cancellationToken);
-
-        //if (groupTeacher == null)
-        //    throw new NotFoundException(_t["GroupTeacher{0} Not Found.", request.Id]);
-
-        //return groupTeacher.Adapt<GroupTeacherDto>();
-    }
+    public async Task<List<UserClass>> Handle(GetUserInClassRequest request, CancellationToken cancellationToken)
+            => await _userClassesRepository.GetUserInClasses(request.ClassId);
 }
