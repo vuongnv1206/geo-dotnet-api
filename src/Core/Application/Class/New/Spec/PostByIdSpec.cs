@@ -2,9 +2,9 @@
 using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.New.Spec;
-public class NewsByIdSpec : Specification<News, NewsDto>, ISingleResultSpecification
+public class PostByIdSpec : Specification<Post, PostDto>, ISingleResultSpecification
 {
-    public NewsByIdSpec(DefaultIdType id)
+    public PostByIdSpec(DefaultIdType id)
     {
         Query.Where(n => n.Id == id);
     }

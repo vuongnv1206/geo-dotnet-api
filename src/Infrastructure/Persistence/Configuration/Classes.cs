@@ -28,21 +28,21 @@ public class GroupClassConfig : IEntityTypeConfiguration<GroupClass>
     }
 }
 
-public class NewsConfig : IEntityTypeConfiguration<News>
+public class NewsConfig : IEntityTypeConfiguration<Post>
 {
-    public void Configure(EntityTypeBuilder<News> builder)
+    public void Configure(EntityTypeBuilder<Post> builder)
     {
-        builder.ToTable("News", SchemaNames.Classes).IsMultiTenant();
+        builder.ToTable("Post", SchemaNames.Classes).IsMultiTenant();
 
     }
 }
 
-public class NewsReactionConfig : IEntityTypeConfiguration<NewsReaction>
+public class NewsReactionConfig : IEntityTypeConfiguration<PostLike>
 {
-    public void Configure(EntityTypeBuilder<NewsReaction> builder)
+    public void Configure(EntityTypeBuilder<PostLike> builder)
     {
         builder.IsMultiTenant();
-        builder.HasKey(b => new { b.UserId, b.NewsId });
+        builder.HasKey(b => new { b.UserId, b.PostId });
         builder.ToTable("NewsReactions", SchemaNames.Classes);
     }
 }
@@ -65,3 +65,22 @@ public class UserStudentConfig : IEntityTypeConfiguration<UserStudent>
 
     }
 }
+
+public class CommentConfig : IEntityTypeConfiguration<Comment>
+{
+    public void Configure(EntityTypeBuilder<Comment> builder)
+    {
+        builder.ToTable("Comments", SchemaNames.Classes).IsMultiTenant();
+
+    }
+}
+
+public class LikeConfig : IEntityTypeConfiguration<CommentLikes>
+{
+    public void Configure(EntityTypeBuilder<CommentLikes> builder)
+    {
+        builder.HasKey(b => new { b.CommentId, b.UserId});
+        builder.ToTable("CommentLikes", SchemaNames.Classes).IsMultiTenant();
+    }
+}
+

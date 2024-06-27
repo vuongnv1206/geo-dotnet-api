@@ -2,7 +2,7 @@
 using FSH.WebApi.Domain.Common.Events;
 
 namespace FSH.WebApi.Application.Class.New;
-public class UpdateNewsRequest : IRequest<Guid>
+public class UpdatePostRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
     public required string Content { get; set; }
@@ -10,16 +10,16 @@ public class UpdateNewsRequest : IRequest<Guid>
     public Guid? ParentId { get; set; }
 }
 
-public class UpdateNewsRequestHandler : IRequestHandler<UpdateNewsRequest, Guid>
+public class UpdateNewsRequestHandler : IRequestHandler<UpdatePostRequest, Guid>
 {
 
-    public readonly IRepository<News> _repository;
+    public readonly IRepository<Post> _repository;
     private readonly IStringLocalizer _t;
 
-    public UpdateNewsRequestHandler(IRepository<News> repository, IStringLocalizer<UpdateNewsRequestHandler> localizer) =>
+    public UpdateNewsRequestHandler(IRepository<Post> repository, IStringLocalizer<UpdateNewsRequestHandler> localizer) =>
         (_repository, _t) = (repository, localizer);
 
-    public async Task<DefaultIdType> Handle(UpdateNewsRequest request, CancellationToken cancellationToken)
+    public async Task<DefaultIdType> Handle(UpdatePostRequest request, CancellationToken cancellationToken)
     {
         var news = await _repository.GetByIdAsync(request.Id, cancellationToken);
 

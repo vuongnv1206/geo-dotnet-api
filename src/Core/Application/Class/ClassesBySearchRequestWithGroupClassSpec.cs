@@ -15,6 +15,7 @@ public class ClassesBySearchRequestWithGroupClassSpec : EntitiesByPaginationFilt
             .Include(p => p.GroupClass).ThenInclude(c => c.Classes)
             .Include(a => a.AssignmentClasses).ThenInclude(a => a.Assignment)
             .Include(u => u.UserClasses).ThenInclude(x => x.UserStudent)
+            .Include(x => x.PaperAccesses).ThenInclude(x => x.Paper)
             .Where(p => p.CreatedBy == userId);
     }
 }

@@ -76,46 +76,45 @@ public class GroupClassSeeder : ICustomSeeder
                 c.CreatedBy = adminGuid;
             }
 
-
             _logger.LogInformation("Seeded Class.");
         }
 
-        if (!_db.News.Any())
+        if (!_db.Post.Any())
         {
-            _logger.LogInformation("Started to Seed News.");
+            _logger.LogInformation("Started to Seed Post.");
 
             var classes = await _db.Classes.ToListAsync(cancellationToken);
 
             foreach (var c in classes)
             {
-                await _db.News.AddAsync(new Domain.Class.News("The news in the class", true, null, c.Id));
+                await _db.Post.AddAsync(new Post("The post in the class", true, null, c.Id));
             }
 
             await _db.SaveChangesAsync(cancellationToken);
 
             // add creator for all news in the database
-            var news = await _db.News.ToListAsync(cancellationToken);
+            var news = await _db.Post.ToListAsync(cancellationToken);
             foreach (var c in news)
             {
                 c.CreatedBy = adminGuid;
             }
 
-            _logger.LogInformation("Seeded News.");
+            _logger.LogInformation("Seeded Post.");
         }
 
-        if (!_db.NewsReactions.Any())
+        if (!_db.PostLike.Any())
         {
-            _logger.LogInformation("Started to Seed NewsReaction.");
+            _logger.LogInformation("Started to Seed PostLike.");
 
-            var news = await _db.News.ToListAsync(cancellationToken);
+            var news = await _db.Post.ToListAsync(cancellationToken);
 
             foreach (var n in news)
             {
-                await _db.NewsReactions.AddAsync(new NewsReaction(adminGuid, n.Id));
+                await _db.PostLike.AddAsync(new PostLike(adminGuid, n.Id));
             }
 
             await _db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Seeded NewsReaction.");
+            _logger.LogInformation("Seeded PostLike.");
         }
     }
 }

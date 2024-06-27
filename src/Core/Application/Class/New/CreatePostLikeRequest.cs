@@ -1,29 +1,29 @@
 ﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.New;
-public class CreateNewsReactionsRequest : IRequest<Guid>
+public class CreatePostLikeRequest : IRequest<Guid>
 {
     public Guid UserId { get; set; }
     public Guid NewsId { get; set; }
 }
 
-public class CreateNewsReactionHandler : IRequestHandler<CreateNewsReactionsRequest, Guid>
+public class CreateNewsReactionHandler : IRequestHandler<CreatePostLikeRequest, Guid>
 {
     private readonly ICurrentUser _currentUser;
-    private readonly IRepository<News> _newRepository;
-    private readonly INewReactionRepository _newReactionRepository;
+    private readonly IRepository<Post> _newRepository;
+    private readonly IPostLikeRepository _newReactionRepository;
     private readonly IStringLocalizer _t;
 
     public CreateNewsReactionHandler(
         ICurrentUser currentUser,
-        IRepository<News> newRepository,
-        INewReactionRepository newReactionRepository,
+        IRepository<Post> newRepository,
+        IPostLikeRepository newReactionRepository,
         IStringLocalizer<CreateNewsReactionHandler> localizer)
     {
         (_currentUser, _newReactionRepository, _newRepository, _t) = (currentUser, newReactionRepository, newRepository, localizer);
     }
 
-    public async Task<DefaultIdType> Handle(CreateNewsReactionsRequest request, CancellationToken cancellationToken)
+    public async Task<DefaultIdType> Handle(CreatePostLikeRequest request, CancellationToken cancellationToken)
     {
         var findNews = await _newRepository.GetByIdAsync(request.NewsId, cancellationToken);
         _ = findNews ?? throw new NotFoundException(_t["News {0} Not Found.", request.NewsId]);
@@ -34,7 +34,7 @@ public class CreateNewsReactionHandler : IRequestHandler<CreateNewsReactionsRequ
         //    throw new NotFoundException(_t["User {0} Not Found.", request.UserId]);
         //}
 
-        await _newReactionRepository.AddNewsReaction(new NewsReaction(request.UserId, request.NewsId));
+        await _newReactionRepository.AddNewsReaction(new PostLike(request.UserId, request.NewsId));
 
         return default(DefaultIdType);
     }

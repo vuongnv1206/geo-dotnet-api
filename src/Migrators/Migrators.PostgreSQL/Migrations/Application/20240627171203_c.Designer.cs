@@ -3,6 +3,7 @@ using System;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240627171203_c")]
+    partial class c
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -221,6 +224,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("NewsId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uuid");
 
@@ -240,7 +246,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("NewsId");
 
                     b.ToTable("Comments", "Classes");
 
@@ -308,7 +314,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.Post", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -354,17 +360,17 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("ClassesId");
 
-                    b.ToTable("Post", "Classes");
+                    b.ToTable("News", "Classes");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.PostLike", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.NewsReaction", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PostId")
+                    b.Property<Guid>("NewsId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("TenantId")
@@ -372,9 +378,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.HasKey("UserId", "PostId");
+                    b.HasKey("UserId", "NewsId");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("NewsId");
 
                     b.ToTable("NewsReactions", "Classes");
 
@@ -1897,13 +1903,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
+                    b.HasOne("FSH.WebApi.Domain.Class.News", "News")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("NewsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.Navigation("News");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.CommentLikes", b =>
@@ -1917,7 +1923,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Comment");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.Post", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classes")
                         .WithMany()
@@ -1928,15 +1934,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Classes");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.PostLike", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.NewsReaction", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
+                    b.HasOne("FSH.WebApi.Domain.Class.News", "News")
                         .WithMany("NewsReactions")
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("NewsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.Navigation("News");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.UserClass", b =>
@@ -2266,7 +2272,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Classes");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.Post", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
                 {
                     b.Navigation("Comments");
 

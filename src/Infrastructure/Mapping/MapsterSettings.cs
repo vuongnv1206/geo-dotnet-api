@@ -100,12 +100,13 @@ public class MapsterSettings
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
 
-        TypeAdapterConfig<News, NewsDto>.NewConfig()
+        TypeAdapterConfig<Post, PostDto>.NewConfig()
             .Map(dest => dest.NumberLikeInTheNews, src => src.NewsReactions.Count());
         TypeAdapterConfig<Classes, ClassDto>.NewConfig()
           .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
           .Map(dest => dest.UserStudents, src => src.UserClasses.Select(p=> p.UserStudent))
-          .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment));
+          .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment))
+          .Map(dest => dest.Papers, src => src.PaperAccesses.Select(pq => pq.Paper));
 
         TypeAdapterConfig<Assignment, AssignmentDetailsDto>.NewConfig()
                 .Map(dest => dest.ClassesId, src => src.AssignmentClasses.Select(pq => pq.ClassesId));

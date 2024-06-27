@@ -26,5 +26,6 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Assignments\AssignmentStudent\" />
+      <Folder Include="Class\Comments\Spec\" />
     </ItemGroup>
 </Project>
