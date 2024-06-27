@@ -87,7 +87,7 @@ public class AnswerCloneConfig : IEntityTypeConfiguration<AnswerClone>
     public void Configure(EntityTypeBuilder<AnswerClone> builder)
     {
         builder
-            .ToTable("Answers", SchemaNames.Question)
+            .ToTable("AnswerClones", SchemaNames.Question)
              .IsMultiTenant();
     }
 }
