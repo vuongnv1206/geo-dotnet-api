@@ -5,6 +5,8 @@ using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Application.Assignments.AssignmentClasses;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
+using FSH.WebApi.Application.Class.SharedClasses;
+using FSH.WebApi.Application.Class.GroupClasses.Dto;
 
 namespace FSH.WebApi.Host.Controllers.Class;
 public class ClassController : VersionedApiController
@@ -79,6 +81,14 @@ public class ClassController : VersionedApiController
     [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
     [OpenApiOperation("Remove assignment from class")]
     public Task RemoveAssignmentFromClass(RemoveAssignmentFromClassRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("shared-classes")]
+    [MustHavePermission(FSHAction.View, FSHResource.Classes)]
+    [OpenApiOperation("Get all shared classes")]
+    public Task<PaginationResponse<GroupClassDto>> GetSharedClasses(SearchSharedClassRequest request)
     {
         return Mediator.Send(request);
     }

@@ -65,7 +65,6 @@ public class AnswerConfig : IEntityTypeConfiguration<Answer>
     public void Configure(EntityTypeBuilder<Answer> builder)
     {
         builder
-            .ToTable("Answers", SchemaNames.Question)
-            .IsMultiTenant();
+            .ToTable("Answers", SchemaNames.Question);
     }
 }

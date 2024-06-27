@@ -1,5 +1,7 @@
 ﻿using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.TeacherGroup;
+using FSH.WebApi.Domain.Assignment;
 
 namespace FSH.WebApi.Domain.Class;
 public class Classes : AuditableEntity, IAggregateRoot
@@ -8,7 +10,7 @@ public class Classes : AuditableEntity, IAggregateRoot
     public string SchoolYear { get; private set; }
     public Guid OwnerId { get; private set; }
     public Guid? GroupClassId { get; private set; }
-    public virtual GroupClass GroupClass { get; private set; }
+    public virtual GroupClass? GroupClass { get; private set; }
 
     public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
     public virtual List<UserStudent> UserStudents { get; set; } = new();
@@ -46,6 +48,16 @@ public class Classes : AuditableEntity, IAggregateRoot
     public void UpdateGroupClassId(Guid? newGroupClassId)
     {
         GroupClassId = newGroupClassId;
+    }
+
+    public void AddUserToClass(UserClass userClass)
+    {
+        UserClasses.Add(userClass);
+    }
+
+    public void AssignAssignmentToClass(AssignmentClass assignmentClass)
+    {
+        AssignmentClasses.Add(assignmentClass);
     }
 
     public bool CanUpdate(Guid userId)
