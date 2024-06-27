@@ -29,7 +29,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
         if (request.PaperFolderId.HasValue)
         {
             parentIds.Add(request.PaperFolderId.Value);
-            var parentFolder = await _paperFolderRepo.GetByIdAsync(request.PaperFolderId.Value);
+            var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value));
             if (parentFolder != null)
             {
                 parentFolder.ChildPaperFolderIds(null, parentIds);

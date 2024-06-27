@@ -1,5 +1,7 @@
 ﻿
 
+using FSH.WebApi.Application.Examination.PaperFolders;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -35,14 +37,20 @@ public class SharePaperRequestHandler : IRequestHandler<SharePaperRequest, Guid>
     private readonly ICurrentUser _currentUser;
     private readonly IStringLocalizer _t;
     private readonly IRepositoryWithEvents<Paper> _paperRepo;
+    private readonly IUserService _userService;
+    private readonly IRepositoryWithEvents<PaperFolder> _paperFolderRepo;
     public SharePaperRequestHandler(
                       ICurrentUser currentUser,
                              IStringLocalizer<SharePaperRequestHandler> t,
-                                    IRepositoryWithEvents<Paper> paperRepo)
+                                    IRepositoryWithEvents<Paper> paperRepo,
+                                        IUserService userService,
+                                        IRepositoryWithEvents<PaperFolder> paperFolderRepo)
     {
         _currentUser = currentUser;
         _t = t;
         _paperRepo = paperRepo;
+        _userService = userService;
+        _paperFolderRepo = paperFolderRepo;
     }
 
     public async Task<DefaultIdType> Handle(SharePaperRequest request, CancellationToken cancellationToken)

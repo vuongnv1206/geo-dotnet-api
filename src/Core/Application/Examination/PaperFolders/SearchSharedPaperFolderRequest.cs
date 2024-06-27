@@ -21,12 +21,13 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
 
-    public SearchSharedPaperFolderRequestHandler(IReadRepository<PaperFolder> paperFolderRepo, ICurrentUser currentUser, IUserService userService, IReadRepository<PaperFolderPermission> paperFolderPermissionRepo)
+    public SearchSharedPaperFolderRequestHandler(IReadRepository<PaperFolder> paperFolderRepo, IReadRepository<GroupTeacher> groupTeacherRepo, IReadRepository<PaperFolderPermission> paperFolderPermissionRepo, ICurrentUser currentUser, IUserService userService)
     {
         _paperFolderRepo = paperFolderRepo;
+        _groupTeacherRepo = groupTeacherRepo;
+        _paperFolderPermissionRepo = paperFolderPermissionRepo;
         _currentUser = currentUser;
         _userService = userService;
-        _paperFolderPermissionRepo = paperFolderPermissionRepo;
     }
 
     public async Task<List<PaperFolderDto>> Handle(SearchSharedPaperFolderRequest request, CancellationToken cancellationToken)
@@ -50,20 +51,32 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
             if (request.ParentId.HasValue)
             {
                 parentIds.Add(request.ParentId.Value);
-                var parentFolder = await _paperFolderRepo.GetByIdAsync(request.ParentId.Value);
+                var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value));
                 if (parentFolder != null)
                 {
                     parentFolder.ChildPaperFolderIds(null, parentIds);
                 }
             }
 
-            var searchFolderIds = accessibleFolderIds.Intersect(parentIds).ToList();
-            var spec = new AccessibleFoldersWithChildrenSpec(searchFolderIds,request);
+            parentIds.AddRange(accessibleFolderIds);
+            var spec = new AccessibleFoldersWithChildrenSpec(parentIds,request);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
         }
         else
         {
-            var spec = new AccessibleFoldersTreeSpec(accessibleFolderIds,request);
+            // Find all parent IDs
+            var parentIds = new List<Guid>();
+            if (request.ParentId.HasValue)
+            {
+                parentIds.Add(request.ParentId.Value);
+                var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value));
+                if (parentFolder != null)
+                {
+                    parentFolder.ChildPaperFolderIds(null, parentIds);
+                }
+            }
+            parentIds.AddRange(accessibleFolderIds);
+            var spec = new AccessibleFoldersTreeSpec(parentIds, request);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
            
         }
