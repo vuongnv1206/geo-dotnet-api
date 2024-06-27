@@ -65,6 +65,29 @@ public class AnswerConfig : IEntityTypeConfiguration<Answer>
     public void Configure(EntityTypeBuilder<Answer> builder)
     {
         builder
-            .ToTable("Answers", SchemaNames.Question);
+            .ToTable("Answers", SchemaNames.Question)
+             .IsMultiTenant();
+    }
+}
+
+
+public class QuestionCloneConfig : IEntityTypeConfiguration<QuestionClone>
+{
+    public void Configure(EntityTypeBuilder<QuestionClone> builder)
+    {
+        builder
+            .ToTable("QuestionClones", SchemaNames.Question)
+            .IsMultiTenant();
+    }
+}
+
+
+public class AnswerCloneConfig : IEntityTypeConfiguration<AnswerClone>
+{
+    public void Configure(EntityTypeBuilder<AnswerClone> builder)
+    {
+        builder
+            .ToTable("Answers", SchemaNames.Question)
+             .IsMultiTenant();
     }
 }

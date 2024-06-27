@@ -1,5 +1,7 @@
 ﻿
 
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace FSH.WebApi.Domain.Examination;
 public class SubmitPaperDetail : AuditableEntity, IAggregateRoot
 {
@@ -8,7 +10,8 @@ public class SubmitPaperDetail : AuditableEntity, IAggregateRoot
     public string? AnswerRaw { get; set; }
     public float? Mark { get; set; }
     public virtual SubmitPaper? SubmitPaper { get; set; }
-    public virtual Question.Question? Question { get; set; }
+    [ForeignKey(nameof(QuestionId))]       
+    public virtual Question.QuestionClone? Question { get; set; }
 
     public SubmitPaperDetail(Guid submitPaperId, Guid questionId, string? answerRaw)
     {

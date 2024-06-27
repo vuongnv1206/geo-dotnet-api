@@ -95,7 +95,7 @@ public class PaperSeeder : ICustomSeeder
 
             var submitPapers = await _db.SubmitPapers.Include(sp => sp.Paper).ToListAsync(cancellationToken);
             // Assuming PaperQuestions is the entity that links Papers to Questions
-            var paperQuestions = await _db.PaperQuestions.Include(pq => pq.Question).ThenInclude(q => q.Answers).ToListAsync(cancellationToken);
+            var paperQuestions = await _db.PaperQuestions.Include(pq => pq.Question).ThenInclude(q => q.AnswerClones).ToListAsync(cancellationToken);
 
             var submitPaperDetails = new List<SubmitPaperDetail>();
 
@@ -126,14 +126,14 @@ public class PaperSeeder : ICustomSeeder
 
 
 
-    private string GenerateAnswerRawForQuestionType(Domain.Question.Question question)
+    private string GenerateAnswerRawForQuestionType(Domain.Question.QuestionClone question)
     {
         switch (question.QuestionType)
         {
             case QuestionType.SingleChoice:
-                return question.Answers.FirstOrDefault()?.Id.ToString() ?? string.Empty;
+                return question.AnswerClones.FirstOrDefault()?.Id.ToString() ?? string.Empty;
             case QuestionType.MultipleChoice:
-                return string.Join("|", question.Answers.Select(a => a.Id));
+                return string.Join("|", question.AnswerClones.Select(a => a.Id));
             case QuestionType.FillBlank:
                 // Assuming FillBlank questions have a predefined structure for answers
                 return "[{\"1\":\"content\"}]";

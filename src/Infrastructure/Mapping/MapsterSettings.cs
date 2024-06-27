@@ -87,7 +87,7 @@ public class MapsterSettings
                .Map(dest => dest.TotalQuestion, src => src.Paper.PaperQuestions.Count());
 
         TypeAdapterConfig<SubmitPaperDetail, SubmitPaperDetailDto>.NewConfig()
-           .Map(dest => dest.IsCorrect, src => src.IsAnswerCorrect(src.Question, src.Question.Answers.ToList()));
+           .Map(dest => dest.IsCorrect, src => src.IsAnswerCorrect(src.Question, src.Question.AnswerClones.ToList()));
 
         TypeAdapterConfig<CreateQuestionDto, NewQuestionDto>.NewConfig();
         TypeAdapterConfig<CreateQuestionDto, Domain.Question.Question>.NewConfig()
