@@ -5,12 +5,14 @@ using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
+using System.Linq;
 
 namespace FSH.WebApi.Application.Class.UserClasses;
 public class AddUserInClassRequest : IRequest<Guid>
 {
     public Guid StudentId { get; set; }
     public Guid ClassesId { get; set; }
+    public string? StudentCode { get; set; }
 }
 
 public class AddUserInClassRequestValidator : CustomValidator<AddUserInClassRequest>

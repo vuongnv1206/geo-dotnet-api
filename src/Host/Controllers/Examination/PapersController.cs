@@ -55,7 +55,7 @@ public class PapersController : VersionedApiController
 
     [HttpPost("Shared")]
     [OpenApiOperation("")]
-    public Task<PaginationResponse<PaperInListDto>> SearchSharedPaper(SearchSharedPaperRequest request)
+    public Task<List<PaperInListDto>> SearchSharedPaper(SearchSharedPaperRequest request)
     {
         return Mediator.Send(request);
     }
