@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240623154832_a")]
-    partial class a
+    [Migration("20240627014209_base")]
+    partial class @base
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -320,10 +320,25 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("ClassesId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("IsGender")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StudentCode")
+                        .HasColumnType("text");
+
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("UserStudentId", "ClassesId");
 
@@ -338,6 +353,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ClassesId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CreatedBy")
@@ -387,6 +405,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassesId");
 
                     b.ToTable("UserStudent", "Classes");
 
@@ -621,7 +641,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -967,18 +987,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("QuestionId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId");
 
                     b.ToTable("Answers", "Question");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
@@ -1282,6 +1295,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClassId");
+
                     b.HasIndex("GroupTeacherId");
 
                     b.ToTable("GroupPermissionInClasses", "GroupTeacher");
@@ -1391,6 +1406,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("TeacherTeamId");
 
@@ -1868,6 +1885,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("UserStudent");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserStudent", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", null)
+                        .WithMany("UserStudents")
+                        .HasForeignKey("ClassesId");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Examination.PaperFolder", "PaperFolder")
@@ -2053,11 +2077,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupPermissionInClass", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classroom")
+                        .WithMany("GroupPermissionInClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
                         .WithMany("GroupPermissionInClasses")
                         .HasForeignKey("GroupTeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Classroom");
 
                     b.Navigation("GroupTeacher");
                 });
@@ -2083,11 +2115,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherPermissionInClass", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classroom")
+                        .WithMany("TeacherPermissionInClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FSH.WebApi.Domain.TeacherGroup.TeacherTeam", "TeacherTeam")
                         .WithMany("TeacherPermissionInClasses")
                         .HasForeignKey("TeacherTeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Classroom");
 
                     b.Navigation("TeacherTeam");
                 });
@@ -2152,7 +2192,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.Navigation("AssignmentClasses");
 
+                    b.Navigation("GroupPermissionInClasses");
+
+                    b.Navigation("TeacherPermissionInClasses");
+
                     b.Navigation("UserClasses");
+
+                    b.Navigation("UserStudents");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.GroupClass", b =>
