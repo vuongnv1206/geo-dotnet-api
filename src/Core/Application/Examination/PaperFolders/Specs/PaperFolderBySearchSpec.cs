@@ -12,6 +12,8 @@ public class PaperFolderBySearchSpec : EntitiesByPaginationFilterSpec<PaperFolde
             Query
             .Include(x => x.PaperFolderParent)
             .Include(x => x.PaperFolderChildrens)
+            .Include(x => x.PaperFolderPermissions)
+            .ThenInclude(x => x.GroupTeacher)
             .Where(x => (x.CreatedBy == currentUserId || x.PaperFolderPermissions.Any(x => x.CanView))
                   && (string.IsNullOrEmpty(request.Keyword) || x.Name.ToLower().Contains(request.Keyword.ToLower())));
 
