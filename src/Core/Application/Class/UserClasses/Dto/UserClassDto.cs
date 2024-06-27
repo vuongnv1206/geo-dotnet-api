@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FSH.WebApi.Domain.Class;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,11 @@ namespace FSH.WebApi.Application.Class.UserClasses.Dto;
 public class UserClassDto
 {
     public DefaultIdType ClassesId { get; set; }
-    public DefaultIdType UserId { get; set; }
-    public UserClassDto(DefaultIdType userId, DefaultIdType classesId)
+    public DefaultIdType UserStudentId { get; set; }
+    public List<UserStudent> userStudents { get; set; }
+    public UserClassDto(DefaultIdType userStudentId, DefaultIdType classesId)
     {
-        UserId = userId;
+        UserStudentId = userStudentId;
         ClassesId = classesId;
     }
 }

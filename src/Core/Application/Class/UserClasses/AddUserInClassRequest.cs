@@ -1,12 +1,16 @@
 ﻿using FSH.WebApi.Application.Class.New;
+using FSH.WebApi.Application.Class.UserStudents;
+using FSH.WebApi.Application.Class.UserStudents.Spec;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.TeacherGroup;
 using System.Linq;
 
 namespace FSH.WebApi.Application.Class.UserClasses;
 public class AddUserInClassRequest : IRequest<Guid>
 {
-    public Guid UserId { get; set; }
+    public Guid StudentId { get; set; }
     public Guid ClassesId { get; set; }
     public string? StudentCode { get; set; }
 }
@@ -24,50 +28,53 @@ public class AddUserInClassRequestValidator : CustomValidator<AddUserInClassRequ
 
 public class AddUserInClassRequestHandler : IRequestHandler<AddUserInClassRequest, Guid>
 {
+    private readonly IRepository<UserStudent> _userStudentRepository;
     private readonly IUserService _userService;
-    private readonly IRepository<Classes> _classesRepository;
-    private readonly IUserClassesRepository _userClassesRepository;
-    private readonly IStringLocalizer _stringLocalizer;
+    private readonly ICurrentUser _currentUser;
+    private readonly IStringLocalizer<CreateUserStudentRequestHandler> _t;
+    private readonly IRepository<Classes> _classRepository;
 
-    public AddUserInClassRequestHandler(IUserClassesRepository userClassesRepository, IUserService userService,
-                                        IStringLocalizer<AddUserInClassRequestHandler> localizer, IRepository<Classes> classesRepository) =>
-        (_userClassesRepository,_classesRepository, _userService, _stringLocalizer) = (userClassesRepository,classesRepository ,userService, localizer);
+    public AddUserInClassRequestHandler(IUserService userService, ICurrentUser currentUser,
+                                           IStringLocalizer<CreateUserStudentRequestHandler> t, IRepository<UserStudent> userStudentRepository, IRepository<Classes> classRepository)
+    {
+        _userService = userService;
+        _currentUser = currentUser;
+        _t = t;
+        _classRepository = classRepository;
+        _userStudentRepository = userStudentRepository;
+    }
 
     public async Task<Guid> Handle(AddUserInClassRequest request, CancellationToken cancellationToken)
     {
-
-        string userIdString = request.UserId.ToString();
-
-        var user = await _userService.GetAsync(userIdString, cancellationToken);
-        var classes = await _classesRepository.GetByIdAsync(request.ClassesId);
-
-        if (user == null)
+        var classes = await _classRepository.GetByIdAsync(request.ClassesId);
+        if (classes is null)
         {
-            throw new NotFoundException(_stringLocalizer["User {0} Not Found.", request.UserId]);
+            throw new NotFoundException(_t["Class {0} Not Found.", request.ClassesId]);
         }
 
-        var getRoleUser = await _userService.GetRolesAsync(userIdString, cancellationToken);
-        var checkRole = getRoleUser.Any(x => x.RoleName.Equals("Teacher") && x.Enabled.Equals(true));
-        if (checkRole)
+        var userInClass = await _userStudentRepository
+      .FirstOrDefaultAsync(new UserStudentByIdSpec(request.StudentId, _currentUser.GetUserId()));
+
+        if (userInClass is null)
         {
-            throw new InvalidOperationException(_stringLocalizer["User with role 'teacher' cannot be added to the class."]);
+            throw new NotFoundException(_t["Student {0} Not Found.", request.StudentId]);
         }
-
-
-        classes.AddUserToClass(new UserClass
+        else
         {
+            if (userInClass.StudentId == Guid.Empty)
+            {
+                // create new user active false
+            }
+
+            classes.AddUserInClass(new UserClass
+            {
                 ClassesId = request.ClassesId,
-                UserId = request.UserId,
-                IsGender = user.Gender,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                StudentCode = request.StudentCode
+                UserStudentId = request.StudentId
+            });
 
-        });
-
-        await _classesRepository.UpdateAsync(classes);
+            await _classRepository.UpdateAsync(classes);
+        }
 
         return default(Guid);
-
     }
 }

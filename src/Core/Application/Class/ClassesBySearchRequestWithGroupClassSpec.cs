@@ -13,8 +13,8 @@ public class ClassesBySearchRequestWithGroupClassSpec : EntitiesByPaginationFilt
     {
         Query
             .Include(p => p.GroupClass).ThenInclude(c => c.Classes)
-            .Include(u => u.UserClasses).ThenInclude(c => c.Classes)
             .Include(a => a.AssignmentClasses).ThenInclude(a => a.Assignment)
+            .Include(u => u.UserClasses).ThenInclude(x => x.UserStudent)
             .Where(p => p.CreatedBy == userId);
     }
 }
