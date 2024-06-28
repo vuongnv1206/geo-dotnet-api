@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New;
-public interface INewReactionRepository : IScopedService
+public interface IPostLikeRepository : IScopedService
 {
-    Task AddNewsReaction(NewsReaction request);
-    Task DeleteNewsReactionAsync(NewsReaction request);
-    Task<NewsReaction> GetUserLikeTheNews(NewsReaction request);
+    Task AddNewsReaction(PostLike request);
+    Task DeleteNewsReactionAsync(PostLike request);
+    Task<PostLike> GetUserLikeTheNews(PostLike request);
     Task<int> CountLikeOfUserInNews(Guid classId);
 }

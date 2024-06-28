@@ -27,9 +27,9 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<Classes> Classes => Set<Classes>();
     public DbSet<GroupClass> GroupClasses => Set<GroupClass>();
-    public DbSet<News> News => Set<News>();
+    public DbSet<Post> Post => Set<Post>();
     public DbSet<UserClass> UserClasses => Set<UserClass>();
-    public DbSet<NewsReaction> NewsReactions => Set<NewsReaction>();
+    public DbSet<PostLike> PostLike => Set<PostLike>();
     public DbSet<QuestionFolder> QuestionFolders => Set<QuestionFolder>();
     public DbSet<Domain.Question.Question> Questions => Set<Domain.Question.Question>();
     public DbSet<QuestionLable> QuestionLables => Set<QuestionLable>();

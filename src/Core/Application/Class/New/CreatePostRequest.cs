@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New;
-public class CreateNewsRequest : IRequest<Guid>
+public class CreatePostRequest : IRequest<Guid>
 {
     public Guid ClassesId { get; set; }
     public string? Content { get; set; }
@@ -14,7 +14,7 @@ public class CreateNewsRequest : IRequest<Guid>
     public Guid? ParentId { get; set; }
 }
 
-public class CreateNewsRequestValidator : CustomValidator<CreateNewsRequest>
+public class CreateNewsRequestValidator : CustomValidator<CreatePostRequest>
 {
     public CreateNewsRequestValidator(IReadRepository<Classes> classRepos, IStringLocalizer<CreateNewsRequestValidator> T)
     {
@@ -25,20 +25,20 @@ public class CreateNewsRequestValidator : CustomValidator<CreateNewsRequest>
     }
 }
 
-public class CreateNewsRequestHandler : IRequestHandler<CreateNewsRequest, Guid>
+public class CreateNewsRequestHandler : IRequestHandler<CreatePostRequest, Guid>
 {
-    private readonly IRepositoryWithEvents<News> _repository;
+    private readonly IRepositoryWithEvents<Post> _repository;
     private readonly ICurrentUser _currentUser;
 
-    public CreateNewsRequestHandler(IRepositoryWithEvents<News> repository, ICurrentUser currentUser) =>
+    public CreateNewsRequestHandler(IRepositoryWithEvents<Post> repository, ICurrentUser currentUser) =>
         (_repository, _currentUser) = (repository, currentUser);
 
-    public async Task<Guid> Handle(CreateNewsRequest request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreatePostRequest request, CancellationToken cancellationToken)
     {
-        var news = new News(request.Content, request.IsLockCommnet, request.ParentId, request.ClassesId);
+        var post = new Post(request.Content, request.IsLockCommnet, request.ParentId, request.ClassesId);
 
-        await _repository.AddAsync(news);
+        await _repository.AddAsync(post);
 
-        return news.Id;
+        return post.Id;
     }
 }

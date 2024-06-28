@@ -19,6 +19,7 @@ using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Identity;
 using Mapster;
+using FSH.WebApi.Application.Class.Comments.Dto;
 
 namespace FSH.WebApi.Infrastructure.Mapping;
 
@@ -100,18 +101,27 @@ public class MapsterSettings
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
 
-        TypeAdapterConfig<News, NewsDto>.NewConfig()
-            .Map(dest => dest.NumberLikeInTheNews, src => src.NewsReactions.Count());
+        // Post
+        TypeAdapterConfig<Post, PostDto>.NewConfig()
+            .Map(dest => dest.NumberLikeInThePost, src => src.PostLikes.Count());
+        // Comment
+        TypeAdapterConfig<Comment, CommentDto>.NewConfig()
+            .Map(dest => dest.NumberLikeInComment, src => src.CommentLikes.Count());
+
+        // Class
         TypeAdapterConfig<Classes, ClassDto>.NewConfig()
           .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
           .Map(dest => dest.UserStudents, src => src.UserClasses.Select(p=> p.UserStudent))
-          .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment));
+          .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment))
+          .Map(dest => dest.Papers, src => src.PaperAccesses.Select(pq => pq.Paper));
 
         TypeAdapterConfig<Assignment, AssignmentDetailsDto>.NewConfig()
                 .Map(dest => dest.ClassesId, src => src.AssignmentClasses.Select(pq => pq.ClassesId));
 
         TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();
+
+
 
     }
 }

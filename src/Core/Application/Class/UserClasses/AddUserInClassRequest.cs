@@ -52,8 +52,7 @@ public class AddUserInClassRequestHandler : IRequestHandler<AddUserInClassReques
             throw new NotFoundException(_t["Class {0} Not Found.", request.ClassesId]);
         }
 
-        var userInClass = await _userStudentRepository
-      .FirstOrDefaultAsync(new UserStudentByIdSpec(request.StudentId, _currentUser.GetUserId()));
+        var userInClass = await _userStudentRepository.FirstOrDefaultAsync(new UserStudentByIdSpec(request.StudentId));
 
         if (userInClass is null)
         {

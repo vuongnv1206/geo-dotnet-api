@@ -6,10 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New.Spec;
-public class NewsCommentByParentIdSpec : Specification<News>, ISingleResultSpecification
+public class PostLikeByParentIdSpec : Specification<Post>, ISingleResultSpecification
 {
-    public NewsCommentByParentIdSpec(DefaultIdType newsId)
+    public PostLikeByParentIdSpec(DefaultIdType postId)
     {
-        Query.Where(p => p.ParentId == newsId);
+        Query.Where(p => p.ParentId == postId);
     }
 }

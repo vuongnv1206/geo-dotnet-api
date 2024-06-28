@@ -10,23 +10,23 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New;
-public class GetNewsRequest : PaginationFilter,IRequest<PaginationResponse<NewsDto>>
+public class GetPostRequest : PaginationFilter,IRequest<PaginationResponse<PostDto>>
 {
 }
-public class GetNewsRequestHandler : IRequestHandler<GetNewsRequest, PaginationResponse<NewsDto>>
+public class GetNewsRequestHandler : IRequestHandler<GetPostRequest, PaginationResponse<PostDto>>
 {
-    private readonly IReadRepository<News> _repository;
-    private readonly INewReactionRepository _newReactionRepository;
+    private readonly IReadRepository<Post> _repository;
+    private readonly IPostLikeRepository _newReactionRepository;
 
-    public GetNewsRequestHandler(IReadRepository<News> repository, INewReactionRepository newReactionRepository)
+    public GetNewsRequestHandler(IReadRepository<Post> repository, IPostLikeRepository newReactionRepository)
     {
         _repository = repository;
         _newReactionRepository = newReactionRepository;
     }
 
-    public async Task<PaginationResponse<NewsDto>> Handle(GetNewsRequest request, CancellationToken cancellationToken)
+    public async Task<PaginationResponse<PostDto>> Handle(GetPostRequest request, CancellationToken cancellationToken)
     {
-        var spec = new NewByClassIdSpec(request);
+        var spec = new PostByClassIdSpec(request);
         var data = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
         return data;
     }

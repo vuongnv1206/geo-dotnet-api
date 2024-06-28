@@ -16,7 +16,7 @@ public class UserStudentController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpPost("student-in-class")]
+    [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
     [OpenApiOperation("Add a student in class")]
     public Task AddStudentInClass(CreateUserStudentRequest request)
@@ -27,14 +27,14 @@ public class UserStudentController : VersionedApiController
     [HttpPut("{id:guid}")]
     [MustHavePermission(FSHAction.Update, FSHResource.Classes)]
     [OpenApiOperation("Update a userStudent.", "")]
-    public async Task<ActionResult<Guid>> UpdateTeacherRegistrationStatusAsync(UpdateStudentWhenUserRegisterRequest request, Guid id)
+    public async Task<ActionResult<Guid>> UpdateStudentRegistrationStatusAsync(UpdateStudentWhenUserRegisterRequest request, Guid id)
     {
         return id != request.Id
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }
 
-    [HttpDelete("remove-user-student")]
+    [HttpDelete]
     [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
     [OpenApiOperation("Delete a userStudent.", "")]
     public Task DeleteUserInClass(Guid id)

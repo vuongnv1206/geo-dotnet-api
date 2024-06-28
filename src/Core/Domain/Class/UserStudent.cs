@@ -16,13 +16,14 @@ public class UserStudent : AuditableEntity, IAggregateRoot
     public string? PhoneNumber { get; set; }
     public string? StudentCode { get; set; }
     public bool? Gender { get; set; }
-
+    public virtual IEnumerable<UserClass> UserClasses { get; set; }
 
     public UserStudent Update(string? firstName, string? lastName, string? studentEmail, string? studentEPhoneNumber, string? studentCode, bool? gender)
     {
         if (firstName is not null && FirstName?.Equals(firstName) is not true) FirstName = firstName;
         if (lastName is not null && LastName?.Equals(LastName) is not true) LastName = lastName;
         if (studentEmail is not null && Email?.Equals(studentEmail) is not true) Email = studentEmail;
+        if (studentCode is not null && StudentCode?.Equals(studentCode) is not true) StudentCode = studentCode;
         if (studentEPhoneNumber is not null && PhoneNumber?.Equals(studentEPhoneNumber) is not true) PhoneNumber = studentEPhoneNumber;
         if (gender.HasValue && Gender != gender.Value) Gender = gender.Value;
         return this;

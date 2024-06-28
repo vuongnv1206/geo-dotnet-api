@@ -10,8 +10,9 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Class.UserStudents.Spec;
 public class UserStudentByIdSpec : Specification<UserStudent>, ISingleResultSpecification
 {
-    public UserStudentByIdSpec(Guid id, Guid userId)
+    public UserStudentByIdSpec(Guid id)
     {
-        Query.Where(x => x.Id == id && x.StudentId == userId);
+        Query.Include(x => x.UserClasses)
+             .Where(x => x.Id == id);
     }
 }

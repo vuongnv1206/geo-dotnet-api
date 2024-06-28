@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Application.Class.UserStudents.Spec;
+using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,9 +36,9 @@ public class DeleteStudentRequestHandler : IRequestHandler<DeleteStudentRequest,
 
     public async Task<Guid> Handle(DeleteStudentRequest request, CancellationToken cancellationToken)
     {
-        var student = await _userStudentRepository.GetByIdAsync(request.Id, cancellationToken);
+        var student = await _userStudentRepository.FirstOrDefaultAsync(new UserStudentByIdSpec(request.Id));
 
-        _ = student ?? throw new NotFoundException(_localizer["student in class {0} Not Found."]);
+        _ = student ?? throw new NotFoundException(_localizer["Student in class {0} Not Found."]);
 
         await _userStudentRepository.DeleteAsync(student, cancellationToken);
         return student.Id;
