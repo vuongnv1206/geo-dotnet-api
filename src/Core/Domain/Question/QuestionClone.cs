@@ -15,6 +15,9 @@ public class QuestionClone : AuditableEntity, IAggregateRoot
     [ForeignKey(nameof(QuestionLabelId))]
     public virtual QuestionLable? QuestionLabel { get; set; }
     public Guid? QuestionParentId { get; set; }
+    public Guid? OriginalQuestionId { get; set; }
+    [ForeignKey(nameof(OriginalQuestionId))]
+    public virtual Question? OriginalQuestion { get; set; }
     public virtual QuestionClone? QuestionCloneParent { get; set; }
     public virtual List<QuestionClone> QuestionPassages { get; set; } = new();
     public virtual List<AnswerClone> AnswerClones { get; set; } = new();

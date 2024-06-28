@@ -1,6 +1,4 @@
 ﻿using FSH.WebApi.Application.Examination.PaperFolders;
-using FSH.WebApi.Application.Questions;
-using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Question;
@@ -19,7 +17,6 @@ public class CreatePaperRequest : IRequest<Guid>
     public Guid? PaperFolderId { get; set; }
     public Guid? SubjectId { get; set; }
     public List<CreateUpdateQuestionInPaperDto>? Questions { get; set; } = new(); // Thêm danh sách câu hỏi đã có
-    public List<NewQuestionDto>? NewQuestions { get; set; } = new();// Thêm danh sách câu hỏi mới
 }
 
 public class CreatePaperRequestValidator : CustomValidator<CreatePaperRequest>
@@ -73,27 +70,8 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Gui
             request.PaperLabelId,
             request.SubjectId);
 
-        if (!request.Questions.Any() && !request.NewQuestions.Any())
+        if (!request.Questions.Any())
             throw new ConflictException(_t["Create paper must have questions."]);
-
-        if (request.NewQuestions.Any())
-        {
-
-            var createQuestionRequest = new CreateQuestionRequest { Questions = request.NewQuestions.Adapt<List<CreateQuestionDto>>() };
-            await _mediator.Send(createQuestionRequest, cancellationToken);
-
-            var createQuestionCloneRequest = new CreateQuestionCloneRequest { Questions = request.NewQuestions.Adapt<List<CreateQuestionDto>>() };
-            var newQuestionCloneIds = await _mediator.Send(createQuestionCloneRequest, cancellationToken);
-
-            var newPaperQuestions = request.NewQuestions.Select(q => new PaperQuestion
-            {
-                QuestionId = newQuestionCloneIds[request.NewQuestions.IndexOf(q)],
-                Mark = q.Mark,
-                RawIndex = q.RawIndex
-            }).ToList();
-            newPaper.AddQuestions(newPaperQuestions);
-        }
-
 
         if (request.Questions.Any())
         {
@@ -104,6 +82,7 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Gui
                     throw new NotFoundException(_t["Question {0} Not Found.", question.QuestionId]);
 
                 var questionClone = existingQuestion.Adapt<QuestionClone>();
+                questionClone.OriginalQuestionId = existingQuestion.Id;
                 await _questionCloneRepo.AddAsync(questionClone);
 
                 var paperQuestion = new PaperQuestion
