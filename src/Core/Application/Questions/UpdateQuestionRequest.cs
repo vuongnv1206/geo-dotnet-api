@@ -111,11 +111,6 @@ public class UpdateQuestionRequestHandler : IRequestHandler<UpdateQuestionReques
             }
         }
 
-        if (request.QuestionPassages == null)
-        {
-            throw new BadRequestException(_t["Question must have at least 1 question passage."]);
-        }
-
         // validate question by question type
         // Multiple choice
         if (question.QuestionType == QuestionType.MultipleChoice)
