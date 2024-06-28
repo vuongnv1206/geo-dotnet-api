@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Domain.Examination;
 public class PaperFolderPermission : AuditableEntity, IAggregateRoot
 {
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
     public Guid FolderId { get; set; }
     public Guid? GroupTeacherId { get; set; }
     public bool CanView { get; private set; }
@@ -19,9 +19,10 @@ public class PaperFolderPermission : AuditableEntity, IAggregateRoot
     public bool CanShare { get; set; }
     [ForeignKey(nameof(FolderId))]
     public virtual PaperFolder PaperFolder { get; set; }
+    [ForeignKey(nameof(GroupTeacherId))]
     public virtual GroupTeacher? GroupTeacher { get; set; }
 
-    public PaperFolderPermission(Guid userId, Guid folderId, Guid? groupTeacherId, bool canView, bool canAdd, bool canUpdate, bool canDelete,bool canShare)
+    public PaperFolderPermission(Guid? userId, Guid folderId, Guid? groupTeacherId, bool canView, bool canAdd, bool canUpdate, bool canDelete,bool canShare)
     {
         UserId = userId;
         FolderId = folderId;
