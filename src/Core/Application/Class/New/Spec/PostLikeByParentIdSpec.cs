@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Class.New.Spec;
 public class PostLikeByParentIdSpec : Specification<Post>, ISingleResultSpecification
 {
-    public PostLikeByParentIdSpec(DefaultIdType newsId)
+    public PostLikeByParentIdSpec(DefaultIdType postId)
     {
-        Query.Where(p => p.ParentId == newsId);
+        Query.Where(p => p.ParentId == postId);
     }
 }

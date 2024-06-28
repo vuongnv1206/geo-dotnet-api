@@ -15,6 +15,6 @@ public class PostDto : IDto
     public bool IsLockComment { get; set; }
     public DefaultIdType ParentId { get; set; }
     public string? ClassesName { get; set; }
-    public int? NumberLikeInTheNews { get; set; }
+    public int? NumberLikeInThePost { get; set; }
     public List<CommentDto> Comments { get; set; }
 }

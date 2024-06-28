@@ -19,13 +19,6 @@ public class ClassController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    //[HttpGet]
-    //[MustHavePermission(FSHAction.View, FSHResource.Classes)]
-    //[OpenApiOperation("Get class of user", "")]
-    //public Task<List<ClassDto>> GetClassByUserAsync()
-    //{
-    //    return Mediator.Send(new GetClassOfUserRequest());
-    //}
 
     [HttpGet("{id:guid}")]
     [MustHavePermission(FSHAction.View, FSHResource.Classes)]
@@ -34,14 +27,6 @@ public class ClassController : VersionedApiController
     {
         return Mediator.Send(new GetClassesRequest(id));
     }
-
-    //[HttpGet("get-class-by-group-class")]
-    //[MustHavePermission(FSHAction.View, FSHResource.Classes)]
-    //[OpenApiOperation("Get class by group class.", "")]
-    //public Task<List<Classes>> GetClassByGroupClassAsync(Guid groupClassId)
-    //{
-    //    return Mediator.Send(new GetClassByGroupClassRequest(groupClassId));
-    //}
 
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Classes)]

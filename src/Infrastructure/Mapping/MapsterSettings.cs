@@ -19,6 +19,7 @@ using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Identity;
 using Mapster;
+using FSH.WebApi.Application.Class.Comments.Dto;
 
 namespace FSH.WebApi.Infrastructure.Mapping;
 
@@ -100,8 +101,14 @@ public class MapsterSettings
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
 
+        // Post
         TypeAdapterConfig<Post, PostDto>.NewConfig()
-            .Map(dest => dest.NumberLikeInTheNews, src => src.NewsReactions.Count());
+            .Map(dest => dest.NumberLikeInThePost, src => src.PostLikes.Count());
+        // Comment
+        TypeAdapterConfig<Comment, CommentDto>.NewConfig()
+            .Map(dest => dest.NumberLikeInComment, src => src.CommentLikes.Count());
+
+        // Class
         TypeAdapterConfig<Classes, ClassDto>.NewConfig()
           .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
           .Map(dest => dest.UserStudents, src => src.UserClasses.Select(p=> p.UserStudent))
@@ -113,6 +120,8 @@ public class MapsterSettings
 
         TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();
+
+
 
     }
 }

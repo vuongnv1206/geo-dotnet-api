@@ -14,4 +14,5 @@ public class CommentDto : IDto
     public string Content { get; set; }
     public Guid? ParentId { get; set; }
     public DateTime Timestamp { get; set; }
+    public int NumberLikeInComment { get; set; }
 }

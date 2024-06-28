@@ -10,13 +10,11 @@ public class Classes : AuditableEntity, IAggregateRoot
     public string SchoolYear { get; private set; }
     public Guid OwnerId { get; private set; }
     public Guid? GroupClassId { get; private set; }
-    public virtual GroupClass GroupClass { get; private set; }
     public virtual GroupClass? GroupClass { get; private set; }
-
-    public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
-    public virtual List<UserStudent> UserStudents { get; set; } = new();
-    public virtual List<UserClass> UserClasses{ get; set; } = new();
-    public virtual List<PaperAccess> PaperAccesses { get; set; } = new();
+    public virtual List<AssignmentClass> AssignmentClasses { get; set; }
+    public virtual List<UserStudent> UserStudents { get; set; }
+    public virtual List<UserClass> UserClasses{ get; set; }
+    public virtual List<PaperAccess> PaperAccesses { get; set; }
     public virtual IEnumerable<TeacherPermissionInClass>? TeacherPermissionInClasses { get; set; }
     public virtual IEnumerable<GroupPermissionInClass>? GroupPermissionInClasses { get; set; }
 
@@ -54,10 +52,6 @@ public class Classes : AuditableEntity, IAggregateRoot
         GroupClassId = newGroupClassId;
     }
 
-    public void AddUserToClass(UserClass userClass)
-    {
-        UserClasses.Add(userClass);
-    }
 
     public void AssignAssignmentToClass(AssignmentClass assignmentClass)
     {

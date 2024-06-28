@@ -9,7 +9,7 @@ public class Post : AuditableEntity, IAggregateRoot
     public Guid ClassesId { get; private set; }
     public virtual Classes Classes { get; private set; }
     public virtual ICollection<Comment> Comments { get; private set; }
-    public virtual ICollection<PostLike> NewsReactions { get; private set; }
+    public virtual ICollection<PostLike> PostLikes { get; private set; }
 
     public Post(string content, bool isLockComment, Guid? parentId, Guid classesId)
     {
