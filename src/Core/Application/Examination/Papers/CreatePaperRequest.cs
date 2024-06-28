@@ -1,7 +1,9 @@
 ﻿using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Questions;
+using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Examination.Enums;
+using FSH.WebApi.Domain.Question;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.Papers;
@@ -35,16 +37,23 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Gui
     private readonly IStringLocalizer<CreatePaperRequestHandler> _t;
     private readonly IRepository<PaperFolder> _paperFolderRepo;
     private readonly IMediator _mediator;
+    private readonly IReadRepository<Question> _questionRepo;
+    private readonly IRepository<QuestionClone> _questionCloneRepo;
     public CreatePaperRequestHandler(
         IRepositoryWithEvents<Paper> paperRepo,
         IStringLocalizer<CreatePaperRequestHandler> t,
         IRepository<PaperFolder> paperFolderRepo,
-        IMediator mediator)
+        IMediator mediator,
+        IReadRepository<Question> questionRepo,
+        IRepository<QuestionClone> questionCloneRepo
+        )
     {
         _paperRepo = paperRepo;
         _t = t;
         _paperFolderRepo = paperFolderRepo;
         _mediator = mediator;
+        _questionRepo = questionRepo;
+        _questionCloneRepo = questionCloneRepo;
     }
 
     public async Task<Guid> Handle(CreatePaperRequest request, CancellationToken cancellationToken)
@@ -69,12 +78,16 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Gui
 
         if (request.NewQuestions.Any())
         {
+
             var createQuestionRequest = new CreateQuestionRequest { Questions = request.NewQuestions.Adapt<List<CreateQuestionDto>>() };
-            var newQuestionIds = await _mediator.Send(createQuestionRequest, cancellationToken);
+            await _mediator.Send(createQuestionRequest, cancellationToken);
+
+            var createQuestionCloneRequest = new CreateQuestionCloneRequest { Questions = request.NewQuestions.Adapt<List<CreateQuestionDto>>() };
+            var newQuestionCloneIds = await _mediator.Send(createQuestionCloneRequest, cancellationToken);
 
             var newPaperQuestions = request.NewQuestions.Select(q => new PaperQuestion
             {
-                QuestionId = newQuestionIds[request.NewQuestions.IndexOf(q)],
+                QuestionId = newQuestionCloneIds[request.NewQuestions.IndexOf(q)],
                 Mark = q.Mark,
                 RawIndex = q.RawIndex
             }).ToList();
@@ -84,8 +97,23 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Gui
 
         if (request.Questions.Any())
         {
-            var questions = request.Questions.Adapt<List<PaperQuestion>>();
-            newPaper.AddQuestions(questions);
+            foreach (var question in request.Questions)
+            {
+                var existingQuestion = await _questionRepo.FirstOrDefaultAsync(new Questions.Specs.QuestionByIdSpec(question.QuestionId));
+                if (existingQuestion == null)
+                    throw new NotFoundException(_t["Question {0} Not Found.", question.QuestionId]);
+
+                var questionClone = existingQuestion.Adapt<QuestionClone>();
+                await _questionCloneRepo.AddAsync(questionClone);
+
+                var paperQuestion = new PaperQuestion
+                {
+                    QuestionId = questionClone.Id,
+                    Mark = question.Mark,
+                    RawIndex = question.RawIndex
+                };
+                newPaper.AddQuestion(paperQuestion);
+            }
         }
 
 

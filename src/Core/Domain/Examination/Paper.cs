@@ -73,6 +73,12 @@ public class Paper : AuditableEntity, IAggregateRoot
             });
         }
     }
+
+    public void AddQuestion(PaperQuestion question)
+    {
+        PaperQuestions.Add(question);   
+    }
+
     public void UpdateQuestions(List<PaperQuestion> questions)
     {
         PaperQuestions.RemoveAll(pq => !questions.Any(q => q.QuestionId == pq.QuestionId));
@@ -137,20 +143,6 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperFolderId = paperFolderId;
         return this;
     }
-
-    //public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
-    //{
-    //    if (shareType == PaperShareType.AssignToStudent)
-    //    {
-    //        PaperAccesses.RemoveAll(pa => pa.UserId != null);
-    //        PaperAccesses.AddRange(newPaperAccesses.Where(pa => pa.UserId != null));
-    //    }
-    //    else if (shareType == PaperShareType.AssignToClass)
-    //    {
-    //        PaperAccesses.RemoveAll(pa => pa.ClassId != null);
-    //        PaperAccesses.AddRange(newPaperAccesses.Where(pa => pa.ClassId != null));
-    //    }
-    //}
 
     public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
     {
