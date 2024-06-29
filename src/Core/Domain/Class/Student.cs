@@ -7,18 +7,19 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Domain.Class;
-public class UserStudent : AuditableEntity, IAggregateRoot
+public class Student : AuditableEntity, IAggregateRoot
 {
-    public Guid? StudentId { get; set; }
+    public Guid? StId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    public DateTime? DateOfBirth { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
     public string? StudentCode { get; set; }
     public bool? Gender { get; set; }
-    public virtual IEnumerable<UserClass> UserClasses { get; set; }
 
-    public UserStudent Update(string? firstName, string? lastName, string? studentEmail, string? studentEPhoneNumber, string? studentCode, bool? gender)
+    public Student Update(string? firstName, string? lastName, string? studentEmail, string? studentEPhoneNumber,
+                              DateTime? dateOfBirth, string? studentCode, bool? gender)
     {
         if (firstName is not null && FirstName?.Equals(firstName) is not true) FirstName = firstName;
         if (lastName is not null && LastName?.Equals(LastName) is not true) LastName = lastName;
@@ -26,6 +27,7 @@ public class UserStudent : AuditableEntity, IAggregateRoot
         if (studentCode is not null && StudentCode?.Equals(studentCode) is not true) StudentCode = studentCode;
         if (studentEPhoneNumber is not null && PhoneNumber?.Equals(studentEPhoneNumber) is not true) PhoneNumber = studentEPhoneNumber;
         if (gender.HasValue && Gender != gender.Value) Gender = gender.Value;
+        if (DateOfBirth != DateTime.MinValue && !DateOfBirth.Equals(dateOfBirth)) DateOfBirth = dateOfBirth;
         return this;
     }
 

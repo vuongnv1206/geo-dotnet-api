@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserStudents.Spec;
-public class UserStudentBySearchSpec : EntitiesByPaginationFilterSpec<UserStudent, UserStudentDto>
+public class StudentBySearchSpec : EntitiesByPaginationFilterSpec<Student, UserStudentDto>
 {
-    public UserStudentBySearchSpec(SearchUserStudentRequest request, Guid currentUserId)
+    public StudentBySearchSpec(SearchStudentRequest request, Guid currentUserId)
         : base(request)
     {
         Query.OrderBy(c => c.CreatedOn, !request.HasOrderBy())

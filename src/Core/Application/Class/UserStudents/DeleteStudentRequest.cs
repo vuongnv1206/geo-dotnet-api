@@ -26,9 +26,9 @@ public class DeleteStudentRequestValidator : AbstractValidator<DeleteStudentRequ
 
 public class DeleteStudentRequestHandler : IRequestHandler<DeleteStudentRequest, Guid>
 {
-    private readonly IRepository<UserStudent> _userStudentRepository;
+    private readonly IRepository<Student> _userStudentRepository;
     private readonly IStringLocalizer<DeleteStudentRequestHandler> _localizer;
-    public DeleteStudentRequestHandler(IStringLocalizer<DeleteStudentRequestHandler> localizer, IRepository<UserStudent> repository)
+    public DeleteStudentRequestHandler(IStringLocalizer<DeleteStudentRequestHandler> localizer, IRepository<Student> repository)
     {
         _localizer = localizer;
         _userStudentRepository = repository;
@@ -36,7 +36,7 @@ public class DeleteStudentRequestHandler : IRequestHandler<DeleteStudentRequest,
 
     public async Task<Guid> Handle(DeleteStudentRequest request, CancellationToken cancellationToken)
     {
-        var student = await _userStudentRepository.FirstOrDefaultAsync(new UserStudentByIdSpec(request.Id));
+        var student = await _userStudentRepository.FirstOrDefaultAsync(new StudentByIdSpec(request.Id));
 
         _ = student ?? throw new NotFoundException(_localizer["Student in class {0} Not Found."]);
 

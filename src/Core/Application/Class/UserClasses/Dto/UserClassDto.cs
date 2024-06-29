@@ -8,12 +8,7 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Class.UserClasses.Dto;
 public class UserClassDto
 {
-    public DefaultIdType ClassesId { get; set; }
-    public DefaultIdType UserStudentId { get; set; }
-    public List<UserStudent> userStudents { get; set; }
-    public UserClassDto(DefaultIdType userStudentId, DefaultIdType classesId)
-    {
-        UserStudentId = userStudentId;
-        ClassesId = classesId;
-    }
+    public Guid ClassesId { get; set; }
+    public Guid StudentId { get; set; }
+    public List<Student> UserStudents { get; set; }
 }

@@ -14,10 +14,10 @@ public class UpdateStudentWhenUserRegisterRequest : IRequest<Guid>
 
 public class UpdateStudentWhenUserRegisterRequestHandler : IRequestHandler<UpdateStudentWhenUserRegisterRequest, Guid>
 {
-    private readonly IRepositoryWithEvents<UserStudent> _repository;
+    private readonly IRepositoryWithEvents<Student> _repository;
     private readonly IStringLocalizer _t;
 
-    public UpdateStudentWhenUserRegisterRequestHandler(IRepositoryWithEvents<UserStudent> repository, IStringLocalizer<UpdateStudentWhenUserRegisterRequestHandler> localizer)
+    public UpdateStudentWhenUserRegisterRequestHandler(IRepositoryWithEvents<Student> repository, IStringLocalizer<UpdateStudentWhenUserRegisterRequestHandler> localizer)
         => (_repository, _t) = (repository, localizer);
 
     public async Task<Guid> Handle(UpdateStudentWhenUserRegisterRequest request, CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ public class UpdateStudentWhenUserRegisterRequestHandler : IRequestHandler<Updat
         if (userStudent == null)
             throw new NotFoundException(_t["UserStudent{0} Not Found.", request.Id]);
 
-        userStudent.StudentId = request.StudentId;
+        userStudent.StId = request.StudentId;
 
         await _repository.UpdateAsync(userStudent, cancellationToken);
 

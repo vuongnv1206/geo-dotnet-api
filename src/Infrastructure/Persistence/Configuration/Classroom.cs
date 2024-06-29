@@ -27,22 +27,21 @@ public class GroupClassConfig : IEntityTypeConfiguration<GroupClass>
     }
 }
 
-public class NewsConfig : IEntityTypeConfiguration<Post>
+public class PostConfig : IEntityTypeConfiguration<Post>
 {
     public void Configure(EntityTypeBuilder<Post> builder)
     {
         builder.ToTable("Post", SchemaNames.Classroom).IsMultiTenant();
-
     }
 }
 
-public class NewsReactionConfig : IEntityTypeConfiguration<PostLike>
+public class PostLikeConfig : IEntityTypeConfiguration<PostLike>
 {
     public void Configure(EntityTypeBuilder<PostLike> builder)
     {
         builder.IsMultiTenant();
         builder.HasKey(b => new { b.UserId, b.PostId });
-        builder.ToTable("NewsReactions", SchemaNames.Classroom);
+        builder.ToTable("PostLike", SchemaNames.Classroom);
     }
 }
 
@@ -51,17 +50,16 @@ public class UserClassConfig : IEntityTypeConfiguration<UserClass>
     public void Configure(EntityTypeBuilder<UserClass> builder)
     {
         builder.IsMultiTenant();
-        builder.HasKey(b => new { b.UserStudentId, b.ClassesId });
+        builder.HasKey(b => new { b.ClassesId, b.StudentId });
         builder.ToTable("UserClasses", SchemaNames.Classroom);
     }
 }
 
-public class UserStudentConfig : IEntityTypeConfiguration<UserStudent>
+public class StudentConfig : IEntityTypeConfiguration<Student>
 {
-    public void Configure(EntityTypeBuilder<UserStudent> builder)
+    public void Configure(EntityTypeBuilder<Student> builder)
     {
-        builder.ToTable("UserStudent", SchemaNames.Classroom).IsMultiTenant();
-
+        builder.ToTable("Student", SchemaNames.Classroom).IsMultiTenant();
     }
 }
 
@@ -73,7 +71,7 @@ public class CommentConfig : IEntityTypeConfiguration<Comment>
     }
 }
 
-public class LikeConfig : IEntityTypeConfiguration<CommentLikes>
+public class CommentLikesConfig : IEntityTypeConfiguration<CommentLikes>
 {
     public void Configure(EntityTypeBuilder<CommentLikes> builder)
     {

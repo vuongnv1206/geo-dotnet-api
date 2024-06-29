@@ -13,6 +13,6 @@ public class UserByClassIdSpec : Specification<UserClass, UserClassDto>, ISingle
     {
         Query
             .Where(x => x.ClassesId == classId)
-            .Include(x => x.UserStudent);
+            .Include(x => x.Student);
     }
 }
