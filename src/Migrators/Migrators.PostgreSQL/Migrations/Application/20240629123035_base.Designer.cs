@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240628183304_base")]
+    [Migration("20240629123035_base")]
     partial class @base
     {
         /// <inheritdoc />
@@ -379,34 +379,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("NewsReactions", "Classroom");
+                    b.ToTable("PostLike", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserClass", b =>
-                {
-                    b.Property<Guid>("UserStudentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ClassesId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.HasKey("UserStudentId", "ClassesId");
-
-                    b.HasIndex("ClassesId");
-
-                    b.ToTable("UserClasses", "Classroom");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserStudent", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Student", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -419,6 +397,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("DeletedBy")
@@ -450,11 +431,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("StId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("StudentCode")
                         .HasColumnType("text");
-
-                    b.Property<Guid?>("StudentId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -465,7 +446,29 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("ClassesId");
 
-                    b.ToTable("UserStudent", "Classroom");
+                    b.ToTable("Student", "Classroom");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserClass", b =>
+                {
+                    b.Property<Guid>("ClassesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("ClassesId", "StudentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("UserClasses", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -1937,30 +1940,28 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Student", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", null)
+                        .WithMany("Students")
+                        .HasForeignKey("ClassesId");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Class.UserClass", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classes")
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", null)
                         .WithMany("UserClasses")
                         .HasForeignKey("ClassesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FSH.WebApi.Domain.Class.UserStudent", "UserStudent")
-                        .WithMany("UserClasses")
-                        .HasForeignKey("UserStudentId")
+                    b.HasOne("FSH.WebApi.Domain.Class.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Classes");
-
-                    b.Navigation("UserStudent");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserStudent", b =>
-                {
-                    b.HasOne("FSH.WebApi.Domain.Class.Classes", null)
-                        .WithMany("UserStudents")
-                        .HasForeignKey("ClassesId");
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
@@ -2267,11 +2268,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.Navigation("PaperAccesses");
 
+                    b.Navigation("Students");
+
                     b.Navigation("TeacherPermissionInClasses");
 
                     b.Navigation("UserClasses");
-
-                    b.Navigation("UserStudents");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
@@ -2289,11 +2290,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Comments");
 
                     b.Navigation("PostLikes");
-                });
-
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserStudent", b =>
-                {
-                    b.Navigation("UserClasses");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
