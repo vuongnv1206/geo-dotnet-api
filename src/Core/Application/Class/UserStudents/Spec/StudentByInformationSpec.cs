@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserStudents.Spec;
-public class UserStudentByInformationSpec : Specification<UserStudent>, ISingleResultSpecification
+public class StudentByInformationSpec : Specification<Student>, ISingleResultSpecification
 
 {
-    public UserStudentByInformationSpec(string email, string phoneNumber, DefaultIdType userId) {
+    public StudentByInformationSpec(string email, string phoneNumber, DefaultIdType userId) {
         Query.Where(x => (x.Email.Equals(email) || x.PhoneNumber.Equals(phoneNumber)) && x.CreatedBy == userId);
     }
 }

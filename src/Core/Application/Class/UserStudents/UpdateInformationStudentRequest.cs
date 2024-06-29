@@ -7,6 +7,7 @@ public class UpdateInformationStudentRequest : IRequest<Guid>
     public Guid Id { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
+    public DateTime? DateOfBirth { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
     public string? StudentCode { get; set; }
@@ -16,10 +17,10 @@ public class UpdateInformationStudentRequest : IRequest<Guid>
 
 public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInformationStudentRequest, Guid>
 {
-    private readonly IRepositoryWithEvents<UserStudent> _userStudentRepo;
+    private readonly IRepositoryWithEvents<Student> _userStudentRepo;
     private readonly IStringLocalizer _t;
 
-    public UpdateInformationStudentRequestHandler(IRepositoryWithEvents<UserStudent> userStudentRepo,
+    public UpdateInformationStudentRequestHandler(IRepositoryWithEvents<Student> userStudentRepo,
                                                   IStringLocalizer<UpdateInformationStudentRequestHandler> t)
     {
         _userStudentRepo = userStudentRepo;
@@ -38,12 +39,12 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
         if (request.PhoneNumber is not null && !userStudent.IsValidPhoneNumber(request.PhoneNumber))
             throw new ConflictException(_t["The phone number '{0}' is not valid. It must be 10 digits.", request.PhoneNumber]);
 
-        var existDuplicate = await _userStudentRepo.AnyAsync(new UserStudentByStudentCodeSpec(request.StudentCode));
+        var existDuplicate = await _userStudentRepo.AnyAsync(new StudentByStudentCodeSpec(request.StudentCode));
         if (existDuplicate)
         {
             throw new ConflictException(_t["The student code '{0}' is already in use.", request.StudentCode]);
         }
-        userStudent.Update(request.FirstName, request.LastName, request.Email, request.PhoneNumber, request.StudentCode, request.Gender);
+        userStudent.Update(request.FirstName, request.LastName, request.Email, request.PhoneNumber,request.DateOfBirth,request.StudentCode, request.Gender);
 
         await _userStudentRepo.UpdateAsync(userStudent, cancellationToken);
         return request.Id;

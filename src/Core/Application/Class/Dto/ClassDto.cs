@@ -18,6 +18,6 @@ public class ClassDto : IDto
     public string GroupClassName { get; set; }
     public int? NumberUserOfClass { get; set; }
     public List<AssignmentDto>? Assignments { get; set; }
-    public List<UserStudentDto>? UserStudents { get; set; }
+    public List<UserStudentDto>? Students { get; set; }
     public List<PaperInListDto>? Papers{ get; set; }
 }

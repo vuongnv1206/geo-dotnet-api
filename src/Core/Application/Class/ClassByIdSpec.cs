@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Class;
 public class ClassByIdSpec : Specification<Classes>, ISingleResultSpecification
 {
-    public ClassByIdSpec(DefaultIdType id)
+    public ClassByIdSpec(Guid id)
     {
         Query.Where(b => b.Id == id);
     }

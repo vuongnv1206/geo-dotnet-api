@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserStudents.Spec;
-public class UserStudentByStudentCodeSpec : Specification<UserStudent>, ISingleResultSpecification
+public class StudentByStudentCodeSpec : Specification<Student>, ISingleResultSpecification
 {
-    public UserStudentByStudentCodeSpec(string studentCode)
+    public StudentByStudentCodeSpec(string studentCode)
     {
         Query.Where(x => x.StudentCode.Equals(studentCode));
     }

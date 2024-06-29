@@ -67,7 +67,7 @@ public class MapsterSettings
         // UserClasses
         TypeAdapterConfig<UserClass, UserClassDto>.NewConfig()
             .Map(dest => dest.ClassesId, src => src.ClassesId)
-            .Map(dest => dest.UserStudentId, src => src.UserStudentId);
+            .Map(dest => dest.StudentId, src => src.StudentId);
 
         // Paper
         TypeAdapterConfig<Paper, PaperDto>.NewConfig()
@@ -111,7 +111,7 @@ public class MapsterSettings
         // Class
         TypeAdapterConfig<Classes, ClassDto>.NewConfig()
           .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
-          .Map(dest => dest.UserStudents, src => src.UserClasses.Select(p=> p.UserStudent))
+          .Map(dest => dest.Students, src => src.UserClasses.Select(p => p.Student))
           .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment))
           .Map(dest => dest.Papers, src => src.PaperAccesses.Select(pq => pq.Paper));
 
