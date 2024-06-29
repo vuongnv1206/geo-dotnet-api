@@ -188,7 +188,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("GroupClassId");
 
-                    b.ToTable("Classes", "Classes");
+                    b.ToTable("Classes", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -224,7 +224,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PostId")
+                    b.Property<Guid?>("PostId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("TenantId")
@@ -242,7 +242,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("Comments", "Classes");
+                    b.ToTable("Comments", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -262,7 +262,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("CommentId", "UserId");
 
-                    b.ToTable("CommentLikes", "Classes");
+                    b.ToTable("CommentLikes", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -303,7 +303,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.ToTable("GroupClasses", "Classes");
+                    b.ToTable("GroupClasses", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -354,7 +354,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("ClassesId");
 
-                    b.ToTable("Post", "Classes");
+                    b.ToTable("Post", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -376,7 +376,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("NewsReactions", "Classes");
+                    b.ToTable("NewsReactions", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -389,31 +389,16 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("ClassesId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<bool?>("IsGender")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<string>("StudentCode")
-                        .HasColumnType("text");
-
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("UserStudentId", "ClassesId");
 
                     b.HasIndex("ClassesId");
 
-                    b.ToTable("UserClasses", "Classes");
+                    b.ToTable("UserClasses", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -477,7 +462,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("ClassesId");
 
-                    b.ToTable("UserStudent", "Classes");
+                    b.ToTable("UserStudent", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -710,7 +695,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -1911,9 +1896,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PostId");
 
                     b.Navigation("Post");
                 });
@@ -1943,7 +1926,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Class.PostLike", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
-                        .WithMany("NewsReactions")
+                        .WithMany("PostLikes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1960,7 +1943,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired();
 
                     b.HasOne("FSH.WebApi.Domain.Class.UserStudent", "UserStudent")
-                        .WithMany()
+                        .WithMany("UserClasses")
                         .HasForeignKey("UserStudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2277,9 +2260,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.Navigation("AssignmentClasses");
 
-                    b.Navigation("PaperAccesses");
-
                     b.Navigation("GroupPermissionInClasses");
+
+                    b.Navigation("PaperAccesses");
 
                     b.Navigation("TeacherPermissionInClasses");
 
@@ -2302,7 +2285,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("NewsReactions");
+                    b.Navigation("PostLikes");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserStudent", b =>
+                {
+                    b.Navigation("UserClasses");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>

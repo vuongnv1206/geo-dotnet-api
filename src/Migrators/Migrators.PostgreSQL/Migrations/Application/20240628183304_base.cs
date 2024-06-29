@@ -22,7 +22,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 name: "Auditing");
 
             migrationBuilder.EnsureSchema(
-                name: "Classes");
+                name: "Classroom");
 
             migrationBuilder.EnsureSchema(
                 name: "GroupTeacher");
@@ -78,7 +78,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "GroupClasses",
-                schema: "Classes",
+                schema: "Classroom",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -336,7 +336,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.CreateTable(
                 name: "Classes",
-                schema: "Classes",
+                schema: "Classroom",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -358,7 +358,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_Classes_GroupClasses_GroupClassId",
                         column: x => x.GroupClassId,
-                        principalSchema: "Classes",
+                        principalSchema: "Classroom",
                         principalTable: "GroupClasses",
                         principalColumn: "Id");
                 });
@@ -369,7 +369,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
                     FolderId = table.Column<Guid>(type: "uuid", nullable: false),
                     GroupTeacherId = table.Column<Guid>(type: "uuid", nullable: true),
                     CanView = table.Column<bool>(type: "boolean", nullable: false),
@@ -747,7 +747,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_GroupPermissionInClasses_Classes_ClassId",
                         column: x => x.ClassId,
-                        principalSchema: "Classes",
+                        principalSchema: "Classroom",
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -761,8 +761,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "News",
-                schema: "Classes",
+                name: "Post",
+                schema: "Classroom",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -780,20 +780,14 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_News", x => x.Id);
+                    table.PrimaryKey("PK_Post", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_News_Classes_ClassesId",
+                        name: "FK_Post_Classes_ClassesId",
                         column: x => x.ClassesId,
-                        principalSchema: "Classes",
+                        principalSchema: "Classroom",
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_News_News_ParentId",
-                        column: x => x.ParentId,
-                        principalSchema: "Classes",
-                        principalTable: "News",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -819,7 +813,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_TeacherPermissionInClasses_Classes_ClassId",
                         column: x => x.ClassId,
-                        principalSchema: "Classes",
+                        principalSchema: "Classroom",
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -833,28 +827,36 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserClasses",
-                schema: "Classes",
+                name: "UserStudent",
+                schema: "Classroom",
                 columns: table => new
                 {
-                    ClassesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsGender = table.Column<bool>(type: "boolean", nullable: true),
-                    StudentCode = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    PhoneNumber = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    LastName = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    StudentCode = table.Column<string>(type: "text", nullable: true),
+                    Gender = table.Column<bool>(type: "boolean", nullable: true),
+                    ClassesId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserClasses", x => new { x.UserId, x.ClassesId });
+                    table.PrimaryKey("PK_UserStudent", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserClasses_Classes_ClassesId",
+                        name: "FK_UserStudent_Classes_ClassesId",
                         column: x => x.ClassesId,
-                        principalSchema: "Classes",
+                        principalSchema: "Classroom",
                         principalTable: "Classes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -906,7 +908,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_AssignmentClass_Classes_ClassesId",
                         column: x => x.ClassesId,
-                        principalSchema: "Classes",
+                        principalSchema: "Classroom",
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -929,7 +931,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_PaperAccesses_Classes_ClassId",
                         column: x => x.ClassId,
-                        principalSchema: "Classes",
+                        principalSchema: "Classroom",
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1044,22 +1046,80 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "Comments",
+                schema: "Classroom",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PostId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comments_Post_PostId",
+                        column: x => x.PostId,
+                        principalSchema: "Classroom",
+                        principalTable: "Post",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "NewsReactions",
-                schema: "Classes",
+                schema: "Classroom",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    NewsId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PostId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NewsReactions", x => new { x.UserId, x.NewsId });
+                    table.PrimaryKey("PK_NewsReactions", x => new { x.UserId, x.PostId });
                     table.ForeignKey(
-                        name: "FK_NewsReactions_News_NewsId",
-                        column: x => x.NewsId,
-                        principalSchema: "Classes",
-                        principalTable: "News",
+                        name: "FK_NewsReactions_Post_PostId",
+                        column: x => x.PostId,
+                        principalSchema: "Classroom",
+                        principalTable: "Post",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserClasses",
+                schema: "Classroom",
+                columns: table => new
+                {
+                    ClassesId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserStudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserClasses", x => new { x.UserStudentId, x.ClassesId });
+                    table.ForeignKey(
+                        name: "FK_UserClasses_Classes_ClassesId",
+                        column: x => x.ClassesId,
+                        principalSchema: "Classroom",
+                        principalTable: "Classes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserClasses_UserStudent_UserStudentId",
+                        column: x => x.UserStudentId,
+                        principalSchema: "Classroom",
+                        principalTable: "UserStudent",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1101,6 +1161,27 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CommentLikes",
+                schema: "Classroom",
+                columns: table => new
+                {
+                    CommentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CommentLikes", x => new { x.CommentId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_CommentLikes_Comments_CommentId",
+                        column: x => x.CommentId,
+                        principalSchema: "Classroom",
+                        principalTable: "Comments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_QuestionId",
                 schema: "Question",
@@ -1121,9 +1202,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_GroupClassId",
-                schema: "Classes",
+                schema: "Classroom",
                 table: "Classes",
                 column: "GroupClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_PostId",
+                schema: "Classroom",
+                table: "Comments",
+                column: "PostId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupPermissionInClasses_ClassId",
@@ -1138,22 +1225,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "GroupTeacherId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_News_ClassesId",
-                schema: "Classes",
-                table: "News",
-                column: "ClassesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_News_ParentId",
-                schema: "Classes",
-                table: "News",
-                column: "ParentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_NewsReactions_NewsId",
-                schema: "Classes",
+                name: "IX_NewsReactions_PostId",
+                schema: "Classroom",
                 table: "NewsReactions",
-                column: "NewsId");
+                column: "PostId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PaperAccesses_ClassId",
@@ -1220,6 +1295,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Examination",
                 table: "Papers",
                 column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Post_ClassesId",
+                schema: "Classroom",
+                table: "Post",
+                column: "ClassesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionFolders_ParentId",
@@ -1302,7 +1383,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClasses_ClassesId",
-                schema: "Classes",
+                schema: "Classroom",
                 table: "UserClasses",
                 column: "ClassesId");
 
@@ -1337,6 +1418,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 table: "Users",
                 columns: new[] { "NormalizedUserName", "TenantId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserStudent_ClassesId",
+                schema: "Classroom",
+                table: "UserStudent",
+                column: "ClassesId");
         }
 
         /// <inheritdoc />
@@ -1359,12 +1446,16 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Auditing");
 
             migrationBuilder.DropTable(
+                name: "CommentLikes",
+                schema: "Classroom");
+
+            migrationBuilder.DropTable(
                 name: "GroupPermissionInClasses",
                 schema: "GroupTeacher");
 
             migrationBuilder.DropTable(
                 name: "NewsReactions",
-                schema: "Classes");
+                schema: "Classroom");
 
             migrationBuilder.DropTable(
                 name: "Notification",
@@ -1412,7 +1503,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "UserClasses",
-                schema: "Classes");
+                schema: "Classroom");
 
             migrationBuilder.DropTable(
                 name: "UserLogins",
@@ -1431,8 +1522,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Assignment");
 
             migrationBuilder.DropTable(
-                name: "News",
-                schema: "Classes");
+                name: "Comments",
+                schema: "Classroom");
 
             migrationBuilder.DropTable(
                 name: "Questions",
@@ -1451,6 +1542,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "GroupTeacher");
 
             migrationBuilder.DropTable(
+                name: "UserStudent",
+                schema: "Classroom");
+
+            migrationBuilder.DropTable(
                 name: "Roles",
                 schema: "Identity");
 
@@ -1459,8 +1554,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Identity");
 
             migrationBuilder.DropTable(
-                name: "Classes",
-                schema: "Classes");
+                name: "Post",
+                schema: "Classroom");
 
             migrationBuilder.DropTable(
                 name: "QuestionFolders",
@@ -1475,8 +1570,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Examination");
 
             migrationBuilder.DropTable(
-                name: "GroupClasses",
-                schema: "Classes");
+                name: "Classes",
+                schema: "Classroom");
 
             migrationBuilder.DropTable(
                 name: "PaperFolders",
@@ -1489,6 +1584,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
             migrationBuilder.DropTable(
                 name: "Subject",
                 schema: "Subject");
+
+            migrationBuilder.DropTable(
+                name: "GroupClasses",
+                schema: "Classroom");
         }
     }
 }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240623154832_a")]
-    partial class a
+    [Migration("20240628183304_base")]
+    partial class @base
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -191,7 +191,81 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("GroupClassId");
 
-                    b.ToTable("Classes", "Classes");
+                    b.ToTable("Classes", "Classroom");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("Comments", "Classroom");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.CommentLikes", b =>
+                {
+                    b.Property<Guid>("CommentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("CommentId", "UserId");
+
+                    b.ToTable("CommentLikes", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -232,12 +306,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.ToTable("GroupClasses", "Classes");
+                    b.ToTable("GroupClasses", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Post", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -283,19 +357,17 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("ClassesId");
 
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("News", "Classes");
+                    b.ToTable("Post", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.NewsReaction", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.PostLike", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("NewsId")
+                    b.Property<Guid>("PostId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("TenantId")
@@ -303,11 +375,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.HasKey("UserId", "NewsId");
+                    b.HasKey("UserId", "PostId");
 
-                    b.HasIndex("NewsId");
+                    b.HasIndex("PostId");
 
-                    b.ToTable("NewsReactions", "Classes");
+                    b.ToTable("NewsReactions", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -329,7 +401,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("ClassesId");
 
-                    b.ToTable("UserClasses", "Classes");
+                    b.ToTable("UserClasses", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -338,6 +410,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ClassesId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CreatedBy")
@@ -388,7 +463,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserStudent", "Classes");
+                    b.HasIndex("ClassesId");
+
+                    b.ToTable("UserStudent", "Classroom");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -621,7 +698,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -967,18 +1044,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("QuestionId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId");
 
                     b.ToTable("Answers", "Question");
-
-                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
@@ -1282,6 +1352,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClassId");
+
                     b.HasIndex("GroupTeacherId");
 
                     b.ToTable("GroupPermissionInClasses", "GroupTeacher");
@@ -1391,6 +1463,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("TeacherTeamId");
 
@@ -1821,7 +1895,27 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("GroupClass");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId");
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.CommentLikes", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.Comment", "Comment")
+                        .WithMany("CommentLikes")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Post", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classes")
                         .WithMany()
@@ -1829,24 +1923,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FSH.WebApi.Domain.Class.News", "NewsParent")
-                        .WithMany()
-                        .HasForeignKey("ParentId");
-
                     b.Navigation("Classes");
-
-                    b.Navigation("NewsParent");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.NewsReaction", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.PostLike", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.Class.News", "News")
-                        .WithMany("NewsReactions")
-                        .HasForeignKey("NewsId")
+                    b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
+                        .WithMany("PostLikes")
+                        .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("News");
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.UserClass", b =>
@@ -1858,7 +1946,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired();
 
                     b.HasOne("FSH.WebApi.Domain.Class.UserStudent", "UserStudent")
-                        .WithMany()
+                        .WithMany("UserClasses")
                         .HasForeignKey("UserStudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1866,6 +1954,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Classes");
 
                     b.Navigation("UserStudent");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserStudent", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", null)
+                        .WithMany("UserStudents")
+                        .HasForeignKey("ClassesId");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
@@ -1892,7 +1987,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.PaperAccess", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Classes", "Class")
-                        .WithMany()
+                        .WithMany("PaperAccesses")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2053,11 +2148,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupPermissionInClass", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classroom")
+                        .WithMany("GroupPermissionInClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
                         .WithMany("GroupPermissionInClasses")
                         .HasForeignKey("GroupTeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Classroom");
 
                     b.Navigation("GroupTeacher");
                 });
@@ -2083,11 +2186,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherPermissionInClass", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", "Classroom")
+                        .WithMany("TeacherPermissionInClasses")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FSH.WebApi.Domain.TeacherGroup.TeacherTeam", "TeacherTeam")
                         .WithMany("TeacherPermissionInClasses")
                         .HasForeignKey("TeacherTeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Classroom");
 
                     b.Navigation("TeacherTeam");
                 });
@@ -2152,7 +2263,20 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.Navigation("AssignmentClasses");
 
+                    b.Navigation("GroupPermissionInClasses");
+
+                    b.Navigation("PaperAccesses");
+
+                    b.Navigation("TeacherPermissionInClasses");
+
                     b.Navigation("UserClasses");
+
+                    b.Navigation("UserStudents");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
+                {
+                    b.Navigation("CommentLikes");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.GroupClass", b =>
@@ -2160,9 +2284,16 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Classes");
                 });
 
-            modelBuilder.Entity("FSH.WebApi.Domain.Class.News", b =>
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.Post", b =>
                 {
-                    b.Navigation("NewsReactions");
+                    b.Navigation("Comments");
+
+                    b.Navigation("PostLikes");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Class.UserStudent", b =>
+                {
+                    b.Navigation("UserClasses");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.Paper", b =>
