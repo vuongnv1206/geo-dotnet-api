@@ -66,9 +66,32 @@ public class AuditService : IAuditService
         return new PaginationResponse<AuditTrailsDto>(trails, totalRecords, request.PageNumber, request.PageSize);
     }
 
-    public async Task<AuditTrailsDetailsDto<ClassLogDto>> GetClassUpdateLogDetails(Guid id)
+    public async Task<ClassLogDto> GetClassLogCreateDetails(Guid id)
     {
         var auditTrail = await _context.AuditTrails
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (auditTrail == null) throw new NotFoundException("Audit trail not found");
+
+        var classDTO = new ClassLogDto
+        {
+            Id = Guid.Parse(JsonUtils.GetJsonProperties(auditTrail.PrimaryKey, "id")),
+            Name = JsonUtils.GetJsonProperties(auditTrail.NewValues, "Name"),
+            SchoolYear = JsonUtils.GetJsonProperties(auditTrail.NewValues, "SchoolYear"),
+            GroupClassId = Guid.Parse(JsonUtils.GetJsonProperties(auditTrail.NewValues, "GroupClassId")),
+            GroupName = await _context.GroupClasses.IgnoreQueryFilters()
+                .Where(g => g.Id == Guid.Parse(JsonUtils.GetJsonProperties(auditTrail.NewValues, "GroupClassId")))
+                .Select(g => g.Name)
+                .FirstOrDefaultAsync()
+        };
+
+        return classDTO;
+    }
+
+    public async Task<AuditTrailsUpdateDetailsDto> GetClassUpdateLogDetails(Guid id)
+    {
+        var auditTrail = await _context.AuditTrails
+            .Where(a => a.Type.Equals("Update"))
             .FirstOrDefaultAsync(a => a.Id == id);
         if (auditTrail == null)
         {
@@ -76,44 +99,38 @@ public class AuditService : IAuditService
         }
 
         string[] changeFields = JsonUtils.SplitStringArray(auditTrail.AffectedColumns);
-        Guid classId = Guid.Parse(JsonUtils.GetJsonProperties(auditTrail.PrimaryKey, "id"));
-
-        var currentClass = await _context.Classes.Include(c => c.GroupClass)
-            .IgnoreQueryFilters()
-            .Select(c => new ClassLogDto()
-            {
-                Id = c.Id,
-                Name = c.Name,
-                SchoolYear = c.SchoolYear,
-                GroupClassId = c.GroupClassId,
-                GroupName = c.GroupClass.Name
-            })
-            .FirstOrDefaultAsync(c => c.Id == classId);
-        var oldClass = currentClass.Clone() as ClassLogDto;
+        string classId = JsonUtils.GetJsonProperties(auditTrail.PrimaryKey, "id");
+        Dictionary<string, string> oldData = new();
+        Dictionary<string, string> newData = new();
 
         foreach (var field in changeFields)
         {
-            var property = typeof(Classes).GetProperty(field);
-            string? oldValue = JsonUtils.GetJsonProperties(auditTrail.OldValues, field);
-            oldClass.SetClassChangeField(field, oldValue);
+            oldData.Add(field, JsonUtils.GetJsonProperties(auditTrail.OldValues, field));
+            newData.Add(field, JsonUtils.GetJsonProperties(auditTrail.NewValues, field));
         }
 
         if (changeFields.Contains("GroupClassId"))
         {
-            oldClass.GroupName = await _context.GroupClasses
-                .Where(g => g.Id == oldClass.GroupClassId)
-                .Select(g => g.Name).FirstOrDefaultAsync();
+            oldData.Add("GroupName", await _context.GroupClasses.IgnoreQueryFilters()
+                .Where(g => g.Id == Guid.Parse(oldData["GroupClassId"]))
+                .Select(g => g.Name)
+                .FirstOrDefaultAsync());
+            newData.Add("GroupName", await _context.GroupClasses.IgnoreQueryFilters()
+                .Where(g => g.Id == Guid.Parse(newData["GroupClassId"]))
+                .Select(g => g.Name)
+                .FirstOrDefaultAsync());
         }
 
         return new()
         {
-            OldData = oldClass,
-            NewData = currentClass,
+            Id = classId,
+            OldData = oldData,
+            NewData = newData,
             ChangeFields = changeFields
         };
     }
 
-    public async Task<ClassLogDto> GetClassLogDetails(Guid classId)
+    public async Task<ClassLogDto> GetClassLogDeleteDetails(Guid classId)
     {
         ClassLogDto classLogDto = await _context.Classes.Include(c => c.GroupClass)
             .IgnoreQueryFilters()
@@ -134,4 +151,5 @@ public class AuditService : IAuditService
 
         return classLogDto;
     }
+
 }

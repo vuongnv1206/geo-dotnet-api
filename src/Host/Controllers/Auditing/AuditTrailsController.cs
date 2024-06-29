@@ -12,17 +12,24 @@ public class AuditTrailsController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpGet("class/update/{id}")]
-    [OpenApiOperation("Get class update log", "")]
-    public Task<AuditTrailsDetailsDto<ClassLogDto>> GetClassUpdateLog(Guid id)
+    [HttpGet("class/create/{id}")]
+    [OpenApiOperation("Get class create log", "")]
+    public Task<ClassLogDto> GetClassLogCreateDetails(Guid id)
     {
-        return Mediator.Send(new GetClassUpdateLogRequest(id));
+        return Mediator.Send(new GetClassLogCreateDetailsRequest(id));
     }
 
-    [HttpGet("class/details/{id}")]
-    [OpenApiOperation("Get class log details", "")]
+    [HttpGet("class/update/{id}")]
+    [OpenApiOperation("Get class update log", "")]
+    public Task<AuditTrailsUpdateDetailsDto> GetClassUpdateLog(Guid id)
+    {
+        return Mediator.Send(new GetClassLogUpdateRequest(id));
+    }
+
+    [HttpGet("class/delete/{id}")]
+    [OpenApiOperation("Get class delete log details", "")]
     public Task<ClassLogDto> GetClassLogDetails(Guid id)
     {
-        return Mediator.Send(new GetClassLogDetailsRequest(id));
+        return Mediator.Send(new GetClassLogDeleteDetailsRequest(id));
     }
 }
