@@ -2,7 +2,7 @@
 using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.New.Spec;
-public class PostByIdSpec : Specification<Post, PostDto>, ISingleResultSpecification
+public class PostByIdSpec : Specification<Post>, ISingleResultSpecification
 {
     public PostByIdSpec(DefaultIdType id)
     {

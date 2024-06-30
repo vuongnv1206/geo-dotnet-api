@@ -10,6 +10,6 @@ public class PostLikeByParentIdSpec : Specification<Post>, ISingleResultSpecific
 {
     public PostLikeByParentIdSpec(DefaultIdType postId)
     {
-        Query.Where(p => p.ParentId == postId);
+        Query.Where(p => p.Id == postId);
     }
 }

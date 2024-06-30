@@ -42,31 +42,4 @@ public class PostController : VersionedApiController
     {
         return Mediator.Send(new DeleteNewsRequest(id));
     }
-
-
-    [HttpPost("comments")]
-    [MustHavePermission(FSHAction.Create, FSHResource.News)]
-    [OpenApiOperation("Create a Comment in the Post.", "")]
-    public Task<Guid> CreateCommentAsync(CreateCommentRequest request)
-    {
-        return Mediator.Send(request);
-    }
-
-    [HttpPut("{id:guid}/comment")]
-    [MustHavePermission(FSHAction.Update, FSHResource.News)]
-    [OpenApiOperation("Update a Comment.", "")]
-    public async Task<ActionResult<Guid>> UpdateCommentAsync(UpdateCommentRequest request, Guid id)
-    {
-        return id != request.Id
-            ? BadRequest()
-            : Ok(await Mediator.Send(request));
-    }
-
-    [HttpDelete("{id:guid}/commnets")]
-    [MustHavePermission(FSHAction.Delete, FSHResource.News)]
-    [OpenApiOperation("Delete a comment.", "")]
-    public Task<Guid> DeleteCommentAsync(Guid id)
-    {
-        return Mediator.Send(new DeleteCommentRequest(id));
-    }
 }

@@ -104,6 +104,7 @@ public class MapsterSettings
         // Post
         TypeAdapterConfig<Post, PostDto>.NewConfig()
             .Map(dest => dest.NumberLikeInThePost, src => src.PostLikes.Count());
+
         // Comment
         TypeAdapterConfig<Comment, CommentDto>.NewConfig()
             .Map(dest => dest.NumberLikeInComment, src => src.CommentLikes.Count());
@@ -120,8 +121,5 @@ public class MapsterSettings
 
         TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();
-
-
-
     }
 }

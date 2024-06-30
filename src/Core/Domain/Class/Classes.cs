@@ -1,7 +1,6 @@
 ﻿using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
-using FSH.WebApi.Domain.Assignment;
 
 namespace FSH.WebApi.Domain.Class;
 public class Classes : AuditableEntity, IAggregateRoot
@@ -18,8 +17,11 @@ public class Classes : AuditableEntity, IAggregateRoot
     public virtual IEnumerable<TeacherPermissionInClass>? TeacherPermissionInClasses { get; set; }
     public virtual IEnumerable<GroupPermissionInClass>? GroupPermissionInClasses { get; set; }
 
+    public Classes()
+    {
+    }
 
-    public Classes(string? name, string? schoolYear, Guid ownerId, Guid? groupClassId)
+    public Classes(string name, string schoolYear, Guid ownerId, Guid? groupClassId)
     {
         Name = name;
         SchoolYear = schoolYear;
@@ -41,7 +43,6 @@ public class Classes : AuditableEntity, IAggregateRoot
         UserClasses.Add(userClass);
     }
 
-
     public void RemoveUserInClass(UserClass userClass)
     {
         UserClasses.Remove(userClass);
@@ -51,7 +52,6 @@ public class Classes : AuditableEntity, IAggregateRoot
     {
         GroupClassId = newGroupClassId;
     }
-
 
     public void AssignAssignmentToClass(AssignmentClass assignmentClass)
     {
