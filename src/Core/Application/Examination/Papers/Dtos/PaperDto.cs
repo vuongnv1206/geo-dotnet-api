@@ -19,7 +19,7 @@ public class PaperDto : IDto
     public bool ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
     public string Type { get; set; }
-   
+    public PaperShareType ShareType { get; set; }
     public bool IsPublish { get; set; }
     public string ExamCode { get; set; }
     public string? Content { get; set; }
