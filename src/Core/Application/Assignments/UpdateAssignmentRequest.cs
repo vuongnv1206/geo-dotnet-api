@@ -58,8 +58,7 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             request.Content,
             request.CanViewResult,
             request.RequireLoginToSubmit,
-            request.SubjectId
-            );
+            request.SubjectId);
 
         if (request.ClassIds != null)
         {

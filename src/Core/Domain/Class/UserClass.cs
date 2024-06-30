@@ -10,23 +10,16 @@ namespace FSH.WebApi.Domain.Class;
 public class UserClass
 {
     public Guid ClassesId { get; set; }
-    public Guid UserStudentId { get; set; }
-    public virtual UserStudent UserStudent { get;  set; }
-    public virtual Classes Classes { get; set; }
-    public DefaultIdType UserId { get; set; }
-    public bool? IsGender { get; set; }
-    public string? StudentCode { get; set; }
-    public string? Email { get; set; }
-    public string? PhoneNumber { get; set; }
+    public Guid StudentId { get; set; }
+    public virtual Student Student { get; set; }
 
     public UserClass()
     {
     }
 
-    public UserClass(Guid classesId, Guid userStudentId)
+    public UserClass(DefaultIdType classesId, DefaultIdType studentId)
     {
         ClassesId = classesId;
-        UserStudentId = userStudentId;
+        StudentId = studentId;
     }
-
 }

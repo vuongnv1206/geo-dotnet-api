@@ -21,7 +21,7 @@ public class UserClassesRepository : IUserClassesRepository
 
     public async Task DeleteUserInClass(Guid userId, Guid classId)
     {
-        var userClasses = await _context.UserClasses.FirstOrDefaultAsync(c => c.UserStudentId == userId && c.ClassesId == classId);
+        var userClasses = await _context.UserClasses.FirstOrDefaultAsync(c => c.StudentId == userId && c.ClassesId == classId);
         if (userClasses != null)
         {
             _context.UserClasses.Remove(userClasses);
@@ -37,12 +37,12 @@ public class UserClassesRepository : IUserClassesRepository
 
     public async Task<UserClass> GetUserDetailInClasses(Guid userId, Guid classesId)
     {
-        return await _context.UserClasses.FirstOrDefaultAsync(t => t.UserStudentId == userId && t.ClassesId == classesId);
+        return await _context.UserClasses.FirstOrDefaultAsync(t => t.StudentId == userId && t.ClassesId == classesId);
     }
 
     public async Task<List<UserClass>> GetUserInClasses(Guid classesId)
     {
-        return await _context.UserClasses.Include(x => x.UserStudent)
+        return await _context.UserClasses.Include(x => x.Student)
          .Where(uc => uc.ClassesId == classesId)
          .ToListAsync();
     }
