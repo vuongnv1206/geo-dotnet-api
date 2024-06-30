@@ -8,19 +8,16 @@ namespace FSH.WebApi.Application.Class.GroupClasses;
 
 public class SearchGroupClassRequest : PaginationFilter,IRequest<PaginationResponse<GroupClassDto>>
 {
-    public string? Name { get; set; }
 }
 
-public class GroupClassBySearchRequestSpec : Specification<GroupClass, GroupClassDto>
+public class GroupClassBySearchRequestSpec : EntitiesByPaginationFilterSpec<GroupClass, GroupClassDto>
 {
-    public GroupClassBySearchRequestSpec(string? name, DefaultIdType userId)
+    public GroupClassBySearchRequestSpec(SearchGroupClassRequest request, DefaultIdType userId)
+        : base(request)
     {
         Query
             .Include(c => c.Classes)
-            .OrderBy(c => c.Name)
-            .Where(c => string.IsNullOrEmpty(name) || c.Name.ToLower().Contains(name.ToLower()));
-
-        Query.Where(x => x.CreatedBy == userId);
+            .Where(x => x.CreatedBy == userId);
     }
 }
 public class GroupClassByUserSpec : Specification<GroupClass, GroupClassDto>
@@ -40,14 +37,16 @@ public class SearchGroupClassesRequestHandler : IRequestHandler<SearchGroupClass
     private readonly IStringLocalizer _t;
     private readonly ICurrentUser _currentUser;
 
-    public SearchGroupClassesRequestHandler(IReadRepository<GroupClass> repository, ICurrentUser currentUser,
-                                            IStringLocalizer<SearchClassesRequestHandler> localizer) =>
+    public SearchGroupClassesRequestHandler(
+        IReadRepository<GroupClass> repository,
+        ICurrentUser currentUser,
+        IStringLocalizer<SearchClassesRequestHandler> localizer) =>
         (_repository, _currentUser, _t) = (repository, currentUser, localizer);
 
     public async Task<PaginationResponse<GroupClassDto>> Handle(SearchGroupClassRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
-        var spec = new GroupClassBySearchRequestSpec(request.Name, userId);
+        var spec = new GroupClassBySearchRequestSpec(request, userId);
         return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
     }
 }
