@@ -9,7 +9,6 @@ namespace FSH.WebApi.Application.Class.New;
 public class CreatePostRequest : IRequest<Guid>
 {
     public Guid ClassesId { get; set; }
-    public Guid UserId { get; set; }
     public string? Content { get; set; }
     public bool IsLockComment { get; set; }
 }
@@ -35,7 +34,7 @@ public class CreateNewsRequestHandler : IRequestHandler<CreatePostRequest, Guid>
 
     public async Task<Guid> Handle(CreatePostRequest request, CancellationToken cancellationToken)
     {
-        var post = new Post(request.Content ?? string.Empty, request.IsLockComment, request.UserId, request.ClassesId);
+        var post = new Post(request.Content ?? string.Empty, request.IsLockComment, request.ClassesId);
 
         await _repository.AddAsync(post);
 
