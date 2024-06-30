@@ -10,7 +10,6 @@ public class CreatePostRequest : IRequest<Guid>
 {
     public Guid ClassesId { get; set; }
     public Guid UserId { get; set; }
-
     public string? Content { get; set; }
     public bool IsLockComment { get; set; }
 }

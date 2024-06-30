@@ -24,7 +24,7 @@ public class Post : AuditableEntity, IAggregateRoot
         ClassesId = classesId;
     }
 
-    public Post Update(string? content, bool? isLockComment, Guid? parentId)
+    public Post Update(string? content, bool? isLockComment)
     {
         if (content is not null && !Content.Equals(content)) Content = content;
         if (isLockComment.HasValue) IsLockComment = isLockComment.Value;
