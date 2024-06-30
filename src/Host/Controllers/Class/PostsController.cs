@@ -6,7 +6,7 @@ using FSH.WebApi.Application.Class.New.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.Class;
-public class PostController : VersionedApiController
+public class PostsController : VersionedApiController
 {
 
     [HttpPost("search")]
@@ -51,7 +51,7 @@ public class PostController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpDelete("like")]
+    [HttpPost("dislike")]
     [MustHavePermission(FSHAction.Delete, FSHResource.NewsReaction)]
     [OpenApiOperation("DisLike a post", "")]
     public Task RemoveLikeInTheNews(DeletePostReactionRequest request)
