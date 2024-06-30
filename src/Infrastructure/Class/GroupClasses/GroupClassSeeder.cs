@@ -31,90 +31,90 @@ public class GroupClassSeeder : ICustomSeeder
 
         if (!_db.GroupClasses.Any())
         {
-            _logger.LogInformation("Started to Seed GroupClass.");
+            //    _logger.LogInformation("Started to Seed GroupClass.");
 
-            // Here you can use your own logic to populate the database.
-            // As an example, I am using a JSON file to populate the database.
-            string groupClassData = await File.ReadAllTextAsync(path + "/Class/GroupClasses/groupClasses.json", cancellationToken);
-            var groupClass = _serializerService.Deserialize<List<GroupClass>>(groupClassData);
+            //    // Here you can use your own logic to populate the database.
+            //    // As an example, I am using a JSON file to populate the database.
+            //    string groupClassData = await File.ReadAllTextAsync(path + "/Class/GroupClasses/groupClasses.json", cancellationToken);
+            //    var groupClass = _serializerService.Deserialize<List<GroupClass>>(groupClassData);
 
-            if (groupClass != null)
-            {
-                foreach (var gc in groupClass)
-                {
-                    await _db.GroupClasses.AddAsync(gc, cancellationToken);
-                }
-            }
+            //    if (groupClass != null)
+            //    {
+            //        foreach (var gc in groupClass)
+            //        {
+            //            await _db.GroupClasses.AddAsync(gc, cancellationToken);
+            //        }
+            //    }
 
-            await _db.SaveChangesAsync(cancellationToken);
+            //    await _db.SaveChangesAsync(cancellationToken);
 
-            var groupClasses = await _db.GroupClasses.ToListAsync(cancellationToken);
-            foreach (var g in groupClasses)
-            {
-                g.CreatedBy = adminGuid;
-            }
+            //    var groupClasses = await _db.GroupClasses.ToListAsync(cancellationToken);
+            //    foreach (var g in groupClasses)
+            //    {
+            //        g.CreatedBy = adminGuid;
+            //    }
 
-            _logger.LogInformation("Seeded GroupClasses.");
-        }
+            //    _logger.LogInformation("Seeded GroupClasses.");
+            //}
 
-        if (!_db.Classes.Any())
-        {
-            _logger.LogInformation("Started to Seed Classes.");
+            //if (!_db.Classes.Any())
+            //{
+            //    _logger.LogInformation("Started to Seed Classes.");
 
-            var groupClasses = await _db.GroupClasses.ToListAsync(cancellationToken);
+            //    var groupClasses = await _db.GroupClasses.ToListAsync(cancellationToken);
 
-            foreach (var gc in groupClasses)
-            {
-                await _db.Classes.AddAsync(new Classes("Se1600", "2024", basicGuid, gc.Id));
-            }
+            //    foreach (var gc in groupClasses)
+            //    {
+            //        await _db.Classes.AddAsync(new Classes("Se1600", "2024", basicGuid, gc.Id));
+            //    }
 
-            await _db.SaveChangesAsync(cancellationToken);
-            // add creator for all classes in the database
-            var classes = await _db.Classes.ToListAsync(cancellationToken);
-            foreach (var c in classes)
-            {
-                c.CreatedBy = adminGuid;
-            }
+            //    await _db.SaveChangesAsync(cancellationToken);
+            //    // add creator for all classes in the database
+            //    var classes = await _db.Classes.ToListAsync(cancellationToken);
+            //    foreach (var c in classes)
+            //    {
+            //        c.CreatedBy = adminGuid;
+            //    }
 
-            _logger.LogInformation("Seeded Class.");
-        }
+            //    _logger.LogInformation("Seeded Class.");
+            //}
 
-        if (!_db.Post.Any())
-        {
-            _logger.LogInformation("Started to Seed Post.");
+            //if (!_db.Post.Any())
+            //{
+            //    _logger.LogInformation("Started to Seed Post.");
 
-            var classes = await _db.Classes.ToListAsync(cancellationToken);
+            //    var classes = await _db.Classes.ToListAsync(cancellationToken);
 
-            foreach (var c in classes)
-            {
-                await _db.Post.AddAsync(new Post("The post in the class", true, null, c.Id));
-            }
+            //    foreach (var c in classes)
+            //    {
+            //        await _db.Post.AddAsync(new Post("The post in the class", true, c.Id, c.Id));
+            //    }
 
-            await _db.SaveChangesAsync(cancellationToken);
+            //    await _db.SaveChangesAsync(cancellationToken);
 
-            // add creator for all news in the database
-            var news = await _db.Post.ToListAsync(cancellationToken);
-            foreach (var c in news)
-            {
-                c.CreatedBy = adminGuid;
-            }
+            //    // add creator for all news in the database
+            //    var news = await _db.Post.ToListAsync(cancellationToken);
+            //    foreach (var c in news)
+            //    {
+            //        c.CreatedBy = adminGuid;
+            //    }
 
-            _logger.LogInformation("Seeded Post.");
-        }
+            //    _logger.LogInformation("Seeded Post.");
+            //}
 
-        if (!_db.PostLike.Any())
-        {
-            _logger.LogInformation("Started to Seed PostLike.");
+            //if (!_db.PostLike.Any())
+            //{
+            //    _logger.LogInformation("Started to Seed PostLike.");
 
-            var news = await _db.Post.ToListAsync(cancellationToken);
+            //    var news = await _db.Post.ToListAsync(cancellationToken);
 
-            foreach (var n in news)
-            {
-                await _db.PostLike.AddAsync(new PostLike(adminGuid, n.Id));
-            }
+            //    foreach (var n in news)
+            //    {
+            //        await _db.PostLike.AddAsync(new PostLike(adminGuid, n.Id));
+            //    }
 
-            await _db.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Seeded PostLike.");
+            //    await _db.SaveChangesAsync(cancellationToken);
+            //    _logger.LogInformation("Seeded PostLike.");
         }
     }
 }
