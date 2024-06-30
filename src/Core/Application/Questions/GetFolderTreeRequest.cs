@@ -66,7 +66,11 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
     {
         var userId = _currentUser.GetUserId();
 
-        var spec = new QuestionFoldersWithPermissionsSpecByUserId(userId, request.ParentId);
+        var groupTeachers = await _groupTeacherRepository.ListAsync(new GroupTeachersByUserIdSpec(userId), cancellationToken);
+
+        List<Guid> groupTeacherIds = groupTeachers.Select(x => x.Id).ToList();
+
+        var spec = new QuestionFoldersWithPermissionsSpecByUserId(userId, groupTeacherIds, request.ParentId);
         var questionFolders = await _questionFolderRepository.ListAsync(spec, cancellationToken);
         var questionFolderTree = questionFolders.Adapt<List<QuestionTreeDto>>();
         await GetDetails(questionFolderTree, cancellationToken);
