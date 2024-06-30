@@ -17,4 +17,6 @@ public class PostDto : IDto
     public string? ClassesName { get; set; }
     public int? NumberLikeInThePost { get; set; }
     public List<CommentDto> Comments { get; set; }
+    public Guid CreatedBy { get; set; }
+
 }

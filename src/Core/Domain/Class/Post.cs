@@ -11,6 +11,10 @@ public class Post : AuditableEntity, IAggregateRoot
     public virtual ICollection<Comment> Comments { get; private set; }
     public virtual ICollection<PostLike> PostLikes { get; private set; }
 
+    public Post()
+    {
+    }
+
     public Post(string content, bool isLockComment, Guid? parentId, Guid classesId)
     {
         Content = content;
@@ -19,10 +23,10 @@ public class Post : AuditableEntity, IAggregateRoot
         ClassesId = classesId;
     }
 
-    public Post Update(string? content, bool? isLockCommnet, Guid? parentId)
+    public Post Update(string? content, bool? isLockComment, Guid? parentId)
     {
-        if (isLockCommnet.HasValue) IsLockComment = isLockCommnet.Value;
-        if (content is not null && Content?.Equals(content) is not true) Content = content;
+        if (content is not null && !Content.Equals(content)) Content = content;
+        if (isLockComment.HasValue) IsLockComment = isLockComment.Value;
         if (parentId.HasValue && parentId.Value != Guid.Empty && !ParentId.Equals(parentId.Value)) ParentId = parentId.Value;
         return this;
     }
