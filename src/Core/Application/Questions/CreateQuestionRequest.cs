@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Question;
+﻿using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
 using Mapster;
 
@@ -92,20 +93,49 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
 {
     private readonly IRepositoryWithEvents<Question> _questionRepo;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
+    private readonly IRepositoryWithEvents<QuestionFolder> _questionFolderRepository;
 
     public CreateQuestionRequestHandler(
         IRepositoryWithEvents<Question> questionRepo,
-        IStringLocalizer<CreateQuestionRequestHandler> t)
+        IStringLocalizer<CreateQuestionRequestHandler> t,
+        ICurrentUser currentUser,
+        IRepositoryWithEvents<QuestionFolder> questionFolderRepository)
     {
         _questionRepo = questionRepo;
         _t = t;
+        _currentUser = currentUser;
+        _questionFolderRepository = questionFolderRepository;
     }
 
     public async Task<List<Guid>> Handle(CreateQuestionRequest request, CancellationToken cancellationToken)
     {
         var createdQuestionIds = new List<Guid>();
+        HashSet<Guid> questionfolderIds = new HashSet<Guid>();
+
         foreach (var questionDto in request.Questions)
         {
+            if (questionDto.QuestionFolderId.HasValue)
+            {
+                questionfolderIds.Add(questionDto.QuestionFolderId.Value);
+            }
+        }
+        foreach (var questionId in questionfolderIds)
+        {
+            var questionFolder = await _questionFolderRepository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(questionId), cancellationToken);
+            _ = questionFolder ?? throw new NotFoundException(_t["Folder {0} Not Found.", questionId]);
+            // check if user has permission to add question to folder
+            if (!questionFolder.CanAdd(_currentUser.GetUserId()))
+            {
+                throw new ForbiddenException(_t["You do not have permission to add question to this folder."]);
+            }
+        }
+
+        foreach (var questionDto in request.Questions)
+        {
+
+
+
             var question = questionDto.Adapt<Question>();
             var answers = questionDto.Answers?.Adapt<List<Answer>>();
 

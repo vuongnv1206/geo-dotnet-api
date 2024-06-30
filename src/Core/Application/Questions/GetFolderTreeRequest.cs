@@ -82,6 +82,22 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
                 CurrentShow = true,
                 Children = questionFolderTree
             };
+
+            // get questions folder if user has no permission to view parent folder but has permission to view child folder
+            // get all folders that user has permission to view
+            var spec2 = new QuestionChildrenFoldersWithPermissionsSpecByUserId(userId);
+            var questionFolders2 = await _questionFolderRepository.ListAsync(spec2, cancellationToken);
+            // get folders that user has no permission to view but has permission to view child folder
+            foreach (var folder in questionFolders2)
+            {
+                var parentFolder2 = await _questionFolderRepository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(folder.ParentId.Value), cancellationToken);
+                if (parentFolder2 != null && !parentFolder2.Permissions.Any(x => x.UserId == userId && x.CanView))
+                {
+                    var sharedFolder = folder.Adapt<QuestionTreeDto>();
+                    await GetDetails(new List<QuestionTreeDto> { sharedFolder }, cancellationToken);
+                    result.Children.Add(sharedFolder);
+                }
+            }
         }
         else
         {

@@ -42,17 +42,20 @@ public class UpdateQuestionRequestHandler : IRequestHandler<UpdateQuestionReques
     private readonly IStringLocalizer _t;
     private readonly ICurrentUser _currentUser;
     private readonly IRepositoryWithEvents<Answer> _answerRepo;
+    private readonly IRepositoryWithEvents<QuestionFolder> _questionFolderRepository;
 
     public UpdateQuestionRequestHandler(
         IRepositoryWithEvents<Question> questionRepo,
         IStringLocalizer<UpdateQuestionRequestHandler> t,
         ICurrentUser currentUser,
-        IRepositoryWithEvents<Answer> answerRepo)
+        IRepositoryWithEvents<Answer> answerRepo,
+        IRepositoryWithEvents<QuestionFolder> questionFolderRepository)
     {
         _questionRepo = questionRepo;
         _t = t;
         _currentUser = currentUser;
         _answerRepo = answerRepo;
+        _questionFolderRepository = questionFolderRepository;
     }
 
     private async Task AddQuestionPassages(List<CreateQuestionDto> passages, Guid parentId, CancellationToken cancellationToken)
@@ -85,7 +88,13 @@ public class UpdateQuestionRequestHandler : IRequestHandler<UpdateQuestionReques
         _ = question ?? throw new NotFoundException(_t["Question {0} Not Found.", request.Id]);
 
         if (!question.CanUpdate(_currentUser.GetUserId()))
-            throw new ForbiddenException(_t["You can not edit this question."]);
+        {
+            var folder = await _questionFolderRepository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(question.QuestionFolderId));
+            if (folder.CreatedBy != _currentUser.GetUserId())
+            {
+                throw new ForbiddenException(_t["You do not have permission to update this question."]);
+            }
+        }
 
         question.Update(request.Content, request.Image, request.Audio, request.QuestionFolderId, request.QuestionType, request.QuestionLabelId, request.ParentId);
         foreach (var answer in question.Answers)
@@ -126,7 +135,7 @@ public class UpdateQuestionRequestHandler : IRequestHandler<UpdateQuestionReques
         {
             if (question.Answers.Count < 2)
                 throw new BadRequestException(_t["Single choice question must have at least 2 answers."]);
-            if (question.Answers.Count(a => a.IsCorrect) != 1)
+            if (question.Answers.Count(a => a.IsCorrect) > 1)
                 throw new BadRequestException(_t["Single choice question must have exactly 1 correct answer."]);
         }
 
