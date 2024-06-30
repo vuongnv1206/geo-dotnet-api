@@ -44,7 +44,7 @@ public class StudentController : VersionedApiController
             : Ok(await Mediator.Send(request));
     }
 
-    [HttpDelete]
+    [HttpDelete("{id:guid}")]
     [MustHavePermission(FSHAction.Delete, FSHResource.Classes)]
     [OpenApiOperation("Delete a Student.", "")]
     public Task DeleteUserInClass(Guid id)
