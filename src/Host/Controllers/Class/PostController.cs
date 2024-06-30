@@ -11,7 +11,7 @@ public class PostController : VersionedApiController
 
     [HttpPost("search")]
     [MustHavePermission(FSHAction.Search, FSHResource.Classes)]
-    [OpenApiOperation("Get all news in the class.", "")]
+    [OpenApiOperation("Search posts using available filters.", "")]
     public Task<PaginationResponse<PostDto>> SearchAsync(GetPostRequest request)
     {
         return Mediator.Send(request);
@@ -19,7 +19,7 @@ public class PostController : VersionedApiController
 
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.News)]
-    [OpenApiOperation("Create a News.", "")]
+    [OpenApiOperation("Create a posts.", "")]
     public Task<Guid> CreateAsync(CreatePostRequest request)
     {
         return Mediator.Send(request);
@@ -27,7 +27,7 @@ public class PostController : VersionedApiController
 
     [HttpPut("{id:guid}")]
     [MustHavePermission(FSHAction.Update, FSHResource.News)]
-    [OpenApiOperation("Update a News.", "")]
+    [OpenApiOperation("Update a posts.", "")]
     public async Task<ActionResult<Guid>> UpdateAsync(UpdatePostRequest request, Guid id)
     {
         return id != request.Id
@@ -37,9 +37,25 @@ public class PostController : VersionedApiController
 
     [HttpDelete("{id:guid}")]
     [MustHavePermission(FSHAction.Delete, FSHResource.News)]
-    [OpenApiOperation("Delete a News.", "")]
+    [OpenApiOperation("Delete a posts.", "")]
     public Task<Guid> DeleteAsync(Guid id)
     {
         return Mediator.Send(new DeleteNewsRequest(id));
+    }
+
+    [HttpPost("like")]
+    [MustHavePermission(FSHAction.Create, FSHResource.NewsReaction)]
+    [OpenApiOperation("Like a post.", "")]
+    public Task<Guid> CreateAsync(CreatePostLikeRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpDelete("like")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.NewsReaction)]
+    [OpenApiOperation("DisLike a post", "")]
+    public Task RemoveLikeInTheNews(DeletePostReactionRequest request)
+    {
+        return Mediator.Send(request);
     }
 }
