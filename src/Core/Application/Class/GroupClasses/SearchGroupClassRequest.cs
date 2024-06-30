@@ -6,7 +6,7 @@ using MapsterMapper;
 
 namespace FSH.WebApi.Application.Class.GroupClasses;
 
-public class SearchGroupClassRequest : PaginationFilter,IRequest<PaginationResponse<GroupClassDto>>
+public class SearchGroupClassRequest : PaginationFilter, IRequest<PaginationResponse<GroupClassDto>>
 {
 }
 
@@ -20,6 +20,7 @@ public class GroupClassBySearchRequestSpec : EntitiesByPaginationFilterSpec<Grou
             .Where(x => x.CreatedBy == userId);
     }
 }
+
 public class GroupClassByUserSpec : Specification<GroupClass, GroupClassDto>
 {
     public GroupClassByUserSpec(DefaultIdType userId)
