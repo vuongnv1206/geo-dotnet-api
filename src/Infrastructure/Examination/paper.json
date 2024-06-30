@@ -15,6 +15,7 @@
     "ExamCode": "MATH2023",
     "Content": "This is the content of the Math Test.",
     "Description": "Description of Math Test",
+    "ShareType":  1
   },
   {
     "ExamName": "Science Test",
@@ -31,7 +32,8 @@
     "IsPublish": false,
     "ExamCode": "SCI2023",
     "Content": "This is the content of the Science Test.",
-    "Description": "Description of Science Test"
+    "Description": "Description of Science Test",
+    "ShareType": 1
   },
   {
     "ExamName": "MAS Test",
@@ -48,7 +50,8 @@
     "IsPublish": false,
     "ExamCode": "SCI2023",
     "Content": "This is the content of the Science Test.",
-    "Description": "Description of Science Test"
+    "Description": "Description of Science Test",
+    "ShareType": 1
   },
   {
     "ExamName": "Exam Test",
@@ -65,6 +68,7 @@
     "IsPublish": false,
     "ExamCode": "SCI2023",
     "Content": "This is the content of the Science Test.",
-    "Description": "Description of Science Test"
+    "Description": "Description of Science Test",
+    "ShareType": 1
   }
 ]
