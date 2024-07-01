@@ -22,14 +22,12 @@ public class JsonUtils
 
     public static string[] SplitStringArray(string jsonString)
     {
-        string[] ignoreFields = { "LastModifiedOn" };
         if (string.IsNullOrEmpty(jsonString)) return Array.Empty<string>();
         using (JsonDocument doc = JsonDocument.Parse(jsonString))
         {
             JsonElement root = doc.RootElement;
             return root.EnumerateArray()
                        .Select(x => x.GetString())
-                       .Where(f => !ignoreFields.Contains(f))
                        .ToArray();
         }
     }

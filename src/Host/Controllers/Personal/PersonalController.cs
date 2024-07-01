@@ -9,8 +9,12 @@ namespace FSH.WebApi.Host.Controllers.Identity;
 public class PersonalController : VersionNeutralApiController
 {
     private readonly IUserService _userService;
-
-    public PersonalController(IUserService userService) => _userService = userService;
+    private readonly IAuditService _auditService;
+    public PersonalController(IUserService userService, IAuditService auditService)
+    {
+        _userService = userService;
+        _auditService = auditService;
+    }
 
     [HttpGet("profile")]
     [OpenApiOperation("Get profile details of currently logged in user.", "")]
@@ -57,11 +61,18 @@ public class PersonalController : VersionNeutralApiController
             : Ok(await _userService.GetPermissionsAsync(userId, cancellationToken));
     }
 
-    [HttpGet("logs")]
+    [HttpPost("logs")]
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
-    public Task<List<AuditDto>> GetLogsAsync()
+    public Task<PaginationResponse<AuditDto>> GetLogsAsync(GetMyAuditLogsRequest request)
     {
-        return Mediator.Send(new GetMyAuditLogsRequest());
+        return Mediator.Send(request);
+    }
+
+    [HttpGet("logs/resource-type")]
+    [OpenApiOperation("Get resource type for audit logs.", "")]
+    public async Task<List<string>> GetResourceNamesAsync()
+    {
+        return await _auditService.GetResourceName();
     }
 
     [HttpPut("update-email")]
