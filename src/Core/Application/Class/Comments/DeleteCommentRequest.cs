@@ -17,13 +17,11 @@ public class DeleteCommentRequest : IRequest<Guid>
     }
 }
 
-
 public class DeleteCommentRequestHandler : IRequestHandler<DeleteCommentRequest, Guid>
 {
 
     private readonly IRepository<Comment> _repository;
     private readonly IStringLocalizer _t;
-
 
     public DeleteCommentRequestHandler(IRepository<Comment> repository, IStringLocalizer<DeleteCommentRequestHandler> t)
     {
@@ -33,10 +31,14 @@ public class DeleteCommentRequestHandler : IRequestHandler<DeleteCommentRequest,
 
     public async Task<Guid> Handle(DeleteCommentRequest request, CancellationToken cancellationToken)
     {
-        var comment = await _repository.FirstOrDefaultAsync(new CommentByIdSpec(request.Id));
+        var commentTree = await _repository.ListAsync(new CommentTreeSpec(), cancellationToken);
+        _ = commentTree ?? throw new NotFoundException(_t["Comment {0} Not Found."]);
+
+        var comment = commentTree.FirstOrDefault(x => x.Id == request.Id);
         _ = comment ?? throw new NotFoundException(_t["Comment {0} Not Found."]);
 
         await _repository.DeleteAsync(comment);
+
         return comment.Id;
     }
 }
