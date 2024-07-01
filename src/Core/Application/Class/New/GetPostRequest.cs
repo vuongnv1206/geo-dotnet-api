@@ -10,9 +10,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New;
-public class GetPostRequest : PaginationFilter,IRequest<PaginationResponse<PostDto>>
+public class GetPostRequest : PaginationFilter, IRequest<PaginationResponse<PostDto>>
 {
 }
+
 public class GetNewsRequestHandler : IRequestHandler<GetPostRequest, PaginationResponse<PostDto>>
 {
     private readonly IReadRepository<Post> _repository;

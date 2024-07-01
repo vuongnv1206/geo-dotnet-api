@@ -14,8 +14,8 @@ public class PostDto : IDto
     public DefaultIdType CreatedBy { get; set; }
     public string? Content { get; set; }
     public bool IsLockComment { get; set; }
-    public string? ClassesName { get; set; }
+    public DateTime CreatedOn { get; set; }
     public int? NumberLikeInThePost { get; set; }
-    public List<CommentDto> Comments { get; set; }
+    public List<CommentDto>? Comments { get; set; }
 
 }

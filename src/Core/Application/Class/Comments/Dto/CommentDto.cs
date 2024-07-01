@@ -10,9 +10,11 @@ public class CommentDto : IDto
 {
     public Guid Id { get; set; }
     public Guid PostId { get; set; }
-    public Guid UserId { get; set; }
-    public string Content { get; set; }
+    public DefaultIdType CreatedBy { get; set; }
+    public string? Content { get; set; }
     public Guid? ParentId { get; set; }
     public DateTime Timestamp { get; set; }
     public int NumberLikeInComment { get; set; }
+    public DateTime CreatedOn { get; set; }
+
 }

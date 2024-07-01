@@ -7,6 +7,7 @@ public class UpdateInformationStudentRequest : IRequest<Guid>
     public Guid Id { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
+    public string? AvatarUrl { get; set; }
     public DateTime? DateOfBirth { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
@@ -40,12 +41,12 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
         var updatedStudent = student.Update(
             request.FirstName,
             request.LastName,
+            request.AvatarUrl,
+            request.DateOfBirth,
             request.Email,
             request.PhoneNumber,
-            request.DateOfBirth,
             request.StudentCode,
             request.Gender);
-        Console.WriteLine("Updated student name: " + updatedStudent.FirstName + " " + updatedStudent.LastName);
 
         await _repository.UpdateAsync(updatedStudent, cancellationToken);
         return request.Id;

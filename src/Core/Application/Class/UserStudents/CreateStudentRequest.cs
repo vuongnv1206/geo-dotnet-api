@@ -14,8 +14,9 @@ public class CreateStudentRequest : IRequest<Guid>
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
-    public string? Email { get; set; }
+    public string? AvatarUrl { get; set; }
     public DateTime? DateOfBirth { get; set; }
+    public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
     public string? StudentCode { get; set; }
     public bool? Gender { get; set; }
@@ -29,20 +30,25 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
     private readonly IStringLocalizer<CreateUserStudentRequestHandler> _t;
     private readonly IRepository<Classes> _classRepository;
 
-    public CreateUserStudentRequestHandler(IUserService userService, IStringLocalizer<CreateUserStudentRequestHandler> t,
-                                           IRepository<Student> userStudentRepository, IRepository<Classes> classRepository)
+    public CreateUserStudentRequestHandler(
+        IUserService userService,
+        IStringLocalizer<CreateUserStudentRequestHandler> t,
+        IRepository<Student> userStudentRepository,
+        IRepository<Classes> classRepository)
     {
         _userService = userService;
         _t = t;
         _classRepository = classRepository;
         _userStudentRepository = userStudentRepository;
     }
+
     public async Task<DefaultIdType> Handle(CreateStudentRequest request, CancellationToken cancellationToken)
     {
         var userStudent = new Student
         {
             FirstName = request.FirstName,
             LastName = request.LastName,
+            AvatarUrl = request.AvatarUrl,
             DateOfBirth = request.DateOfBirth,
             Gender = request.Gender,
         };
