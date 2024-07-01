@@ -28,7 +28,7 @@ public class StudentController : VersionedApiController
 
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
-    [OpenApiOperation("Add a student in class")]
+    [OpenApiOperation("Create a student", "")]
     public Task AddStudentInClass(CreateStudentRequest request)
     {
         return Mediator.Send(request);
@@ -54,7 +54,7 @@ public class StudentController : VersionedApiController
 
     [HttpPut("student-in-class/{id:guid}")]
     [MustHavePermission(FSHAction.Update, FSHResource.Classes)]
-    [OpenApiOperation("Update information of student in class")]
+    [OpenApiOperation("Update student information.", "")]
     public async Task<ActionResult<Guid>> UpdateInformationStudentInClass(UpdateInformationStudentRequest request, Guid id)
     {
         return id != request.Id

@@ -6,7 +6,6 @@ namespace FSH.WebApi.Application.Class.New;
 public class UpdatePostRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public Guid? UserId { get; set; }
     public required string Content { get; set; }
     public bool IsLockComment { get; set; }
 }
