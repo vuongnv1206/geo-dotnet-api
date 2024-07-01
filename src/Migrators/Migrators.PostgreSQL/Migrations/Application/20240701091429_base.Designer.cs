@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240630075007_base-2")]
-    partial class base2
+    [Migration("20240701091429_base")]
+    partial class @base
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -235,12 +235,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PostId");
@@ -350,9 +344,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClassesId");
@@ -389,6 +380,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("ClassesId")
                         .HasColumnType("uuid");
@@ -1101,6 +1095,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<bool>("isApproved")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

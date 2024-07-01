@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class base2 : Migration
+    public partial class @base : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -451,6 +451,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     QuestionType = table.Column<int>(type: "integer", nullable: true),
                     QuestionLableId = table.Column<Guid>(type: "uuid", nullable: true),
                     QuestionParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    isApproved = table.Column<bool>(type: "boolean", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -769,7 +770,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Content = table.Column<string>(type: "text", nullable: false),
                     IsLockComment = table.Column<bool>(type: "boolean", nullable: false),
                     ClassesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -799,6 +799,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     StId = table.Column<Guid>(type: "uuid", nullable: true),
                     FirstName = table.Column<string>(type: "text", nullable: true),
                     LastName = table.Column<string>(type: "text", nullable: true),
+                    AvatarUrl = table.Column<string>(type: "text", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Email = table.Column<string>(type: "text", nullable: true),
                     PhoneNumber = table.Column<string>(type: "text", nullable: true),
@@ -1053,10 +1054,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     PostId = table.Column<Guid>(type: "uuid", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

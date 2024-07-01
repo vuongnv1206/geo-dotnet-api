@@ -232,12 +232,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PostId");
@@ -347,9 +341,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ClassesId");
@@ -386,6 +377,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("ClassesId")
                         .HasColumnType("uuid");
@@ -1098,6 +1092,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<bool>("isApproved")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
