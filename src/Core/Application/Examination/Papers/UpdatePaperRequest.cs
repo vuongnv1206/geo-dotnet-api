@@ -28,7 +28,7 @@ public class UpdatePaperRequest : IRequest<Guid>
     public Guid? PaperLabelId { get; set; }
     public Guid? SubjectId { get; set; }
     public Guid? PaperFolderId { get; set; }
-    public List<PaperAccessDto>? PaperAccess { get; set; }
+    public List<PaperAccessDto>? PaperAccesses { get; set; }
 
 }
 
@@ -111,9 +111,9 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             request.PaperLabelId,
             request.SubjectId
             );
-        if (request.PaperAccess is not null)
+        if (request.PaperAccesses is not null)
         {
-            paper.UpdatePaperAccesses(request.ShareType,request.PaperAccess.Adapt<List<PaperAccess>>());
+            paper.UpdatePaperAccesses(request.ShareType,request.PaperAccesses.Adapt<List<PaperAccess>>());
         }
 
         await _paperRepo.UpdateAsync(paper, cancellationToken);
