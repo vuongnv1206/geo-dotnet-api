@@ -3,12 +3,12 @@ namespace FSH.WebApi.Application.Auditing;
 public class AuditDto
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
-    public string? Type { get; set; }
-    public string? TableName { get; set; }
-    public DateTime DateTime { get; set; }
+    public AuthorDto Author { get; set; }
+    public string? Action { get; set; }
+    public string? Resource { get; set; }
     public string? OldValues { get; set; }
     public string? NewValues { get; set; }
-    public string? AffectedColumns { get; set; }
-    public string? PrimaryKey { get; set; }
+    public string[] AffectedColumns { get; set; } = Array.Empty<string>();
+    public string? ResourceId { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
