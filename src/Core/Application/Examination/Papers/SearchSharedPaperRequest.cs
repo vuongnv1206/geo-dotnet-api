@@ -44,23 +44,10 @@ public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaper
 
 
         var data = new List<Paper>();
-        var parentIds = new List<Guid>();
-        if (request.PaperFolderId.HasValue)
-        {
-            parentIds.Add(request.PaperFolderId.Value);
-            var parentFolder = await _paperFolderRepo.GetByIdAsync(request.PaperFolderId.Value);
-            if (parentFolder != null)
-            {
-                parentFolder.ChildPaperFolderIds(null, parentIds);
-            }
-            var spec = new AccessiblePapersSpec(parentIds,accessiblePaperIds, request);
+
+            var spec = new AccessiblePapersSpec(accessiblePaperIds, request);
             data = await _repository.ListAsync(spec, cancellationToken);
-        }
-        else
-        {
-            var spec = new AccessiblePapersSpec(null, accessiblePaperIds, request);
-            data = await _repository.ListAsync(spec, cancellationToken);
-        }
+
 
         var dtos = new List<PaperInListDto>();
         foreach (var paper in data)

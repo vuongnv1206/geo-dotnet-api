@@ -1,18 +1,15 @@
-﻿using FSH.WebApi.Domain.Examination;
-using MediatR;
+﻿
 
+using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class PaperFolderTreeSpec : EntitiesByPaginationFilterSpec<PaperFolder>
+public class PaperFolderTreeSpec : Specification<PaperFolder>
 {
-    public PaperFolderTreeSpec(DefaultIdType currentUserId, SearchPaperFolderRequest request)
-        : base(request)
+    public PaperFolderTreeSpec()
     {
         Query
-        .Include(x => x.PaperFolderParent)
-        .Include(x => x.PaperFolderChildrens)
-        .Where(x => x.ParentId == request.ParentId)
-        .Where(x => (x.CreatedBy == currentUserId || x.PaperFolderPermissions.Any(x => x.CanView)))
-        .OrderBy(x => x.CreatedOn, !request.HasOrderBy());
+       .Include(b => b.PaperFolderChildrens)
+       .Include(x => x.PaperFolderPermissions)
+       .Include(x => x.Papers).ThenInclude(x => x.PaperPermissions);
     }
 }

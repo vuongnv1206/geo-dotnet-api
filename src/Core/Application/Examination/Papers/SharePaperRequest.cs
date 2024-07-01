@@ -10,7 +10,7 @@ using Mapster;
 namespace FSH.WebApi.Application.Examination.Papers;
 public class SharePaperRequest : IRequest<Guid>
 {
-    public List<Guid> UserIds { get; set; }
+    public Guid? UserId { get; set; }
     public Guid PaperId { get; set; }
     public Guid? GroupId { get; set; }
     public bool CanView { get; set; }
@@ -22,7 +22,7 @@ public class SharePaperRequest : IRequest<Guid>
 public class PaperPermissionDto
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
     public Guid PaperId { get; set; }
     public Guid? GroupId { get; set; }
     public bool CanView { get; set; }
@@ -39,18 +39,21 @@ public class SharePaperRequestHandler : IRequestHandler<SharePaperRequest, Guid>
     private readonly IRepositoryWithEvents<Paper> _paperRepo;
     private readonly IUserService _userService;
     private readonly IRepositoryWithEvents<PaperFolder> _paperFolderRepo;
+    private readonly IRepository<PaperPermission> _paperPermissionRepo;
     public SharePaperRequestHandler(
                       ICurrentUser currentUser,
                              IStringLocalizer<SharePaperRequestHandler> t,
                                     IRepositoryWithEvents<Paper> paperRepo,
                                         IUserService userService,
-                                        IRepositoryWithEvents<PaperFolder> paperFolderRepo)
+                                        IRepositoryWithEvents<PaperFolder> paperFolderRepo,
+                                        IRepository<PaperPermission> paperPermissionRepo)
     {
         _currentUser = currentUser;
         _t = t;
         _paperRepo = paperRepo;
         _userService = userService;
         _paperFolderRepo = paperFolderRepo;
+        _paperPermissionRepo = paperPermissionRepo;
     }
 
     public async Task<DefaultIdType> Handle(SharePaperRequest request, CancellationToken cancellationToken)
@@ -64,25 +67,36 @@ public class SharePaperRequestHandler : IRequestHandler<SharePaperRequest, Guid>
             throw new ForbiddenException(_t["You do not have permission to share this paper."]);
         }
 
-        List<PaperPermission> permissionsToUpdate = new List<PaperPermission>();
-        foreach (var userId in request.UserIds)
+        if (request.GroupId.HasValue)
         {
-            var existingPermission = paper.PaperPermissions.FirstOrDefault(pp => pp.UserId == userId);
+            var existingPermission = paper.PaperPermissions.FirstOrDefault(pp => pp.UserId == request.UserId);
             if (existingPermission != null)
             {
                 existingPermission.SetPermission(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
-                permissionsToUpdate.Add(existingPermission);
+                await _paperPermissionRepo.UpdateAsync(existingPermission);
             }
             else
             {
-                var newPermission = new PaperPermission(userId, request.PaperId, request.GroupId, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
-                permissionsToUpdate.Add(newPermission);
+                var newPermission = new PaperPermission(null, request.PaperId, request.GroupId, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
+                await _paperPermissionRepo.AddAsync(newPermission);
             }
         }
 
-        paper.UpdatePermissions(permissionsToUpdate);
+        if (request.UserId.HasValue)
+        {
+            var existingPermission = paper.PaperPermissions.FirstOrDefault(pp => pp.UserId == request.UserId);
+            if (existingPermission != null)
+            {
+                existingPermission.SetPermission(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
+                await _paperPermissionRepo.UpdateAsync(existingPermission);
+            }
+            else
+            {
+                var newPermission = new PaperPermission(request.UserId, request.PaperId, null, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
+                await _paperPermissionRepo.AddAsync(newPermission);
+            }
+        }
 
-        await _paperRepo.UpdateAsync(paper, cancellationToken);
         return paper.Id;
     }
 }

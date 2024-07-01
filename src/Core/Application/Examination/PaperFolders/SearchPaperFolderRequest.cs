@@ -48,7 +48,7 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
         }
         else
         {
-            var spec = new PaperFolderTreeSpec(currentUserId,request);
+            var spec = new PaperFolderTreeBySearchSpec(currentUserId,request);
             count = await _paperFolderRepo.CountAsync(spec, cancellationToken);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
            
