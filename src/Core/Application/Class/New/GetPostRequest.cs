@@ -32,4 +32,3 @@ public class GetNewsRequestHandler : IRequestHandler<GetPostRequest, PaginationR
         return data;
     }
 }
-
