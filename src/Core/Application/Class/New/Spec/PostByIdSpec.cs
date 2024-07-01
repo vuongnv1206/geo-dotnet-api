@@ -6,6 +6,6 @@ public class PostByIdSpec : Specification<Post>, ISingleResultSpecification
 {
     public PostByIdSpec(DefaultIdType id)
     {
-        Query.Where(n => n.Id == id);
+        Query.Where(x => x.Id == id).Include(x => x.PostLikes).Include(x => x.Comments);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,11 @@ public class Comment : AuditableEntity, IAggregateRoot
     public string Content { get; set; }
     public Guid? ParentId { get; set; }
     public virtual Post Post { get; set; }
-    public virtual ICollection<CommentLikes> CommentLikes { get; set; }
+    public virtual List<CommentLikes> CommentLikes { get; set; }
+
+    [ForeignKey(nameof(ParentId))]
+    public virtual Comment? CommentParent { get; set; }
+    public virtual List<Comment> CommentChildrens { get; set; } = new();
 
     public Comment()
     {

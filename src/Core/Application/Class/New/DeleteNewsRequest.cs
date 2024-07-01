@@ -23,15 +23,9 @@ public class DeleteNewsRequestHandler : IRequestHandler<DeleteNewsRequest, Guid>
 
     public async Task<DefaultIdType> Handle(DeleteNewsRequest request, CancellationToken cancellationToken)
     {
-        var post = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var post = await _repository.FirstOrDefaultAsync(new PostByIdSpec(request.Id), cancellationToken);
 
         _ = post ?? throw new NotFoundException(_t["News {0} Not Found."]);
-
-        var postLike = await _repository.ListAsync(new PostLikeByParentIdSpec(request.Id), cancellationToken);
-        if (postLike != null)
-        {
-            await _repository.DeleteRangeAsync(postLike, cancellationToken);
-        }
 
         await _repository.DeleteAsync(post, cancellationToken);
 
