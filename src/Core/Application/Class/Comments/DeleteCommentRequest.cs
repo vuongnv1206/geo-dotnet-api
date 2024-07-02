@@ -34,7 +34,7 @@ public class DeleteCommentRequestHandler : IRequestHandler<DeleteCommentRequest,
         var commentTree = await _repository.ListAsync(new CommentTreeSpec(), cancellationToken);
         _ = commentTree ?? throw new NotFoundException(_t["Comment {0} Not Found."]);
 
-        var comment = commentTree.FirstOrDefault(x => x.Id == request.Id && x.ParentId == request.Id);
+        var comment = commentTree.FirstOrDefault(x => x.Id == request.Id);
         _ = comment ?? throw new NotFoundException(_t["Comment {0} Not Found."]);
 
         await _repository.DeleteAsync(comment);
