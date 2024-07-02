@@ -39,6 +39,7 @@ public static class FSHResource
     public const string UserClasses = nameof(UserClasses);
     public const string Files = nameof(Files);
     public const string Notifications = nameof(Notifications);
+    public const string AuditLogs = nameof(AuditLogs);
 }
 
 public static class FSHPermissions
@@ -141,6 +142,9 @@ public static class FSHPermissions
 
         // NOTIFICATIONS
         new("Send Notifications", FSHAction.Create, FSHResource.Notifications, IsRoot: true),
+
+        // AUDIT LOGS
+        new("View AuditLogs", FSHAction.View, FSHResource.AuditLogs),
 
     };
 
