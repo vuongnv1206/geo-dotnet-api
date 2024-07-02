@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240701091429_base")]
+    [Migration("20240702010432_base")]
     partial class @base
     {
         /// <inheritdoc />
@@ -236,6 +236,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.HasIndex("PostId");
 
@@ -573,7 +575,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ClassId")
-                        .IsRequired()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("PaperId")
@@ -1895,9 +1896,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Comment", "CommentParent")
+                        .WithMany("CommentChildrens")
+                        .HasForeignKey("ParentId");
+
                     b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId");
+
+                    b.Navigation("CommentParent");
 
                     b.Navigation("Post");
                 });
@@ -1984,9 +1991,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Classes", "Class")
                         .WithMany("PaperAccesses")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClassId");
 
                     b.HasOne("FSH.WebApi.Domain.Examination.Paper", "Paper")
                         .WithMany("PaperAccesses")
@@ -2272,6 +2277,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
                 {
+                    b.Navigation("CommentChildrens");
+
                     b.Navigation("CommentLikes");
                 });
 

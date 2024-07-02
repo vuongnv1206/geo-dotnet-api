@@ -234,6 +234,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ParentId");
+
                     b.HasIndex("PostId");
 
                     b.ToTable("Comments", "Classroom");
@@ -570,7 +572,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ClassId")
-                        .IsRequired()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("PaperId")
@@ -1892,9 +1893,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Comment", "CommentParent")
+                        .WithMany("CommentChildrens")
+                        .HasForeignKey("ParentId");
+
                     b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId");
+
+                    b.Navigation("CommentParent");
 
                     b.Navigation("Post");
                 });
@@ -1981,9 +1988,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Classes", "Class")
                         .WithMany("PaperAccesses")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClassId");
 
                     b.HasOne("FSH.WebApi.Domain.Examination.Paper", "Paper")
                         .WithMany("PaperAccesses")
@@ -2269,6 +2274,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
                 {
+                    b.Navigation("CommentChildrens");
+
                     b.Navigation("CommentLikes");
                 });
 

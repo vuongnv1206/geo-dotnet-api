@@ -923,7 +923,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     PaperId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserId = table.Column<Guid>(type: "uuid", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
@@ -935,8 +935,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         column: x => x.ClassId,
                         principalSchema: "Classroom",
                         principalTable: "Classes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_PaperAccesses_Papers_PaperId",
                         column: x => x.PaperId,
@@ -1067,6 +1066,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comments_Comments_ParentId",
+                        column: x => x.ParentId,
+                        principalSchema: "Classroom",
+                        principalTable: "Comments",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Comments_Post_PostId",
                         column: x => x.PostId,
@@ -1205,6 +1210,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Classroom",
                 table: "Classes",
                 column: "GroupClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_ParentId",
+                schema: "Classroom",
+                table: "Comments",
+                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_PostId",
