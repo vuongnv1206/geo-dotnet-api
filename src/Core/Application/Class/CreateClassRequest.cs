@@ -37,13 +37,13 @@ public class CreateClassRequestHandler : IRequestHandler<CreateClassRequest, Gui
     private readonly ICurrentUser _currentUser;
 
     public CreateClassRequestHandler(IRepositoryWithEvents<Classes> repository, ICurrentUser currentUser) =>
-        (_repository, _currentUser) =(repository, currentUser);
+        (_repository, _currentUser) = (repository, currentUser);
 
     public async Task<Guid> Handle(CreateClassRequest request, CancellationToken cancellationToken)
     {
         var user = _currentUser.GetUserId();
 
-        var classes = new Classes(request.Name, request.SchoolYear, user ,request.GroupClassId);
+        var classes = new Classes(request.Name, request.SchoolYear, user, request.GroupClassId);
 
         await _repository.AddAsync(classes);
 
