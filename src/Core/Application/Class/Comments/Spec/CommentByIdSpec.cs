@@ -6,10 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.Comments.Spec;
-public class CommentByIdSpec : Specification<Comment>
+public class CommentByIdSpec : Specification<Comment>, ISingleResultSpecification
 {
     public CommentByIdSpec(Guid id)
     {
-        Query.Where(x => x.Id == id).Include(x => x.CommentLikes);
+        Query
+            .Include(x => x.CommentLikes)
+            .Include(x => x.CommentChildrens)
+            .Where(x => x.Id == id);
     }
 }
