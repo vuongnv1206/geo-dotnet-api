@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Comments.Dto;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,5 @@ public class PostDto : IDto
     public DateTime CreatedOn { get; set; }
     public int? NumberLikeInThePost { get; set; }
     public List<CommentDto>? Comments { get; set; }
-
+    public UserDetailsDto? Owner { get; set; }
 }

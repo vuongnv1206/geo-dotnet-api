@@ -10,6 +10,6 @@ internal class CommentTreeSpec : Specification<Comment>
 {
     public CommentTreeSpec()
     {
-        Query.Include(x => x.CommentLikes).Include(x => x.CommentChildrens);
+        Query.Include(x => x.CommentLikes).Include(x => x.CommentParent).Include(x => x.CommentChildrens);
     }
 }

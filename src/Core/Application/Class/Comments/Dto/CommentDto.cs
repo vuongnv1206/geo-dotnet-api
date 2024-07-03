@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Domain.Class;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,5 @@ public class CommentDto : IDto
     public Guid? ParentId { get; set; }
     public int NumberLikeInComment { get; set; }
     public DateTime CreatedOn { get; set; }
-
+    public UserDetailsDto? Owner { get; set; }
 }
