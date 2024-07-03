@@ -31,10 +31,5 @@ internal class AccessiblePapersSpec : Specification<Paper>
         {
             Query.Where(x => x.PaperFolderId == null);
         }
-
-        if (!string.IsNullOrEmpty(request.Name))
-        {
-            Query.Where(x => x.ExamName.ToLower().Contains(request.Name.ToLower()));
-        }
     }
 }

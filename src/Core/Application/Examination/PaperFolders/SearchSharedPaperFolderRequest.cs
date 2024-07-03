@@ -5,6 +5,7 @@ using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
+using System.Linq;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class SearchSharedPaperFolderRequest : IRequest<List<PaperFolderDto>>
@@ -48,11 +49,18 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
         {
             var spec = new AccessibleFoldersWithChildrenSpec(accessibleFolderIds, request);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
+
         }
         else
         {
-            var spec = new AccessibleFoldersTreeSpec(accessibleFolderIds, request);
-            data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
+            var specRoot = new AccessibleFoldersTreeSpec(accessibleFolderIds, request);
+            data = await _paperFolderRepo.ListAsync(specRoot, cancellationToken);
+            if (!request.ParentId.HasValue)
+            {
+                //if root thì mới thêm các con mà được share
+                var specChildren = new SearchSharedPaperFolderChildrenSpec(accessibleFolderIds);
+                data.AddRange(await _paperFolderRepo.ListAsync(specChildren, cancellationToken));
+            }
         }
 
         var dtos = new List<PaperFolderDto>();
@@ -60,7 +68,7 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
         foreach (var folder in data)
         {
             var dto = await CustomMappings.MapPaperFolderAsync(folder, _userService, cancellationToken);
-            var parents = folder.ListParents();
+            var parents = folder.ListAccessibleParents(accessibleFolderIds);
             dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
             dtos.Add(dto);
         }
