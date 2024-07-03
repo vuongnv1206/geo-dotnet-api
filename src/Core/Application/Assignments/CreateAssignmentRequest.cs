@@ -30,7 +30,7 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
     {
         string productAttachmentPath = await _file.UploadAsync<Assignment>(request.Attachment, FileType.Image, cancellationToken);
 
-        var assignment = new Assignment(request.Name, request.StartTime, request.EndTime, productAttachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
+        var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, productAttachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
         if (request.ClassIds != null)
         {
 

@@ -51,7 +51,7 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             : null;
 
         var updatedAssignment = assignment.Update(
-            request.Name,
+            request.Name.Trim(),
             request.StartTime,
             request.EndTime,
             assignmentAttachmentPath,
