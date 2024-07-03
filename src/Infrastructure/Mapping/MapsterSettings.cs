@@ -142,8 +142,6 @@ public class MapsterSettings
             .Map(dest => dest.NumberLikeInComment, src => src.CommentLikes.Count());
 
         // Class
-        TypeAdapterConfig<News, NewsDto>.NewConfig()
-            .Map(dest => dest.NumberLikeInTheNews, src => src.NewsReactions.Count());
         TypeAdapterConfig<Classes, ClassDto>.NewConfig()
           .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count())
           .Map(dest => dest.Students, src => src.UserClasses.Select(p => p.Student))

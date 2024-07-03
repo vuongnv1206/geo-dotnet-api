@@ -12,8 +12,7 @@ public class PaperFolderTreeSpec : Specification<PaperFolder>
         .Include(x => x.PaperFolderChildrens)
         .Include(x => x.PaperFolderPermissions)
         .ThenInclude(x => x.GroupTeacher)
-        .Where(x => x.ParentId == request.ParentId)
-        .Where(x => (x.CreatedBy == currentUserId || x.PaperFolderPermissions.Any(x => x.CanView)))
-        .OrderBy(x => x.CreatedOn, !request.HasOrderBy());
+        .Where(x =>  x.PaperFolderPermissions.Any(x => x.CanView))
+        .OrderBy(x => x.CreatedOn);
     }
 }
