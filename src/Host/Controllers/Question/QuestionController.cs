@@ -2,7 +2,7 @@
 using FSH.WebApi.Application.Questions.Dtos;
 
 namespace FSH.WebApi.Host.Controllers.Question;
-
+    
 public class QuestionController : VersionedApiController
 {
     [HttpPost("search")]

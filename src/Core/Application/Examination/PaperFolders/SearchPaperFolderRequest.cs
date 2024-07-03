@@ -5,7 +5,7 @@ using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class SearchPaperFolderRequest : PaginationFilter,IRequest<PaginationResponse<PaperFolderDto>>
+public class SearchPaperFolderRequest : PaginationFilter, IRequest<PaginationResponse<PaperFolderDto>>
 {
     public Guid? ParentId { get; set; }
 }
@@ -42,7 +42,7 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
                     parentFolder.ChildPaperFolderIds(null, parentIds);
                 }
             }
-            var spec = new PaperFolderBySearchSpec(parentIds,request,currentUserId);
+            var spec = new PaperFolderBySearchSpec(parentIds, request, currentUserId);
             count = await _paperFolderRepo.CountAsync(spec, cancellationToken);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
         }
@@ -51,20 +51,34 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
             var spec = new PaperFolderTreeBySearchSpec(currentUserId,request);
             count = await _paperFolderRepo.CountAsync(spec, cancellationToken);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
-           
+
 
         }
 
         var dtos = new List<PaperFolderDto>();
 
         foreach (var folder in data)
-        {   
+        {
             var dto = await CustomMappings.MapPaperFolderAsync(folder, _userService, cancellationToken);
             var parents = folder.ListParents();
             dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
+            if (dto.PaperFolderPermissions.Any())
+            {
+                foreach (var per in dto.PaperFolderPermissions)
+                {
+                    if (per.UserId.HasValue)
+                    {
+                        var user_permission = await _userService.GetAsync(per.UserId.ToString(), cancellationToken);
+                        if (user_permission != null)
+                        {
+                            per.User = user_permission;
+                        }
+                    }
+                }
+            }
             dtos.Add(dto);
         }
-        return new PaginationResponse<PaperFolderDto>(dtos, count, request.PageNumber, request.PageSize); 
+        return new PaginationResponse<PaperFolderDto>(dtos, count, request.PageNumber, request.PageSize);
     }
 }
 

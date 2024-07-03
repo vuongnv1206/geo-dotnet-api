@@ -17,13 +17,13 @@ public class DeleteClassRequestHandler : IRequestHandler<DeleteClassRequest, Gui
 {
     private readonly IRepositoryWithEvents<Classes> _repository;
     private readonly IStringLocalizer<DeleteClassRequest> _t;
-    private readonly IRepositoryWithEvents<News> _newRepository;
+    private readonly IRepositoryWithEvents<Post> _postRepository;
 
-    public DeleteClassRequestHandler(IRepositoryWithEvents<Classes> repository, IStringLocalizer<DeleteClassRequest> t, IRepositoryWithEvents<News> newRepository)
+    public DeleteClassRequestHandler(IRepositoryWithEvents<Classes> repository, IStringLocalizer<DeleteClassRequest> t, IRepositoryWithEvents<Post> postRepository)
     {
         _repository = repository;
         _t = t;
-        _newRepository = newRepository;
+        _postRepository = postRepository;
     }
 
     public async Task<Guid> Handle(DeleteClassRequest request, CancellationToken cancellationToken)
@@ -31,8 +31,8 @@ public class DeleteClassRequestHandler : IRequestHandler<DeleteClassRequest, Gui
         var classes = await _repository.FirstOrDefaultAsync(new ClassByIdSpec(request.Id), cancellationToken);
         _ = classes ?? throw new NotFoundException(_t["Classes {0} Not Found."]);
 
-        var news = await _newRepository.ListAsync(new NewsBySearchRequestWithClass(request.Id), cancellationToken);
-        await _newRepository.DeleteRangeAsync(news, cancellationToken);
+        var news = await _postRepository.ListAsync(new PostBySearchRequestWithClass(request.Id), cancellationToken);
+        await _postRepository.DeleteRangeAsync(news, cancellationToken);
 
         await _repository.DeleteAsync(classes, cancellationToken);
 

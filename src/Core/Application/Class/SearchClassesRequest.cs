@@ -6,6 +6,7 @@ using Mapster;
 namespace FSH.WebApi.Application.Class;
 public class SearchClassesRequest : PaginationFilter, IRequest<PaginationResponse<ClassDto>>
 {
+    public Guid? GroupClassId { get; set; }
 }
 
 public class SearchClassesRequestHandler : IRequestHandler<SearchClassesRequest, PaginationResponse<ClassDto>>
@@ -13,15 +14,14 @@ public class SearchClassesRequestHandler : IRequestHandler<SearchClassesRequest,
     private readonly IReadRepository<Classes> _repository;
     private readonly ICurrentUser _currentUser;
     private readonly IStringLocalizer _t;
-    private readonly IUserClassesRepository _userClassesRepository;
-    public SearchClassesRequestHandler(IReadRepository<Classes> repository, ICurrentUser currentUser,
-                                       IStringLocalizer<SearchClassesRequestHandler> localizer,
-                                       IUserClassesRepository userClassesRepository)
+    public SearchClassesRequestHandler(
+        IReadRepository<Classes> repository,
+        ICurrentUser currentUser,
+        IStringLocalizer<SearchClassesRequestHandler> localizer)
     {
         _repository = repository;
         _currentUser = currentUser;
         _t = localizer;
-        _userClassesRepository = userClassesRepository;
     }
 
     public async Task<PaginationResponse<ClassDto>> Handle(SearchClassesRequest request, CancellationToken cancellationToken)

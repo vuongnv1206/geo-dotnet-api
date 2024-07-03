@@ -14,13 +14,6 @@ public class GroupClassesController : VersionedApiController
     {
         return Mediator.Send(request);
     }
-    [HttpGet]
-    [MustHavePermission(FSHAction.View, FSHResource.GroupClasses)]
-    [OpenApiOperation("Get list GroupClasses of user.", "")]
-    public Task<List<GroupClassDto>> GetAsync()
-    {
-        return Mediator.Send(new GroupClassRequest());
-    }
 
     [HttpGet("group-class-detail")]
     [MustHavePermission(FSHAction.View, FSHResource.GroupClasses)]

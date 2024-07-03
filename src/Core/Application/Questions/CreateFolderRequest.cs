@@ -50,10 +50,11 @@ public class CreateFolderRequestHandler : IRequestHandler<CreateFolderRequest, G
             {
                 throw new BadRequestException(_t["Folder with name {0} already exists in this folder.", request.Name]);
             }
-        } else
+        }
+        else
         {
             // check if folder name is unique
-            bool isFolderNameUnique = await _repository.AnyAsync(new QuestionFolderByNameAndParentIdSpec(request.Name, null), cancellationToken);
+            bool isFolderNameUnique = await _repository.AnyAsync(new QuestionFolderByNameAndParentIdSpec(request.Name, null, _currentUser.GetUserId()), cancellationToken);
             if (isFolderNameUnique)
             {
                 throw new BadRequestException(_t["Folder with name {0} already exists in root folder.", request.Name]);
@@ -67,15 +68,19 @@ public class CreateFolderRequestHandler : IRequestHandler<CreateFolderRequest, G
         {
             var parentFolder = await _repository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(request.ParentId), cancellationToken);
             folder.CopyPermissions(parentFolder);
+            folder.CreatedBy = parentFolder.CreatedBy;
+        }
+        else
+        {
+            // add owner permission
+            bool isHasOwnerPermission = folder.Permissions.Any(x => x.UserId == _currentUser.GetUserId());
+            if (!isHasOwnerPermission)
+            {
+                var permission = new QuestionFolderPermission(_currentUser.GetUserId(), Guid.Empty, folder.Id, true, true, true, true, true);
+                folder.AddPermission(permission);
+            }
         }
 
-        // add owner permission
-        bool isHasOwnerPermission = folder.Permissions.Any(x => x.UserId == _currentUser.GetUserId());
-        if (!isHasOwnerPermission)
-        {
-            var permission = new QuestionFolderPermission(_currentUser.GetUserId(), Guid.Empty, folder.Id, true, true, true, true, true);
-            folder.AddPermission(permission);
-        }
 
         await _repository.UpdateAsync(folder, cancellationToken);
 

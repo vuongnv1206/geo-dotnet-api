@@ -12,5 +12,5 @@ public class PaperAccess : BaseEntity<Guid>
     public virtual Paper Paper { get; set; }
 
     [ForeignKey(nameof(ClassId))]
-    public virtual Classes Class { get; set; }
+    public virtual Classes? Class { get; set; }
 }

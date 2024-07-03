@@ -11,11 +11,11 @@ public class DeleteNewsRequest : IRequest<Guid>
 
 public class DeleteNewsRequestHandler : IRequestHandler<DeleteNewsRequest, Guid>
 {
-    private readonly IRepository<News> _repository;
+    private readonly IRepository<Post> _repository;
 
     private readonly IStringLocalizer _t;
 
-    public DeleteNewsRequestHandler(IRepository<News> repository, IStringLocalizer<DeleteNewsRequestHandler> t)
+    public DeleteNewsRequestHandler(IRepository<Post> repository, IStringLocalizer<DeleteNewsRequestHandler> t)
     {
         _repository = repository;
         _t = t;
@@ -23,17 +23,11 @@ public class DeleteNewsRequestHandler : IRequestHandler<DeleteNewsRequest, Guid>
 
     public async Task<DefaultIdType> Handle(DeleteNewsRequest request, CancellationToken cancellationToken)
     {
-        var news = await _repository.GetByIdAsync(request.Id, cancellationToken);
+        var post = await _repository.FirstOrDefaultAsync(new PostByIdSpec(request.Id), cancellationToken);
 
-        _ = news ?? throw new NotFoundException(_t["News {0} Not Found."]);
+        _ = post ?? throw new NotFoundException(_t["News {0} Not Found."]);
 
-        var newsComment = await _repository.ListAsync(new NewsCommentByParentIdSpec(request.Id), cancellationToken);
-        if (newsComment != null)
-        {
-            await _repository.DeleteRangeAsync(newsComment, cancellationToken);
-        }
-
-        await _repository.DeleteAsync(news, cancellationToken);
+        await _repository.DeleteAsync(post, cancellationToken);
 
         return request.Id;
     }

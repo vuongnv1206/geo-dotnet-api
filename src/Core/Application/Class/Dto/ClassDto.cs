@@ -1,6 +1,10 @@
 ﻿using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Application.Class.UserClasses;
+using FSH.WebApi.Application.Class.UserStudents.Dto;
+using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
+using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.Examination;
 using System.Security.Cryptography.X509Certificates;
 
 namespace FSH.WebApi.Application.Class.Dto;
@@ -13,7 +17,7 @@ public class ClassDto : IDto
     public Guid GroupClassId { get; set; }
     public string GroupClassName { get; set; }
     public int? NumberUserOfClass { get; set; }
-
     public List<AssignmentDto>? Assignments { get; set; }
-
+    public List<UserStudentDto>? Students { get; set; }
+    public List<PaperInListDto>? Papers{ get; set; }
 }

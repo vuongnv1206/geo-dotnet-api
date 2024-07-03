@@ -23,6 +23,8 @@ public class QuestionByIdSpec : Specification<Question>, ISingleResultSpecificat
 {
     public QuestionByIdSpec(Guid id) =>
         Query
+        .Include(b => b.Answers)
+        .Include(b => b.QuestionPassages)
         .Include(b => b.QuestionFolder)
         .ThenInclude(b => b.Permissions)
         .Where(b => b.Id == id);

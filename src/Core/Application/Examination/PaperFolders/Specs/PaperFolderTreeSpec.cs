@@ -8,8 +8,12 @@ public class PaperFolderTreeSpec : Specification<PaperFolder>
     public PaperFolderTreeSpec()
     {
         Query
-       .Include(b => b.PaperFolderChildrens)
-       .Include(x => x.PaperFolderPermissions)
-       .Include(x => x.Papers).ThenInclude(x => x.PaperPermissions);
+        .Include(x => x.PaperFolderParent)
+        .Include(x => x.PaperFolderChildrens)
+        .Include(x => x.PaperFolderPermissions)
+        .ThenInclude(x => x.GroupTeacher)
+        .Where(x => x.ParentId == request.ParentId)
+        .Where(x => (x.CreatedBy == currentUserId || x.PaperFolderPermissions.Any(x => x.CanView)))
+        .OrderBy(x => x.CreatedOn, !request.HasOrderBy());
     }
 }

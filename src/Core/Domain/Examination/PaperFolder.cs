@@ -142,8 +142,6 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
 
     public void UpdatePermissions(List<PaperFolderPermission> permissions)
     {
-        PaperFolderPermissions.RemoveAll(a => !permissions.Any(x => x.Id == a.Id));
-
         foreach (var permission in permissions)
         {
             var existingPermission = PaperFolderPermissions.FirstOrDefault(a => a.Id == permission.Id && a.Id != Guid.Empty);

@@ -1,7 +1,14 @@
-﻿
-using FSH.WebApi.Application.Examination.Papers;
+﻿using FSH.WebApi.Application.Common.Models;
+using FSH.WebApi.Application.Examination.PaperFolders.Specs;
+using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
+using Mapster;
+using MapsterMapper;
+using MediatR;
+using System.Threading;
 
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
@@ -20,9 +27,11 @@ public class SharePaperFolderRequest : IRequest<Guid>
 public class PaperFolderPermissionDto
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
+    public UserDetailsDto? User { get; set; }
     public Guid FolderId { get; set; }
-    public Guid? GroupId { get; set; }
+    public Guid? GroupTeacherId { get; set; }
+    public GroupTeacherDto? GroupTeacher { get; set; }
     public bool CanView { get; set; }
     public bool CanAdd { get; set; }
     public bool CanUpdate { get; set; }

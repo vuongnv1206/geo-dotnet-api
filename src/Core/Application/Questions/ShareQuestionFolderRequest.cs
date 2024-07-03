@@ -1,6 +1,7 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Question;
+using MediatR;
 
 namespace FSH.WebApi.Application.Questions;
 public class ShareQuestionFolderRequest : IRequest<DefaultIdType>
@@ -45,6 +46,43 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
         _userService = userService;
         _t = localizer;
         _currentUser = currentUser;
+    }
+
+    private bool AllPermissionsFalse(ShareQuestionFolderRequest request)
+    {
+        return !request.CanView && !request.CanAdd && !request.CanUpdate && !request.CanDelete && !request.CanShare;
+    }
+
+    private bool AllPermissionsFalse(QuestionFolderPermission request)
+    {
+        return !request.CanView && !request.CanAdd && !request.CanUpdate && !request.CanDelete && !request.CanShare;
+    }
+
+    public async Task InheritPermissions(QuestionFolder folder, QuestionFolderPermission permission, CancellationToken cancellationToken)
+    {
+
+        foreach (var childFolder in folder.Children)
+        {
+
+            var childPermission = await _permissionRepository.FirstOrDefaultAsync(new QuestionFolderPermissionByFolderIdAndUserIdSpec(childFolder.Id, (DefaultIdType)permission.UserId), cancellationToken);
+
+            if (childPermission == null)
+            {
+                childPermission = new QuestionFolderPermission(permission.UserId, permission.GroupTeacherId, childFolder.Id, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete, permission.CanShare);
+                childFolder.Permissions.Add(childPermission);
+                await _repository.UpdateAsync(childFolder, cancellationToken);
+            }
+            else
+            {
+                childPermission.SetPermissions(permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete, permission.CanShare);
+                await _permissionRepository.UpdateAsync(childPermission, cancellationToken);
+            }
+
+            // Recursively apply permissions to subfolders
+            var childFolderWithChildren = await _repository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(childFolder.Id), cancellationToken);
+            await InheritPermissions(childFolderWithChildren, permission, cancellationToken);
+
+        }
     }
 
     public async Task<Guid> Handle(ShareQuestionFolderRequest request, CancellationToken cancellationToken)
@@ -96,6 +134,11 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
 
         foreach (var userId in userIds)
         {
+            if (userId == Guid.Empty)
+            {
+                continue;
+            }
+
             var permission = await _permissionRepository.FirstOrDefaultAsync(new QuestionFolderPermissionByFolderIdAndUserIdSpec(folder.Id, userId), cancellationToken);
 
             if (permission == null)
@@ -109,10 +152,20 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
                 permission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
                 await _permissionRepository.UpdateAsync(permission, cancellationToken);
             }
+
+            // Apply permissions to all descendants
+            await InheritPermissions(folder, permission, cancellationToken);
+
         }
 
         foreach (var teacherGroupId in teacherGroupIds)
         {
+
+            if (teacherGroupId == Guid.Empty)
+            {
+                continue;
+            }
+
             var permission = await _permissionRepository.FirstOrDefaultAsync(new QuestionFolderPermissionByFolderIdAndTeacherGroupIdSpec(folder.Id, teacherGroupId), cancellationToken);
 
             if (permission == null)
@@ -123,11 +176,17 @@ public class ShareQuestionFolderRequestHandler : IRequestHandler<ShareQuestionFo
             }
             else
             {
+
                 permission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
                 await _permissionRepository.UpdateAsync(permission, cancellationToken);
             }
+
+            // Apply permissions to all descendants
+            await InheritPermissions(folder, permission, cancellationToken);
+
         }
 
         return folder.Id;
     }
+
 }

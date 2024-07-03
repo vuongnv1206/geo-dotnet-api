@@ -12,9 +12,14 @@ public class ClassesBySearchRequestWithGroupClassSpec : EntitiesByPaginationFilt
         : base(request)
     {
         Query
-            .Include(p => p.GroupClass).ThenInclude(c => c.Classes)
-            .Include(u => u.UserClasses).ThenInclude(c => c.Classes)
-            .Include(a => a.AssignmentClasses).ThenInclude(a => a.Assignment)
-            .Where(p => p.CreatedBy == userId);
+            .Include(p => p.GroupClass)
+            .Include(a => a.AssignmentClasses)
+                .ThenInclude(a => a.Assignment)
+            .Include(u => u.UserClasses)
+                .ThenInclude(x => x.Student)
+            .Include(x => x.PaperAccesses)
+                .ThenInclude(x => x.Paper)
+            .Where(p => p.CreatedBy == userId &&
+            (!request.GroupClassId.HasValue || p.GroupClassId == request.GroupClassId));
     }
 }

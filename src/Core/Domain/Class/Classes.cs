@@ -1,6 +1,6 @@
 ﻿using FSH.WebApi.Domain.Assignment;
+using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
-using FSH.WebApi.Domain.Assignment;
 
 namespace FSH.WebApi.Domain.Class;
 public class Classes : AuditableEntity, IAggregateRoot
@@ -10,18 +10,18 @@ public class Classes : AuditableEntity, IAggregateRoot
     public Guid OwnerId { get; private set; }
     public Guid? GroupClassId { get; private set; }
     public virtual GroupClass? GroupClass { get; private set; }
-
-    public virtual List<AssignmentClass>? AssignmentClasses { get; set; } = new();
+    public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
+    public virtual List<Student>? Students { get; set; } = new();
     public virtual List<UserClass>? UserClasses { get; set; } = new();
+    public virtual List<PaperAccess> PaperAccesses { get; set; } = new();
     public virtual IEnumerable<TeacherPermissionInClass>? TeacherPermissionInClasses { get; set; }
     public virtual IEnumerable<GroupPermissionInClass>? GroupPermissionInClasses { get; set; }
 
     public Classes()
     {
-
     }
 
-    public Classes(string? name, string? schoolYear, Guid ownerId, Guid? groupClassId)
+    public Classes(string name, string schoolYear, Guid ownerId, Guid? groupClassId)
     {
         Name = name;
         SchoolYear = schoolYear;
@@ -38,14 +38,19 @@ public class Classes : AuditableEntity, IAggregateRoot
         return this;
     }
 
+    public void AddUserInClass(UserClass userClass)
+    {
+        UserClasses.Add(userClass);
+    }
+
+    public void RemoveUserInClass(UserClass userClass)
+    {
+        UserClasses.Remove(userClass);
+    }
+
     public void UpdateGroupClassId(Guid? newGroupClassId)
     {
         GroupClassId = newGroupClassId;
-    }
-
-    public void AddUserToClass(UserClass userClass)
-    {
-        UserClasses.Add(userClass); 
     }
 
     public void AssignAssignmentToClass(AssignmentClass assignmentClass)

@@ -64,9 +64,6 @@ public class Assignment : AuditableEntity, IAggregateRoot
     //    AssignmentClasses.Add(assignmentClass);
     //}
 
-
-
-
     public void UpdateAssignmentFromClass(List<AssignmentClass> aClass)
     {
         AssignmentClasses.RemoveAll(ac => !aClass.Any(c => c.AssignmentId == ac.AssignmentId));
