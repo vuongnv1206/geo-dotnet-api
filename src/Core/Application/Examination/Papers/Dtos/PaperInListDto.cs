@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.PaperLabels;
+using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Examination.Enums;
 
 
@@ -11,8 +12,8 @@ public class PaperInListDto : IDto
    
     public int NumberOfQuestion { get; set; }
     public int? Duration { get; set; }
-    public bool ShowMarkResult { get; set; }
-    public bool ShowQuestionAnswer { get; set; }
+    public ShowResult ShowMarkResult { get; set; }
+    public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
     public string Type { get; set; }
     public string Status { get; set; }

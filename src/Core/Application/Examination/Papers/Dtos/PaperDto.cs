@@ -3,7 +3,7 @@ using FSH.WebApi.Application.Examination.PaperLabels;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.Subjects;
-
+using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.Papers;
 public class PaperDto : IDto
@@ -15,8 +15,8 @@ public class PaperDto : IDto
     public int? Duration { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public bool ShowMarkResult { get; set; }
-    public bool ShowQuestionAnswer { get; set; }
+    public ShowResult ShowMarkResult { get; set; }
+    public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
     public string Type { get; set; }
     public PaperShareType ShareType { get; set; }
