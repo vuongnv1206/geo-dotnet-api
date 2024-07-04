@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240702010432_base")]
+    [Migration("20240704092417_base")]
     partial class @base
     {
         /// <inheritdoc />
@@ -529,11 +529,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<int>("ShareType")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("ShowMarkResult")
-                        .HasColumnType("boolean");
+                    b.Property<int>("ShowMarkResult")
+                        .HasColumnType("integer");
 
-                    b.Property<bool>("ShowQuestionAnswer")
-                        .HasColumnType("boolean");
+                    b.Property<int>("ShowQuestionAnswer")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Shuffle")
                         .HasColumnType("boolean");
