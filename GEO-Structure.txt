@@ -1,0 +1,652 @@
+Folder PATH listing for volume DEV
+Volume serial number is 06FB-C9BE
+F:.
+ÃÄÄÄ.config
+ÃÄÄÄ.github
+³   ÃÄÄÄISSUE_TEMPLATE
+³   ÀÄÄÄworkflows
+ÃÄÄÄ.gitlab
+ÃÄÄÄcode-snippets
+ÃÄÄÄdocker-compose
+ÃÄÄÄpublic
+ÃÄÄÄscripts
+ÃÄÄÄsrc
+³   ÃÄÄÄCore
+³   ³   ÃÄÄÄApplication
+³   ³   ³   ÃÄÄÄAssignments
+³   ³   ³   ³   ÃÄÄÄAssignmentClasses
+³   ³   ³   ³   ÃÄÄÄDtos
+³   ³   ³   ³   ÀÄÄÄEventHandlers
+³   ³   ³   ÃÄÄÄAuditing
+³   ³   ³   ÃÄÄÄbin
+³   ³   ³   ³   ÃÄÄÄDebug
+³   ³   ³   ³   ³   ÀÄÄÄnet7.0
+³   ³   ³   ³   ÀÄÄÄRelease
+³   ³   ³   ³       ÀÄÄÄnet7.0
+³   ³   ³   ÃÄÄÄClass
+³   ³   ³   ³   ÃÄÄÄComments
+³   ³   ³   ³   ³   ÃÄÄÄDto
+³   ³   ³   ³   ³   ÀÄÄÄSpec
+³   ³   ³   ³   ÃÄÄÄDto
+³   ³   ³   ³   ÃÄÄÄGroupClasses
+³   ³   ³   ³   ³   ÃÄÄÄDto
+³   ³   ³   ³   ³   ÀÄÄÄSpec
+³   ³   ³   ³   ÃÄÄÄNew
+³   ³   ³   ³   ³   ÃÄÄÄDto
+³   ³   ³   ³   ³   ÀÄÄÄSpec
+³   ³   ³   ³   ÃÄÄÄSharedClasses
+³   ³   ³   ³   ³   ÀÄÄÄSpecs
+³   ³   ³   ³   ÃÄÄÄUserClasses
+³   ³   ³   ³   ³   ÃÄÄÄDto
+³   ³   ³   ³   ³   ÀÄÄÄSpec
+³   ³   ³   ³   ÀÄÄÄUserStudents
+³   ³   ³   ³       ÃÄÄÄDto
+³   ³   ³   ³       ÀÄÄÄSpec
+³   ³   ³   ÃÄÄÄCommon
+³   ³   ³   ³   ÃÄÄÄCaching
+³   ³   ³   ³   ÃÄÄÄEvents
+³   ³   ³   ³   ÃÄÄÄExceptions
+³   ³   ³   ³   ÃÄÄÄExporters
+³   ³   ³   ³   ÃÄÄÄFileStorage
+³   ³   ³   ³   ÃÄÄÄInterfaces
+³   ³   ³   ³   ÃÄÄÄMailing
+³   ³   ³   ³   ÃÄÄÄModels
+³   ³   ³   ³   ÃÄÄÄPersistence
+³   ³   ³   ³   ÃÄÄÄReCaptchaV3
+³   ³   ³   ³   ÃÄÄÄSpecification
+³   ³   ³   ³   ÃÄÄÄSpeedSMS
+³   ³   ³   ³   ÀÄÄÄValidation
+³   ³   ³   ÃÄÄÄExamination
+³   ³   ³   ³   ÃÄÄÄPaperFolders
+³   ³   ³   ³   ³   ÃÄÄÄDtos
+³   ³   ³   ³   ³   ÀÄÄÄSpecs
+³   ³   ³   ³   ÃÄÄÄPaperLabels
+³   ³   ³   ³   ³   ÃÄÄÄDtos
+³   ³   ³   ³   ³   ÀÄÄÄSpecs
+³   ³   ³   ³   ÃÄÄÄPapers
+³   ³   ³   ³   ³   ÃÄÄÄByStudents
+³   ³   ³   ³   ³   ÃÄÄÄDtos
+³   ³   ³   ³   ³   ÀÄÄÄSpecs
+³   ³   ³   ³   ÃÄÄÄReviews
+³   ³   ³   ³   ³   ÃÄÄÄDtos
+³   ³   ³   ³   ³   ÀÄÄÄSpecs
+³   ³   ³   ³   ÀÄÄÄSubmitPapers
+³   ³   ³   ³       ÃÄÄÄDtos
+³   ³   ³   ³       ÀÄÄÄSpecs
+³   ³   ³   ÃÄÄÄExtensions
+³   ³   ³   ÃÄÄÄIdentity
+³   ³   ³   ³   ÃÄÄÄRoles
+³   ³   ³   ³   ÃÄÄÄTokens
+³   ³   ³   ³   ÀÄÄÄUsers
+³   ³   ³   ³       ÃÄÄÄPassword
+³   ³   ³   ³       ÃÄÄÄProfile
+³   ³   ³   ³       ÀÄÄÄVerify
+³   ³   ³   ÃÄÄÄMultitenancy
+³   ³   ³   ÃÄÄÄNotifications
+³   ³   ³   ÃÄÄÄobj
+³   ³   ³   ³   ÃÄÄÄDebug
+³   ³   ³   ³   ³   ÀÄÄÄnet7.0
+³   ³   ³   ³   ³       ÃÄÄÄref
+³   ³   ³   ³   ³       ÀÄÄÄrefint
+³   ³   ³   ³   ÀÄÄÄRelease
+³   ³   ³   ³       ÀÄÄÄnet7.0
+³   ³   ³   ³           ÃÄÄÄref
+³   ³   ³   ³           ÀÄÄÄrefint
+³   ³   ³   ÃÄÄÄQuestions
+³   ³   ³   ³   ÃÄÄÄDtos
+³   ³   ³   ³   ÀÄÄÄSpecs
+³   ³   ³   ÃÄÄÄSubjects
+³   ³   ³   ÀÄÄÄTeacherGroup
+³   ³   ³       ÃÄÄÄGroupTeachers
+³   ³   ³       ³   ÃÄÄÄDtos
+³   ³   ³       ³   ÀÄÄÄSpecs
+³   ³   ³       ÃÄÄÄPermissionClasses
+³   ³   ³       ³   ÃÄÄÄDtos
+³   ³   ³       ³   ÀÄÄÄSpecs
+³   ³   ³       ÃÄÄÄTeacherInGroups
+³   ³   ³       ÀÄÄÄTeacherTeams
+³   ³   ³           ÃÄÄÄDtos
+³   ³   ³           ÀÄÄÄSpecs
+³   ³   ÃÄÄÄDomain
+³   ³   ³   ÃÄÄÄAssignment
+³   ³   ³   ÃÄÄÄbin
+³   ³   ³   ³   ÃÄÄÄDebug
+³   ³   ³   ³   ³   ÀÄÄÄnet7.0
+³   ³   ³   ³   ÀÄÄÄRelease
+³   ³   ³   ³       ÀÄÄÄnet7.0
+³   ³   ³   ÃÄÄÄClass
+³   ³   ³   ÃÄÄÄCommon
+³   ³   ³   ³   ÃÄÄÄContracts
+³   ³   ³   ³   ÀÄÄÄEvents
+³   ³   ³   ÃÄÄÄExamination
+³   ³   ³   ³   ÀÄÄÄEnums
+³   ³   ³   ÃÄÄÄIdentity
+³   ³   ³   ÃÄÄÄNotification
+³   ³   ³   ÃÄÄÄobj
+³   ³   ³   ³   ÃÄÄÄDebug
+³   ³   ³   ³   ³   ÀÄÄÄnet7.0
+³   ³   ³   ³   ³       ÃÄÄÄref
+³   ³   ³   ³   ³       ÀÄÄÄrefint
+³   ³   ³   ³   ÀÄÄÄRelease
+³   ³   ³   ³       ÀÄÄÄnet7.0
+³   ³   ³   ³           ÃÄÄÄref
+³   ³   ³   ³           ÀÄÄÄrefint
+³   ³   ³   ÃÄÄÄQuestion
+³   ³   ³   ³   ÀÄÄÄEnums
+³   ³   ³   ÃÄÄÄSubjects
+³   ³   ³   ÀÄÄÄTeacherGroup
+³   ³   ÀÄÄÄShared
+³   ³       ÃÄÄÄAuthorization
+³   ³       ÃÄÄÄbin
+³   ³       ³   ÃÄÄÄDebug
+³   ³       ³   ³   ÀÄÄÄnet7.0
+³   ³       ³   ÀÄÄÄRelease
+³   ³       ³       ÀÄÄÄnet7.0
+³   ³       ÃÄÄÄEvents
+³   ³       ÃÄÄÄMultitenancy
+³   ³       ÃÄÄÄNotifications
+³   ³       ÀÄÄÄobj
+³   ³           ÃÄÄÄDebug
+³   ³           ³   ÀÄÄÄnet7.0
+³   ³           ³       ÃÄÄÄref
+³   ³           ³       ÀÄÄÄrefint
+³   ³           ÀÄÄÄRelease
+³   ³               ÀÄÄÄnet7.0
+³   ³                   ÃÄÄÄref
+³   ³                   ÀÄÄÄrefint
+³   ÃÄÄÄHost
+³   ³   ÃÄÄÄbin
+³   ³   ³   ÃÄÄÄDebug
+³   ³   ³   ³   ÀÄÄÄnet7.0
+³   ³   ³   ³       ÃÄÄÄAssignment
+³   ³   ³   ³       ÃÄÄÄca
+³   ³   ³   ³       ÃÄÄÄClass
+³   ³   ³   ³       ³   ÀÄÄÄGroupClasses
+³   ³   ³   ³       ÃÄÄÄConfigurations
+³   ³   ³   ³       ÃÄÄÄcs
+³   ³   ³   ³       ÃÄÄÄde
+³   ³   ³   ³       ÃÄÄÄEmail Templates
+³   ³   ³   ³       ÃÄÄÄes
+³   ³   ³   ³       ÃÄÄÄExamination
+³   ³   ³   ³       ÃÄÄÄfa
+³   ³   ³   ³       ÃÄÄÄFiles
+³   ³   ³   ³       ÃÄÄÄfr
+³   ³   ³   ³       ÃÄÄÄit
+³   ³   ³   ³       ÃÄÄÄja
+³   ³   ³   ³       ÃÄÄÄko
+³   ³   ³   ³       ÃÄÄÄnb
+³   ³   ³   ³       ÃÄÄÄnl
+³   ³   ³   ³       ÃÄÄÄNotifications
+³   ³   ³   ³       ÃÄÄÄpl
+³   ³   ³   ³       ÃÄÄÄpt
+³   ³   ³   ³       ÃÄÄÄpt-BR
+³   ³   ³   ³       ÃÄÄÄpt-PT
+³   ³   ³   ³       ÃÄÄÄQuestion
+³   ³   ³   ³       ÃÄÄÄru
+³   ³   ³   ³       ÃÄÄÄruntimes
+³   ³   ³   ³       ³   ÃÄÄÄalpine-arm
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄalpine-arm64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄalpine-x64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄbrowser-wasm
+³   ³   ³   ³       ³   ³   ÀÄÄÄnativeassets
+³   ³   ³   ³       ³   ³       ÀÄÄÄnet7.0
+³   ³   ³   ³       ³   ÃÄÄÄlinux
+³   ³   ³   ³       ³   ³   ÀÄÄÄlib
+³   ³   ³   ³       ³   ³       ÀÄÄÄnetcoreapp2.0
+³   ³   ³   ³       ³   ÃÄÄÄlinux-arm
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-arm64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-armel
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-mips64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-musl-arm
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-musl-arm64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-musl-x64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-ppc64le
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-s390x
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-x64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄlinux-x86
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄmaccatalyst-arm64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄmaccatalyst-x64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄosx
+³   ³   ³   ³       ³   ³   ÀÄÄÄlib
+³   ³   ³   ³       ³   ³       ÀÄÄÄnetcoreapp2.0
+³   ³   ³   ³       ³   ÃÄÄÄosx-arm64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄosx-x64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄunix
+³   ³   ³   ³       ³   ³   ÀÄÄÄlib
+³   ³   ³   ³       ³   ³       ÃÄÄÄnet6.0
+³   ³   ³   ³       ³   ³       ÃÄÄÄnetcoreapp3.1
+³   ³   ³   ³       ³   ³       ÀÄÄÄnetstandard2.0
+³   ³   ³   ³       ³   ÃÄÄÄwin
+³   ³   ³   ³       ³   ³   ÀÄÄÄlib
+³   ³   ³   ³       ³   ³       ÃÄÄÄnet6.0
+³   ³   ³   ³       ³   ³       ÃÄÄÄnetcoreapp2.0
+³   ³   ³   ³       ³   ³       ÃÄÄÄnetcoreapp3.1
+³   ³   ³   ³       ³   ³       ÀÄÄÄnetstandard2.0
+³   ³   ³   ³       ³   ÃÄÄÄwin-arm
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄwin-arm64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÃÄÄÄwin-x64
+³   ³   ³   ³       ³   ³   ÀÄÄÄnative
+³   ³   ³   ³       ³   ÀÄÄÄwin-x86
+³   ³   ³   ³       ³       ÀÄÄÄnative
+³   ³   ³   ³       ÃÄÄÄSubjects
+³   ³   ³   ³       ÃÄÄÄsv
+³   ³   ³   ³       ÃÄÄÄTeacherGroup
+³   ³   ³   ³       ÃÄÄÄtr
+³   ³   ³   ³       ÃÄÄÄtr-TR
+³   ³   ³   ³       ÃÄÄÄzh
+³   ³   ³   ³       ÃÄÄÄzh-Hans
+³   ³   ³   ³       ÃÄÄÄzh-Hant
+³   ³   ³   ³       ÀÄÄÄzh-TW
+³   ³   ³   ÀÄÄÄRelease
+³   ³   ³       ÀÄÄÄnet7.0
+³   ³   ³           ÃÄÄÄAssignment
+³   ³   ³           ÃÄÄÄca
+³   ³   ³           ÃÄÄÄClass
+³   ³   ³           ³   ÀÄÄÄGroupClasses
+³   ³   ³           ÃÄÄÄConfigurations
+³   ³   ³           ÃÄÄÄcs
+³   ³   ³           ÃÄÄÄde
+³   ³   ³           ÃÄÄÄEmail Templates
+³   ³   ³           ÃÄÄÄes
+³   ³   ³           ÃÄÄÄExamination
+³   ³   ³           ÃÄÄÄfa
+³   ³   ³           ÃÄÄÄFiles
+³   ³   ³           ÃÄÄÄfr
+³   ³   ³           ÃÄÄÄit
+³   ³   ³           ÃÄÄÄja
+³   ³   ³           ÃÄÄÄko
+³   ³   ³           ÃÄÄÄnb
+³   ³   ³           ÃÄÄÄnl
+³   ³   ³           ÃÄÄÄNotifications
+³   ³   ³           ÃÄÄÄpl
+³   ³   ³           ÃÄÄÄpt
+³   ³   ³           ÃÄÄÄpt-BR
+³   ³   ³           ÃÄÄÄpt-PT
+³   ³   ³           ÃÄÄÄQuestion
+³   ³   ³           ÃÄÄÄru
+³   ³   ³           ÃÄÄÄruntimes
+³   ³   ³           ³   ÃÄÄÄalpine-arm
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄalpine-arm64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄalpine-x64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄbrowser-wasm
+³   ³   ³           ³   ³   ÀÄÄÄnativeassets
+³   ³   ³           ³   ³       ÀÄÄÄnet7.0
+³   ³   ³           ³   ÃÄÄÄlinux
+³   ³   ³           ³   ³   ÀÄÄÄlib
+³   ³   ³           ³   ³       ÀÄÄÄnetcoreapp2.0
+³   ³   ³           ³   ÃÄÄÄlinux-arm
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-arm64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-armel
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-mips64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-musl-arm
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-musl-arm64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-musl-x64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-ppc64le
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-s390x
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-x64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄlinux-x86
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄmaccatalyst-arm64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄmaccatalyst-x64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄosx
+³   ³   ³           ³   ³   ÀÄÄÄlib
+³   ³   ³           ³   ³       ÀÄÄÄnetcoreapp2.0
+³   ³   ³           ³   ÃÄÄÄosx-arm64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄosx-x64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄunix
+³   ³   ³           ³   ³   ÀÄÄÄlib
+³   ³   ³           ³   ³       ÃÄÄÄnet6.0
+³   ³   ³           ³   ³       ÃÄÄÄnetcoreapp3.1
+³   ³   ³           ³   ³       ÀÄÄÄnetstandard2.0
+³   ³   ³           ³   ÃÄÄÄwin
+³   ³   ³           ³   ³   ÀÄÄÄlib
+³   ³   ³           ³   ³       ÃÄÄÄnet6.0
+³   ³   ³           ³   ³       ÃÄÄÄnetcoreapp2.0
+³   ³   ³           ³   ³       ÃÄÄÄnetcoreapp3.1
+³   ³   ³           ³   ³       ÀÄÄÄnetstandard2.0
+³   ³   ³           ³   ÃÄÄÄwin-arm
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄwin-arm64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÃÄÄÄwin-x64
+³   ³   ³           ³   ³   ÀÄÄÄnative
+³   ³   ³           ³   ÀÄÄÄwin-x86
+³   ³   ³           ³       ÀÄÄÄnative
+³   ³   ³           ÃÄÄÄSubjects
+³   ³   ³           ÃÄÄÄsv
+³   ³   ³           ÃÄÄÄTeacherGroup
+³   ³   ³           ÃÄÄÄtr
+³   ³   ³           ÃÄÄÄtr-TR
+³   ³   ³           ÃÄÄÄzh
+³   ³   ³           ÃÄÄÄzh-Hans
+³   ³   ³           ÃÄÄÄzh-Hant
+³   ³   ³           ÀÄÄÄzh-TW
+³   ³   ÃÄÄÄConfigurations
+³   ³   ÃÄÄÄControllers
+³   ³   ³   ÃÄÄÄAssignment
+³   ³   ³   ÃÄÄÄClass
+³   ³   ³   ÃÄÄÄExamination
+³   ³   ³   ÃÄÄÄFile
+³   ³   ³   ÃÄÄÄIdentity
+³   ³   ³   ÃÄÄÄMultitenancy
+³   ³   ³   ÃÄÄÄNotification
+³   ³   ³   ÃÄÄÄPersonal
+³   ³   ³   ÃÄÄÄQuestion
+³   ³   ³   ÃÄÄÄSubject
+³   ³   ³   ÀÄÄÄTeacherGroup
+³   ³   ÃÄÄÄEmail Templates
+³   ³   ÃÄÄÄFiles
+³   ³   ³   ÃÄÄÄDocument
+³   ³   ³   ³   ÃÄÄÄdocx
+³   ³   ³   ³   ÀÄÄÄtxt
+³   ³   ³   ÀÄÄÄImage
+³   ³   ³       ÀÄÄÄjpg
+³   ³   ÃÄÄÄLocalization
+³   ³   ³   ÃÄÄÄde
+³   ³   ³   ÃÄÄÄen
+³   ³   ³   ÃÄÄÄfr
+³   ³   ³   ÃÄÄÄit
+³   ³   ³   ÃÄÄÄnl
+³   ³   ³   ÃÄÄÄpt
+³   ³   ³   ÀÄÄÄtemplates
+³   ³   ÃÄÄÄLogs
+³   ³   ÃÄÄÄobj
+³   ³   ³   ÃÄÄÄDebug
+³   ³   ³   ³   ÀÄÄÄnet7.0
+³   ³   ³   ³       ÃÄÄÄref
+³   ³   ³   ³       ÃÄÄÄrefint
+³   ³   ³   ³       ÀÄÄÄstaticwebassets
+³   ³   ³   ÀÄÄÄRelease
+³   ³   ³       ÀÄÄÄnet7.0
+³   ³   ³           ÃÄÄÄref
+³   ³   ³           ÃÄÄÄrefint
+³   ³   ³           ÀÄÄÄstaticwebassets
+³   ³   ÀÄÄÄProperties
+³   ÃÄÄÄInfrastructure
+³   ³   ÃÄÄÄAssignment
+³   ³   ÃÄÄÄAuditing
+³   ³   ÃÄÄÄAuth
+³   ³   ³   ÃÄÄÄAzureAd
+³   ³   ³   ÃÄÄÄJwt
+³   ³   ³   ÀÄÄÄPermissions
+³   ³   ÃÄÄÄBackgroundJobs
+³   ³   ÃÄÄÄbin
+³   ³   ³   ÃÄÄÄDebug
+³   ³   ³   ³   ÀÄÄÄnet7.0
+³   ³   ³   ³       ÃÄÄÄAssignment
+³   ³   ³   ³       ÃÄÄÄClass
+³   ³   ³   ³       ³   ÀÄÄÄGroupClasses
+³   ³   ³   ³       ÃÄÄÄExamination
+³   ³   ³   ³       ÃÄÄÄNotifications
+³   ³   ³   ³       ÃÄÄÄQuestion
+³   ³   ³   ³       ÃÄÄÄSubjects
+³   ³   ³   ³       ÀÄÄÄTeacherGroup
+³   ³   ³   ÀÄÄÄRelease
+³   ³   ³       ÀÄÄÄnet7.0
+³   ³   ³           ÃÄÄÄAssignment
+³   ³   ³           ÃÄÄÄClass
+³   ³   ³           ³   ÀÄÄÄGroupClasses
+³   ³   ³           ÃÄÄÄExamination
+³   ³   ³           ÃÄÄÄNotifications
+³   ³   ³           ÃÄÄÄQuestion
+³   ³   ³           ÃÄÄÄSubjects
+³   ³   ³           ÀÄÄÄTeacherGroup
+³   ³   ÃÄÄÄCaching
+³   ³   ÃÄÄÄClass
+³   ³   ³   ÃÄÄÄGroupClasses
+³   ³   ³   ÃÄÄÄNews
+³   ³   ³   ÀÄÄÄUserClasses
+³   ³   ÃÄÄÄCommon
+³   ³   ³   ÃÄÄÄExport
+³   ³   ³   ÃÄÄÄExtensions
+³   ³   ³   ÃÄÄÄServices
+³   ³   ³   ÀÄÄÄUtils
+³   ³   ÃÄÄÄCors
+³   ³   ÃÄÄÄExamination
+³   ³   ÃÄÄÄFileStorage
+³   ³   ÃÄÄÄIdentity
+³   ³   ÃÄÄÄLocalization
+³   ³   ÃÄÄÄLogging
+³   ³   ³   ÀÄÄÄSerilog
+³   ³   ÃÄÄÄMailing
+³   ³   ÃÄÄÄMapping
+³   ³   ÃÄÄÄMiddleware
+³   ³   ÃÄÄÄMultitenancy
+³   ³   ÃÄÄÄNotifications
+³   ³   ÃÄÄÄobj
+³   ³   ³   ÃÄÄÄDebug
+³   ³   ³   ³   ÀÄÄÄnet7.0
+³   ³   ³   ³       ÃÄÄÄref
+³   ³   ³   ³       ÀÄÄÄrefint
+³   ³   ³   ÀÄÄÄRelease
+³   ³   ³       ÀÄÄÄnet7.0
+³   ³   ³           ÃÄÄÄref
+³   ³   ³           ÀÄÄÄrefint
+³   ³   ÃÄÄÄOpenApi
+³   ³   ÃÄÄÄPersistence
+³   ³   ³   ÃÄÄÄConfiguration
+³   ³   ³   ÃÄÄÄConnectionString
+³   ³   ³   ÃÄÄÄContext
+³   ³   ³   ÃÄÄÄInitialization
+³   ³   ³   ÀÄÄÄRepository
+³   ³   ÃÄÄÄQuestion
+³   ³   ÃÄÄÄreCAPTCHAv3
+³   ³   ÃÄÄÄSecurityHeaders
+³   ³   ÃÄÄÄSpeedSMS
+³   ³   ÃÄÄÄSubjects
+³   ³   ÃÄÄÄTeacherGroup
+³   ³   ÀÄÄÄValidations
+³   ÀÄÄÄMigrators
+³       ÃÄÄÄMigrators.MSSQL
+³       ³   ÀÄÄÄMigrations
+³       ³       ÃÄÄÄApplication
+³       ³       ÀÄÄÄTenant
+³       ÃÄÄÄMigrators.MySQL
+³       ³   ÀÄÄÄMigrations
+³       ³       ÃÄÄÄApplication
+³       ³       ÀÄÄÄTenant
+³       ÃÄÄÄMigrators.Oracle
+³       ³   ÀÄÄÄMigrations
+³       ³       ÃÄÄÄApplication
+³       ³       ÀÄÄÄTenant
+³       ÃÄÄÄMigrators.PostgreSQL
+³       ³   ÃÄÄÄbin
+³       ³   ³   ÃÄÄÄDebug
+³       ³   ³   ³   ÀÄÄÄnet7.0
+³       ³   ³   ³       ÃÄÄÄAssignment
+³       ³   ³   ³       ÃÄÄÄClass
+³       ³   ³   ³       ³   ÀÄÄÄGroupClasses
+³       ³   ³   ³       ÃÄÄÄExamination
+³       ³   ³   ³       ÃÄÄÄNotifications
+³       ³   ³   ³       ÃÄÄÄQuestion
+³       ³   ³   ³       ÃÄÄÄSubjects
+³       ³   ³   ³       ÀÄÄÄTeacherGroup
+³       ³   ³   ÀÄÄÄRelease
+³       ³   ³       ÀÄÄÄnet7.0
+³       ³   ³           ÃÄÄÄAssignment
+³       ³   ³           ÃÄÄÄClass
+³       ³   ³           ³   ÀÄÄÄGroupClasses
+³       ³   ³           ÃÄÄÄExamination
+³       ³   ³           ÃÄÄÄNotifications
+³       ³   ³           ÃÄÄÄQuestion
+³       ³   ³           ÃÄÄÄSubjects
+³       ³   ³           ÀÄÄÄTeacherGroup
+³       ³   ÃÄÄÄMigrations
+³       ³   ³   ÃÄÄÄApplication
+³       ³   ³   ÀÄÄÄTenant
+³       ³   ÀÄÄÄobj
+³       ³       ÃÄÄÄDebug
+³       ³       ³   ÀÄÄÄnet7.0
+³       ³       ³       ÃÄÄÄref
+³       ³       ³       ÀÄÄÄrefint
+³       ³       ÀÄÄÄRelease
+³       ³           ÀÄÄÄnet7.0
+³       ³               ÃÄÄÄref
+³       ³               ÀÄÄÄrefint
+³       ÀÄÄÄMigrators.SqLite
+³           ÀÄÄÄMigrations
+³               ÀÄÄÄTenantDb
+ÃÄÄÄterraform
+³   ÃÄÄÄbackend
+³   ÀÄÄÄenvironments
+³       ÀÄÄÄstaging
+ÃÄÄÄtests
+³   ÀÄÄÄInfrastructure.Test
+³       ÃÄÄÄbin
+³       ³   ÀÄÄÄDebug
+³       ³       ÀÄÄÄnet7.0
+³       ³           ÃÄÄÄAssignment
+³       ³           ÃÄÄÄca
+³       ³           ÃÄÄÄClass
+³       ³           ³   ÀÄÄÄGroupClasses
+³       ³           ÃÄÄÄConfigurations
+³       ³           ÃÄÄÄcs
+³       ³           ÃÄÄÄde
+³       ³           ÃÄÄÄEmail Templates
+³       ³           ÃÄÄÄes
+³       ³           ÃÄÄÄExamination
+³       ³           ÃÄÄÄfa
+³       ³           ÃÄÄÄFiles
+³       ³           ÃÄÄÄfr
+³       ³           ÃÄÄÄit
+³       ³           ÃÄÄÄja
+³       ³           ÃÄÄÄko
+³       ³           ÃÄÄÄLocalization
+³       ³           ³   ÀÄÄÄResources
+³       ³           ³       ÃÄÄÄnl
+³       ³           ³       ÀÄÄÄnl-BE
+³       ³           ÃÄÄÄnb
+³       ³           ÃÄÄÄnl
+³       ³           ÃÄÄÄNotifications
+³       ³           ÃÄÄÄpl
+³       ³           ÃÄÄÄpt
+³       ³           ÃÄÄÄpt-BR
+³       ³           ÃÄÄÄpt-PT
+³       ³           ÃÄÄÄQuestion
+³       ³           ÃÄÄÄru
+³       ³           ÃÄÄÄruntimes
+³       ³           ³   ÃÄÄÄalpine-arm
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄalpine-arm64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄalpine-x64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄbrowser-wasm
+³       ³           ³   ³   ÀÄÄÄnativeassets
+³       ³           ³   ³       ÀÄÄÄnet7.0
+³       ³           ³   ÃÄÄÄlinux
+³       ³           ³   ³   ÀÄÄÄlib
+³       ³           ³   ³       ÀÄÄÄnetcoreapp2.0
+³       ³           ³   ÃÄÄÄlinux-arm
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-arm64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-armel
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-mips64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-musl-arm
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-musl-arm64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-musl-x64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-ppc64le
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-s390x
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-x64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄlinux-x86
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄmaccatalyst-arm64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄmaccatalyst-x64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄosx
+³       ³           ³   ³   ÀÄÄÄlib
+³       ³           ³   ³       ÀÄÄÄnetcoreapp2.0
+³       ³           ³   ÃÄÄÄosx-arm64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄosx-x64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄunix
+³       ³           ³   ³   ÀÄÄÄlib
+³       ³           ³   ³       ÃÄÄÄnet6.0
+³       ³           ³   ³       ÃÄÄÄnetcoreapp3.1
+³       ³           ³   ³       ÀÄÄÄnetstandard2.0
+³       ³           ³   ÃÄÄÄwin
+³       ³           ³   ³   ÀÄÄÄlib
+³       ³           ³   ³       ÃÄÄÄnet6.0
+³       ³           ³   ³       ÃÄÄÄnetcoreapp2.0
+³       ³           ³   ³       ÃÄÄÄnetcoreapp3.1
+³       ³           ³   ³       ÀÄÄÄnetstandard2.0
+³       ³           ³   ÃÄÄÄwin-arm
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄwin-arm64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÃÄÄÄwin-x64
+³       ³           ³   ³   ÀÄÄÄnative
+³       ³           ³   ÀÄÄÄwin-x86
+³       ³           ³       ÀÄÄÄnative
+³       ³           ÃÄÄÄSubjects
+³       ³           ÃÄÄÄsv
+³       ³           ÃÄÄÄTeacherGroup
+³       ³           ÃÄÄÄtr
+³       ³           ÃÄÄÄtr-TR
+³       ³           ÃÄÄÄzh
+³       ³           ÃÄÄÄzh-Hans
+³       ³           ÃÄÄÄzh-Hant
+³       ³           ÀÄÄÄzh-TW
+³       ÃÄÄÄCaching
+³       ÃÄÄÄControllers
+³       ³   ÀÄÄÄIdentity
+³       ÃÄÄÄLocalization
+³       ³   ÀÄÄÄResources
+³       ³       ÃÄÄÄnl
+³       ³       ÀÄÄÄnl-BE
+³       ÃÄÄÄobj
+³       ³   ÀÄÄÄDebug
+³       ³       ÀÄÄÄnet7.0
+³       ³           ÃÄÄÄref
+³       ³           ÀÄÄÄrefint
+³       ÃÄÄÄPersistence
+³       ÀÄÄÄValidation
+ÀÄÄÄthunder-tests
