@@ -11,6 +11,7 @@ public class Classes : AuditableEntity, IAggregateRoot
     public Guid? GroupClassId { get; private set; }
     public virtual GroupClass? GroupClass { get; private set; }
     public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
+    public virtual List<AssignmentStudent> AssignmentStudents { get; set; } = new();
     public virtual List<Student>? Students { get; set; } = new();
     public virtual List<UserClass>? UserClasses { get; set; } = new();
     public virtual List<PaperAccess> PaperAccesses { get; set; } = new();
