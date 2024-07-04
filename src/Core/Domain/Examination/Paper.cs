@@ -17,8 +17,8 @@ public class Paper : AuditableEntity, IAggregateRoot
     public PaperStatus Status { get; set; }
     //Security
     public bool Shuffle { get; set; }
-    public bool ShowMarkResult { get; set; }
-    public bool ShowQuestionAnswer { get; set; }
+    public ShowResult ShowMarkResult { get; set; }
+    public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
     public string ExamCode { get; set; }
     public int? NumberAttempt { get; set; }
@@ -104,8 +104,8 @@ public class Paper : AuditableEntity, IAggregateRoot
         DateTime? endTime,
         int? duration,
         bool shuffle,
-        bool showMarkResult,
-        bool showQuestionAnswer,
+        ShowResult showMarkResult,
+        ShowQuestionAnswer showQuestionAnswer,
         PaperType type,
         bool isPublish,
         string? content,

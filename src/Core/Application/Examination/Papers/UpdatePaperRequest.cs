@@ -16,8 +16,8 @@ public class UpdatePaperRequest : IRequest<Guid>
     public DateTime? EndTime { get; set; }
     public int? Duration { get; set; }
     public bool Shuffle { get; set; }
-    public bool ShowMarkResult { get; set; }
-    public bool ShowQuestionAnswer { get; set; }
+    public ShowResult ShowMarkResult { get; set; }
+    public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
     public int? NumberAttempt { get; set; }
     public PaperShareType ShareType { get; set; }

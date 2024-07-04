@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Examination.PaperLabels;
 using FSH.WebApi.Application.Subjects;
+using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.SubmitPapers;
 public class PaperStudentDto : IDto
@@ -11,8 +12,8 @@ public class PaperStudentDto : IDto
     public int? Duration { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public bool ShowMarkResult { get; set; }
-    public bool ShowQuestionAnswer { get; set; }
+    public ShowResult ShowMarkResult { get; set; }
+    public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
     public string Type { get; set; }
     public bool IsPublish { get; set; }
     public string ExamCode { get; set; }
