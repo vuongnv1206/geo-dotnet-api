@@ -14,6 +14,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
     public Guid? SubjectId { get; set; }
     public virtual Subject Subject { get; set; } = default!;
     public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
+    public virtual List<AssignmentStudent> AssignmentStudents { get; set; } = new();
 
     public Assignment()
     {
