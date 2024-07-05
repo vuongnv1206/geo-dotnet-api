@@ -1,6 +1,6 @@
 {
   "DatabaseSettings": {
     "DBProvider": "postgresql",
-    "ConnectionString": "Host=geo-postgresql-sgp1-13977-do-user-11263864-0.c.db.ondigitalocean.com;Port=25060;Database=geo-db-test;Username=geo-db-test;Password=AVNS_w0nYzHOzw-hDxPYRY_6;Include Error Detail=true"
+    "ConnectionString": "Host=localhost;Port=5432;Database=geo-db-test;Username=postgres;Password=123;Include Error Detail=true"
   }
 }
