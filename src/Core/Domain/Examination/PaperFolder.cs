@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FSH.WebApi.Domain.Examination;
 public class PaperFolder : AuditableEntity, IAggregateRoot
@@ -71,6 +72,27 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
         list.Reverse();
         return list;
     }
+
+
+    public List<PaperFolder> ListAccessibleParents(IEnumerable<Guid> accessibleFolderIds)
+    {
+        List<PaperFolder> accessibleParents = new List<PaperFolder>();
+        accessibleParents.Add(this);
+        var parent = this.PaperFolderParent;
+
+        while (parent != null)
+        {
+            if (accessibleFolderIds.Contains(parent.Id))
+            {
+                accessibleParents.Add(parent);
+            }
+            parent = parent.PaperFolderParent;
+        }
+
+        accessibleParents.Reverse(); // Đảo ngược danh sách để có thứ tự từ cha đến con
+        return accessibleParents;
+    }
+
 
     public void ChildPaperFolderIds(ICollection<PaperFolder> childs, List<Guid> ids)
     {

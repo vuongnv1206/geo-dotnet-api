@@ -5,7 +5,7 @@ using FSH.WebApi.Domain.Question.Enums;
 namespace FSH.WebApi.Application.Extensions;
 public static class GetResultAnswerExtensions
 {
-    public static bool IsAnswerCorrect(this SubmitPaperDetail submitDetail, Question question, List<Answer> correctAnswers)
+    public static bool IsAnswerCorrect(this SubmitPaperDetail submitDetail, QuestionClone question, List<AnswerClone> correctAnswers)
     {
         switch (question.QuestionType)
         {
@@ -36,7 +36,7 @@ public static class GetResultAnswerExtensions
         }
     }
 
-    public static float GetPointQuestion(this SubmitPaperDetail submitDetail, Question question, float mark)
+    public static float GetPointQuestion(this SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
         switch (question.QuestionType)
         {
@@ -59,28 +59,28 @@ public static class GetResultAnswerExtensions
         }
     }
 
-    private static float CalculateReadingScore(SubmitPaperDetail submitDetail, Question question, float mark)
+    private static float CalculateReadingScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
         throw new NotImplementedException();
     }
 
-    private static float CalculateSingleChoiceScore(SubmitPaperDetail submitDetail, Question question, float mark)
+    private static float CalculateSingleChoiceScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
         if (Guid.TryParse(submitDetail.AnswerRaw, out var answerIdRaw) &&
-            question.Answers.SingleOrDefault(a => a.Id == answerIdRaw && a.IsCorrect) is not null)
+            question.AnswerClones.SingleOrDefault(a => a.Id == answerIdRaw && a.IsCorrect) is not null)
         {
             return mark;
         }
         return 0;
     }
 
-    private static float CalculateMultipleChoiceScore(SubmitPaperDetail submitDetail, Question question, float mark)
+    private static float CalculateMultipleChoiceScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
         var answerIds = submitDetail.AnswerRaw.Split('|', StringSplitOptions.RemoveEmptyEntries)
                                               .Select(Guid.Parse)
                                               .ToList();
 
-        var correctAnswers = question.Answers.Where(x => x.IsCorrect).ToList();
+        var correctAnswers = question.AnswerClones.Where(x => x.IsCorrect).ToList();
         if (correctAnswers.Count < answerIds.Count)
         {
             return 0;
@@ -90,13 +90,13 @@ public static class GetResultAnswerExtensions
         return answerIds.Intersect(correctAnswers.Select(a => a.Id)).Count() * averageScore;
     }
 
-    private static float CalculateMatchingScore(SubmitPaperDetail submitDetail, Question question, float mark)
+    private static float CalculateMatchingScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
         var matchingAnswers = submitDetail.AnswerRaw.Split('|')
                                                     .Select(ma => ma.Split('_'))
                                                     .ToDictionary(ma => ma[0], ma => ma[1]);
 
-        var correctMatchings = question.Answers[0].Content.Split('|')
+        var correctMatchings = question.AnswerClones[0].Content.Split('|')
                                                     .Select(ma => ma.Split('_'))
                                                     .ToDictionary(ma => ma[0], ma => ma[1]);
 
@@ -106,7 +106,7 @@ public static class GetResultAnswerExtensions
         return numberCorrectAnswer * averageScore;
     }
 
-    private static float CalculateFillBlankScore(SubmitPaperDetail submitDetail, Question question, float mark)
+    private static float CalculateFillBlankScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
         return 0;
     }
