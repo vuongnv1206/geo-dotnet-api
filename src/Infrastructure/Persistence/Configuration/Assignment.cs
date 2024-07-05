@@ -53,4 +53,3 @@ public class AssignmentConfig : IEntityTypeConfiguration<Assignment>
         }
     }
 }
-
