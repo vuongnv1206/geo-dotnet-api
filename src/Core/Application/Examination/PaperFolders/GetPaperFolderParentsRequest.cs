@@ -27,7 +27,7 @@ public class GetPaperFolderParentsRequestHandler : IRequestHandler<GetPaperFolde
     {
         var currentUserId = _currentUser.GetUserId();
 
-        var paperFolders = await _paperFolderRepo.ListAsync(new PaperFolderTreeByIdSpec(currentUserId), cancellationToken);
+        var paperFolders = await _paperFolderRepo.ListAsync(new MyPaperFolderTreeByIdSpec(currentUserId), cancellationToken);
         var paperFolder = paperFolders.FirstOrDefault(x => x.Id == request.PaperFolderId);
         if (paperFolder == null)
         {

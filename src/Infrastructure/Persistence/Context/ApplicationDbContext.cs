@@ -51,6 +51,8 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<PaperPermission> PaperPermissions { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Student> Students{ get; set; }
+    public DbSet<QuestionClone> QuestionClones { get; set; }
+    public DbSet<AnswerClone> AnswerClones { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

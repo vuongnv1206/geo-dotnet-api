@@ -6,9 +6,9 @@ public class PaperByIdSpec : Specification<Paper>, ISingleResultSpecification
     public PaperByIdSpec(Guid id)
     {
         Query.Where(p => p.Id == id)
-            .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.Answers)
-            .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionPassages).ThenInclude(qp => qp.Answers)
-            .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionLable)
+            .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.AnswerClones)
+            .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionPassages).ThenInclude(qp => qp.AnswerClones)
+            .Include(p => p.PaperQuestions).ThenInclude(pq => pq.Question).ThenInclude(q => q.QuestionLabel)
             .Include(x => x.SubmitPapers)
             .Include(x => x.PaperAccesses)
             .Include(x => x.PaperPermissions);

@@ -2,9 +2,9 @@
 
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-internal class PaperFolderTreeByIdSpec : Specification<PaperFolder>
+internal class MyPaperFolderTreeByIdSpec : Specification<PaperFolder>
 {
-    public PaperFolderTreeByIdSpec(DefaultIdType currentUserId)
+    public MyPaperFolderTreeByIdSpec(DefaultIdType currentUserId)
     {
         Query
         .Include(x => x.PaperFolderParent)

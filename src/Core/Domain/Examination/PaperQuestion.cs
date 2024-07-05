@@ -1,4 +1,7 @@
-﻿namespace FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Domain.Question;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FSH.WebApi.Domain.Examination;
 public class PaperQuestion
 {
     public Guid PaperId { get; set; }
@@ -6,5 +9,6 @@ public class PaperQuestion
     public float Mark { get; set; }
     public int? RawIndex { get; set; }
     public virtual Paper? Paper { get; set; }
-    public virtual Question.Question? Question { get; set; }
+    [ForeignKey(nameof(QuestionId))]
+    public virtual QuestionClone? Question { get; set; }
 }
