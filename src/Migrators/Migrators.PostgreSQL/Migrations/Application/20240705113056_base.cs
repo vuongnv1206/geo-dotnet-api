@@ -40,22 +40,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 name: "Subject");
 
             migrationBuilder.CreateTable(
-                name: "AssignmentStudent",
-                schema: "Assignment",
-                columns: table => new
-                {
-                    AssignmentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AttachmentPath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
-                    Score = table.Column<string>(type: "text", nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AssignmentStudent", x => new { x.AssignmentId, x.StudentId });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AuditTrails",
                 schema: "Auditing",
                 columns: table => new
@@ -1102,6 +1086,43 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "AssignmentStudent",
+                schema: "Assignment",
+                columns: table => new
+                {
+                    AssignmentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AttachmentPath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    Score = table.Column<string>(type: "text", nullable: true),
+                    ClassesId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssignmentStudent", x => new { x.AssignmentId, x.StudentId });
+                    table.ForeignKey(
+                        name: "FK_AssignmentStudent_Assignment_AssignmentId",
+                        column: x => x.AssignmentId,
+                        principalSchema: "Assignment",
+                        principalTable: "Assignment",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AssignmentStudent_Classes_ClassesId",
+                        column: x => x.ClassesId,
+                        principalSchema: "Classroom",
+                        principalTable: "Classes",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AssignmentStudent_Student_StudentId",
+                        column: x => x.StudentId,
+                        principalSchema: "Classroom",
+                        principalTable: "Student",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserClasses",
                 schema: "Classroom",
                 columns: table => new
@@ -1204,6 +1225,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Assignment",
                 table: "AssignmentClass",
                 column: "ClassesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssignmentStudent_ClassesId",
+                schema: "Assignment",
+                table: "AssignmentStudent",
+                column: "ClassesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssignmentStudent_StudentId",
+                schema: "Assignment",
+                table: "AssignmentStudent",
+                column: "StudentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_GroupClassId",
