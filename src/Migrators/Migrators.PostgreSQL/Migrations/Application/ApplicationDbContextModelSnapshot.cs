@@ -802,7 +802,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -1044,11 +1044,65 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("QuestionId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId");
 
                     b.ToTable("Answers", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.AnswerClone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("QuestionCloneId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionCloneId");
+
+                    b.ToTable("AnswerClones", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
@@ -1113,6 +1167,77 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasIndex("QuestionParentId");
 
                     b.ToTable("Questions", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionClone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Audio")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("OriginalQuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionCloneParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionFolderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionLabelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("QuestionType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OriginalQuestionId");
+
+                    b.HasIndex("QuestionCloneParentId");
+
+                    b.HasIndex("QuestionFolderId");
+
+                    b.HasIndex("QuestionLabelId");
+
+                    b.ToTable("QuestionClones", "Question");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -2082,7 +2207,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Question")
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2106,7 +2231,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.SubmitPaperDetail", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Question")
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2132,6 +2257,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Question");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.AnswerClone", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "QuestionClone")
+                        .WithMany("AnswerClones")
+                        .HasForeignKey("QuestionCloneId");
+
+                    b.Navigation("QuestionClone");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
@@ -2151,6 +2285,33 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("QuestionLable");
 
                     b.Navigation("QuestionParent");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionClone", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.Question", "OriginalQuestion")
+                        .WithMany()
+                        .HasForeignKey("OriginalQuestionId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "QuestionCloneParent")
+                        .WithMany("QuestionPassages")
+                        .HasForeignKey("QuestionCloneParentId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
+                        .WithMany()
+                        .HasForeignKey("QuestionFolderId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionLable", "QuestionLabel")
+                        .WithMany()
+                        .HasForeignKey("QuestionLabelId");
+
+                    b.Navigation("OriginalQuestion");
+
+                    b.Navigation("QuestionCloneParent");
+
+                    b.Navigation("QuestionFolder");
+
+                    b.Navigation("QuestionLabel");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
@@ -2353,6 +2514,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
                 {
                     b.Navigation("Answers");
+
+                    b.Navigation("QuestionPassages");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionClone", b =>
+                {
+                    b.Navigation("AnswerClones");
 
                     b.Navigation("QuestionPassages");
                 });
