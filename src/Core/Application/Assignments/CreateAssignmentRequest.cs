@@ -1,6 +1,9 @@
-﻿using FSH.WebApi.Domain.Assignment;
+﻿using FSH.WebApi.Application.Common.FileStorage;
+using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Common.Events;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace FSH.WebApi.Application.Assignments;
 public class CreateAssignmentRequest : IRequest<Guid>
@@ -12,9 +15,9 @@ public class CreateAssignmentRequest : IRequest<Guid>
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }
     public Guid SubjectId { get; set; }
-    public FileUploadRequest? Attachment { get; set; }
-    //public List<FileUploadRequest>? Attachments { get; set; }
-
+    [AllowedExtensions(".jpg", ".png", ".jpeg", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".zip", ".rar", ".7z", ".mp4", ".avi", ".mkv", ".flv", ".wmv", ".mov", ".webm", ".mp3", ".wav", ".flac", ".ogg", ".wma", ".json", ".xml", ".csv", ".tsv")]
+    [MaxFileSize(20 * 1024 * 1024)]
+    public IFormFile[]? Attachment { get; set; }
     public List<Guid>? ClassIds { get; set; }
 }
 
@@ -28,9 +31,23 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
 
     public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
     {
-        string productAttachmentPath = await _file.UploadAsync<Assignment>(request.Attachment, FileType.Image, cancellationToken);
+        string[] allowedExtensions = new[] { ".jpg", ".png", ".jpeg", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".zip", ".rar", ".7z", ".mp4", ".avi", ".mkv", ".flv", ".wmv", ".mov", ".webm", ".mp3", ".wav", ".flac", ".ogg", ".wma", ".json", ".xml", ".csv", ".tsv" };
+        string allowedExtensionsMessage = string.Join(", ", allowedExtensions);
 
-        var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, productAttachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
+        foreach (var file in request.Attachment)
+        {
+            string extension = Path.GetExtension(file.FileName);
+            if (!allowedExtensions.Contains(extension))
+            {
+                throw new BadRequestException($"Only {allowedExtensionsMessage} files are allowed.");
+            }
+        }
+
+        string[] listFilePaths = await _file.SaveFilesAsync(request.Attachment, cancellationToken);
+
+        string attachmentPath = JsonSerializer.Serialize(listFilePaths);
+
+        var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, attachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
         if (request.ClassIds != null)
         {
 
@@ -45,31 +62,4 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
 
         return assignment.Id;
     }
-
-    //public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
-    //{
-    //    List<string> attachmentPaths = new List<string>();
-
-    //    if (request.Attachments != null && request.Attachments.Any())
-    //    {
-    //        foreach (var attachment in request.Attachments)
-    //        {
-    //            string attachmentPath = await _file.UploadAsync<Assignment>(attachment, FileType.Image, cancellationToken);
-    //            attachmentPaths.Add(attachmentPath);
-    //        }
-    //    }
-
-    //    // Convert the list of paths to a single string, or handle it as needed
-    //    string combinedAttachmentPaths = string.Join(";", attachmentPaths); // Example of combining paths
-
-    //    var assignment = new Assignment(request.Name, request.StartTime, request.EndTime, combinedAttachmentPaths, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
-
-    //    // Add Domain Events to be raised after the commit
-    //    assignment.DomainEvents.Add(EntityCreatedEvent.WithEntity(assignment));
-
-    //    await _repository.AddAsync(assignment, cancellationToken);
-
-    //    return assignment.Id;
-    //}
-
 }
