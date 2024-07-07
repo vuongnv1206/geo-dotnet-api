@@ -29,7 +29,8 @@ namespace Infrastructure.Test.Controllers.Identity
             var request = new TokenRequest(
                 string.Empty,
                 "123Pa$$word!",
-                "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW"
+                "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW",
+                "123"
             );
 
             // Act
@@ -46,7 +47,8 @@ namespace Infrastructure.Test.Controllers.Identity
             var request = new TokenRequest(
                 "admin@root.com",
                 string.Empty,
-                "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW"
+                "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW",
+                "123"
             );
 
             // Act
@@ -60,7 +62,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_CaptchaTokenIsEmpty_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest("admin@root.com", "123Pa$$word!", string.Empty);
+            var request = new TokenRequest("admin@root.com", "123Pa$$word!", string.Empty, "123");
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -73,7 +75,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_AllFieldsAreEmpty_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest(string.Empty, string.Empty, string.Empty);
+            var request = new TokenRequest(string.Empty, string.Empty, string.Empty, "123");
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -86,7 +88,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_AllFieldsAreNull_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest(null, null, null);
+            var request = new TokenRequest(null, null, null, "123");
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -99,7 +101,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_AllFieldsAreWhitespace_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest(" ", " ", " ");
+            var request = new TokenRequest(" ", " ", " ", "123");
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -112,7 +114,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsyncValidRequestReturnsTokenResponse()
         {
             // Arrange
-            var request = new TokenRequest("test@gmail.com", "password", "captchaToken");
+            var request = new TokenRequest("test@gmail.com", "password", "captchaToken", "123");
             var response = new TokenResponse("token", "refreshToken", DateTime.UtcNow.AddDays(7));
 
             _tokenServiceMock
@@ -213,7 +215,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsyncInvalidCaptchaTokenReturnsUnauthorized()
         {
             // Arrange
-            var request = new TokenRequest("test@gmail.com", "password", "invalidCaptchaToken");
+            var request = new TokenRequest("test@gmail.com", "password", "invalidCaptchaToken", "123");
 
             _tokenServiceMock
                 .Setup(x =>
@@ -240,7 +242,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsyncServiceExceptionReturnsInternalServerError()
         {
             // Arrange
-            var request = new TokenRequest("test@gmail.com", "password", "captchaToken");
+            var request = new TokenRequest("test@gmail.com", "password", "captchaToken", "123");
 
             _tokenServiceMock
                 .Setup(x =>
