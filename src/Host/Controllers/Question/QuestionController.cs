@@ -2,13 +2,27 @@
 using FSH.WebApi.Application.Questions.Dtos;
 
 namespace FSH.WebApi.Host.Controllers.Question;
-    
+
 public class QuestionController : VersionedApiController
 {
     [HttpPost("search")]
     [MustHavePermission(FSHAction.View, FSHResource.Question)]
     [OpenApiOperation("search questions using available filters.", "")]
     public Task<PaginationResponse<QuestionDto>> SearchAsync(SearchQuestionsRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("search-my-requests")]
+    [OpenApiOperation("search questions created by the current user.", "")]
+    public Task<PaginationResponse<QuestionDto>> SearchMyRequestsAsync(SearchMyRequestQuestionsRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("search-approval")]
+    [OpenApiOperation("search questions that need approval.", "")]
+    public Task<PaginationResponse<QuestionDto>> SearchApprovalAsync(SearchApprovalQuestionsRequest request)
     {
         return Mediator.Send(request);
     }
@@ -47,4 +61,17 @@ public class QuestionController : VersionedApiController
         return await Mediator.Send(request);
     }
 
+    [HttpPut("approve")]
+    [OpenApiOperation("Approve questions.", "")]
+    public async Task<List<Guid>> ApproveAsync(ApproveQuestionsRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+    [HttpPut("reject")]
+    [OpenApiOperation("Reject questions.", "")]
+    public async Task<List<Guid>> RejectAsync(RejectQuestionsRequest request)
+    {
+        return await Mediator.Send(request);
+    }
 }

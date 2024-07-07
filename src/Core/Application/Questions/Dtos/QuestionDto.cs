@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
 
 namespace FSH.WebApi.Application.Questions.Dtos;
@@ -23,4 +24,5 @@ public class QuestionDto : AuditableEntity, IDto
     public List<QuestionPassagesDto>? QuestionPassages { get; set; } = new();
     public List<AnswerDto>? Answers { get; set; } = new();
     public UserDetailsDto? Owner { get; set; }
+    public QuestionStatus QuestionStatus { get; set; }
 }
