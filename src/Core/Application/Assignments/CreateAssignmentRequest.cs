@@ -1,6 +1,9 @@
-﻿using FSH.WebApi.Domain.Assignment;
+﻿using FSH.WebApi.Application.Common.FileStorage;
+using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Common.Events;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace FSH.WebApi.Application.Assignments;
 public class CreateAssignmentRequest : IRequest<Guid>
@@ -12,9 +15,7 @@ public class CreateAssignmentRequest : IRequest<Guid>
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }
     public Guid SubjectId { get; set; }
-    public FileUploadRequest? Attachment { get; set; }
-    //public List<FileUploadRequest>? Attachments { get; set; }
-
+    public string? Attachment { get; set; }
     public List<Guid>? ClassIds { get; set; }
 }
 
@@ -28,9 +29,10 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
 
     public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
     {
-        string productAttachmentPath = await _file.UploadAsync<Assignment>(request.Attachment, FileType.Image, cancellationToken);
 
-        var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, productAttachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
+        //string attachmentPath = JsonSerializer.Serialize(request.Attachment);
+
+        var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, request.Attachment, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
         if (request.ClassIds != null)
         {
 
@@ -45,31 +47,4 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
 
         return assignment.Id;
     }
-
-    //public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
-    //{
-    //    List<string> attachmentPaths = new List<string>();
-
-    //    if (request.Attachments != null && request.Attachments.Any())
-    //    {
-    //        foreach (var attachment in request.Attachments)
-    //        {
-    //            string attachmentPath = await _file.UploadAsync<Assignment>(attachment, FileType.Image, cancellationToken);
-    //            attachmentPaths.Add(attachmentPath);
-    //        }
-    //    }
-
-    //    // Convert the list of paths to a single string, or handle it as needed
-    //    string combinedAttachmentPaths = string.Join(";", attachmentPaths); // Example of combining paths
-
-    //    var assignment = new Assignment(request.Name, request.StartTime, request.EndTime, combinedAttachmentPaths, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
-
-    //    // Add Domain Events to be raised after the commit
-    //    assignment.DomainEvents.Add(EntityCreatedEvent.WithEntity(assignment));
-
-    //    await _repository.AddAsync(assignment, cancellationToken);
-
-    //    return assignment.Id;
-    //}
-
 }

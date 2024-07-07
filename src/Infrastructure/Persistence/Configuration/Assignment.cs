@@ -18,7 +18,7 @@ public class AssignmentConfig : IEntityTypeConfiguration<Assignment>
                 .HasMaxLength(256);
 
         builder
-          .Property(p => p.AttachmentPath)
+          .Property(p => p.Attachment)
               .HasMaxLength(2048);
     }
 

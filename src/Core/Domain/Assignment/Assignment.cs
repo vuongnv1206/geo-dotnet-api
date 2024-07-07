@@ -7,7 +7,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
     public string Name { get; set; } = default!;
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public string? AttachmentPath { get; set; }
+    public string? Attachment { get; set; }
     public string? Content { get; set; }
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }
@@ -20,19 +20,19 @@ public class Assignment : AuditableEntity, IAggregateRoot
     {
     }
 
-    public Assignment(string name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool canViewResult, bool requireLoginToSubmit, Guid subjectId)
+    public Assignment(string name, DateTime? startTime, DateTime? endTime, string? attachment, string? content, bool canViewResult, bool requireLoginToSubmit, Guid subjectId)
     {
         Name = name;
         StartTime = startTime;
         EndTime = endTime;
-        AttachmentPath = attachmentPath;
+        Attachment = attachment;
         Content = content;
         CanViewResult = canViewResult;
         RequireLoginToSubmit = requireLoginToSubmit;
         SubjectId = subjectId;
     }
 
-    public Assignment Update(string? name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool? canViewResult, bool? requireLoginToSubmit, Guid? subjectId)
+    public Assignment Update(string? name, DateTime? startTime, DateTime? endTime, string? attachment, string? content, bool? canViewResult, bool? requireLoginToSubmit, Guid? subjectId)
     {
         if (name is not null && !Name.Equals(name))
             Name = name;
@@ -40,8 +40,8 @@ public class Assignment : AuditableEntity, IAggregateRoot
             StartTime = startTime;
         if (endTime.HasValue && EndTime != endTime)
             EndTime = endTime;
-        if (attachmentPath is not null)
-            AttachmentPath = attachmentPath;
+        if (attachment is not null)
+            Attachment = attachment;
         if (content is not null && !Content.Equals(content))
             Content = content;
         if (canViewResult.HasValue && CanViewResult != canViewResult)
@@ -56,7 +56,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
 
     public Assignment ClearAttachmentPath()
     {
-        AttachmentPath = string.Empty;
+        Attachment = string.Empty;
         return this;
     }
 
