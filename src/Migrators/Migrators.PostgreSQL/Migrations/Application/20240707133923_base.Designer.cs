@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240705120101_base")]
+    [Migration("20240707133923_base")]
     partial class @base
     {
         /// <inheritdoc />
@@ -32,7 +32,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AttachmentPath")
+                    b.Property<string>("Attachment")
                         .HasMaxLength(2048)
                         .HasColumnType("character varying(2048)");
 
@@ -1150,6 +1150,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("QuestionParentId")
                         .HasColumnType("uuid");
 
+                    b.Property<int?>("QuestionStatus")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("QuestionType")
                         .HasColumnType("integer");
 
@@ -1157,9 +1160,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
-
-                    b.Property<bool>("isApproved")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
