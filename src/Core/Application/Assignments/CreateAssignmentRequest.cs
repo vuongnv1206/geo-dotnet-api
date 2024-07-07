@@ -15,9 +15,7 @@ public class CreateAssignmentRequest : IRequest<Guid>
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }
     public Guid SubjectId { get; set; }
-    [AllowedExtensions(".jpg", ".png", ".jpeg", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".zip", ".rar", ".7z", ".mp4", ".avi", ".mkv", ".flv", ".wmv", ".mov", ".webm", ".mp3", ".wav", ".flac", ".ogg", ".wma", ".json", ".xml", ".csv", ".tsv")]
-    [MaxFileSize(20 * 1024 * 1024)]
-    public IFormFile[]? Attachment { get; set; }
+    public string? Attachment { get; set; }
     public List<Guid>? ClassIds { get; set; }
 }
 
@@ -31,23 +29,10 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
 
     public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
     {
-        string[] allowedExtensions = new[] { ".jpg", ".png", ".jpeg", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".zip", ".rar", ".7z", ".mp4", ".avi", ".mkv", ".flv", ".wmv", ".mov", ".webm", ".mp3", ".wav", ".flac", ".ogg", ".wma", ".json", ".xml", ".csv", ".tsv" };
-        string allowedExtensionsMessage = string.Join(", ", allowedExtensions);
 
-        foreach (var file in request.Attachment)
-        {
-            string extension = Path.GetExtension(file.FileName);
-            if (!allowedExtensions.Contains(extension))
-            {
-                throw new BadRequestException($"Only {allowedExtensionsMessage} files are allowed.");
-            }
-        }
+        //string attachmentPath = JsonSerializer.Serialize(request.Attachment);
 
-        string[] listFilePaths = await _file.SaveFilesAsync(request.Attachment, cancellationToken);
-
-        string attachmentPath = JsonSerializer.Serialize(listFilePaths);
-
-        var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, attachmentPath, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
+        var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, request.Attachment, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
         if (request.ClassIds != null)
         {
 
