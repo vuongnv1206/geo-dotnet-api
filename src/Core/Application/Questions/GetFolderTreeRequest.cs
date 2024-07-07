@@ -42,7 +42,7 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
             WITH RECURSIVE RecursiveFolders AS (
                 SELECT
                     ""Id"",
-                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = ""QuestionFolders"".""Id"" AND ""DeletedOn"" IS NULL) AS question_count
+                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = ""QuestionFolders"".""Id"" AND ""QuestionStatus"" = 2 AND ""DeletedOn"" IS NULL) AS question_count
                 FROM ""Question"".""QuestionFolders""
                 WHERE ""Id"" = @p0
 
@@ -50,7 +50,7 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
 
                 SELECT
                     qf.""Id"",
-                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = qf.""Id"" AND ""DeletedOn"" IS NULL) AS question_count
+                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = qf.""Id"" AND ""QuestionStatus"" = 2 AND ""DeletedOn"" IS NULL) AS question_count
                 FROM ""Question"".""QuestionFolders"" qf
                 INNER JOIN RecursiveFolders rf ON qf.""ParentId"" = rf.""Id""
             )

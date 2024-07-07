@@ -16,7 +16,7 @@ public class Question : AuditableEntity, IAggregateRoot
     public virtual Question? QuestionParent { get; set; }
     public virtual List<Question> QuestionPassages { get; set; } = new();
     public virtual List<Answer> Answers { get; set; } = new();
-    public bool isApproved { get; set; } = false;
+    public QuestionStatus? QuestionStatus { get; set; }
 
     public Question()
     {
