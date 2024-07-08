@@ -37,6 +37,10 @@ public static class FSHResource
     public const string News = nameof(News);
     public const string NewsReaction = nameof(NewsReaction);
     public const string UserClasses = nameof(UserClasses);
+    public const string PaperFolders = nameof(PaperFolders);
+    public const string Papers = nameof(Papers);
+    public const string PaperLabels = nameof(PaperLabels);
+    public const string TeacherTeams = nameof(TeacherTeams);
     public const string Files = nameof(Files);
     public const string Notifications = nameof(Notifications);
     public const string AuditLogs = nameof(AuditLogs);
@@ -114,7 +118,7 @@ public static class FSHPermissions
         new("Create News", FSHAction.Create, FSHResource.News),
         new("Update News", FSHAction.Update, FSHResource.News),
         new("Delete News", FSHAction.Delete, FSHResource.News),
-
+        //NEWS REACTIONS
         new("View NewsReaction", FSHAction.View, FSHResource.NewsReaction, IsStudent: true),
         new("Search NewsReaction", FSHAction.Search, FSHResource.NewsReaction, IsStudent: true),
         new("Create NewsReaction", FSHAction.Create, FSHResource.NewsReaction),
@@ -136,6 +140,36 @@ public static class FSHPermissions
         new("Create UserClasses", FSHAction.Create, FSHResource.UserClasses),
         new("Update UserClasses", FSHAction.Update, FSHResource.UserClasses),
         new("Delete UserClasses", FSHAction.Delete, FSHResource.UserClasses),
+
+        // PAPER FOLDERS
+        new("View PaperFolders", FSHAction.View, FSHResource.PaperFolders),
+        new("Create PaperFolders", FSHAction.Create, FSHResource.PaperFolders),
+        new("Update PaperFolders", FSHAction.Update, FSHResource.PaperFolders),
+        new("Delete PaperFolders", FSHAction.Delete, FSHResource.PaperFolders),
+
+        // PAPERS
+        new("View Papers", FSHAction.View, FSHResource.Papers),
+        new("Create Papers", FSHAction.Create, FSHResource.Papers),
+        new("Update Papers", FSHAction.Update, FSHResource.Papers),
+        new("Delete Papers", FSHAction.Delete, FSHResource.Papers),
+
+        //PAPER LABELS
+        new("View PaperLabels", FSHAction.View, FSHResource.PaperLabels),
+        new("Create PaperLabels", FSHAction.Create, FSHResource.PaperLabels),
+        new("Update PaperLabels", FSHAction.Update, FSHResource.PaperLabels),
+        new("Delete PaperLabels", FSHAction.Delete, FSHResource.PaperLabels),
+
+        // TEACHER TEAMS
+        new("View TeacherTeams", FSHAction.View, FSHResource.TeacherTeams),
+        new("Create TeacherTeams", FSHAction.Create, FSHResource.TeacherTeams),
+        new("Update TeacherTeams", FSHAction.Update, FSHResource.TeacherTeams),
+        new("Delete TeacherTeams", FSHAction.Delete, FSHResource.TeacherTeams),
+
+        //GROUP TEACHERS
+        new("View GroupTeachers", FSHAction.View, FSHResource.GroupTeachers),
+        new("Create GroupTeachers", FSHAction.Create, FSHResource.GroupTeachers),
+        new("Update GroupTeachers", FSHAction.Update, FSHResource.GroupTeachers),
+        new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
 
         // FILES
         new("Upload files", FSHAction.Upload, FSHResource.Files, IsRoot: true),

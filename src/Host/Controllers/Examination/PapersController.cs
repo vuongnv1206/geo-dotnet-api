@@ -5,7 +5,8 @@ namespace FSH.WebApi.Host.Controllers.Examination;
 public class PapersController : VersionedApiController
 {
     [HttpPost("Search")]
-    [OpenApiOperation("")]
+    [OpenApiOperation("Search paper using available filter", "")]
+    [MustHavePermission(FSHAction.View, FSHResource.Papers)]
     public Task<PaginationResponse<PaperInListDto>> SearchPaper(SearchPaperRequest request)
     {
         return Mediator.Send(request);
@@ -13,6 +14,7 @@ public class PapersController : VersionedApiController
 
     [HttpPost]
     [OpenApiOperation("Create a paper.")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Papers)]
     public Task<Guid> CreateAsync(CreatePaperRequest request)
     {
         return Mediator.Send(request);
@@ -20,6 +22,7 @@ public class PapersController : VersionedApiController
 
     [HttpGet("{id:guid}")]
     [OpenApiOperation("Get paper details.", "")]
+    [MustHavePermission(FSHAction.View, FSHResource.Papers)]
     public Task<PaperDto> GetAsync(Guid id)
     {
         return Mediator.Send(new GetPaperByIdRequest(id));
@@ -27,6 +30,7 @@ public class PapersController : VersionedApiController
 
     [HttpPut("{id:guid}")]
     [OpenApiOperation("Update information of paper")]
+    [MustHavePermission(FSHAction.Update, FSHResource.Papers)]
     public async Task<ActionResult<Guid>> UpdateAsync(UpdatePaperRequest request, Guid id)
     {
         return id != request.Id
@@ -36,6 +40,7 @@ public class PapersController : VersionedApiController
 
     [HttpDelete("{id:guid}")]
     [OpenApiOperation("Delete a paper")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Papers)]
     public async Task<Guid> DeleteAsync(Guid id)
     {
         return await Mediator.Send(new DeletePaperRequest(id));
@@ -43,6 +48,7 @@ public class PapersController : VersionedApiController
 
     [HttpPut("{id:guid}/questions")]
     [OpenApiOperation("Update questions in a paper")]
+    [MustHavePermission(FSHAction.Update, FSHResource.Papers)]
     public async Task<IActionResult> UpdateQuestionsInPaperAsync(Guid id, [FromBody] UpdateQuestionsInPaperRequest request)
     {
         if (id != request.PaperId)
@@ -54,6 +60,7 @@ public class PapersController : VersionedApiController
     }
 
     [HttpPost("Shared")]
+    [MustHavePermission(FSHAction.View, FSHResource.Papers)]
     [OpenApiOperation("")]
     public Task<List<PaperInListDto>> SearchSharedPaper(SearchSharedPaperRequest request)
     {
@@ -62,15 +69,12 @@ public class PapersController : VersionedApiController
 
     [HttpPost("{id:guid}/share-paper")]
     [OpenApiOperation("Share paper.")]
+    [MustHavePermission(FSHAction.Update, FSHResource.Papers)]
     public async Task<ActionResult<Guid>> ShareFolder(Guid id, SharePaperRequest request)
     {
         return id != request.PaperId
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }
-
-  
-
-
 
 }

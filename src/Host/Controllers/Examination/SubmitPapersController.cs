@@ -31,7 +31,7 @@ public class SubmitPapersController : VersionedApiController
 
     [HttpGet("paper/{paperId:guid}")]
     [OpenApiOperation("get information of paper by role student")]
-    public async Task<PaperStudentDto> GetPapperByRoleStudent(Guid paperId)
+    public async Task<PaperStudentDto> GetPaperByRoleStudent(Guid paperId)
     {
         return await Mediator.Send(new GetPaperByIdRoleStudentRequest(paperId));
     }
