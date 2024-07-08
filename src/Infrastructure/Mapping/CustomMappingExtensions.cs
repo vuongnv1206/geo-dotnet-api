@@ -45,4 +45,14 @@ public static class CustomMappingExtensions
 
         return questionDtos;
     }
+
+    public static List<AnswerForStudentDto> MapAnswers(List<Answer> answers)
+    {
+        foreach (var answer in answers)
+        {
+            answer.IsCorrect = false;
+        }
+
+        return answers.Select(a => a.Adapt<AnswerForStudentDto>()).ToList();
+    }
 }

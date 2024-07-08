@@ -146,10 +146,10 @@ public class SubmmitPaperService : ISubmmitPaperService
         }
 
         // check public ip
-        if (!string.IsNullOrEmpty(paper.PublicIpAllowed) && !string.IsNullOrEmpty(request.PublicIp) && !IsIpInRange(request.PublicIp, paper.PublicIpAllowed))
-        {
-            throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
-        }
+        //if (!string.IsNullOrEmpty(paper.PublicIpAllowed) && !string.IsNullOrEmpty(request.PublicIp) && !IsIpInRange(request.PublicIp, paper.PublicIpAllowed))
+        //{
+        //    throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
+        //}
 
         var submitPaper = new SubmitPaper
         {
