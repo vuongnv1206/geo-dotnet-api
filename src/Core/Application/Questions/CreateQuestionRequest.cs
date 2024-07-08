@@ -14,77 +14,82 @@ public class CreateQuestionRequest : IRequest<List<Guid>>
 
 public class CreateQuestionRequestValidator : CustomValidator<CreateQuestionRequest>
 {
-    public CreateQuestionRequestValidator()
+    private readonly IStringLocalizer<CreateQuestionRequestValidator> _t;
+
+    public CreateQuestionRequestValidator(IStringLocalizer<CreateQuestionRequestValidator> localizer)
     {
+        _t = localizer;
+
         RuleForEach(x => x.Questions).ChildRules(questions =>
         {
-            questions.RuleFor(q => q.QuestionType).NotEmpty().WithMessage("Question type is required.");
+            questions.RuleFor(q => q.QuestionType).NotEmpty().WithMessage(_t["QuestionTypeRequired"]);
 
             questions.When(q => q.QuestionType == QuestionType.MultipleChoice, () =>
             {
                 questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 3)
-                    .WithMessage("Multiple choice question must have at least 3 answers.");
+                    .WithMessage(_t["MultipleChoiceAtLeast3Answers"]);
 
                 questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count(a => a.IsCorrect) >= 2)
-                    .WithMessage("Multiple choice question must have at least 2 correct answers.");
+                    .WithMessage(_t["MultipleChoiceAtLeast2CorrectAnswers"]);
             });
 
             questions.When(q => q.QuestionType == QuestionType.SingleChoice, () =>
             {
                 questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 2)
-                    .WithMessage("Single choice question must have at least 2 answers.");
+                    .WithMessage(_t["SingleChoiceAtLeast2Answers"]);
 
                 questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count(a => a.IsCorrect) == 1)
-                    .WithMessage("Single choice question must have exactly 1 correct answer.");
+                    .WithMessage(_t["SingleChoiceExactly1CorrectAnswer"]);
             });
 
             questions.When(q => q.QuestionType == QuestionType.Matching, () =>
             {
                 questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 1)
-                    .WithMessage("Matching question must have at least 1 pair.");
+                    .WithMessage(_t["MatchingAtLeast1Pair"]);
+
                 questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.All(a => !a.Content.Equals(string.Empty)))
-                    .WithMessage("Matching question must have exactly 1 pair.");
+                    .WithMessage(_t["MatchingNoEmptyPairs"]);
             });
 
             questions.When(q => q.QuestionType == QuestionType.FillBlank, () =>
             {
                 questions.RuleFor(q => q.Content)
                     .Must((question, content) => content != null && content.Split("$_fillblank").Length - 1 == question.Answers?.Count)
-                    .WithMessage((question, content) => $"Fill in the blank question must have exactly {content.Split("$_fillblank").Length - 1} answers.");
+                    .WithMessage((question, content) => _t["FillBlankExactAnswers", content.Split("$_fillblank").Length - 1]);
             });
 
             questions.When(q => q.QuestionType == QuestionType.Writing, () =>
             {
                 questions.RuleFor(q => q.Content)
                     .NotEmpty()
-                    .WithMessage("Writing question must have content.");
+                    .WithMessage(_t["WritingContentRequired"]);
             });
 
             questions.When(q => q.QuestionType == QuestionType.Reading, () =>
             {
                 questions.RuleFor(q => q.QuestionPassages)
                     .NotEmpty()
-                    .WithMessage("Reading question must have at least 1 question passage.");
+                    .WithMessage(_t["ReadingAtLeast1Passage"]);
 
                 questions.RuleForEach(q => q.QuestionPassages).ChildRules(passages =>
                 {
                     passages.RuleFor(p => p.Answers)
                         .NotEmpty()
-                        .WithMessage("Reading question passage must have at least 1 answer.");
+                        .WithMessage(_t["ReadingPassageAtLeast1Answer"]);
 
                     passages.RuleFor(p => p.Answers)
                         .Must(answers => answers != null && answers.Count >= 2)
-                        .WithMessage("Reading question passage must have at least 2 answers.");
+                        .WithMessage(_t["ReadingPassageAtLeast2Answers"]);
 
                     passages.RuleFor(p => p.Answers)
                         .Must(answers => answers != null && answers.Count(a => a.IsCorrect) >= 1)
-                        .WithMessage("Reading question passage must have at least 1 correct answer.");
+                        .WithMessage(_t["ReadingPassageAtLeast1CorrectAnswer"]);
                 });
             });
         });
@@ -99,6 +104,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
     private readonly IRepositoryWithEvents<QuestionFolder> _questionFolderRepository;
     private readonly IQuestionService _questionService;
     private readonly INotificationService _notificationService;
+    private readonly IStringLocalizer<CreateQuestionRequestHandler> _t;
 
     public CreateQuestionRequestHandler(
         IRepositoryWithEvents<Question> questionRepo,
@@ -106,7 +112,8 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         IUserService userService,
         IRepositoryWithEvents<QuestionFolder> questionFolderRepository,
         IQuestionService questionService,
-        INotificationService notificationService
+        INotificationService notificationService,
+        IStringLocalizer<CreateQuestionRequestHandler> t
         )
     {
         _questionRepo = questionRepo;
@@ -115,6 +122,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         _questionFolderRepository = questionFolderRepository;
         _questionService = questionService;
         _notificationService = notificationService;
+        _t = t;
     }
 
     public async Task<List<Guid>> Handle(CreateQuestionRequest request, CancellationToken cancellationToken)
@@ -127,12 +135,12 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         foreach (var folderId in questionfolderIds)
         {
             var questionFolder = await _questionFolderRepository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(folderId), cancellationToken);
-            _ = questionFolder ?? throw new NotFoundException("Folder Not Found.");
+            _ = questionFolder ?? throw new NotFoundException(_t["Folder Not Found."]);
 
             // check if user has permission to add question to folder
             if (!questionFolder.CanAdd(_currentUser.GetUserId()))
             {
-                throw new ForbiddenException("You do not have permission to add question to this folder.");
+                throw new ForbiddenException(_t["You do not have permission to add question to this folder."]);
             }
         }
 
