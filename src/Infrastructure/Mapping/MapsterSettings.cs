@@ -20,6 +20,7 @@ using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Identity;
 using Mapster;
 using FSH.WebApi.Application.Class.Comments.Dto;
+using FSH.WebApi.Application.Examination.PaperStudents;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 
 namespace FSH.WebApi.Infrastructure.Mapping;
@@ -139,6 +140,10 @@ public class MapsterSettings
         TypeAdapterConfig<Paper, PaperStudentDto>.NewConfig()
           .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
           .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
+
+        TypeAdapterConfig<Paper, StudentTestDto>.NewConfig()
+            .Map(dest => dest.PaperLabelName, src => src.PaperLabel.Name)
+            .Map(dest => dest.SubjectName, src => src.Subject.Name);
 
         TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
 
