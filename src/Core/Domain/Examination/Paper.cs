@@ -5,7 +5,7 @@ using FSH.WebApi.Domain.Subjects;
 namespace FSH.WebApi.Domain.Examination;
 public class Paper : AuditableEntity, IAggregateRoot
 {
-    //General config
+    // General config
     public string ExamName { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
@@ -15,7 +15,8 @@ public class Paper : AuditableEntity, IAggregateRoot
     public string? Content { get; set; }
     public string? Description { get; set; }
     public PaperStatus Status { get; set; }
-    //Security
+
+    // Security
     public bool Shuffle { get; set; }
     public ShowResult ShowMarkResult { get; set; }
     public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
@@ -23,7 +24,10 @@ public class Paper : AuditableEntity, IAggregateRoot
     public string ExamCode { get; set; }
     public int? NumberAttempt { get; set; }
     public PaperShareType ShareType { get; set; }
-    //Navigation
+    public string? PublicIpAllowed { get; set; }
+    public string? LocalIpAllowed { get; set; }
+
+    // Navigation
     public Guid? PaperLabelId { get; set; }
     public Guid? PaperFolderId { get; set; }
     public Guid? SubjectId { get; set; }

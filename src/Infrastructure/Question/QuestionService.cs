@@ -13,7 +13,6 @@ public class QuestionService : IQuestionService
     private readonly ApplicationDbContext _repository;
     private readonly IDapperRepository _dapperRepository;
 
-
     public async Task<QuestionFolder> GetRootFolder(Guid folderId, CancellationToken cancellationToken)
     {
         var folder = await _repository.QuestionFolders.FindAsync(folderId, cancellationToken);
@@ -102,5 +101,31 @@ public class QuestionService : IQuestionService
         }
 
         return questionId;
+    }
+
+    public async Task<int> countQuestions(DefaultIdType folderId, CancellationToken cancellationToken)
+    {
+        const string sql = @"
+            WITH RECURSIVE RecursiveFolders AS (
+                SELECT
+                    ""Id"",
+                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = ""QuestionFolders"".""Id"" AND ""QuestionStatus"" = 2 AND ""DeletedOn"" IS NULL) AS question_count
+                FROM ""Question"".""QuestionFolders""
+                WHERE ""Id"" = @p0
+
+                UNION ALL
+
+                SELECT
+                    qf.""Id"",
+                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = qf.""Id"" AND ""QuestionStatus"" = 2 AND ""DeletedOn"" IS NULL) AS question_count
+                FROM ""Question"".""QuestionFolders"" qf
+                INNER JOIN RecursiveFolders rf ON qf.""ParentId"" = rf.""Id""
+            )
+            SELECT
+                SUM(rf.question_count) AS total_questions
+            FROM RecursiveFolders rf;
+        "
+        ;
+        return await _dapperRepository.RawQuerySingleAsync<int>(sql, new { p0 = folderId }, cancellationToken: cancellationToken);
     }
 }

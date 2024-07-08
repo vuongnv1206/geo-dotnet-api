@@ -11,11 +11,17 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
     [ForeignKey(nameof(PaperId))]
     public virtual Paper? Paper { get; set; }
     public virtual List<SubmitPaperDetail> SubmitPaperDetails { get; set; } = new();
+    public string DeviceId { get; set; }
+    public string DeviceName { get; set; }
+    public string DeviceType { get; set; }
+    public string PublicIp { get; set; }
+    public string LocalIp { get; set; }
 
     public SubmitPaper()
     {
 
     }
+
     public SubmitPaper(Guid paperId)
     {
         PaperId = paperId;
