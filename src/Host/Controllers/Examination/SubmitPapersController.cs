@@ -1,5 +1,6 @@
 ﻿
 using FSH.WebApi.Application.Examination.Papers.ByStudents;
+using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 
@@ -45,7 +46,6 @@ public class SubmitPapersController : VersionedApiController
             : BadRequest();
     }
 
-
     [HttpPost("last-result")]
     public async Task<ActionResult<LastResultExamDto>> GetLastResult(GetLastResultExamRequest request)
     {
@@ -58,6 +58,19 @@ public class SubmitPapersController : VersionedApiController
     public async Task<Guid> MarkAnswer(MarkAnswerRequest request)
     {
         return await Mediator.Send(request);
-    }   
+    }
+
+    [HttpPost("start")]
+    [OpenApiOperation("Start exam")]
+    public async Task<ActionResult<PaperForStudentDto>> StartExam(StartExamRequest request)
+    {
+        request.PublicIp = GetIpAddress();
+        return await Mediator.Send(request);
+    }
+
+    public string? GetIpAddress() =>
+    Request.Headers.ContainsKey("X-Forwarded-For")
+        ? Request.Headers["X-Forwarded-For"]
+        : HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "N/A";
 
 }
