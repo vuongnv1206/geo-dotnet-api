@@ -161,9 +161,8 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
             Message = $"{fullName} added new question to your folder.",
             Label = BasicNotification.LabelType.Information,
             Title = "New Question Added",
-            Url = "/questions/approval-queue"
+            Url = "/questions?tab=2"
         };
-
 
         await _notificationService.SendNotificationToUsers(notiUserId.Distinct().ToList(), noti, null, cancellationToken);
 
