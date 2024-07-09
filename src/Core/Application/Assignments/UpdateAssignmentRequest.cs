@@ -1,11 +1,9 @@
 ﻿using FSH.WebApi.Domain.Assignment;
-using FSH.WebApi.Domain.Common.Events;
-using System.Text.Json;
 namespace FSH.WebApi.Application.Assignments;
 public class UpdateAssignmentRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = default!;
+    public string? Name { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public string? Content { get; set; }
@@ -34,7 +32,7 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
 
         var updatedAssignment = assignment.Update(
-            request.Name.Trim(),
+            request.Name,
             request.StartTime,
             request.EndTime,
             request.Attachment,
