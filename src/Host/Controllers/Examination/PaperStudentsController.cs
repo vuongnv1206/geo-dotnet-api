@@ -9,4 +9,11 @@ public class PaperStudentsController : VersionedApiController
     {
         return await Mediator.Send(request);
     }
+
+    [HttpPost("history/search")]
+    [OpenApiOperation("get list of paper that student did")]
+    public async Task<PaginationResponse<StudentTestHistoryDto>> GetHistoryTests(GetHistoryTestOfStudentRequest request)
+    {
+        return await Mediator.Send(request);
+    }
 }
