@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.PaperStudents;
+using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class PaperStudentsController : VersionedApiController

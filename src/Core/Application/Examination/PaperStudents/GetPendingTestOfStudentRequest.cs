@@ -1,4 +1,6 @@
 ﻿using FSH.WebApi.Application.Class.Specs;
+using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
+using FSH.WebApi.Application.Examination.PaperStudents.Specs;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
 using Mapster;

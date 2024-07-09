@@ -20,8 +20,8 @@ using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Identity;
 using Mapster;
 using FSH.WebApi.Application.Class.Comments.Dto;
-using FSH.WebApi.Application.Examination.PaperStudents;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
+using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 
 namespace FSH.WebApi.Infrastructure.Mapping;
 
