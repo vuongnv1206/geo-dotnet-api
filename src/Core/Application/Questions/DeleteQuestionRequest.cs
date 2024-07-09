@@ -14,20 +14,22 @@ public class DeleteQuestionRequestValidator : CustomValidator<DeleteQuestionRequ
 {
     public DeleteQuestionRequestValidator()
     {
-        RuleFor(x => x.Id)
+        _ = RuleFor(x => x.Id)
             .NotNull();
     }
 }
 
 public class QuestionByIdSpec : Specification<Question>, ISingleResultSpecification
 {
-    public QuestionByIdSpec(Guid id) =>
-        Query
+    public QuestionByIdSpec(Guid id)
+    {
+        _ = Query
         .Include(b => b.Answers)
         .Include(b => b.QuestionPassages)
         .Include(b => b.QuestionFolder)
         .ThenInclude(b => b.Permissions)
         .Where(b => b.Id == id);
+    }
 }
 
 public class DeleteQuestionRequestHandler : IRequestHandler<DeleteQuestionRequest, Guid>
@@ -54,7 +56,7 @@ public class DeleteQuestionRequestHandler : IRequestHandler<DeleteQuestionReques
         if (!question.CanDelete(_currentUser.GetUserId()))
         {
             // if folder owner is not the current user, throw an exception
-            if (!question.QuestionFolder.Permissions.Any(p => p.CanDelete && p.UserId == _currentUser.GetUserId()))
+            if (!question.QuestionFolder.CreatedBy.Equals(_currentUser.GetUserId()))
             {
                 throw new ForbiddenException(_t["You do not have permission to delete this question."]);
             }
