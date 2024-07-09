@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.PaperFolders;
+using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Question;
@@ -81,21 +82,20 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Gui
                 if (existingQuestion == null)
                     throw new NotFoundException(_t["Question {0} Not Found.", question.QuestionId]);
 
-                var questionClone = existingQuestion.Adapt<QuestionClone>();
-                questionClone.OriginalQuestionId = existingQuestion.Id;
-                await _questionCloneRepo.AddAsync(questionClone);
+                var createdQuestionCloneId = _mediator.Send(new CreateQuestionCloneRequest
+               {
+                    OriginalQuestionId = question.QuestionId,
+                }).Result;
 
                 var paperQuestion = new PaperQuestion
                 {
-                    QuestionId = questionClone.Id,
+                    QuestionId = createdQuestionCloneId,
                     Mark = question.Mark,
                     RawIndex = question.RawIndex
                 };
                 newPaper.AddQuestion(paperQuestion);
             }
         }
-
-
         await _paperRepo.AddAsync(newPaper);
 
         return newPaper.Id;

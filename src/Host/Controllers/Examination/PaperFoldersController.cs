@@ -39,7 +39,7 @@ public class PaperFoldersController : VersionedApiController
 
     [HttpPost("{id:guid}/share-paper-folder")]
     [OpenApiOperation("Share paper folder.")]
-    [MustHavePermission(FSHAction.Update, FSHResource.PaperFolders)
+    [MustHavePermission(FSHAction.Update, FSHResource.PaperFolders)]
     public async Task<ActionResult<Guid>> ShareFolder(Guid id, SharePaperFolderRequest request)
     {
         return id != request.FolderId

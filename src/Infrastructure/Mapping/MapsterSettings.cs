@@ -65,6 +65,7 @@ public class MapsterSettings
         TypeAdapterConfig<Domain.Question.Question, QuestionClone>.NewConfig()
             .Ignore(dest => dest.QuestionLabel)
             .Ignore(dest => dest.QuestionFolder)
+            .Map(dest => dest.QuestionLabelId, src => src.QuestionLableId)
             .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
             .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
             .Map(dest => dest.AnswerClones, src => src.Answers);
@@ -81,6 +82,7 @@ public class MapsterSettings
              .Map(dest => dest.QuestionId, src => src.QuestionCloneId);
 
         TypeAdapterConfig<QuestionClone, QuestionDto>.NewConfig()
+           .Map(dest => dest.QuestionLable, src => src.QuestionLabel)
            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
            .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
            .Map(dest => dest.Answers, src => src.AnswerClones);
