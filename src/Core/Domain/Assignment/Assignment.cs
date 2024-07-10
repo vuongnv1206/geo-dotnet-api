@@ -60,10 +60,10 @@ public class Assignment : AuditableEntity, IAggregateRoot
         return this;
     }
 
-    //public void AssignAssignmentToClass(AssignmentClass assignmentClass)
-    //{
-    //    AssignmentClasses.Add(assignmentClass);
-    //}
+    public void AssignAssignmentToClass(AssignmentClass assignmentClass)
+    {
+        AssignmentClasses.Add(assignmentClass);
+    }
 
     public void UpdateAssignmentFromClass(List<AssignmentClass> aClass)
     {

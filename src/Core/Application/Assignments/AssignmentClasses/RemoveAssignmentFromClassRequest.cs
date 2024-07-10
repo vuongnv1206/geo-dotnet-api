@@ -12,7 +12,7 @@ namespace FSH.WebApi.Application.Assignments.AssignmentClasses;
 public class RemoveAssignmentFromClassRequest : IRequest<Guid>
 {
     public Guid AssignmentId { get; set; }
-    public Guid ClassesdId { get; set; }
+    public Guid ClassId { get; set; }
 }
 
 public class RemoveAssignmentFromClassRequestValidator : CustomValidator<RemoveAssignmentFromClassRequest>
@@ -41,28 +41,14 @@ public class RemoveAssignmentFromClassRequestHandler : IRequestHandler<RemoveAss
 
     public async Task<DefaultIdType> Handle(RemoveAssignmentFromClassRequest request, CancellationToken cancellationToken)
     {
-        var classes = await _classesRepository.FirstOrDefaultAsync(new ClassesByIdSpec(request.ClassesdId));
-        //var classes = await _classesRepository.GetByIdAsync(request.ClassesdId);
-        if (classes is null)
-            throw new NotFoundException(_t["Class {0} Not Found.", request.ClassesdId]);
+        var classroom = await _classesRepository.FirstOrDefaultAsync(new ClassesByIdSpec(request.ClassId));
 
-        if (!classes.CanUpdate(_currentUser.GetUserId()))
-            throw new ForbiddenException(_t["You cannot have permission update with {0}", request.ClassesdId]);
+        _ = classroom ?? throw new NotFoundException(_t["Class {0} Not Found.", request.ClassId]);
 
-        if (classes.AssignmentClasses.Any())
-        {
-            var assignmentInClass = classes.AssignmentClasses?.FirstOrDefault(x => x.AssignmentId == request.AssignmentId && x.ClassesId == request.ClassesdId);
+        classroom.RemoveAssignment(request.AssignmentId);
 
-            if (assignmentInClass is null)
-            {
-                throw new NotFoundException(_t["Assignment {0} Not Found.", request.AssignmentId]);
-            }
+        await _classesRepository.UpdateAsync(classroom, cancellationToken);
 
-            classes.RemoveAssignmentFromClass(assignmentInClass);
-
-            await _classesRepository.UpdateAsync(classes);
-        }
-
-        return default(DefaultIdType);
+        return classroom.Id;
     }
 }
