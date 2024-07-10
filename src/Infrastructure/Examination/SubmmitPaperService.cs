@@ -4,18 +4,12 @@ using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.SubmitPapers;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Host.Controllers.Examination;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using Mapster;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Infrastructure.Examination;
 public class SubmmitPaperService : ISubmmitPaperService
@@ -24,13 +18,15 @@ public class SubmmitPaperService : ISubmmitPaperService
     private readonly IRepository<Paper> _paperRepository;
     private readonly IRepository<SubmitPaper> _submitPaperRepository;
     private readonly ICurrentUser _currentUser;
+    private readonly IUserService _userService;
 
-    public SubmmitPaperService(ApplicationDbContext context, IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, ICurrentUser currentUser)
+    public SubmmitPaperService(ApplicationDbContext context, IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, ICurrentUser currentUser, IUserService userService)
     {
         _context = context;
         _paperRepository = paperRepository;
         _submitPaperRepository = submitPaperRepository;
         _currentUser = currentUser;
+        _userService = userService;
     }
 
     private bool IsIpInRange(string ip, string ipRange)
@@ -39,7 +35,10 @@ public class SubmmitPaperService : ISubmmitPaperService
         {
             // Split the IP range into IP address and CIDR subnet mask
             string[] parts = ipRange.Split('/');
-            if (parts.Length != 2) return false;
+            if (parts.Length != 2)
+            {
+                return false;
+            }
 
             var ipAddress = IPAddress.Parse(parts[0]);
             int prefixLength = int.Parse(parts[1]);
@@ -47,7 +46,10 @@ public class SubmmitPaperService : ISubmmitPaperService
             byte[] ipBytes = ipAddress.GetAddressBytes();
             byte[] ipToCheckBytes = IPAddress.Parse(ip).GetAddressBytes();
 
-            if (ipBytes.Length != ipToCheckBytes.Length) return false;
+            if (ipBytes.Length != ipToCheckBytes.Length)
+            {
+                return false;
+            }
 
             // Create a mask with the specified prefix length
             byte[] mask = new byte[ipBytes.Length];
@@ -76,7 +78,7 @@ public class SubmmitPaperService : ISubmmitPaperService
 
             return true;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return false;
         }
@@ -116,21 +118,21 @@ public class SubmmitPaperService : ISubmmitPaperService
         var userId = _currentUser.GetUserId();
 
         //// check user has permission to start exam
-        //bool hasPermission = false;
-        //if (!paper.PaperAccesses.Any(x => x.UserId == userId))
-        //{
+        // bool hasPermission = false;
+        // if (!paper.PaperAccesses.Any(x => x.UserId == userId))
+        // {
         //    hasPermission = true;
-        //}
+        // }
 
-        //if (!paper.PaperAccesses.Any(x => x.Class.UserClasses.Any(y => y.StudentId == userId)))
-        //{
+        // if (!paper.PaperAccesses.Any(x => x.Class.UserClasses.Any(y => y.StudentId == userId)))
+        // {
         //    hasPermission = true;
-        //}
+        // }
 
-        //if (!hasPermission)
-        //{
+        // if (!hasPermission)
+        // {
         //    throw new ForbiddenException("You do not have permission to start this exam.");
-        //}
+        // }
 
         // check user has not submitted this paper
         var submitPapers = await _submitPaperRepository.ListAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
@@ -146,10 +148,10 @@ public class SubmmitPaperService : ISubmmitPaperService
         }
 
         // check public ip
-        //if (!string.IsNullOrEmpty(paper.PublicIpAllowed) && !string.IsNullOrEmpty(request.PublicIp) && !IsIpInRange(request.PublicIp, paper.PublicIpAllowed))
-        //{
+        // if (!string.IsNullOrEmpty(paper.PublicIpAllowed) && !string.IsNullOrEmpty(request.PublicIp) && !IsIpInRange(request.PublicIp, paper.PublicIpAllowed))
+        // {
         //    throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
-        //}
+        // }
 
         var submitPaper = new SubmitPaper
         {
@@ -161,10 +163,12 @@ public class SubmmitPaperService : ISubmmitPaperService
             LocalIp = request.LocalIp
         };
 
-        await _submitPaperRepository.AddAsync(submitPaper, cancellationToken);
+        _ = await _submitPaperRepository.AddAsync(submitPaper, cancellationToken);
 
         var paperDot = paper.Adapt<PaperForStudentDto>();
-
+        var user = await _userService.GetAsync(submitPaper.CreatedBy.ToString(), cancellationToken);
+        paperDot.SubmitPaperId = submitPaper.Id;
+        paperDot.UserDetails = user.Adapt<UserDetailsDto>();
         return paperDot;
     }
 }
