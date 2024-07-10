@@ -1,10 +1,13 @@
-﻿using FSH.WebApi.Domain.Question;
+﻿using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Question;
 using Mapster;
 
 namespace FSH.WebApi.Application.Questions;
-public class CreateQuestionCloneRequest : IRequest<List<Guid>>
+public class CreateQuestionCloneRequest : IRequest<Guid>
 {
-    public required List<CreateQuestionDto> Questions { get; set; }
+    public required Guid OriginalQuestionId { get; set; }
 }
 
 public class CreateQuestionCloneRequestValidator : CustomValidator<CreateQuestionCloneRequest>
@@ -15,64 +18,43 @@ public class CreateQuestionCloneRequestValidator : CustomValidator<CreateQuestio
     }
 }
 
-public class CreateQuestionCloneRequestHandler : IRequestHandler<CreateQuestionCloneRequest, List<Guid>>
+public class CreateQuestionCloneRequestHandler : IRequestHandler<CreateQuestionCloneRequest, Guid>
 {
-    private readonly IRepositoryWithEvents<QuestionClone> _questionRepo;
+    private readonly IRepositoryWithEvents<QuestionClone> _questionCloneRepo;
+    private readonly IRepositoryWithEvents<Question> _questionRepo;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
+    private readonly IRepository<QuestionFolder> _questionFolderRepository;
 
     public CreateQuestionCloneRequestHandler(
-               IRepositoryWithEvents<QuestionClone> questionRepo,
-                      IStringLocalizer<CreateQuestionCloneRequestHandler> t)
+               IRepositoryWithEvents<QuestionClone> questionCloneRepo,
+               IRepositoryWithEvents<Question> questionRepo,
+                      IStringLocalizer<CreateQuestionCloneRequestHandler> t,
+                      ICurrentUser currentUser,
+                      IRepository<QuestionFolder> questionFolderRepository)
     {
-        _questionRepo = questionRepo;
+        _questionCloneRepo = questionCloneRepo;
         _t = t;
+        _currentUser = currentUser;
+        _questionFolderRepository = questionFolderRepository;
+        _questionRepo = questionRepo;
     }
 
-    public async Task<List<Guid>> Handle(CreateQuestionCloneRequest request, CancellationToken cancellationToken)
-    {
-        var createdQuestionIds = new List<Guid>();
-        foreach (var questionDto in request.Questions)
-        {
-            var question = questionDto.Adapt<QuestionClone>();
-            var answers = questionDto.Answers?.Adapt<List<AnswerClone>>();
-
-            if (answers != null)
-            {
-                question.AddAnswerClones(answers);
-            }
-
-            await _questionRepo.AddAsync(question, cancellationToken);
-            createdQuestionIds.Add(question.Id);
-            if (questionDto.QuestionPassages != null)
-            {
-                await AddQuestionPassages(questionDto.QuestionPassages, question.Id, cancellationToken);
-            }
-        }
-
-        return createdQuestionIds;
-
-    }
-
-    private async Task AddQuestionPassages(List<CreateQuestionDto> passages, Guid parentId, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreateQuestionCloneRequest request, CancellationToken cancellationToken)
     {
 
-        foreach (var passageDto in passages)
-        {
-            passageDto.QuestionParentId = parentId;
-            var passage = passageDto.Adapt<QuestionClone>();
-            var answers = passageDto.Answers?.Adapt<List<AnswerClone>>();
+        var existingQuestion = await _questionRepo.FirstOrDefaultAsync(new Questions.Specs.QuestionByIdSpec(request.OriginalQuestionId));
+        if (existingQuestion == null)
+            throw new NotFoundException(_t["Question {0} Not Found.", request.OriginalQuestionId]);
 
-            if (answers != null)
-            {
-                passage.AddAnswerClones(answers);
-            }
+        var questionClone = existingQuestion.Adapt<QuestionClone>();
+        questionClone.OriginalQuestionId = existingQuestion.Id;
 
-            await _questionRepo.AddAsync(passage, cancellationToken);
-            if (passageDto.QuestionPassages != null)
-            {
-                await AddQuestionPassages(passageDto.QuestionPassages, passage.Id, cancellationToken);
-            }
-        }
+        await _questionCloneRepo.AddAsync(questionClone);
+
+        return questionClone.Id;
     }
+
+  
 }
 

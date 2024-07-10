@@ -12,7 +12,7 @@ public class PaperFolderTreeBySearchSpec : EntitiesByPaginationFilterSpec<PaperF
         .Include(x => x.PaperFolderParent)
         .Include(x => x.PaperFolderChildrens)
         .Where(x => x.ParentId == request.ParentId)
-        .Where(x => (x.CreatedBy == currentUserId || x.PaperFolderPermissions.Any(x => x.CanView)))
+        .Where(x => (x.CreatedBy == currentUserId))
         .OrderBy(x => x.CreatedOn, !request.HasOrderBy());
     }
 }
