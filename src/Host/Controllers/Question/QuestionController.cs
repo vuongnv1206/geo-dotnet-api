@@ -74,4 +74,13 @@ public class QuestionController : VersionedApiController
     {
         return await Mediator.Send(request);
     }
+    [HttpPost("Clone")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Question)]
+    [OpenApiOperation("Create question clone.", "")]
+    public async Task<Guid> CreateAsync(CreateQuestionCloneRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+
 }

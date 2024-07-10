@@ -62,7 +62,9 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
 
     public async Task<DefaultIdType> Handle(SharePaperFolderRequest request, CancellationToken cancellationToken)
     {
-        var folderTree = await _paperFolderRepo.ListAsync(new PaperFolderTreeSpec(), cancellationToken);
+        var currentUserId = _currentUser.GetUserId();
+        var folderTree = await _paperFolderRepo.ListAsync(new MyPaperFolderTreeSpec(currentUserId), cancellationToken);
+
            var folderParent = folderTree.FirstOrDefault(x => x.Id == request.FolderId)
             ?? throw new NotFoundException(_t["The Folder {0} Not Found", request.FolderId]);
 
@@ -71,7 +73,7 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
         folderParent.ChildPaperFolderIds(null, folderChildrenIds);
         folderChildrenIds.Add(request.FolderId);
 
-        var currentUserId = _currentUser.GetUserId();
+       
         if (!folderParent.CanShare(currentUserId))
         {
             throw new ForbiddenException(_t["You do not have permission to share this folder."]);

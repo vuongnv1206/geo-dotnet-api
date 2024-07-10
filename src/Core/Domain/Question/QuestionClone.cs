@@ -18,6 +18,7 @@ public class QuestionClone : AuditableEntity, IAggregateRoot
     public Guid? OriginalQuestionId { get; set; }
     [ForeignKey(nameof(OriginalQuestionId))]
     public virtual Question? OriginalQuestion { get; set; }
+    [ForeignKey(nameof(QuestionParentId))]
     public virtual QuestionClone? QuestionCloneParent { get; set; }
     public virtual List<QuestionClone> QuestionPassages { get; set; } = new();
     public virtual List<AnswerClone> AnswerClones { get; set; } = new();
@@ -92,6 +93,7 @@ public class QuestionClone : AuditableEntity, IAggregateRoot
     {
         QuestionPassages.Remove(questionClone);
     }
+
 
     public void UpdateAnswerClones(List<AnswerClone> answerClones)
     {
