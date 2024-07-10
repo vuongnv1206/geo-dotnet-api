@@ -147,6 +147,19 @@ public class MapsterSettings
             .Map(dest => dest.PaperLabelName, src => src.PaperLabel.Name)
             .Map(dest => dest.SubjectName, src => src.Subject.Name);
 
+        TypeAdapterConfig<SubmitPaper, StudentTestHistoryDto>.NewConfig()
+            .Map(dest => dest.PaperLabelName, src => src.Paper.PaperLabel.Name)
+            .Map(dest => dest.PaperLabelId, src => src.Paper.PaperLabelId)
+            .Map(dest => dest.SubjectId, src => src.Paper.SubjectId)
+            .Map(dest => dest.SubjectName, src => src.Paper.Subject.Name)
+            .Map(dest => dest.Duration, src => src.Paper.Duration)
+            .Map(dest => dest.ExamName, src => src.Paper.ExamName)
+            .Map(dest => dest.StartedTime, src => src.StartTime)
+            .Map(dest => dest.SubmittedTime, src => src.EndTime)
+            .Map(dest => dest.CompletionStatus, src => src.Status)
+            .Map(dest => dest.Score, src => src.TotalMark)
+            .Map(dest => dest.ShowMarkResult, src => src.Paper.ShowMarkResult);
+
         TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
 
         TypeAdapterConfig<SubmitPaper, LastResultExamDto>.NewConfig()
