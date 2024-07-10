@@ -49,7 +49,7 @@ public class PapersController : VersionedApiController
     [HttpPut("{id:guid}/questions")]
     [OpenApiOperation("Update questions in a paper")]
     [MustHavePermission(FSHAction.Update, FSHResource.Papers)]
-    public async Task<IActionResult> UpdateQuestionsInPaperAsync(Guid id, [FromBody] UpdateQuestionsInPaperRequest request)
+    public async Task<IActionResult> UpdateQuestionsInPaperAsync(Guid id, [FromBody] AddQuestionsInPaperRequest request)
     {
         if (id != request.PaperId)
         {
@@ -76,5 +76,29 @@ public class PapersController : VersionedApiController
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }
+
+    //Write controller for DeleteQuestionInPaperRequest
+    [HttpDelete("{id:guid}/questions/{questionId:guid}")]
+    [OpenApiOperation("Delete a question in a paper")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Papers)]
+    public async Task<ActionResult> DeleteQuestionInPaperAsync(Guid id, Guid questionId)
+    {
+        return Ok(await Mediator.Send(new DeleteQuestionInPaperRequest { PaperId = id, QuestionCloneId = questionId }));
+    }
+
+    //fix controller for AddQuestionInPaperRequest
+
+    [HttpPost("{id:guid}/questions")]
+    [OpenApiOperation("Add questions in a paper")]
+    [MustHavePermission(FSHAction.Update, FSHResource.Papers)]
+    public async Task<ActionResult> UpdateQuestionInPaperAsync(Guid id,AddQuestionsInPaperRequest request)
+    {
+        if (id != request.PaperId)
+        {
+            return BadRequest("Paper Id in the request does not match the Id in the route.");
+        }
+        return Ok(await Mediator.Send(request));
+    }
+    
 
 }

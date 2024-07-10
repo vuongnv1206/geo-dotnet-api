@@ -79,6 +79,11 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperQuestions.Add(question);   
     }
 
+    public void RemoveQuestion(Guid questionId)
+    {
+        PaperQuestions.RemoveAll(x => x.QuestionId == questionId);
+    }
+
     public void UpdateQuestions(List<PaperQuestion> questions)
     {
         PaperQuestions.RemoveAll(pq => !questions.Any(q => q.QuestionId == pq.QuestionId));
