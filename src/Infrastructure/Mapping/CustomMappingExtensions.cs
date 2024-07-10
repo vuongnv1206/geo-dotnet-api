@@ -1,5 +1,7 @@
-﻿using FSH.WebApi.Application.Questions.Dtos;
+﻿using FSH.WebApi.Application.Questions;
+using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Question;
 using Mapster;
 using System;
 using System.Collections.Generic;
@@ -25,5 +27,32 @@ public static class CustomMappingExtensions
         }
 
         return questionDtos;
+    }
+
+    public static List<QuestionForStudentDto> MapQuestionsForStudent(List<PaperQuestion> paperQuestions)
+    {
+        var questionDtos = paperQuestions.Select(pq => pq.Question.Adapt<QuestionForStudentDto>()).ToList();
+
+        foreach (var pq in paperQuestions)
+        {
+            var questionDto = questionDtos.FirstOrDefault(q => q.Id == pq.QuestionId);
+            if (questionDto != null)
+            {
+                questionDto.RawIndex = pq.RawIndex;
+                questionDto.Mark = pq.Mark;
+            }
+        }
+
+        return questionDtos;
+    }
+
+    public static List<AnswerForStudentDto> MapAnswers(List<Answer> answers)
+    {
+        foreach (var answer in answers)
+        {
+            answer.IsCorrect = false;
+        }
+
+        return answers.Select(a => a.Adapt<AnswerForStudentDto>()).ToList();
     }
 }

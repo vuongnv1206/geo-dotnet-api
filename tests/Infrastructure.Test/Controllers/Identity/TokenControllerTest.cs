@@ -1,9 +1,9 @@
-﻿using FSH.WebApi.Application.Identity.Tokens;
+﻿using System.Net;
+using FSH.WebApi.Application.Identity.Tokens;
 using FSH.WebApi.Host.Controllers.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System.Net;
 using Xunit;
 
 namespace Infrastructure.Test.Controllers.Identity
@@ -19,17 +19,19 @@ namespace Infrastructure.Test.Controllers.Identity
             _controller = new TokensController(_tokenServiceMock.Object);
             var httpContext = new DefaultHttpContext();
             httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = httpContext
-            };
+            _controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
         }
 
         [Fact]
         public async Task GetTokenAsync_EmailIsEmpty_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest(string.Empty, "123Pa$$word!", "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW");
+            var request = new TokenRequest(
+                string.Empty,
+                "123Pa$$word!",
+                "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW",
+                "123"
+            );
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -42,7 +44,12 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_PasswordIsEmpty_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest("admin@root.com", string.Empty, "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW");
+            var request = new TokenRequest(
+                "admin@root.com",
+                string.Empty,
+                "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW",
+                "123"
+            );
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -55,7 +62,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_CaptchaTokenIsEmpty_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest("admin@root.com", "123Pa$$word!", string.Empty);
+            var request = new TokenRequest("admin@root.com", "123Pa$$word!", string.Empty, "123");
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -68,7 +75,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_AllFieldsAreEmpty_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest(string.Empty, string.Empty, string.Empty);
+            var request = new TokenRequest(string.Empty, string.Empty, string.Empty, "123");
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -81,7 +88,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_AllFieldsAreNull_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest(null, null, null);
+            var request = new TokenRequest(null, null, null, "123");
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -94,7 +101,7 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsync_AllFieldsAreWhitespace_ReturnsBadRequest()
         {
             // Arrange
-            var request = new TokenRequest(" ", " ", " ");
+            var request = new TokenRequest(" ", " ", " ", "123");
 
             // Act
             var result = await _controller.GetTokenAsync(request, CancellationToken.None);
@@ -107,10 +114,13 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsyncValidRequestReturnsTokenResponse()
         {
             // Arrange
-            var request = new TokenRequest("test@gmail.com", "password", "captchaToken");
+            var request = new TokenRequest("test@gmail.com", "password", "captchaToken", "123");
             var response = new TokenResponse("token", "refreshToken", DateTime.UtcNow.AddDays(7));
 
-            _tokenServiceMock.Setup(x => x.GetTokenAsync(request, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _tokenServiceMock
+                .Setup(x =>
+                    x.GetTokenAsync(request, It.IsAny<string>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(response);
 
             // Act
@@ -127,9 +137,14 @@ namespace Infrastructure.Test.Controllers.Identity
         {
             // Arrange
             var request = new RefreshTokenRequest("token", "refreshToken");
-            var response = new TokenResponse("newToken", "newRefreshToken", DateTime.UtcNow.AddDays(7));
+            var response = new TokenResponse(
+                "newToken",
+                "newRefreshToken",
+                DateTime.UtcNow.AddDays(7)
+            );
 
-            _tokenServiceMock.Setup(x => x.RefreshTokenAsync(request, It.IsAny<string>()))
+            _tokenServiceMock
+                .Setup(x => x.RefreshTokenAsync(request, It.IsAny<string>()))
                 .ReturnsAsync(response);
 
             // Act
@@ -158,10 +173,7 @@ namespace Infrastructure.Test.Controllers.Identity
             // Arrange
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers["X-Forwarded-For"] = "192.168.1.1";
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = httpContext
-            };
+            _controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
             // Act
             var ipAddress = _controller.GetIpAddress();
@@ -176,10 +188,7 @@ namespace Infrastructure.Test.Controllers.Identity
             // Arrange
             var httpContext = new DefaultHttpContext();
             httpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = httpContext
-            };
+            _controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
             // Act
             var ipAddress = _controller.GetIpAddress();
@@ -193,10 +202,7 @@ namespace Infrastructure.Test.Controllers.Identity
         {
             // Arrange
             var httpContext = new DefaultHttpContext();
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = httpContext
-            };
+            _controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
 
             // Act
             var ipAddress = _controller.GetIpAddress();
@@ -209,9 +215,12 @@ namespace Infrastructure.Test.Controllers.Identity
         public async Task GetTokenAsyncInvalidCaptchaTokenReturnsUnauthorized()
         {
             // Arrange
-            var request = new TokenRequest("test@gmail.com", "password", "invalidCaptchaToken");
+            var request = new TokenRequest("test@gmail.com", "password", "invalidCaptchaToken", "123");
 
-            _tokenServiceMock.Setup(x => x.GetTokenAsync(request, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _tokenServiceMock
+                .Setup(x =>
+                    x.GetTokenAsync(request, It.IsAny<string>(), It.IsAny<CancellationToken>())
+                )
                 .ThrowsAsync(new UnauthorizedAccessException());
 
             try
@@ -227,17 +236,18 @@ namespace Infrastructure.Test.Controllers.Identity
                 // Assert
                 Assert.True(true);
             }
-
-
         }
 
         [Fact]
         public async Task GetTokenAsyncServiceExceptionReturnsInternalServerError()
         {
             // Arrange
-            var request = new TokenRequest("test@gmail.com", "password", "captchaToken");
+            var request = new TokenRequest("test@gmail.com", "password", "captchaToken", "123");
 
-            _tokenServiceMock.Setup(x => x.GetTokenAsync(request, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            _tokenServiceMock
+                .Setup(x =>
+                    x.GetTokenAsync(request, It.IsAny<string>(), It.IsAny<CancellationToken>())
+                )
                 .ThrowsAsync(new Exception());
 
             // Act

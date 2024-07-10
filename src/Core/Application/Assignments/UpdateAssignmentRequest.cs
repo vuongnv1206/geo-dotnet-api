@@ -1,19 +1,17 @@
 ﻿using FSH.WebApi.Domain.Assignment;
-using FSH.WebApi.Domain.Common.Events;
 namespace FSH.WebApi.Application.Assignments;
 public class UpdateAssignmentRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = default!;
+    public string? Name { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public string? AttachmentPath { get; set; }
     public string? Content { get; set; }
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }
     public DefaultIdType? SubjectId { get; set; }
     public bool DeleteCurrentAttachment { get; set; } = false;
-    public FileUploadRequest? Attachment { get; set; }
+    public string? Attachment { get; set; }
     public List<Guid>? ClassIds { get; set; }
 
 }
@@ -33,28 +31,11 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
 
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
 
-        // Remove old image if flag is set
-        if (request.DeleteCurrentAttachment)
-        {
-            string? currentAssignmentAttachmentPath = assignment.AttachmentPath;
-            if (!string.IsNullOrEmpty(currentAssignmentAttachmentPath))
-            {
-                string root = Directory.GetCurrentDirectory();
-                _file.Remove(Path.Combine(root, currentAssignmentAttachmentPath));
-            }
-
-            assignment = assignment.ClearAttachmentPath();
-        }
-
-        string? assignmentAttachmentPath = request.Attachment is not null
-            ? await _file.UploadAsync<Assignment>(request.Attachment, FileType.Image, cancellationToken)
-            : null;
-
         var updatedAssignment = assignment.Update(
-            request.Name.Trim(),
+            request.Name,
             request.StartTime,
             request.EndTime,
-            assignmentAttachmentPath,
+            request.Attachment,
             request.Content,
             request.CanViewResult,
             request.RequireLoginToSubmit,

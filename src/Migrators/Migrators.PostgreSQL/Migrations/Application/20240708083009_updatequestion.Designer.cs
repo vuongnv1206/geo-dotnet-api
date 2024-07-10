@@ -3,6 +3,7 @@ using System;
 using FSH.WebApi.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240708083009_updatequestion")]
+    partial class updatequestion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -869,12 +872,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeviceId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("DeviceName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("DeviceType")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("EndTime")
@@ -887,12 +893,14 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LocalIp")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("PaperId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("PublicIp")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartTime")

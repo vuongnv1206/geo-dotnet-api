@@ -40,22 +40,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 name: "Subject");
 
             migrationBuilder.CreateTable(
-                name: "AssignmentStudent",
-                schema: "Assignment",
-                columns: table => new
-                {
-                    AssignmentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AttachmentPath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
-                    Score = table.Column<string>(type: "text", nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AssignmentStudent", x => new { x.AssignmentId, x.StudentId });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AuditTrails",
                 schema: "Auditing",
                 columns: table => new
@@ -451,7 +435,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     QuestionType = table.Column<int>(type: "integer", nullable: true),
                     QuestionLableId = table.Column<Guid>(type: "uuid", nullable: true),
                     QuestionParentId = table.Column<Guid>(type: "uuid", nullable: true),
-                    isApproved = table.Column<bool>(type: "boolean", nullable: false),
+                    QuestionStatus = table.Column<int>(type: "integer", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -518,7 +502,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    AttachmentPath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    Attachment = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     Content = table.Column<string>(type: "text", nullable: true),
                     CanViewResult = table.Column<bool>(type: "boolean", nullable: false),
                     RequireLoginToSubmit = table.Column<bool>(type: "boolean", nullable: false),
@@ -870,6 +854,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     Content = table.Column<string>(type: "text", nullable: true),
                     QuestionId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsCorrect = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
@@ -883,6 +868,58 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     table.ForeignKey(
                         name: "FK_Answers_Questions_QuestionId",
                         column: x => x.QuestionId,
+                        principalSchema: "Question",
+                        principalTable: "Questions",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuestionClones",
+                schema: "Question",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    Image = table.Column<string>(type: "text", nullable: true),
+                    Audio = table.Column<string>(type: "text", nullable: true),
+                    QuestionFolderId = table.Column<Guid>(type: "uuid", nullable: true),
+                    QuestionType = table.Column<int>(type: "integer", nullable: true),
+                    QuestionLabelId = table.Column<Guid>(type: "uuid", nullable: true),
+                    QuestionParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    OriginalQuestionId = table.Column<Guid>(type: "uuid", nullable: true),
+                    QuestionCloneParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuestionClones", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_QuestionClones_QuestionClones_QuestionCloneParentId",
+                        column: x => x.QuestionCloneParentId,
+                        principalSchema: "Question",
+                        principalTable: "QuestionClones",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_QuestionClones_QuestionFolders_QuestionFolderId",
+                        column: x => x.QuestionFolderId,
+                        principalSchema: "Question",
+                        principalTable: "QuestionFolders",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_QuestionClones_QuestionLabels_QuestionLabelId",
+                        column: x => x.QuestionLabelId,
+                        principalSchema: "Question",
+                        principalTable: "QuestionLabels",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_QuestionClones_Questions_OriginalQuestionId",
+                        column: x => x.OriginalQuestionId,
                         principalSchema: "Question",
                         principalTable: "Questions",
                         principalColumn: "Id");
@@ -951,7 +988,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
                     PaperId = table.Column<Guid>(type: "uuid", nullable: false),
                     GroupTeacherId = table.Column<Guid>(type: "uuid", nullable: true),
                     CanView = table.Column<bool>(type: "boolean", nullable: false),
@@ -981,36 +1018,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         column: x => x.PaperId,
                         principalSchema: "Examination",
                         principalTable: "Papers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PaperQuestions",
-                schema: "Examination",
-                columns: table => new
-                {
-                    PaperId = table.Column<Guid>(type: "uuid", nullable: false),
-                    QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Mark = table.Column<float>(type: "real", nullable: false),
-                    RawIndex = table.Column<int>(type: "integer", nullable: true),
-                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PaperQuestions", x => new { x.PaperId, x.QuestionId });
-                    table.ForeignKey(
-                        name: "FK_PaperQuestions_Papers_PaperId",
-                        column: x => x.PaperId,
-                        principalSchema: "Examination",
-                        principalTable: "Papers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PaperQuestions_Questions_QuestionId",
-                        column: x => x.QuestionId,
-                        principalSchema: "Question",
-                        principalTable: "Questions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1102,6 +1109,43 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "AssignmentStudent",
+                schema: "Assignment",
+                columns: table => new
+                {
+                    AssignmentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AttachmentPath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    Score = table.Column<string>(type: "text", nullable: true),
+                    ClassesId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AssignmentStudent", x => new { x.AssignmentId, x.StudentId });
+                    table.ForeignKey(
+                        name: "FK_AssignmentStudent_Assignment_AssignmentId",
+                        column: x => x.AssignmentId,
+                        principalSchema: "Assignment",
+                        principalTable: "Assignment",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AssignmentStudent_Classes_ClassesId",
+                        column: x => x.ClassesId,
+                        principalSchema: "Classroom",
+                        principalTable: "Classes",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AssignmentStudent_Student_StudentId",
+                        column: x => x.StudentId,
+                        principalSchema: "Classroom",
+                        principalTable: "Student",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserClasses",
                 schema: "Classroom",
                 columns: table => new
@@ -1130,6 +1174,64 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "AnswerClones",
+                schema: "Question",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    QuestionCloneId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsCorrect = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnswerClones", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnswerClones_QuestionClones_QuestionCloneId",
+                        column: x => x.QuestionCloneId,
+                        principalSchema: "Question",
+                        principalTable: "QuestionClones",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaperQuestions",
+                schema: "Examination",
+                columns: table => new
+                {
+                    PaperId = table.Column<Guid>(type: "uuid", nullable: false),
+                    QuestionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Mark = table.Column<float>(type: "real", nullable: false),
+                    RawIndex = table.Column<int>(type: "integer", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaperQuestions", x => new { x.PaperId, x.QuestionId });
+                    table.ForeignKey(
+                        name: "FK_PaperQuestions_Papers_PaperId",
+                        column: x => x.PaperId,
+                        principalSchema: "Examination",
+                        principalTable: "Papers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PaperQuestions_QuestionClones_QuestionId",
+                        column: x => x.QuestionId,
+                        principalSchema: "Question",
+                        principalTable: "QuestionClones",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubmitPaperDetails",
                 schema: "Examination",
                 columns: table => new
@@ -1151,10 +1253,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     table.PrimaryKey("PK_SubmitPaperDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SubmitPaperDetails_Questions_QuestionId",
+                        name: "FK_SubmitPaperDetails_QuestionClones_QuestionId",
                         column: x => x.QuestionId,
                         principalSchema: "Question",
-                        principalTable: "Questions",
+                        principalTable: "QuestionClones",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -1188,6 +1290,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AnswerClones_QuestionCloneId",
+                schema: "Question",
+                table: "AnswerClones",
+                column: "QuestionCloneId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Answers_QuestionId",
                 schema: "Question",
                 table: "Answers",
@@ -1204,6 +1312,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Assignment",
                 table: "AssignmentClass",
                 column: "ClassesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssignmentStudent_ClassesId",
+                schema: "Assignment",
+                table: "AssignmentStudent",
+                column: "ClassesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssignmentStudent_StudentId",
+                schema: "Assignment",
+                table: "AssignmentStudent",
+                column: "StudentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_GroupClassId",
@@ -1312,6 +1432,30 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Classroom",
                 table: "PostLike",
                 column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionClones_OriginalQuestionId",
+                schema: "Question",
+                table: "QuestionClones",
+                column: "OriginalQuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionClones_QuestionCloneParentId",
+                schema: "Question",
+                table: "QuestionClones",
+                column: "QuestionCloneParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionClones_QuestionFolderId",
+                schema: "Question",
+                table: "QuestionClones",
+                column: "QuestionFolderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionClones_QuestionLabelId",
+                schema: "Question",
+                table: "QuestionClones",
+                column: "QuestionLabelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionFolders_ParentId",
@@ -1441,6 +1585,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AnswerClones",
+                schema: "Question");
+
+            migrationBuilder.DropTable(
                 name: "Answers",
                 schema: "Question");
 
@@ -1537,7 +1685,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Classroom");
 
             migrationBuilder.DropTable(
-                name: "Questions",
+                name: "QuestionClones",
                 schema: "Question");
 
             migrationBuilder.DropTable(
@@ -1569,11 +1717,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Classroom");
 
             migrationBuilder.DropTable(
-                name: "QuestionFolders",
-                schema: "Question");
-
-            migrationBuilder.DropTable(
-                name: "QuestionLabels",
+                name: "Questions",
                 schema: "Question");
 
             migrationBuilder.DropTable(
@@ -1583,6 +1727,14 @@ namespace Migrators.PostgreSQL.Migrations.Application
             migrationBuilder.DropTable(
                 name: "Classes",
                 schema: "Classroom");
+
+            migrationBuilder.DropTable(
+                name: "QuestionFolders",
+                schema: "Question");
+
+            migrationBuilder.DropTable(
+                name: "QuestionLabels",
+                schema: "Question");
 
             migrationBuilder.DropTable(
                 name: "PaperFolders",

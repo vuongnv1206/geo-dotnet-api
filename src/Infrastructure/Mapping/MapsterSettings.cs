@@ -20,6 +20,8 @@ using FSH.WebApi.Domain.TeacherGroup;
 using FSH.WebApi.Infrastructure.Identity;
 using Mapster;
 using FSH.WebApi.Application.Class.Comments.Dto;
+using FSH.WebApi.Application.Examination.Papers.Dtos;
+using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 
 namespace FSH.WebApi.Infrastructure.Mapping;
 
@@ -70,12 +72,25 @@ public class MapsterSettings
             .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
             .Map(dest => dest.AnswerClones, src => src.Answers);
 
+        TypeAdapterConfig<Domain.Question.Question, QuestionForStudentDto>.NewConfig()
+            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+            .Map(dest => dest.Answers, src => CustomMappingExtensions.MapAnswers(src.Answers));
 
+        TypeAdapterConfig<Answer, AnswerForStudentDto>.NewConfig()
+            .Map(dest => dest.IsCorrect, src => false);
+
+        TypeAdapterConfig<Paper, PaperForStudentDto>.NewConfig()
+            .Map(dest => dest.PaperFolder, src => src.PaperFolder)
+            .Map(dest => dest.PaperLable, src => src.PaperLabel)
+            .Map(dest => dest.Questions, src => CustomMappingExtensions.MapQuestionsForStudent(src.PaperQuestions))
+            .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
+            .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
 
         TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();
         TypeAdapterConfig<AnswerClone, CreateAnswerDto>.NewConfig();
 
         TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
+
         TypeAdapterConfig<AnswerClone, AnswerDto>.NewConfig();
 
         TypeAdapterConfig<AnswerClone, AnswerDto>.NewConfig()
@@ -86,6 +101,13 @@ public class MapsterSettings
            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
            .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
            .Map(dest => dest.Answers, src => src.AnswerClones);
+
+        TypeAdapterConfig<QuestionClone, QuestionForStudentDto>.NewConfig()
+           .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+           .Map(dest => dest.Answers, src => src.AnswerClones);
+
+        TypeAdapterConfig<AnswerClone, AnswerForStudentDto>.NewConfig()
+           .Map(dest => dest.IsCorrect , src => false);
 
         TypeAdapterConfig<TeacherTeam, TeacherTeamDto>.NewConfig()
             .Map(dest => dest.TeacherPermissionInClassDto, src => src.TeacherPermissionInClasses);
@@ -118,8 +140,12 @@ public class MapsterSettings
           .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
 
         TypeAdapterConfig<Paper, PaperStudentDto>.NewConfig()
-             .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
+          .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
           .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
+
+        TypeAdapterConfig<Paper, StudentTestDto>.NewConfig()
+            .Map(dest => dest.PaperLabelName, src => src.PaperLabel.Name)
+            .Map(dest => dest.SubjectName, src => src.Subject.Name);
 
         TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
 

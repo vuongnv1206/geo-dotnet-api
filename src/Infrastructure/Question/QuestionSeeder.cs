@@ -38,6 +38,7 @@ public class QuestionSeeder : ICustomSeeder
             {
                 foreach (var question in questions)
                 {
+                    question.QuestionStatus = QuestionStatus.Approved;
                     await SeedQuestion(question, cancellationToken);
                 }
             }

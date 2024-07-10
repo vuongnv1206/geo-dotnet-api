@@ -49,7 +49,7 @@ internal class TokenService : ITokenService
     {
         try
         {
-            var res = await _reCAPTCHAv3Service.Verify(request.captchaToken);
+            var res = await _reCAPTCHAv3Service.Verify(request.CaptchaToken);
             if (!res.success)
             {
                 throw new UnauthorizedException(_t["reCAPTCHA Verification Failed."]);
@@ -90,7 +90,7 @@ internal class TokenService : ITokenService
             }
         }
 
-        return await GenerateTokensAndUpdateUser(user, ipAddress);
+        return await GenerateTokensAndUpdateUser(user, ipAddress, request.DeviceId);
     }
 
     public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenRequest request, string ipAddress)
@@ -111,9 +111,9 @@ internal class TokenService : ITokenService
         return await GenerateTokensAndUpdateUser(user, ipAddress);
     }
 
-    private async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress)
+    private async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, string ipAddress, string? deviceId = null)
     {
-        string token = GenerateJwt(user, ipAddress);
+        string token = GenerateJwt(user, ipAddress, deviceId);
 
         user.RefreshToken = GenerateRefreshToken();
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays);
@@ -123,10 +123,10 @@ internal class TokenService : ITokenService
         return new TokenResponse(token, user.RefreshToken, user.RefreshTokenExpiryTime);
     }
 
-    private string GenerateJwt(ApplicationUser user, string ipAddress) =>
-        GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress));
+    private string GenerateJwt(ApplicationUser user, string ipAddress, string? deviceId = null) =>
+        GenerateEncryptedToken(GetSigningCredentials(), GetClaims(user, ipAddress, deviceId));
 
-    private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress)
+    private IEnumerable<Claim> GetClaims(ApplicationUser user, string ipAddress, string? deviceId = null)
     {
         var roles = _userManager.GetRolesAsync(user).Result;
 
@@ -149,6 +149,7 @@ internal class TokenService : ITokenService
             new(ClaimTypes.Name, user.FirstName ?? string.Empty),
             new(ClaimTypes.Surname, user.LastName ?? string.Empty),
             new(FSHClaims.IpAddress, ipAddress),
+            new(FSHClaims.DeviceId, deviceId ?? string.Empty),
             new(FSHClaims.Tenant, _currentTenant!.Id),
             new(FSHClaims.ImageUrl, user.ImageUrl ?? string.Empty),
             new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
