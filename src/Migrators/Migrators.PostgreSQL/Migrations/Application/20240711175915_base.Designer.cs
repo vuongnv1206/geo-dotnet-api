@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240709051808_updatequestion-2")]
-    partial class updatequestion2
+    [Migration("20240711175915_base")]
+    partial class @base
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -121,6 +121,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AnswerRaw")
+                        .HasColumnType("text");
+
                     b.Property<string>("AttachmentPath")
                         .HasMaxLength(2048)
                         .HasColumnType("character varying(2048)");
@@ -128,8 +131,14 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("ClassesId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Score")
+                    b.Property<string>("Comment")
                         .HasColumnType("text");
+
+                    b.Property<float?>("Score")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -1231,9 +1240,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("OriginalQuestionId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("QuestionCloneParentId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid?>("QuestionFolderId")
                         .HasColumnType("uuid");
 
@@ -1255,11 +1261,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
                     b.HasIndex("OriginalQuestionId");
 
-                    b.HasIndex("QuestionCloneParentId");
-
                     b.HasIndex("QuestionFolderId");
 
                     b.HasIndex("QuestionLabelId");
+
+                    b.HasIndex("QuestionParentId");
 
                     b.ToTable("QuestionClones", "Question");
 
@@ -2317,10 +2323,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .WithMany()
                         .HasForeignKey("OriginalQuestionId");
 
-                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "QuestionCloneParent")
-                        .WithMany("QuestionPassages")
-                        .HasForeignKey("QuestionCloneParentId");
-
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
                         .WithMany()
                         .HasForeignKey("QuestionFolderId");
@@ -2328,6 +2330,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionLable", "QuestionLabel")
                         .WithMany()
                         .HasForeignKey("QuestionLabelId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "QuestionCloneParent")
+                        .WithMany("QuestionPassages")
+                        .HasForeignKey("QuestionParentId");
 
                     b.Navigation("OriginalQuestion");
 

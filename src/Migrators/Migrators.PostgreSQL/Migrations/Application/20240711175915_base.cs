@@ -548,6 +548,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     ExamCode = table.Column<string>(type: "text", nullable: false),
                     NumberAttempt = table.Column<int>(type: "integer", nullable: true),
                     ShareType = table.Column<int>(type: "integer", nullable: false),
+                    PublicIpAllowed = table.Column<string>(type: "text", nullable: true),
+                    LocalIpAllowed = table.Column<string>(type: "text", nullable: true),
                     PaperLabelId = table.Column<Guid>(type: "uuid", nullable: true),
                     PaperFolderId = table.Column<Guid>(type: "uuid", nullable: true),
                     SubjectId = table.Column<Guid>(type: "uuid", nullable: true),
@@ -887,7 +889,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     QuestionLabelId = table.Column<Guid>(type: "uuid", nullable: true),
                     QuestionParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     OriginalQuestionId = table.Column<Guid>(type: "uuid", nullable: true),
-                    QuestionCloneParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -900,8 +901,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     table.PrimaryKey("PK_QuestionClones", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_QuestionClones_QuestionClones_QuestionCloneParentId",
-                        column: x => x.QuestionCloneParentId,
+                        name: "FK_QuestionClones_QuestionClones_QuestionParentId",
+                        column: x => x.QuestionParentId,
                         principalSchema: "Question",
                         principalTable: "QuestionClones",
                         principalColumn: "Id");
@@ -1033,6 +1034,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     TotalMark = table.Column<float>(type: "real", nullable: false),
+                    DeviceId = table.Column<string>(type: "text", nullable: true),
+                    DeviceName = table.Column<string>(type: "text", nullable: true),
+                    DeviceType = table.Column<string>(type: "text", nullable: true),
+                    PublicIp = table.Column<string>(type: "text", nullable: true),
+                    LocalIp = table.Column<string>(type: "text", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1115,8 +1121,11 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     AssignmentId = table.Column<Guid>(type: "uuid", nullable: false),
                     StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    AnswerRaw = table.Column<string>(type: "text", nullable: true),
                     AttachmentPath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
-                    Score = table.Column<string>(type: "text", nullable: true),
+                    Score = table.Column<float>(type: "real", nullable: true),
+                    Comment = table.Column<string>(type: "text", nullable: true),
                     ClassesId = table.Column<Guid>(type: "uuid", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
@@ -1440,12 +1449,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "OriginalQuestionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_QuestionClones_QuestionCloneParentId",
-                schema: "Question",
-                table: "QuestionClones",
-                column: "QuestionCloneParentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_QuestionClones_QuestionFolderId",
                 schema: "Question",
                 table: "QuestionClones",
@@ -1456,6 +1459,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Question",
                 table: "QuestionClones",
                 column: "QuestionLabelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionClones_QuestionParentId",
+                schema: "Question",
+                table: "QuestionClones",
+                column: "QuestionParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionFolders_ParentId",
