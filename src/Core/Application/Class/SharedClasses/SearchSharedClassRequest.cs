@@ -5,27 +5,24 @@ using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.Class.SharedClasses;
-public class SearchSharedClassRequest : PaginationFilter, IRequest<PaginationResponse<GroupClassDto>>
+public class SearchSharedClassRequest : PaginationFilter, IRequest<PaginationResponse<SharedGroupClassDto>>
 {
 }
 
-public class SearcherSharedClassRequestHandler : IRequestHandler<SearchSharedClassRequest, PaginationResponse<GroupClassDto>>
+public class SearcherSharedClassRequestHandler : IRequestHandler<SearchSharedClassRequest, PaginationResponse<SharedGroupClassDto>>
 {
     private readonly IRepository<GroupClass> _classRepo;
-    private readonly IDapperRepository _dapperRepository;
     private readonly ICurrentUser _currentUser;
 
     public SearcherSharedClassRequestHandler(
         IRepository<GroupClass> classRepo,
-        IDapperRepository dapperRepository,
         ICurrentUser currentUser)
     {
         _classRepo = classRepo;
-        _dapperRepository = dapperRepository;
         _currentUser = currentUser;
     }
 
-    public async Task<PaginationResponse<GroupClassDto>> Handle(SearchSharedClassRequest request, CancellationToken cancellationToken)
+    public async Task<PaginationResponse<SharedGroupClassDto>> Handle(SearchSharedClassRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
         var spec = new SharedClassSpec(request, userId);

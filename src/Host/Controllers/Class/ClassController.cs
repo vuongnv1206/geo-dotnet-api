@@ -73,7 +73,7 @@ public class ClassController : VersionedApiController
     [HttpPost("shared-classes")]
     [MustHavePermission(FSHAction.View, FSHResource.Classes)]
     [OpenApiOperation("Get all shared classes")]
-    public Task<PaginationResponse<GroupClassDto>> GetSharedClasses(SearchSharedClassRequest request)
+    public Task<PaginationResponse<SharedGroupClassDto>> GetSharedClasses(SearchSharedClassRequest request)
     {
         return Mediator.Send(request);
     }
