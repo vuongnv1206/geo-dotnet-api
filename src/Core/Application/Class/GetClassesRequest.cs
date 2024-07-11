@@ -59,11 +59,8 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
             {
                 classroom.Students = null;
             }
-            else if (!listPermission.Any(x => x.PermissionType == PermissionType.Marking))
-            {
-
-            }
-            else if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment))
+            if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment
+                                        && x.PermissionType == PermissionType.Marking))
             {
                 classroom.Assignments = null;
             }
