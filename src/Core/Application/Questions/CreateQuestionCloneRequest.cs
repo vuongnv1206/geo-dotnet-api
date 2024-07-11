@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
@@ -47,10 +48,11 @@ public class CreateQuestionCloneRequestHandler : IRequestHandler<CreateQuestionC
         if (existingQuestion == null)
             throw new NotFoundException(_t["Question {0} Not Found.", request.OriginalQuestionId]);
 
-        var questionClone = existingQuestion.Adapt<QuestionClone>();
-        questionClone.OriginalQuestionId = existingQuestion.Id;
+        var questionCloneDto = existingQuestion.Adapt<CreateQuestionCloneDto>();
+        questionCloneDto.OriginalQuestionId = existingQuestion.Id;
 
-        await _questionCloneRepo.AddAsync(questionClone);
+        var questionClone = questionCloneDto.Adapt<QuestionClone>();
+        await _questionCloneRepo.AddAsync(questionClone,cancellationToken);
 
         return questionClone.Id;
     }

@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Identity.Users;
+﻿using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using System;
@@ -12,7 +13,13 @@ namespace FSH.WebApi.Application.Assignments.AssignmentClasses;
 public class AssignAssignmentToClassRequest : IRequest<Guid>
 {
     public Guid AssignmentId { get; set; }
-    public Guid ClassesdId { get; set; }
+    public List<Guid> ClassIds { get; set; }
+
+    public AssignAssignmentToClassRequest(DefaultIdType assignmentId, List<DefaultIdType> classIds)
+    {
+        AssignmentId = assignmentId;
+        ClassIds = classIds;
+    }
 }
 
 public class AssignAssignmentToClassRequestValidator : CustomValidator<AssignAssignmentToClassRequest>
@@ -23,54 +30,40 @@ public class AssignAssignmentToClassRequestValidator : CustomValidator<AssignAss
     }
 }
 
-//public class AssignAssignmentToClassRequestHandler : IRequestHandler<AssignAssignmentToClassRequest, Guid>
-//{
-//    //private readonly IRepository<Classes> _classesRepository;
-//    //private readonly IUserService _userService;
-//    //private readonly IStringLocalizer _t;
-//    //private readonly ICurrentUser _currentUser;
-//    //private readonly IReadRepository<Assignment> _assignmentRepository;
+public class AssignAssignmentToClassRequestHandler : IRequestHandler<AssignAssignmentToClassRequest, Guid>
+{
+    private readonly IRepository<Classes> _classesRepository;
+    private readonly IUserService _userService;
+    private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
+    private readonly IRepository<Assignment> _assignmentRepository;
 
-//    //public AssignAssignmentToClassRequestHandler(
-//    //    IRepository<Classes> classesRepository,
-//    //    IUserService userService,
-//    //    IStringLocalizer<AssignAssignmentToClassRequestHandler> t,
-//    //    ICurrentUser currentUser,
-//    //    IReadRepository<Assignment> assignmentRepository)
-//    //    => (_classesRepository, _userService, _t, _currentUser, _assignmentRepository)
-//    //        = (classesRepository, userService, t, currentUser, assignmentRepository);
+    public AssignAssignmentToClassRequestHandler(
+        IRepository<Classes> classesRepository,
+        IUserService userService,
+        IStringLocalizer<AssignAssignmentToClassRequestHandler> t,
+        ICurrentUser currentUser,
+        IRepository<Assignment> assignmentRepository)
+        => (_classesRepository, _userService, _t, _currentUser, _assignmentRepository)
+            = (classesRepository, userService, t, currentUser, assignmentRepository);
 
-//    //public async Task<DefaultIdType> Handle(AssignAssignmentToClassRequest request, CancellationToken cancellationToken)
-//    //{
-//    //    var classes = await _classesRepository.GetByIdAsync(request.ClassesdId);
-//    //    if (classes is null)
-//    //        throw new NotFoundException(_t["Class {0} Not Found.", request.ClassesdId]);
+    public async Task<Guid> Handle(AssignAssignmentToClassRequest request, CancellationToken cancellationToken)
+    {
 
-//    //    var userId = _currentUser.GetUserId();
-//    //    if (!classes.CanUpdate(_currentUser.GetUserId()))
-//    //        throw new ForbiddenException(_t["You cannot have permission update with {0}", classes.Name]);
+        var assignment = await _assignmentRepository.FirstOrDefaultAsync(new AssignmentByIdSpec(request.AssignmentId));
+        _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.AssignmentId]);
 
-//    //    var assignmentInClass = await _assignmentRepository.FirstOrDefaultAsync(new AssignmentByIdSpec(request.AssignmentId, userId));
+        foreach (var classId in request.ClassIds)
+        {
+            var classroom = await _classesRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId));
+            _ = classroom ?? throw new NotFoundException(_t["Class {0} Not Found.", classId]);
+            assignment.AssignAssignmentToClass(classroom.Id);
 
-//    //    if (assignmentInClass is null)
-//    //    {
-//    //        throw new NotFoundException(_t["Assignment {0} Not Found.", request.AssignmentId]);
-//    //    }
-//    //    else
-//    //    {
-//    //        if (assignmentInClass.Id == Guid.Empty)
-//    //            throw new NotFoundException(_t["Assignment {0} Not Found.", request.AssignmentId]);
+            var studentIds = classroom.UserClasses.Select(x => x.StudentId).ToList();
+            assignment.AssignAssignmentToStudents(studentIds);
+        }
+        await _assignmentRepository.UpdateAsync(assignment);
 
-//    //        classes.AssignAssignmentToClass(new AssignmentClass
-//    //        {
-//    //            AssignmentId = request.AssignmentId,
-//    //            ClassesId = request.ClassesdId
-//    //        });
-
-//    //        await _classesRepository.UpdateAsync(classes);
-
-//    //    }
-
-//    //    return default(DefaultIdType);
-//    //}
-//}
+        return assignment.Id;
+    }
+}

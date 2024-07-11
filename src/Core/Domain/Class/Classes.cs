@@ -54,9 +54,9 @@ public class Classes : AuditableEntity, IAggregateRoot
         GroupClassId = newGroupClassId;
     }
 
-    public void AssignAssignmentToClass(AssignmentClass assignmentClass)
+    public void RemoveAssignment(Guid assignmentId)
     {
-        AssignmentClasses.Add(assignmentClass);
+        AssignmentClasses.RemoveAll(x => x.AssignmentId == assignmentId);
     }
 
     public bool CanUpdate(Guid userId)

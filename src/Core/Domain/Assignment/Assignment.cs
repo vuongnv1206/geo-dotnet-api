@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Subjects;
 namespace FSH.WebApi.Domain.Assignment;
 public class Assignment : AuditableEntity, IAggregateRoot
@@ -60,21 +61,81 @@ public class Assignment : AuditableEntity, IAggregateRoot
         return this;
     }
 
-    //public void AssignAssignmentToClass(AssignmentClass assignmentClass)
-    //{
-    //    AssignmentClasses.Add(assignmentClass);
-    //}
-
-    public void UpdateAssignmentFromClass(List<AssignmentClass> aClass)
+    public void AssignAssignmentToClass(Guid classId)
     {
-        AssignmentClasses.RemoveAll(ac => !aClass.Any(c => c.AssignmentId == ac.AssignmentId));
-        foreach (var ac in aClass)
+        AssignmentClasses.Add(new AssignmentClass
         {
-            AssignmentClasses.Add(new AssignmentClass
+            AssignmentId = this.Id,
+            ClassesId = classId
+        });
+    }
+
+    public void MarkScoreForSubmission(Guid studentId, float score,string? comment)
+    {
+        var submission = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
+        if (submission is not null)
+        {
+            submission.Score = score;
+            submission.Comment = comment;
+        }
+    }
+
+    public void SubmitAssignment(Guid studentId, string? answerRaw,string? attachmentPath)
+    {
+        var assignmentStudent = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
+        if (assignmentStudent is not null)
+        {
+            assignmentStudent.AnswerRaw = answerRaw;
+            assignmentStudent.AttachmentPath = attachmentPath;
+            assignmentStudent.Status = SubmitAssignmentStatus.Submmitted;
+        }
+    }
+
+    public void AssignAssignmentToStudent(Guid studentId)
+    {
+        if (!AssignmentStudents.Any(a => a.StudentId == studentId))
+        {
+            AssignmentStudents.Add(new AssignmentStudent
             {
                 AssignmentId = this.Id,
-                ClassesId = ac.ClassesId
+                StudentId = studentId
             });
         }
     }
+
+    public void AssignAssignmentToStudents(List<Guid> studentIds)
+    {
+        foreach (var studentId in studentIds)
+        {
+            if (!AssignmentStudents.Any(a => a.StudentId == studentId))
+            {
+                AssignmentStudents.Add(new AssignmentStudent
+                {
+                    AssignmentId = this.Id,
+                    StudentId = studentId
+                });
+            }
+        }
+    }
+
+    public void RemoveAssignmentFromClass(Guid classId)
+    {
+        AssignmentStudents.RemoveAll(x => AssignmentClasses.Any(ac => ac.ClassesId == classId && ac.AssignmentId == x.AssignmentId));
+    }
+
+
+ 
+    public void RemoveAssignmentOfStudent(Guid studentId)
+    {
+        AssignmentStudents.RemoveAll(x => x.StudentId == studentId);
+    }
+
+
+    public void UpdateStatusSubmitAssignment(SubmitAssignmentStatus status)
+    {
+        AssignmentStudents.Where(s => s.Status == SubmitAssignmentStatus.Doing)
+                   .ToList()
+                   .ForEach(s => s.Status = status);
+    }
+    
 }

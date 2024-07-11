@@ -1,3 +1,4 @@
+using FSH.WebApi.Application.Assignments;
 using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Application.Class.Comments.Dto;
 using FSH.WebApi.Application.Class.Dto;
@@ -56,6 +57,23 @@ public class MapsterSettings
             .Ignore(dest => dest.QuestionPassages)
             .TwoWays();
 
+        _ = TypeAdapterConfig<CreateQuestionCloneDto, Domain.Question.Question>.NewConfig()
+          .Map(dest => dest.Answers, src => src.Answers)
+            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<CreateQuestionCloneDto>>())
+          .TwoWays();
+
+        _ = TypeAdapterConfig<CreateQuestionCloneDto, Domain.Question.QuestionClone>.NewConfig()
+        .Map(dest => dest.AnswerClones, src => src.Answers)
+        .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<CreateQuestionCloneDto>>())
+        .TwoWays();
+
+        _ = TypeAdapterConfig<CreateQuestionDto, Domain.Question.Question>.NewConfig()
+          .Ignore(dest => dest.Answers)
+          .Ignore(dest => dest.QuestionPassages)
+          .TwoWays();
+
+
+
         _ = TypeAdapterConfig<CreateQuestionDto, QuestionClone>.NewConfig()
             .Ignore(dest => dest.AnswerClones)
             .Ignore(dest => dest.QuestionPassages)
@@ -90,14 +108,14 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
 
-        _ = TypeAdapterConfig<AnswerClone, AnswerDto>.NewConfig();
 
         _ = TypeAdapterConfig<AnswerClone, AnswerDto>.NewConfig()
              .Map(dest => dest.QuestionId, src => src.QuestionCloneId);
 
         _ = TypeAdapterConfig<QuestionClone, QuestionDto>.NewConfig()
            .Map(dest => dest.QuestionLable, src => src.QuestionLabel)
-           .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+           //.Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+    .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<QuestionDto>>())
            .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
            .Map(dest => dest.Answers, src => src.AnswerClones);
 
@@ -192,6 +210,11 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<Assignment, AssignmentDetailsDto>.NewConfig()
                 .Map(dest => dest.ClassesId, src => src.AssignmentClasses.Select(pq => pq.ClassesId));
+
+        _ = TypeAdapterConfig<Assignment, AssignmentDto>.NewConfig();
+        _ = TypeAdapterConfig<Assignment, SubmissionAssignmentDto>.NewConfig()
+            .Map(dest => dest.Student, src => src.AssignmentStudents.Select(pq => pq.Student));
+
 
         _ = TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         _ = TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();

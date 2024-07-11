@@ -15,6 +15,7 @@ public class AssignmentByIdSpec : Specification<Assignment>, ISingleResultSpecif
     {
         Query
             .Include(a => a.AssignmentClasses)
+            .Include(a => a.AssignmentStudents).ThenInclude(x => x.Student)
             .Where(x => x.Id == id);
     }
 }

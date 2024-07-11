@@ -12,7 +12,13 @@ namespace FSH.WebApi.Application.Assignments.AssignmentClasses;
 public class RemoveAssignmentFromClassRequest : IRequest<Guid>
 {
     public Guid AssignmentId { get; set; }
-    public Guid ClassesdId { get; set; }
+    public Guid ClassId { get; set; }
+
+    public RemoveAssignmentFromClassRequest(DefaultIdType assignmentId, DefaultIdType classId)
+    {
+        AssignmentId = assignmentId;
+        ClassId = classId;
+    }
 }
 
 public class RemoveAssignmentFromClassRequestValidator : CustomValidator<RemoveAssignmentFromClassRequest>
@@ -28,41 +34,32 @@ public class RemoveAssignmentFromClassRequestHandler : IRequestHandler<RemoveAss
     private readonly IRepository<Classes> _classesRepository;
     private readonly IStringLocalizer _t;
     private readonly ICurrentUser _currentUser;
+    private readonly IRepository<Assignment> _assignmentRepo;
 
     public RemoveAssignmentFromClassRequestHandler(
         IStringLocalizer<RemoveAssignmentFromClassRequestHandler> t,
         IRepository<Classes> classesRepository,
-        ICurrentUser currentUser)
+        ICurrentUser currentUser,
+        IRepository<Assignment> assignmentRepo)
     {
         _t = t;
         _classesRepository = classesRepository;
         _currentUser = currentUser;
+        _assignmentRepo = assignmentRepo;
     }
 
     public async Task<DefaultIdType> Handle(RemoveAssignmentFromClassRequest request, CancellationToken cancellationToken)
     {
-        var classes = await _classesRepository.FirstOrDefaultAsync(new ClassesByIdSpec(request.ClassesdId));
-        //var classes = await _classesRepository.GetByIdAsync(request.ClassesdId);
-        if (classes is null)
-            throw new NotFoundException(_t["Class {0} Not Found.", request.ClassesdId]);
+        var assignment = await _assignmentRepo.FirstOrDefaultAsync(new AssignmentByIdSpec(request.AssignmentId));
+        _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found", request.AssignmentId]);
+        assignment.RemoveAssignmentFromClass(request.ClassId);
+        await _assignmentRepo.UpdateAsync(assignment);
 
-        if (!classes.CanUpdate(_currentUser.GetUserId()))
-            throw new ForbiddenException(_t["You cannot have permission update with {0}", request.ClassesdId]);
+        var classroom = await _classesRepository.FirstOrDefaultAsync(new ClassesByIdSpec(request.ClassId));
+        _ = classroom ?? throw new NotFoundException(_t["Class {0} Not Found.", request.ClassId]);
+        classroom.RemoveAssignment(request.AssignmentId);
+        await _classesRepository.UpdateAsync(classroom, cancellationToken);
 
-        if (classes.AssignmentClasses.Any())
-        {
-            var assignmentInClass = classes.AssignmentClasses?.FirstOrDefault(x => x.AssignmentId == request.AssignmentId && x.ClassesId == request.ClassesdId);
-
-            if (assignmentInClass is null)
-            {
-                throw new NotFoundException(_t["Assignment {0} Not Found.", request.AssignmentId]);
-            }
-
-            classes.RemoveAssignmentFromClass(assignmentInClass);
-
-            await _classesRepository.UpdateAsync(classes);
-        }
-
-        return default(DefaultIdType);
+        return classroom.Id;
     }
 }
