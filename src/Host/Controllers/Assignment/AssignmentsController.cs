@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Assignments;
+using FSH.WebApi.Application.Assignments.AssignmentStudent;
 using FSH.WebApi.Application.Assignments.Dtos;
 
 namespace FSH.WebApi.Host.Controllers.Assignment;
@@ -46,6 +47,27 @@ public class AssignmentsController : VersionedApiController
     {
         return Mediator.Send(new DeleteAssignmentRequest(id));
     }
+
+   
+    [HttpPost("mark")]
+    [MustHavePermission(FSHAction.Update, FSHResource.Assignments)]
+    [OpenApiOperation("Mark assignment.", "")]
+    public Task<Guid> MarkAsync(MarkAssignmentRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+  
+    [HttpPost("submit")]
+    [MustHavePermission(FSHAction.Update, FSHResource.Assignments)]
+    [OpenApiOperation("Submit assignment.", "")]
+    public Task SubmitAsync(SubmitAssignmentRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+
+
 
 }
 

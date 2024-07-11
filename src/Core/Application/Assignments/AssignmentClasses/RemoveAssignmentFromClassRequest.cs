@@ -13,6 +13,12 @@ public class RemoveAssignmentFromClassRequest : IRequest<Guid>
 {
     public Guid AssignmentId { get; set; }
     public Guid ClassId { get; set; }
+
+    public RemoveAssignmentFromClassRequest(DefaultIdType assignmentId, DefaultIdType classId)
+    {
+        AssignmentId = assignmentId;
+        ClassId = classId;
+    }
 }
 
 public class RemoveAssignmentFromClassRequestValidator : CustomValidator<RemoveAssignmentFromClassRequest>

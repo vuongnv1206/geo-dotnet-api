@@ -8,6 +8,6 @@ public class QuestionByIdSpec : Specification<Question>, ISingleResultSpecificat
         .Where(x => x.Id == id)
         .Include(x => x.QuestionFolder)
         .Include(x => x.QuestionLable)
-        .Include(x => x.QuestionPassages)
+        .Include(x => x.QuestionPassages).ThenInclude(x => x.Answers)
         .Include(x => x.Answers);
 }

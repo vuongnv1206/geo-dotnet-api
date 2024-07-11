@@ -14,6 +14,12 @@ public class AssignAssignmentToClassRequest : IRequest<Guid>
 {
     public Guid AssignmentId { get; set; }
     public List<Guid> ClassIds { get; set; }
+
+    public AssignAssignmentToClassRequest(DefaultIdType assignmentId, List<DefaultIdType> classIds)
+    {
+        AssignmentId = assignmentId;
+        ClassIds = classIds;
+    }
 }
 
 public class AssignAssignmentToClassRequestValidator : CustomValidator<AssignAssignmentToClassRequest>

@@ -45,7 +45,8 @@ public class MapsterSettings
 
         // Map Question to QuestionDto
         _ = TypeAdapterConfig<Domain.Question.Question, QuestionDto>.NewConfig()
-            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+            //.Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<QuestionDto>>())
             .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
             .Map(dest => dest.Answers, src => src.Answers);
 
@@ -66,7 +67,8 @@ public class MapsterSettings
             .Ignore(dest => dest.QuestionLabel)
             .Ignore(dest => dest.QuestionFolder)
             .Map(dest => dest.QuestionLabelId, src => src.QuestionLableId)
-            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+           // .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<QuestionDto>>())
             .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
             .Map(dest => dest.AnswerClones, src => src.Answers);
 
@@ -96,7 +98,8 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<QuestionClone, QuestionDto>.NewConfig()
            .Map(dest => dest.QuestionLable, src => src.QuestionLabel)
-           .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+           //.Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+    .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<QuestionDto>>())
            .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
            .Map(dest => dest.Answers, src => src.AnswerClones);
 

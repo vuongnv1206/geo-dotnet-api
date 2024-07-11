@@ -79,19 +79,6 @@ public class Assignment : AuditableEntity, IAggregateRoot
         }
     }
 
-    public void UpdateAssignmentFromClass(List<AssignmentClass> aClass)
-    {
-        AssignmentClasses.RemoveAll(ac => !aClass.Any(c => c.AssignmentId == ac.AssignmentId));
-        foreach (var ac in aClass)
-        {
-            AssignmentClasses.Add(new AssignmentClass
-            {
-                AssignmentId = this.Id,
-                ClassesId = ac.ClassesId
-            });
-        }
-    }
-
     public void SubmitAssignment(Guid studentId, string? answerRaw,string? attachmentPath)
     {
         var assignmentStudent = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
@@ -105,16 +92,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
 
     public void AssignAssignmentToStudent(Guid studentId)
     {
-        AssignmentStudents.Add(new AssignmentStudent
-        {
-            AssignmentId = this.Id,
-            StudentId = studentId
-        });
-    }
-
-    public void AssignAssignmentToStudents(List<Guid> studentIds)
-    {
-        foreach (var studentId in studentIds)
+        if (!AssignmentStudents.Any(a => a.StudentId == studentId))
         {
             AssignmentStudents.Add(new AssignmentStudent
             {
@@ -124,11 +102,32 @@ public class Assignment : AuditableEntity, IAggregateRoot
         }
     }
 
+    public void AssignAssignmentToStudents(List<Guid> studentIds)
+    {
+        foreach (var studentId in studentIds)
+        {
+            if (!AssignmentStudents.Any(a => a.StudentId == studentId))
+            {
+                AssignmentStudents.Add(new AssignmentStudent
+                {
+                    AssignmentId = this.Id,
+                    StudentId = studentId
+                });
+            }
+        }
+    }
+
     public void RemoveAssignmentFromClass(Guid classId)
     {
         AssignmentStudents.RemoveAll(x => AssignmentClasses.Any(ac => ac.ClassesId == classId && ac.AssignmentId == x.AssignmentId));
     }
 
+
+ 
+    public void RemoveAssignmentOfStudent(Guid studentId)
+    {
+        AssignmentStudents.RemoveAll(x => x.StudentId == studentId);
+    }
 
 
     public void UpdateStatusSubmitAssignment(SubmitAssignmentStatus status)
@@ -137,6 +136,5 @@ public class Assignment : AuditableEntity, IAggregateRoot
                    .ToList()
                    .ForEach(s => s.Status = status);
     }
-
     
 }
