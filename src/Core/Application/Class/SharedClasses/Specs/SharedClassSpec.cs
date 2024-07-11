@@ -2,7 +2,7 @@
 using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.SharedClasses;
-public class SharedClassSpec : EntitiesByPaginationFilterSpec<GroupClass, GroupClassDto>
+public class SharedClassSpec : EntitiesByPaginationFilterSpec<GroupClass, SharedGroupClassDto>
 {
     public SharedClassSpec(SearchSharedClassRequest request, Guid userId)
         : base(request)
