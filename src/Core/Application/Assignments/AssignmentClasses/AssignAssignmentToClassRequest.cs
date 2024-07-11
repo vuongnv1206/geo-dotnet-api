@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Identity.Users;
+﻿using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using System;
@@ -48,9 +49,12 @@ public class AssignAssignmentToClassRequestHandler : IRequestHandler<AssignAssig
 
         foreach (var classId in request.ClassIds)
         {
-            var classroom = await _classesRepository.GetByIdAsync(classId);
+            var classroom = await _classesRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId));
             _ = classroom ?? throw new NotFoundException(_t["Class {0} Not Found.", classId]);
-            assignment.AssignAssignmentToClass(new AssignmentClass(assignment.Id,classroom.Id));
+            assignment.AssignAssignmentToClass(classroom.Id);
+
+            var studentIds = classroom.UserClasses.Select(x => x.StudentId).ToList();
+            assignment.AssignAssignmentToStudents(studentIds);
         }
         await _assignmentRepository.UpdateAsync(assignment);
 

@@ -10,6 +10,6 @@ public class ClassByIdSpec : Specification<Classes>, ISingleResultSpecification
 {
     public ClassByIdSpec(Guid id)
     {
-        Query.Where(b => b.Id == id);
+        Query.Where(b => b.Id == id).Include(x => x.UserClasses);
     }
 }
