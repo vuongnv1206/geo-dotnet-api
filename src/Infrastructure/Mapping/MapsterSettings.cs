@@ -1,3 +1,4 @@
+using FSH.WebApi.Application.Assignments;
 using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Application.Class.Comments.Dto;
 using FSH.WebApi.Application.Class.Dto;
@@ -191,6 +192,11 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<Assignment, AssignmentDetailsDto>.NewConfig()
                 .Map(dest => dest.ClassesId, src => src.AssignmentClasses.Select(pq => pq.ClassesId));
+
+        _ = TypeAdapterConfig<Assignment, AssignmentDto>.NewConfig();
+        _ = TypeAdapterConfig<Assignment, SubmissionAssignmentDto>.NewConfig()
+            .Map(dest => dest.Student, src => src.AssignmentStudents.Select(pq => pq.Student));
+
 
         _ = TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         _ = TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();

@@ -10,6 +10,7 @@ public class MarkAssignmentRequest : IRequest<Guid>
     public Guid AssignmentId { get; set; }
     public Guid StudentId { get; set; }
     public float Score { get; set; }
+    public string? Comment { get; set; }
 }
 
 public class MarkAssignmentRequestHandler : IRequestHandler<MarkAssignmentRequest, Guid>
@@ -30,7 +31,7 @@ public class MarkAssignmentRequestHandler : IRequestHandler<MarkAssignmentReques
         var assignment = await _assignmentRepo.FirstOrDefaultAsync(new AssignmentByIdSpec(request.AssignmentId));
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not  Found.", request.AssignmentId]);
 
-        assignment.MarkScoreForSubmission(request.StudentId, request.Score);
+        assignment.MarkScoreForSubmission(request.StudentId, request.Score,request.Comment);
         await _assignmentRepo.UpdateAsync(assignment);
 
         return assignment.Id;

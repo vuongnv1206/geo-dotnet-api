@@ -70,12 +70,13 @@ public class Assignment : AuditableEntity, IAggregateRoot
         });
     }
 
-    public void MarkScoreForSubmission(Guid studentId, float score)
+    public void MarkScoreForSubmission(Guid studentId, float score,string? comment)
     {
         var submission = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
         if (submission is not null)
         {
             submission.Score = score;
+            submission.Comment = comment;
         }
     }
 

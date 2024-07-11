@@ -9,6 +9,7 @@ public class AssignmentStudent
     public string? AnswerRaw { get; set; }
     public string? AttachmentPath { get;  set; }
     public float? Score { get;  set; }
+    public string? Comment { get; set; }
     public virtual Student Student { get; set; }
     public virtual Assignment Assignment { get; set; }
 

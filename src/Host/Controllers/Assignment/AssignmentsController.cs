@@ -66,6 +66,13 @@ public class AssignmentsController : VersionedApiController
         return Mediator.Send(request);
     }
 
+    [HttpGet("submission/{id:guid}")]
+    [MustHavePermission(FSHAction.View, FSHResource.Assignments)]
+    [OpenApiOperation("Get submission assignment details.", "")]
+    public Task<List<SubmissionAssignmentDto>> GetSubmissionAsync(Guid id)
+    {
+        return Mediator.Send(new GetSubmissionAssignmentRequest(id));
+    }
 
 
 
