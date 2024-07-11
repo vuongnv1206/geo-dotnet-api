@@ -1,7 +1,13 @@
 ﻿using FSH.WebApi.Application.Assignments.AssignmentClasses;
 using FSH.WebApi.Application.Assignments.AssignmentStudent;
+using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.TeacherGroup;
+
 namespace FSH.WebApi.Application.Assignments;
 public class UpdateAssignmentRequest : IRequest<Guid>
 {
@@ -25,21 +31,59 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
     private readonly IRepository<Assignment> _repository;
     private readonly IStringLocalizer<UpdateAssignmentRequestHandler> _t;
     private readonly IFileStorageService _file;
+    private readonly IRepository<Classes> _classRepository;
+    private readonly ICurrentUser _currentUser;
+    private readonly IRepository<GroupPermissionInClass> _groupPermissionRepo;
+    private readonly IRepository<TeacherPermissionInClass> _teacherPermissionRepo;
     private readonly IMediator _mediator;
 
     public UpdateAssignmentRequestHandler(
         IRepository<Assignment> repository,
         IStringLocalizer<UpdateAssignmentRequestHandler> t,
         IFileStorageService file,
+        IRepository<Classes> classRepository,
+        ICurrentUser currentUser,
+        IRepository<GroupPermissionInClass> groupPermissionRepo,
+        IRepository<TeacherPermissionInClass> teacherPermissionRepo,
         IMediator mediator)
-        => (_repository, _t, _file, _mediator)
-            = (repository, t, file, mediator);
+    {
+        _repository = repository;
+        _t = t;
+        _file = file;
+        _classRepository = classRepository;
+        _currentUser = currentUser;
+        _groupPermissionRepo = groupPermissionRepo;
+        _teacherPermissionRepo = teacherPermissionRepo;
+        _mediator = mediator;
+    }
 
     public async Task<Guid> Handle(UpdateAssignmentRequest request, CancellationToken cancellationToken)
     {
-        var assignment = await _repository.FirstOrDefaultAsync(new AssignmentByIdSpec(request.Id), cancellationToken);
+        var assignment = await _repository.FirstOrDefaultAsync(new AssignmentByIdSpec(request.Id), cancellationToken)
+            ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
 
-        _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
+        var userId = _currentUser.GetUserId();
+        foreach (var classId in request.ClassIds)
+        {
+            var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId))
+                ?? throw new NotFoundException(_t["Class not found", classId]);
+
+            if (classroom.CreatedBy != userId && assignment.CreatedBy != userId)
+            {
+                var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, classId);
+                var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, classId);
+
+                var listPermission = new List<PermissionInClassDto>();
+
+                listPermission.AddRange(await _groupPermissionRepo.ListAsync(groupPermissionSpec));
+                listPermission.AddRange((await _teacherPermissionRepo
+                                                .ListAsync(teacherPermissionSpec))
+                                                .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
+
+                if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment))
+                    throw new NotFoundException(_t["Classes {0} Not Found.", classId]);
+            }
+        }
 
         var updatedAssignment = assignment.Update(
             request.Name,
