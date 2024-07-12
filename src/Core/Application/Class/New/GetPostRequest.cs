@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Class.New;
 public class GetPostRequest : PaginationFilter, IRequest<PaginationResponse<PostDto>>
 {
+    public Guid ClassId { get; set; }
 }
 
 public class GetNewsRequestHandler : IRequestHandler<GetPostRequest, PaginationResponse<PostDto>>
