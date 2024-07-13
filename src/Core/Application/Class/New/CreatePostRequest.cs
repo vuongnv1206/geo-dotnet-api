@@ -29,15 +29,18 @@ public class CreateNewsRequestHandler : IRequestHandler<CreatePostRequest, Guid>
     private readonly IRepositoryWithEvents<Post> _repository;
     private readonly ICurrentUser _currentUser;
     private readonly IRepository<Classes> _classRepo;
+    private readonly IStringLocalizer _t;
 
     public CreateNewsRequestHandler(
         IRepositoryWithEvents<Post> repository,
         ICurrentUser currentUser,
-        IRepository<Classes> classRepo)
+        IRepository<Classes> classRepo,
+        IStringLocalizer<CreateNewsRequestHandler> t)
     {
         _repository = repository;
         _currentUser = currentUser;
         _classRepo = classRepo;
+        _t = t;
     }
 
     public async Task<Guid> Handle(CreatePostRequest request, CancellationToken cancellationToken)
