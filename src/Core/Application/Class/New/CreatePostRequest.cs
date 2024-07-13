@@ -28,12 +28,25 @@ public class CreateNewsRequestHandler : IRequestHandler<CreatePostRequest, Guid>
 {
     private readonly IRepositoryWithEvents<Post> _repository;
     private readonly ICurrentUser _currentUser;
+    private readonly IRepository<Classes> _classRepo;
 
-    public CreateNewsRequestHandler(IRepositoryWithEvents<Post> repository, ICurrentUser currentUser) =>
-        (_repository, _currentUser) = (repository, currentUser);
+    public CreateNewsRequestHandler(
+        IRepositoryWithEvents<Post> repository,
+        ICurrentUser currentUser,
+        IRepository<Classes> classRepo)
+    {
+        _repository = repository;
+        _currentUser = currentUser;
+        _classRepo = classRepo;
+    }
 
     public async Task<Guid> Handle(CreatePostRequest request, CancellationToken cancellationToken)
     {
+        var userId = _currentUser.GetUserId();
+
+        _ = await _classRepo.FirstOrDefaultAsync(new ClassByIdSpec(request.ClassesId, userId), cancellationToken)
+            ?? throw new NotFoundException(_t["Class {0} Not Found", request.ClassesId]);
+
         var post = new Post(request.Content ?? string.Empty, request.IsLockComment, request.ClassesId);
 
         await _repository.AddAsync(post);
