@@ -27,6 +27,13 @@ public class QuestionController : VersionedApiController
         return Mediator.Send(request);
     }
 
+    [HttpPost("search-my-deleted")]
+    [OpenApiOperation("search questions deleted by the current user.", "")]
+    public Task<PaginationResponse<QuestionDto>> SearchMyDeletedAsync(SearchMyDeletedQuestions request)
+    {
+        return Mediator.Send(request);
+    }
+
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.Question)]
     [OpenApiOperation("Create questionn list.", "")]
@@ -43,6 +50,14 @@ public class QuestionController : VersionedApiController
         return await Mediator.Send(new DeleteQuestionRequest(id));
     }
 
+    [HttpDelete]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Question)]
+    [OpenApiOperation("Delete a list of questions.", "")]
+    public async Task<List<Guid>> DeleteListAsync(DeleteQuestionsRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
     [HttpPut("{id:guid}")]
     [MustHavePermission(FSHAction.Create, FSHResource.Question)]
     [OpenApiOperation("Update a question.", "")]
@@ -51,6 +66,13 @@ public class QuestionController : VersionedApiController
         return id != request.Id
             ? BadRequest()
             : Ok(await Mediator.Send(request));
+    }
+
+    [HttpPut("restore-deleted")]
+    [OpenApiOperation("Restore deleted questions.", "")]
+    public async Task<List<Guid>> RestoreDeletedAsync(RestoreDeletedQuestionsRequest request)
+    {
+        return await Mediator.Send(request);
     }
 
     [HttpPost("read-from-file")]
