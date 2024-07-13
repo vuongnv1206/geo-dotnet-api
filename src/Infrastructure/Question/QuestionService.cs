@@ -176,7 +176,7 @@ public class QuestionService : IQuestionService
                         .FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException($"Question {id} not found.");
 
                     var rootFolder = await GetRootFolder(question.QuestionFolderId!.Value, cancellationToken);
-                    if (!rootFolder.CreatedBy.Equals(userId) || !question.CreatedBy.Equals(userId)) throw new ForbiddenException($"You are not allowed to delete Question {id}");
+                    if (!rootFolder.CreatedBy.Equals(userId) && !question.CreatedBy.Equals(userId)) throw new ForbiddenException($"You are not allowed to delete Question {id}");
 
                     _repository.Remove(question);
                     _repository.SaveChanges();
