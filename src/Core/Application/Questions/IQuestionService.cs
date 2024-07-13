@@ -9,4 +9,6 @@ public interface IQuestionService : ITransientService
     Task<List<Guid>> GetFolderIds(Guid folderId, CancellationToken cancellationToken);
     Task<int> countQuestions(Guid folderId, CancellationToken cancellationToken);
     Task<List<Guid>> ChangeQuestionStatus(Guid userId, List<Guid> questionId, QuestionStatus status, CancellationToken cancellationToken);
+    Task<List<Guid>> RestoreDeletedQuestions(Guid userId, List<Guid> questionIds, CancellationToken cancellationToken);
+    Task<List<Guid>> DeleteQuestions(Guid userId, List<Guid> questionIds, CancellationToken cancellationToken);
 }
