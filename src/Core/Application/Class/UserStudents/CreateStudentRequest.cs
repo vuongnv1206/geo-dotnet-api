@@ -3,6 +3,7 @@ using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
+using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
 using System;
@@ -57,7 +58,7 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
     public async Task<DefaultIdType> Handle(CreateStudentRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
-        var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(request.ClassesId))
+        var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(request.ClassesId, userId))
             ?? throw new NotFoundException(_t["Class not found", request.ClassesId]);
 
         if (classroom.CreatedBy != userId)

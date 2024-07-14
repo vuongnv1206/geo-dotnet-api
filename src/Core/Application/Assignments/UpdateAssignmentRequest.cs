@@ -65,7 +65,7 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
         var userId = _currentUser.GetUserId();
         foreach (var classId in request.ClassIds)
         {
-            var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId))
+            var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId, userId))
                 ?? throw new NotFoundException(_t["Class not found", classId]);
 
             if (classroom.CreatedBy != userId && assignment.CreatedBy != userId)

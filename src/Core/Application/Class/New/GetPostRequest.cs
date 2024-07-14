@@ -21,17 +21,33 @@ public class GetNewsRequestHandler : IRequestHandler<GetPostRequest, PaginationR
     private readonly IReadRepository<Post> _repository;
     private readonly IPostLikeRepository _newReactionRepository;
     private readonly IUserService _userService;
+    private readonly IRepository<Classes> _classRepo;
+    private readonly ICurrentUser _currentUser;
+    private readonly IStringLocalizer _t;
 
-
-    public GetNewsRequestHandler(IReadRepository<Post> repository, IPostLikeRepository newReactionRepository, IUserService userService)
+    public GetNewsRequestHandler(
+        IReadRepository<Post> repository,
+        IPostLikeRepository newReactionRepository,
+        IUserService userService,
+        IRepository<Classes> classRepo,
+        ICurrentUser currentUser,
+        IStringLocalizer<GetNewsRequestHandler> t)
     {
         _repository = repository;
         _newReactionRepository = newReactionRepository;
         _userService = userService;
+        _classRepo = classRepo;
+        _currentUser = currentUser;
+        _t = t;
     }
 
     public async Task<PaginationResponse<PostDto>> Handle(GetPostRequest request, CancellationToken cancellationToken)
     {
+        var userId = _currentUser.GetUserId();
+
+        _ = await _classRepo.FirstOrDefaultAsync(new ClassByIdSpec(request.ClassId, userId), cancellationToken)
+            ?? throw new NotFoundException(_t["Class {0} Not Found", request.ClassId]);
+
         var spec = new PostByClassIdSpec(request);
         var data = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
 
