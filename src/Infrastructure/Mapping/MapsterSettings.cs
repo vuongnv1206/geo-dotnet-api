@@ -3,7 +3,6 @@ using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Application.Class.Comments.Dto;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.New.Dto;
-using FSH.WebApi.Application.Class.SharedClasses;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
@@ -204,9 +203,6 @@ public class MapsterSettings
           .Map(dest => dest.Students, src => src.UserClasses.Select(p => p.Student))
           .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment))
           .Map(dest => dest.Papers, src => src.PaperAccesses.Select(pq => pq.Paper));
-
-        _ = TypeAdapterConfig<Classes, SharedClassDto>.NewConfig()
-            .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count());
 
         _ = TypeAdapterConfig<Assignment, AssignmentDetailsDto>.NewConfig()
                 .Map(dest => dest.ClassesId, src => src.AssignmentClasses.Select(pq => pq.ClassesId));
