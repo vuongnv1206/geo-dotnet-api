@@ -11,6 +11,7 @@ using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.PaperStudents;
 using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
+using FSH.WebApi.Application.Examination.Services.Models;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Questions;
@@ -218,5 +219,12 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         _ = TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();
+
+        //Examination.Services.Models
+        _ = TypeAdapterConfig<QuestionModel, QuestionDto>.NewConfig()
+            .Map(dest => dest.Answers, src => src.Answers)
+            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages);
+        _ = TypeAdapterConfig<QuestionPassageModel, QuestionPassagesDto>.NewConfig();
+        _ = TypeAdapterConfig<AnswerModel, AnswerDto>.NewConfig();
     }
 }
