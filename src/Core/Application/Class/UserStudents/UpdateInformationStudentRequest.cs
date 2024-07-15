@@ -73,6 +73,15 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
         //if (request.PhoneNumber is not null && !student.IsValidPhoneNumber(request.PhoneNumber))
         //    throw new ConflictException(_t["The phone number '{0}' is not valid. It must be 10 digits.", request.PhoneNumber]);
 
+
+        if (classOfStudent.UserClasses != null)
+        {
+            if (classOfStudent.UserClasses.Any(x => x.Student.Email.Trim() == request.Email.Trim()))
+                throw new BadRequestException(_t["Email is existed in class"]);
+            else if (classOfStudent.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim()))
+                throw new BadRequestException(_t["Phone number is existed in class"]);
+        }
+
         var updatedStudent = student.Update(
             request.FirstName,
             request.LastName,

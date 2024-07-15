@@ -10,6 +10,9 @@ public class SubmitPaperByPaperIdPaging : EntitiesByPaginationFilterSpec<SubmitP
     {
         Query
             .Where(x => x.PaperId == paper.Id
-            && ( x.CreatedBy == userId || paper.CreatedBy == userId));
+            && ( x.CreatedBy == userId || paper.CreatedBy == userId))
+            .Include(sb => sb.Paper)
+                .ThenInclude(p => p.PaperAccesses)
+                .Where(sb => !request.ClassId.HasValue || sb.Paper.PaperAccesses.Any(x => x.ClassId == request.ClassId));
     }
 }

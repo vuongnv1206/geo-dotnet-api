@@ -8,8 +8,21 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Class;
 public class ClassByIdSpec : Specification<Classes>, ISingleResultSpecification
 {
-    public ClassByIdSpec(Guid id)
+    public ClassByIdSpec(Guid id, Guid userId)
     {
-        Query.Where(b => b.Id == id).Include(x => x.UserClasses);
+        Query.Where(b => b.Id == id).Include(x => x.UserClasses)
+            .Include(c => c.TeacherPermissionInClasses)
+                .ThenInclude(tp => tp.TeacherTeam)
+            .Include(c => c.GroupPermissionInClasses)
+                .ThenInclude(gp => gp.GroupTeacher)
+                    .ThenInclude(gt => gt.TeacherInGroups)
+                        .ThenInclude(tg => tg.TeacherTeam)
+            .Include(c => c.UserClasses)
+                .ThenInclude(uc => uc.Student)
+            .Where(c => c.CreatedBy == userId
+                        || c.TeacherPermissionInClasses.Any(tp => tp.TeacherTeam.TeacherId == userId)
+                        || c.GroupPermissionInClasses.Any(gp => gp.GroupTeacher.TeacherInGroups
+                                .Any(tig => tig.TeacherTeam.TeacherId == userId))
+                        || c.UserClasses.Any(uc => uc.Student.StId == userId));
     }
 }

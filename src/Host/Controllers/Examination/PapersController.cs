@@ -1,5 +1,6 @@
-﻿using FSH.WebApi.Application.Examination.PaperFolders;
+﻿
 using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.Papers.Dtos;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class PapersController : VersionedApiController
@@ -8,6 +9,14 @@ public class PapersController : VersionedApiController
     [OpenApiOperation("Search paper using available filter", "")]
     [MustHavePermission(FSHAction.View, FSHResource.Papers)]
     public Task<PaginationResponse<PaperInListDto>> SearchPaper(SearchPaperRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("search-deleted")]
+    [OpenApiOperation("Search deleted papers", "")]
+    [MustHavePermission(FSHAction.View, FSHResource.Papers)]
+    public Task<PaginationResponse<PaperDeletedDto>> SearchDeletedPaper(SearchPaperDeletedRequest request)
     {
         return Mediator.Send(request);
     }
@@ -44,6 +53,21 @@ public class PapersController : VersionedApiController
     public async Task<Guid> DeleteAsync(Guid id)
     {
         return await Mediator.Send(new DeletePaperRequest(id));
+    }
+
+    [HttpPut("restore-deleted")]
+    [OpenApiOperation("Restore a deleted paper")]
+    public async Task<List<Guid>> RestoreAsync(RestoreDeletedPapersRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+    [HttpDelete]
+    [OpenApiOperation("Delete multiple papers")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.Papers)]
+    public async Task<List<Guid>> DeleteMultipleAsync(DeletePapersRequest request)
+    {
+        return await Mediator.Send(request);
     }
 
     [HttpPut("{id:guid}/questions")]
@@ -91,7 +115,7 @@ public class PapersController : VersionedApiController
     [HttpPost("{id:guid}/questions")]
     [OpenApiOperation("Add questions in a paper")]
     [MustHavePermission(FSHAction.Update, FSHResource.Papers)]
-    public async Task<ActionResult> UpdateQuestionInPaperAsync(Guid id,AddQuestionsInPaperRequest request)
+    public async Task<ActionResult> UpdateQuestionInPaperAsync(Guid id, AddQuestionsInPaperRequest request)
     {
         if (id != request.PaperId)
         {
@@ -99,6 +123,26 @@ public class PapersController : VersionedApiController
         }
         return Ok(await Mediator.Send(request));
     }
-    
+
+    [HttpGet("generate/docx")]
+    public async Task<IActionResult> GeneratePaperDocx(Guid paperId)
+    {
+        var request = new GeneratePaperDocxRequest(paperId);
+        var fileBytes = await Mediator.Send(request);
+
+        // Trả về file DOCX dưới dạng response
+       // return File(fileBytes, "application/msword");
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"ExamPaper-{paperId}.docx", true); //Download file
+    }
+
+    [HttpGet("generate/pdf")]
+    public async Task<IActionResult> GeneratePaperPdf(Guid paperId)
+    {
+        var request = new GeneratePaperPdfRequest(paperId);
+        var fileBytes = await Mediator.Send(request);
+
+        //return File(fileBytes, "application/pdf");  //Get file in pdf format
+        return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
+    }
 
 }

@@ -1,9 +1,9 @@
 using FSH.WebApi.Application.Assignments;
 using FSH.WebApi.Application.Assignments.Dtos;
+using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.Comments.Dto;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.New.Dto;
-using FSH.WebApi.Application.Class.SharedClasses;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
@@ -11,6 +11,7 @@ using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.PaperStudents;
 using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
+using FSH.WebApi.Application.Examination.Services.Models;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Questions;
@@ -206,8 +207,8 @@ public class MapsterSettings
           .Map(dest => dest.Assignments, src => src.AssignmentClasses.Select(pq => pq.Assignment))
           .Map(dest => dest.Papers, src => src.PaperAccesses.Select(pq => pq.Paper));
 
-        _ = TypeAdapterConfig<Classes, SharedClassDto>.NewConfig()
-            .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count());
+        _ = TypeAdapterConfig<Classes, ClassViewListDto>.NewConfig()
+          .Map(dest => dest.NumberUserOfClass, src => src.UserClasses.Count());
 
         _ = TypeAdapterConfig<Assignment, AssignmentDetailsDto>.NewConfig()
                 .Map(dest => dest.ClassesId, src => src.AssignmentClasses.Select(pq => pq.ClassesId));
@@ -218,5 +219,12 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         _ = TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();
+
+        //Examination.Services.Models
+        _ = TypeAdapterConfig<QuestionModel, QuestionDto>.NewConfig()
+            .Map(dest => dest.Answers, src => src.Answers)
+            .Map(dest => dest.QuestionPassages, src => src.QuestionPassages);
+        _ = TypeAdapterConfig<QuestionPassageModel, QuestionPassagesDto>.NewConfig();
+        _ = TypeAdapterConfig<AnswerModel, AnswerDto>.NewConfig();
     }
 }
