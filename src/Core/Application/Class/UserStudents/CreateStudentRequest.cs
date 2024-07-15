@@ -77,6 +77,14 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
                 throw new NotFoundException(_t["Classes {0} Not Found.", request.ClassesId]);
         }
 
+        if (classroom.UserClasses != null)
+        {
+            if (classroom.UserClasses.Any(x => x.Student.Email.Trim() == request.Email.Trim()))
+                throw new BadRequestException(_t["Email is existed in class"]);
+            else if (classroom.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim()))
+                throw new BadRequestException(_t["Phone number is existed in class"]);
+        }
+
         var userStudent = new Student
         {
             FirstName = request.FirstName,

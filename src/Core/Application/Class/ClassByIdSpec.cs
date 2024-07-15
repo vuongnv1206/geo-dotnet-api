@@ -17,10 +17,12 @@ public class ClassByIdSpec : Specification<Classes>, ISingleResultSpecification
                 .ThenInclude(gp => gp.GroupTeacher)
                     .ThenInclude(gt => gt.TeacherInGroups)
                         .ThenInclude(tg => tg.TeacherTeam)
+            .Include(c => c.UserClasses)
+                .ThenInclude(uc => uc.Student)
             .Where(c => c.CreatedBy == userId
                         || c.TeacherPermissionInClasses.Any(tp => tp.TeacherTeam.TeacherId == userId)
                         || c.GroupPermissionInClasses.Any(gp => gp.GroupTeacher.TeacherInGroups
                                 .Any(tig => tig.TeacherTeam.TeacherId == userId))
-                        || c.Students.Any(s => s.StId == userId));
+                        || c.UserClasses.Any(uc => uc.Student.StId == userId));
     }
 }
