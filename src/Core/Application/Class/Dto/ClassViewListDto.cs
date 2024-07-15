@@ -1,9 +1,5 @@
-﻿using FSH.WebApi.Application.Assignments.Dtos;
-using FSH.WebApi.Application.Class.UserStudents.Dto;
-using FSH.WebApi.Application.Examination.Papers;
-
-namespace FSH.WebApi.Application.Class.SharedClasses;
-public class SharedClassDto
+﻿namespace FSH.WebApi.Application.Class;
+public class ClassViewListDto : IDto
 {
     public DefaultIdType Id { get; set; }
     public string Name { get; set; }

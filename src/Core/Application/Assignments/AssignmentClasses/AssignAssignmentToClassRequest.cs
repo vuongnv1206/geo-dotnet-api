@@ -49,13 +49,13 @@ public class AssignAssignmentToClassRequestHandler : IRequestHandler<AssignAssig
 
     public async Task<Guid> Handle(AssignAssignmentToClassRequest request, CancellationToken cancellationToken)
     {
-
+        var userId = _currentUser.GetUserId();
         var assignment = await _assignmentRepository.FirstOrDefaultAsync(new AssignmentByIdSpec(request.AssignmentId));
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.AssignmentId]);
 
         foreach (var classId in request.ClassIds)
         {
-            var classroom = await _classesRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId));
+            var classroom = await _classesRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId, userId));
             _ = classroom ?? throw new NotFoundException(_t["Class {0} Not Found.", classId]);
             assignment.AssignAssignmentToClass(classroom.Id);
 

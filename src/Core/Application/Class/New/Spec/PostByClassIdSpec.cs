@@ -10,8 +10,11 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Class.New.Spec;
 public class PostByClassIdSpec : EntitiesByPaginationFilterSpec<Post, PostDto>
 {
-    public PostByClassIdSpec(GetPostRequest request) : base(request)
+    public PostByClassIdSpec(GetPostRequest request)
+        : base(request)
     {
-        Query.Include(x => x.Comments);
+        Query
+            .Where(x => x.ClassesId == request.ClassId)
+            .Include(x => x.Comments);
     }
 }

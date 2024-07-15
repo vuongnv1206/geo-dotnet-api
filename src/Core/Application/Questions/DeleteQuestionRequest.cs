@@ -62,7 +62,10 @@ public class DeleteQuestionRequestHandler : IRequestHandler<DeleteQuestionReques
             }
         }
 
-        await _questionRepo.DeleteAsync(question, cancellationToken);
+        question.DeletedBy = _currentUser.GetUserId();
+        question.DeletedOn = DateTime.Now;
+
+        await _questionRepo.UpdateAsync(question, cancellationToken);
 
         return request.Id;
     }
