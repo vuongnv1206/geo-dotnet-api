@@ -20,6 +20,7 @@ public class ClassByIdSpec : Specification<Classes>, ISingleResultSpecification
             .Where(c => c.CreatedBy == userId
                         || c.TeacherPermissionInClasses.Any(tp => tp.TeacherTeam.TeacherId == userId)
                         || c.GroupPermissionInClasses.Any(gp => gp.GroupTeacher.TeacherInGroups
-                                .Any(tig => tig.TeacherTeam.TeacherId == userId)));
+                                .Any(tig => tig.TeacherTeam.TeacherId == userId))
+                        || c.Students.Any(s => s.StId == userId));
     }
 }
