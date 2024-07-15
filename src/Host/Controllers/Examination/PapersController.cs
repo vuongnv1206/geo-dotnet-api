@@ -1,5 +1,6 @@
-﻿using FSH.WebApi.Application.Examination.PaperFolders;
+﻿
 using FSH.WebApi.Application.Examination.Papers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class PapersController : VersionedApiController
@@ -99,6 +100,26 @@ public class PapersController : VersionedApiController
         }
         return Ok(await Mediator.Send(request));
     }
-    
+
+    [HttpGet("generate/docx")]
+    public async Task<IActionResult> GeneratePaperDocx(Guid paperId)
+    {
+        var request = new GeneratePaperDocxRequest(paperId);
+        var fileBytes = await Mediator.Send(request);
+
+        // Trả về file DOCX dưới dạng response
+       // return File(fileBytes, "application/msword");
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"ExamPaper-{paperId}.docx", true); //Download file
+    }
+
+    [HttpGet("generate/pdf")]
+    public async Task<IActionResult> GeneratePaperPdf(Guid paperId)
+    {
+        var request = new GeneratePaperPdfRequest(paperId);
+        var fileBytes = await Mediator.Send(request);
+
+        //return File(fileBytes, "application/pdf");  //Get file in pdf format
+        return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
+    }
 
 }

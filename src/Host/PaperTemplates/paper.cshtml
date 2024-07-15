@@ -1,0 +1,285 @@
+﻿
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>ANI - TEST LAB</title>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+<style>
+.A4 {
+  background: white;
+  width: 21cm;
+  height: 29.7cm;
+  display: block;
+  margin: 0 auto;
+  padding: 10px 25px;
+  margin-bottom: 0.5cm;
+  box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  font-size: 8pt;
+}
+.MJXc-display {
+    display: block;
+    text-align: left !important;
+    margin: 0em 0 !important;
+    padding: 0;
+}
+  p {
+    margin-block-start: 3px;
+    margin-block-end: 3px;
+    margin-inline-end: 30px;
+  }
+ @("@")media print {
+  .page-break {
+    display: block;
+    page-break-before: always;
+  }
+  size: A4 portrait;
+}
+.answer-reset {
+  float: left;
+  margin-inline-end: 5px;
+}
+
+ @("@")media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  .A4 {
+    box-shadow: none;
+    margin: 0;
+    width: auto;
+    height: auto;
+    overflow: hidden;
+    font-size: 8pt;
+  }
+  .noprint {
+    display: none;
+  }
+  .enable-print {
+    display: block;
+  }
+  p {
+    margin-block-start: 3px;
+    margin-block-end: 3px;
+    margin-inline-end: 30px;
+  }
+}
+
+.footer-count {
+    margin-top: 25px;
+    margin-left: 95%;
+}
+
+#customers {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+img {
+  float: left!important;
+}
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 1px;
+  width: 50px;
+  text-align: center;
+}
+* {
+    font-size: 8pt !important;
+    font-family: Verdana,sans-serif !important;
+}
+#customers th {
+
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+  background-color: #4CAF50;
+  color: white;
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="A4">
+<p>
+<span style="float: left;font-size: 12pt;text-align: center;" >SỞ GD & ĐT Hà Nội</br>TRƯỜNG <b id="a">FPT</b>
+</br><i style="text-decoration: underline;">ĐỀ CHÍNH THỨC</i>
+</span>
+<span style="float: right;text-align: center;font-size: 12pt;" ><b id="b">Tên đề</b>
+</br>
+<b>MÔN:</b><b id="c">@Model.SubjectName</b>
+</br>
+<span>Thời gian làm bài: </span><span id="d">@Model.Duration</span>
+</br>
+<span>Số câu hỏi: </span><span id="e">@Model.TotalQuestion</span>
+</span>
+</p>
+</br>
+<p style="padding-top: 40px;">
+</p>
+<br/>
+<br/>
+<span style="margin-right:5%;font-size: 12pt;" ><b>Họ Tên:</b>.................................................................... </span> <span style="margin-right:1%;font-size: 12pt;" ><b>SBD:</b>........................... </span> <span style="margin-right:1%;font-size: 12pt;" ><b>Lớp:</b>............. </span>
+<br/>
+<table id="customers">
+  <tr>
+  	<th>:)</th>
+  <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th>  </tr>
+  <tr>
+    <td>A</td>
+  <td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td>  </tr>
+  <tr>
+    <td>B</td>
+    <td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td>  </tr>
+  <tr>
+    <td>C</td>
+    <td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td>  </tr>
+  <tr>
+    <td>D</td>
+    <td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td>  </tr>
+</table>
+<table id="customers">
+  <tr>
+  	<th>:)</th>
+    <th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th><th>32</th><th>33</th><th>34</th><th>35</th><th>36</th><th>37</th><th>38</th><th>39</th><th>40</th>  </tr>
+  <tr>
+    <td>A</td>
+    <td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td>  </tr>
+  <tr>
+    <td>B</td>
+    <td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td>  </tr>
+  <tr>
+    <td>C</td>
+    <td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td>  </tr>
+  <tr>
+    <td>D</td>
+    <td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td>  </tr>
+</table>
+<br/>
+ @foreach (var question in Model.Questions)
+        {
+            <div>
+        <div>
+            <p><b>Câu @question.RawIndex . </b><p>@question.Content</p>
+</p>
+        </div>
+
+         @for (int i = 0; i < question.Answers.Count; i += 2)
+            {
+                <div class="row">
+                    <div class="col-6">
+                        <p class="answer-reset"><b>@((char)('A' + i)). </b><p>@question.Answers[i].Content</p></p>
+                    </div>
+                    @if (i + 1 < question.Answers.Count)
+                    {
+                        <div class="col-6">
+                            <p class="answer-reset"><b>@((char)('A' + i)). </b><p>@question.Answers[i + 1].Content</p></p>
+                        </div>
+                    }
+                </div>
+            }
+    </div>
+        }
+   
+   
+    <center>
+
+<p><span style="font-size: 16pt;text-align: center;" >=== HẾT ===</span></p>
+<p><span style="font-size: 16pt;text-align: center;" >Thí sinh không được sử dụng tài liệu. Cán bộ coi thi không giải thích gì thêm.</span></p>
+</center>
+
+</div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+</script>
+<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script type="text/javascript">
+    var max_pages = 100;
+    var page_count = 0;
+    var a,b,c,d;
+    load();
+    set();
+
+    function snipMe() {
+      page_count++;
+      if (page_count > max_pages) {
+        return;
+      }
+      var long = $(this)[0].scrollHeight - Math.ceil($(this).innerHeight());
+      var children = $(this).children().toArray();
+      var removed = [];
+      while (long > 0 && children.length > 0) {
+        var child = children.pop();
+        $(child).detach();
+        removed.unshift(child);
+        long = $(this)[0].scrollHeight - Math.ceil($(this).innerHeight());
+      }
+      if (removed.length > 0) {
+        var a4 = $('<div class="A4"></div>');
+        a4.append(removed);
+        $(this).after(a4);
+        snipMe.call(a4[0]);
+      }
+    }
+
+    $(document).ready(function() {
+      $('.A4').each(function() {
+        snipMe.call(this);
+      });
+    });
+
+    function save(a,b,c,d) {
+      localStorage.setItem("a", a);
+      localStorage.setItem("b", b);
+      localStorage.setItem("c", c);
+      localStorage.setItem("d", d);
+    }
+
+    function load() {
+      a = localStorage.getItem("a");
+      b = localStorage.getItem("b");
+      c = localStorage.getItem("c");
+      d = localStorage.getItem("d");
+    }
+
+    function set(){ 
+      $("#a").text(a);
+      $("#b").text(b);
+      $("#c").text(c);
+      $("#d").text(d);
+    }
+
+    function KeyPress(e) {
+      var evtobj = window.event? event : e
+      if (evtobj.keyCode == 90 && evtobj.ctrlKey) 
+      {
+        a = prompt("Nhập tên trường học ", "THPT Trần Phú");
+        b = prompt("Nhập tên đề thi ", "@Model.ExamName");
+        c = prompt("Nhập tên Môn Thi ", "@Model.SubjectName");
+        d = prompt("Nhập thời gian làm bài ", "45 phút");
+        save(a,b,c,d);
+        set();
+      }
+    }
+
+
+document.onkeydown = KeyPress;
+
+</script>
+</body>
+</html>
+
+
+
