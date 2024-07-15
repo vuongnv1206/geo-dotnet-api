@@ -4,29 +4,35 @@ using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.SubmitPapers;
+using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.Question.Enums;
 using FSH.WebApi.Host.Controllers.Examination;
-using FSH.WebApi.Infrastructure.Persistence.Context;
+using FSH.WebApi.Infrastructure.Common.Utils;
 using Mapster;
+using Microsoft.Extensions.Localization;
 using System.Net;
 
 namespace FSH.WebApi.Infrastructure.Examination;
 public class SubmmitPaperService : ISubmmitPaperService
 {
-    private readonly ApplicationDbContext _context;
     private readonly IRepository<Paper> _paperRepository;
     private readonly IRepository<SubmitPaper> _submitPaperRepository;
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
+    private readonly IStringLocalizer<SubmmitPaperService> _t;
+    private readonly ISerializerService _serializerService;
 
-    public SubmmitPaperService(ApplicationDbContext context, IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, ICurrentUser currentUser, IUserService userService)
+    public SubmmitPaperService(IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, ICurrentUser currentUser, IUserService userService, IStringLocalizer<SubmmitPaperService> t, ISerializerService serializerService)
     {
-        _context = context;
         _paperRepository = paperRepository;
         _submitPaperRepository = submitPaperRepository;
         _currentUser = currentUser;
         _userService = userService;
+        _t = t;
+        _serializerService = serializerService;
     }
 
     private bool IsIpInRange(string ip, string ipRange)
@@ -171,4 +177,152 @@ public class SubmmitPaperService : ISubmmitPaperService
         paperDot.UserDetails = user.Adapt<UserDetailsDto>();
         return paperDot;
     }
+
+    public async Task<DefaultIdType> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
+    {
+        // Decrypt and validate submit paper data
+        string submitPaperDataDecrypted = EncryptionUtils.SimpleDec(request.SubmitPaperData);
+        if (string.IsNullOrEmpty(submitPaperDataDecrypted))
+        {
+            throw new BadRequestException("Submit paper data is invalid.");
+        }
+
+        // Json to object SubmitPaperData
+        var sbp = _serializerService.Deserialize<SubmitPaperData>(submitPaperDataDecrypted);
+
+        // Get submit paper
+        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByIdSpec(Guid.Parse(sbp.SubmitPaperId!)), cancellationToken);
+
+        // Update or Add submit paper details
+        foreach (var q in sbp.Questions)
+        {
+            // check question is exist in paper
+            var question = submitPaper.SubmitPaperDetails?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!));
+            if (question == null)
+            {
+                var questionDb = submitPaper.Paper?.PaperQuestions?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!)).Question;
+
+                // Add new submit paper detail
+                SubmitPaperDetail submitPaperDetail;
+                if (questionDb != null)
+                {
+                    submitPaperDetail = new SubmitPaperDetail
+                    {
+                        QuestionId = Guid.Parse(q.Id!),
+                        AnswerRaw = FormatAnswerRaw(q, questionDb),
+                        SubmitPaperId = submitPaper.Id
+                    };
+
+                    submitPaper.SubmitPaperDetails.Add(submitPaperDetail);
+                }
+            }
+            else
+            {
+                // Update submit paper detail
+                question.AnswerRaw = FormatAnswerRaw(q, question.Question!);
+            }
+        }
+
+        // Update submit paper
+        await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
+
+        return submitPaper == null
+            ? throw new NotFoundException("Submit Paper " + sbp.SubmitPaperId + " Not Found.")
+            : await Task.FromResult(submitPaper.Id);
+    }
+
+    public string FormatAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    {
+        if (question == null)
+        {
+            return string.Empty;
+        }
+
+        // SingleChoice
+        if (question.QuestionType == QuestionType.SingleChoice)
+        {
+            return FormatSingleChoiceAnswerRaw(spq, question);
+        }
+
+        // MultipleChoice - Reading - Question Passage
+        if (question.QuestionType is QuestionType.MultipleChoice or QuestionType.ReadingQuestionPassage)
+        {
+            return FormatMultipleChoiceAnswerRaw(spq, question);
+        }
+
+        // FillBlank
+        if (question.QuestionType == QuestionType.FillBlank)
+        {
+            return FormatFillBlankAnswerRaw(spq, question);
+        }
+
+        // Matching
+        if (question.QuestionType == QuestionType.Matching)
+        {
+            return spq.Answers!.FirstOrDefault()?.Content ?? string.Empty;
+        }
+
+        // Writing
+        return question.QuestionType == QuestionType.Writing ? spq.Answers!.FirstOrDefault()?.Content ?? string.Empty : string.Empty;
+    }
+
+    private string FormatSingleChoiceAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    {
+        // SingleChoice : answerId
+        foreach (var a in question.AnswerClones)
+        {
+            foreach (var s in spq.Answers)
+            {
+                if (a.Id == Guid.Parse(s.Id!) && s.IsCorrect)
+                {
+                    return a.Id.ToString();
+                }
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private string FormatMultipleChoiceAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    {
+        // MultipleChoise : answerId|answerId
+        var answerIds = new List<string>();
+        foreach (var a in question.AnswerClones)
+        {
+            foreach (var s in spq.Answers)
+            {
+                if (a.Id == Guid.Parse(s.Id!) && s.IsCorrect)
+                {
+                    answerIds.Add(a.Id.ToString());
+                }
+            }
+        }
+
+        return string.Join('|', answerIds);
+    }
+
+    private string FormatFillBlankAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    {
+        List<Dictionary<string, string>> answers = new();
+        foreach (var a in question.AnswerClones)
+        {
+            int index = 1;
+            foreach (var s in spq.Answers)
+            {
+                if (a.Id == Guid.Parse(s.Id!))
+                {
+                    if (!string.IsNullOrEmpty(s.Content))
+                    {
+                        answers.Add(new Dictionary<string, string> { { index.ToString(), s.Content! } });
+                    }
+                }
+
+                index++;
+            }
+        }
+
+        // Serialize to json
+        return _serializerService.Serialize(answers);
+    }
+
 }

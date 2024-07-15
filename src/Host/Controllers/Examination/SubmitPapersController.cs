@@ -1,8 +1,8 @@
-﻿
-using FSH.WebApi.Application.Examination.Papers.ByStudents;
+﻿using FSH.WebApi.Application.Examination.Papers.ByStudents;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
+using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class SubmitPapersController : VersionedApiController
@@ -63,6 +63,14 @@ public class SubmitPapersController : VersionedApiController
     [HttpPost("start")]
     [OpenApiOperation("Start exam")]
     public async Task<ActionResult<PaperForStudentDto>> StartExam(StartExamRequest request)
+    {
+        request.PublicIp = GetIpAddress();
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("submit")]
+    [OpenApiOperation("Submit exam")]
+    public async Task<ActionResult<Guid>> SubmitExam(SubmitExamRequest request)
     {
         request.PublicIp = GetIpAddress();
         return await Mediator.Send(request);

@@ -72,8 +72,6 @@ public class MapsterSettings
           .Ignore(dest => dest.QuestionPassages)
           .TwoWays();
 
-
-
         _ = TypeAdapterConfig<CreateQuestionDto, QuestionClone>.NewConfig()
             .Ignore(dest => dest.AnswerClones)
             .Ignore(dest => dest.QuestionPassages)
@@ -93,6 +91,9 @@ public class MapsterSettings
             .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
             .Map(dest => dest.Answers, src => CustomMappingExtensions.MapAnswers(src.Answers));
 
+        _ = TypeAdapterConfig<Domain.Question.Question, QuestionPassagesForStudentDto>.NewConfig()
+            .Map(dest => dest.Answers, src => CustomMappingExtensions.MapAnswers(src.Answers));
+
         _ = TypeAdapterConfig<Answer, AnswerForStudentDto>.NewConfig()
             .Map(dest => dest.IsCorrect, src => false);
 
@@ -108,13 +109,13 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<Answer, AnswerDto>.NewConfig();
 
-
         _ = TypeAdapterConfig<AnswerClone, AnswerDto>.NewConfig()
              .Map(dest => dest.QuestionId, src => src.QuestionCloneId);
 
         _ = TypeAdapterConfig<QuestionClone, QuestionDto>.NewConfig()
            .Map(dest => dest.QuestionLable, src => src.QuestionLabel)
-           //.Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
+
+    // .Map(dest => dest.QuestionPassages, src => src.QuestionPassages)
     .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<QuestionDto>>())
            .Map(dest => dest.QuestionFolder, src => src.QuestionFolder)
            .Map(dest => dest.Answers, src => src.AnswerClones);
@@ -214,7 +215,6 @@ public class MapsterSettings
         _ = TypeAdapterConfig<Assignment, AssignmentDto>.NewConfig();
         _ = TypeAdapterConfig<Assignment, SubmissionAssignmentDto>.NewConfig()
             .Map(dest => dest.Student, src => src.AssignmentStudents.Select(pq => pq.Student));
-
 
         _ = TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         _ = TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();

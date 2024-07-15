@@ -38,25 +38,16 @@ public static class GetResultAnswerExtensions
 
     public static float GetPointQuestion(this SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
-        switch (question.QuestionType)
+        return question.QuestionType switch
         {
-            case QuestionType.ReadingQuestionPassage:
-            case QuestionType.SingleChoice:
-                return CalculateSingleChoiceScore(submitDetail, question, mark);
-            case QuestionType.MultipleChoice:
-                return CalculateMultipleChoiceScore(submitDetail, question, mark);
-            case QuestionType.FillBlank:
-                return CalculateFillBlankScore(submitDetail, question, mark);
-            case QuestionType.Reading:
-                return CalculateReadingScore(submitDetail, question, mark);
-            case QuestionType.Matching:
-                return CalculateMatchingScore(submitDetail, question, mark);
-            case QuestionType.Writing:
-            case QuestionType.Other:
-                return 0;
-            default:
-                throw new NotImplementedException($"Question type {question.QuestionType} is not supported.");
-        }
+            QuestionType.ReadingQuestionPassage or QuestionType.SingleChoice => CalculateSingleChoiceScore(submitDetail, question, mark),
+            QuestionType.MultipleChoice => CalculateMultipleChoiceScore(submitDetail, question, mark),
+            QuestionType.FillBlank => CalculateFillBlankScore(submitDetail, question, mark),
+            QuestionType.Reading => CalculateReadingScore(submitDetail, question, mark),
+            QuestionType.Matching => CalculateMatchingScore(submitDetail, question, mark),
+            QuestionType.Writing or QuestionType.Other => 0,
+            _ => throw new NotImplementedException($"Question type {question.QuestionType} is not supported."),
+        };
     }
 
     private static float CalculateReadingScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
@@ -66,12 +57,10 @@ public static class GetResultAnswerExtensions
 
     private static float CalculateSingleChoiceScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
-        if (Guid.TryParse(submitDetail.AnswerRaw, out var answerIdRaw) &&
-            question.AnswerClones.SingleOrDefault(a => a.Id == answerIdRaw && a.IsCorrect) is not null)
-        {
-            return mark;
-        }
-        return 0;
+        return Guid.TryParse(submitDetail.AnswerRaw, out var answerIdRaw) &&
+            question.AnswerClones.SingleOrDefault(a => a.Id == answerIdRaw && a.IsCorrect) is not null
+            ? mark
+            : 0;
     }
 
     private static float CalculateMultipleChoiceScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
@@ -101,7 +90,7 @@ public static class GetResultAnswerExtensions
                                                     .ToDictionary(ma => ma[0], ma => ma[1]);
 
         float averageScore = mark / correctMatchings.Count;
-        int numberCorrectAnswer = matchingAnswers.Count(raw => correctMatchings.TryGetValue(raw.Key, out var correctValue) && correctValue == raw.Value);
+        int numberCorrectAnswer = matchingAnswers.Count(raw => correctMatchings.TryGetValue(raw.Key, out string? correctValue) && correctValue == raw.Value);
 
         return numberCorrectAnswer * averageScore;
     }

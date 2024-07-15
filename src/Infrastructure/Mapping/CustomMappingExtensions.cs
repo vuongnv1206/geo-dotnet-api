@@ -2,12 +2,8 @@
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.Question.Enums;
 using Mapster;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Infrastructure.Mapping;
 public static class CustomMappingExtensions
@@ -40,6 +36,20 @@ public static class CustomMappingExtensions
             {
                 questionDto.RawIndex = pq.RawIndex;
                 questionDto.Mark = pq.Mark;
+
+                // Map answers for Question passages
+                if (pq.Question.QuestionType == QuestionType.Reading)
+                {
+                    foreach (var qp in pq.Question.QuestionPassages)
+                    {
+                        var questionPassageDto = questionDto.QuestionPassages.FirstOrDefault(q => q.Id == qp.Id);
+                        if (questionPassageDto != null)
+                        {
+                            questionPassageDto.Answers = MapAnswersForStudent(qp.AnswerClones);
+                        }
+                    }
+                }
+
             }
         }
 
@@ -53,6 +63,11 @@ public static class CustomMappingExtensions
             answer.IsCorrect = false;
         }
 
+        return answers.Select(a => a.Adapt<AnswerForStudentDto>()).ToList();
+    }
+
+    public static List<AnswerForStudentDto> MapAnswersForStudent(List<AnswerClone> answers)
+    {
         return answers.Select(a => a.Adapt<AnswerForStudentDto>()).ToList();
     }
 }

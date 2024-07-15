@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
+using FSH.WebApi.Domain.Examination;
 using MediatR;
 
 namespace FSH.WebApi.Application.Examination.SubmitPapers;
