@@ -198,14 +198,15 @@ public class SubmmitPaperService : ISubmmitPaperService
         {
             // check question is exist in paper
             var question = submitPaper.SubmitPaperDetails?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!));
+            var questionDb = submitPaper.Paper?.PaperQuestions?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!)).Question;
             if (question == null)
             {
-                var questionDb = submitPaper.Paper?.PaperQuestions?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!)).Question;
-
                 // Add new submit paper detail
-                SubmitPaperDetail submitPaperDetail;
                 if (questionDb != null)
                 {
+
+                    // Add new submit paper detail
+                    SubmitPaperDetail submitPaperDetail;
                     submitPaperDetail = new SubmitPaperDetail
                     {
                         QuestionId = Guid.Parse(q.Id!),
@@ -214,12 +215,52 @@ public class SubmmitPaperService : ISubmmitPaperService
                     };
 
                     submitPaper.SubmitPaperDetails.Add(submitPaperDetail);
+
+                    if (questionDb.QuestionType == QuestionType.Reading)
+                    {
+                        foreach (var pq in questionDb.QuestionPassages)
+                        {
+                            foreach (var q1 in q.QuestionPassages)
+                            {
+                                if (pq.Id == Guid.Parse(q1.Id!))
+                                {
+                                    SubmitPaperDetail spdp;
+                                    spdp = new SubmitPaperDetail
+                                    {
+                                        QuestionId = Guid.Parse(q1.Id!),
+                                        AnswerRaw = FormatAnswerRaw(q1, pq),
+                                        SubmitPaperId = submitPaper.Id
+                                    };
+
+                                    submitPaper.SubmitPaperDetails.Add(spdp);
+                                }
+                            }
+                        }
+                    }
+
                 }
+
             }
             else
             {
-                // Update submit paper detail
                 question.AnswerRaw = FormatAnswerRaw(q, question.Question!);
+                if (questionDb.QuestionType == QuestionType.Reading)
+                {
+                    foreach (var pq in questionDb.QuestionPassages)
+                    {
+                        foreach (var q1 in q.QuestionPassages)
+                        {
+                            if (pq.Id == Guid.Parse(q1.Id!))
+                            {
+                                var spdp = submitPaper.SubmitPaperDetails!.FirstOrDefault(x => x.QuestionId == Guid.Parse(q1.Id!));
+                                if (spdp != null)
+                                {
+                                    spdp.AnswerRaw = FormatAnswerRaw(q1, pq);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
