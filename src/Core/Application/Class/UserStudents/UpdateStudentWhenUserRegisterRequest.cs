@@ -1,9 +1,4 @@
 ﻿using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserStudents;
 public class UpdateStudentWhenUserRegisterRequest : IRequest<Guid>
@@ -17,7 +12,9 @@ public class UpdateStudentWhenUserRegisterRequestHandler : IRequestHandler<Updat
     private readonly IRepositoryWithEvents<Student> _repository;
     private readonly IStringLocalizer _t;
 
-    public UpdateStudentWhenUserRegisterRequestHandler(IRepositoryWithEvents<Student> repository, IStringLocalizer<UpdateStudentWhenUserRegisterRequestHandler> localizer)
+    public UpdateStudentWhenUserRegisterRequestHandler(
+        IRepositoryWithEvents<Student> repository,
+        IStringLocalizer<UpdateStudentWhenUserRegisterRequestHandler> localizer)
         => (_repository, _t) = (repository, localizer);
 
     public async Task<Guid> Handle(UpdateStudentWhenUserRegisterRequest request, CancellationToken cancellationToken)

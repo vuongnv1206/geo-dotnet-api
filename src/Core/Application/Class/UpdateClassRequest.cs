@@ -17,7 +17,10 @@ public class UpdateClassRequestHandler : IRequestHandler<UpdateClassRequest, Gui
     public readonly IRepository<GroupClass> _gcRepository;
     private readonly IStringLocalizer _t;
 
-    public UpdateClassRequestHandler(IRepository<Classes> repository, IRepository<GroupClass> gcRepository, IStringLocalizer<UpdateClassRequestHandler> localizer) =>
+    public UpdateClassRequestHandler(
+        IRepository<Classes> repository,
+        IRepository<GroupClass> gcRepository,
+        IStringLocalizer<UpdateClassRequestHandler> localizer) =>
     (_repository, _gcRepository, _t) = (repository, gcRepository, localizer);
 
     public async Task<Guid> Handle(UpdateClassRequest request, CancellationToken cancellationToken)

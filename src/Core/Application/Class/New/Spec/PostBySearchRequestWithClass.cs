@@ -1,10 +1,4 @@
-﻿using FSH.WebApi.Application.Class.New.Dto;
-using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.New.Spec;
 public class PostBySearchRequestWithClass : Specification<Post>

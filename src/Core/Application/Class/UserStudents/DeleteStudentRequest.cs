@@ -3,11 +3,6 @@ using FSH.WebApi.Application.Class.UserStudents.Spec;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserStudents;
 public class DeleteStudentRequest : IRequest<Guid>
@@ -75,8 +70,7 @@ public class DeleteStudentRequestHandler : IRequestHandler<DeleteStudentRequest,
         var student = await _userStudentRepository.FirstOrDefaultAsync(new StudentByIdSpec(request.Id))
             ?? throw new NotFoundException(_localizer["Student in class {0} Not Found."]);
 
-
         await _userStudentRepository.DeleteAsync(student, cancellationToken);
         return student.Id;
     }
-}   
+}
