@@ -1,11 +1,5 @@
-﻿using FSH.WebApi.Application.Class;
-using FSH.WebApi.Domain.Assignment;
+﻿using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Assignments.AssignmentStudent;
 public class RemoveAssignmentOfStudentRequest : IRequest<Guid>
@@ -46,8 +40,6 @@ public class RemoveAssignmentOfStudentRequestHandler : IRequestHandler<RemoveAss
         assignment.RemoveAssignmentOfStudent(request.StudentId);
 
         await _assignmentRepository.UpdateAsync(assignment);
-
-
         return assignment.Id;
     }
 }

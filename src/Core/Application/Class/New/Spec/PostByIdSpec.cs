@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Application.Class.New.Dto;
-using FSH.WebApi.Domain.Class;
+﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.New.Spec;
 public class PostByIdSpec : Specification<Post>, ISingleResultSpecification

@@ -2,7 +2,6 @@ using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
-using Mapster;
 
 namespace FSH.WebApi.Application.Class;
 public class GetClassesRequest : IRequest<ClassDto>
@@ -59,6 +58,7 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
             {
                 classroom.Students = null;
             }
+
             if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment
                                         && x.PermissionType == PermissionType.Marking))
             {
@@ -67,6 +67,7 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
 
             classroom.Permissions = listPermission;
         }
+
         return classroom;
     }
 }

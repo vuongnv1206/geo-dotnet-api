@@ -1,11 +1,6 @@
 ﻿using FSH.WebApi.Application.Class;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Assignments.AssignmentClasses;
 

@@ -14,8 +14,11 @@ public class GetClassOfUserRequestHandler : IRequestHandler<GetClassOfUserReques
     private readonly IUserClassesRepository _userClassesRepository;
     private readonly ICurrentUser _currentUser;
 
-    public GetClassOfUserRequestHandler(IRepository<Classes> repository, ICurrentUser currentUser,
-                                        IStringLocalizer<GetClassRequestHandler> localizer, IUserClassesRepository userClassesRepository) =>
+    public GetClassOfUserRequestHandler(
+        IRepository<Classes> repository,
+        ICurrentUser currentUser,
+        IStringLocalizer<GetClassRequestHandler> localizer,
+        IUserClassesRepository userClassesRepository) =>
         (_repository, _currentUser, _t, _userClassesRepository) = (repository, currentUser, localizer, userClassesRepository);
     public async Task<List<ClassDto>> Handle(GetClassOfUserRequest request, CancellationToken cancellationToken)
     {
@@ -26,9 +29,10 @@ public class GetClassOfUserRequestHandler : IRequestHandler<GetClassOfUserReques
 
         foreach (var classDto in classes)
         {
-            var userCount = await _userClassesRepository.GetNumberUserOfClasses(classDto.Id);
+            int userCount = await _userClassesRepository.GetNumberUserOfClasses(classDto.Id);
             classDto.NumberUserOfClass = userCount;
         }
+
         return classes;
 
     }

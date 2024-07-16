@@ -1,12 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Comments.Spec;
-using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.Comments;
 public class DeleteCommentLikeRequest : IRequest<Guid>
@@ -19,7 +12,9 @@ public class DeleteCommentLikeRequestHandler : IRequestHandler<DeleteCommentLike
 {
     private readonly IStringLocalizer _t;
     private readonly IRepository<Comment> _commentRepository;
-    public DeleteCommentLikeRequestHandler(IRepository<Comment> commentRepository, IStringLocalizer<DeleteCommentLikeRequestHandler> stringLocalizer) =>
+    public DeleteCommentLikeRequestHandler(
+        IRepository<Comment> commentRepository,
+        IStringLocalizer<DeleteCommentLikeRequestHandler> stringLocalizer) =>
 
         (_commentRepository, _t) = (commentRepository, stringLocalizer);
 

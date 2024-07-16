@@ -1,11 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Comments.Dto;
 using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New.Dto;
 public class PostDto : IDto
