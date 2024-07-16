@@ -29,7 +29,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AttachmentPath")
+                    b.Property<string>("Attachment")
                         .HasMaxLength(2048)
                         .HasColumnType("character varying(2048)");
 
@@ -118,12 +118,24 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AnswerRaw")
+                        .HasColumnType("text");
+
                     b.Property<string>("AttachmentPath")
                         .HasMaxLength(2048)
                         .HasColumnType("character varying(2048)");
 
-                    b.Property<string>("Score")
+                    b.Property<Guid?>("ClassesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
                         .HasColumnType("text");
+
+                    b.Property<float?>("Score")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -131,6 +143,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("character varying(64)");
 
                     b.HasKey("AssignmentId", "StudentId");
+
+                    b.HasIndex("ClassesId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("AssignmentStudent", "Assignment");
 
@@ -232,13 +248,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.HasIndex("PostId");
 
@@ -342,9 +354,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -387,6 +396,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
+
                     b.Property<Guid?>("ClassesId")
                         .HasColumnType("uuid");
 
@@ -409,7 +421,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("text");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool?>("Gender")
@@ -422,7 +433,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
@@ -517,6 +527,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("LocalIpAllowed")
+                        .HasColumnType("text");
+
                     b.Property<int?>("NumberAttempt")
                         .HasColumnType("integer");
 
@@ -529,14 +542,17 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<string>("Password")
                         .HasColumnType("text");
 
+                    b.Property<string>("PublicIpAllowed")
+                        .HasColumnType("text");
+
                     b.Property<int>("ShareType")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("ShowMarkResult")
-                        .HasColumnType("boolean");
+                    b.Property<int>("ShowMarkResult")
+                        .HasColumnType("integer");
 
-                    b.Property<bool>("ShowQuestionAnswer")
-                        .HasColumnType("boolean");
+                    b.Property<int>("ShowQuestionAnswer")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Shuffle")
                         .HasColumnType("boolean");
@@ -578,7 +594,6 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ClassId")
-                        .IsRequired()
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("PaperId")
@@ -802,7 +817,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -862,6 +877,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("DeviceId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DeviceName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DeviceType")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -871,8 +895,14 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("LocalIp")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("PaperId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("PublicIp")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone");
@@ -1044,11 +1074,65 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("QuestionId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId");
 
                     b.ToTable("Answers", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.AnswerClone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("QuestionCloneId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionCloneId");
+
+                    b.ToTable("AnswerClones", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
@@ -1093,6 +1177,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<Guid?>("QuestionParentId")
                         .HasColumnType("uuid");
 
+                    b.Property<int?>("QuestionStatus")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("QuestionType")
                         .HasColumnType("integer");
 
@@ -1110,6 +1197,74 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasIndex("QuestionParentId");
 
                     b.ToTable("Questions", "Question");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionClone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Audio")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("OriginalQuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionFolderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionLabelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("QuestionParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("QuestionType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OriginalQuestionId");
+
+                    b.HasIndex("QuestionFolderId");
+
+                    b.HasIndex("QuestionLabelId");
+
+                    b.HasIndex("QuestionParentId");
+
+                    b.ToTable("QuestionClones", "Question");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -1886,6 +2041,29 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Classes");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Assignment.AssignmentStudent", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Assignment.Assignment", "Assignment")
+                        .WithMany("AssignmentStudents")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.Class.Classes", null)
+                        .WithMany("AssignmentStudents")
+                        .HasForeignKey("ClassesId");
+
+                    b.HasOne("FSH.WebApi.Domain.Class.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Classes", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.GroupClass", "GroupClass")
@@ -1897,9 +2075,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
                 {
+                    b.HasOne("FSH.WebApi.Domain.Class.Comment", "CommentParent")
+                        .WithMany("CommentChildrens")
+                        .HasForeignKey("ParentId");
+
                     b.HasOne("FSH.WebApi.Domain.Class.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId");
+
+                    b.Navigation("CommentParent");
 
                     b.Navigation("Post");
                 });
@@ -1986,9 +2170,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     b.HasOne("FSH.WebApi.Domain.Class.Classes", "Class")
                         .WithMany("PaperAccesses")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClassId");
 
                     b.HasOne("FSH.WebApi.Domain.Examination.Paper", "Paper")
                         .WithMany("PaperAccesses")
@@ -2052,7 +2234,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Question")
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2076,7 +2258,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Examination.SubmitPaperDetail", b =>
                 {
-                    b.HasOne("FSH.WebApi.Domain.Question.Question", "Question")
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2102,6 +2284,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Question");
                 });
 
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.AnswerClone", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "QuestionClone")
+                        .WithMany("AnswerClones")
+                        .HasForeignKey("QuestionCloneId");
+
+                    b.Navigation("QuestionClone");
+                });
+
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
@@ -2121,6 +2312,33 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("QuestionLable");
 
                     b.Navigation("QuestionParent");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionClone", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.Question.Question", "OriginalQuestion")
+                        .WithMany()
+                        .HasForeignKey("OriginalQuestionId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
+                        .WithMany()
+                        .HasForeignKey("QuestionFolderId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionLable", "QuestionLabel")
+                        .WithMany()
+                        .HasForeignKey("QuestionLabelId");
+
+                    b.HasOne("FSH.WebApi.Domain.Question.QuestionClone", "QuestionCloneParent")
+                        .WithMany("QuestionPassages")
+                        .HasForeignKey("QuestionParentId");
+
+                    b.Navigation("OriginalQuestion");
+
+                    b.Navigation("QuestionCloneParent");
+
+                    b.Navigation("QuestionFolder");
+
+                    b.Navigation("QuestionLabel");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionFolder", b =>
@@ -2255,11 +2473,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Assignment.Assignment", b =>
                 {
                     b.Navigation("AssignmentClasses");
+
+                    b.Navigation("AssignmentStudents");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Classes", b =>
                 {
                     b.Navigation("AssignmentClasses");
+
+                    b.Navigation("AssignmentStudents");
 
                     b.Navigation("GroupPermissionInClasses");
 
@@ -2274,6 +2496,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             modelBuilder.Entity("FSH.WebApi.Domain.Class.Comment", b =>
                 {
+                    b.Navigation("CommentChildrens");
+
                     b.Navigation("CommentLikes");
                 });
 
@@ -2317,6 +2541,13 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
                 {
                     b.Navigation("Answers");
+
+                    b.Navigation("QuestionPassages");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.Question.QuestionClone", b =>
+                {
+                    b.Navigation("AnswerClones");
 
                     b.Navigation("QuestionPassages");
                 });

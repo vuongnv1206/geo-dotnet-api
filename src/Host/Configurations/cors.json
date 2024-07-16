@@ -1,5 +1,6 @@
 {
   "CorsSettings": {
-    "Vue": "http://localhost:5173;http://localhost:*;https://test.guardianexam.com;https://guardianexam.com"
+    "Vue": "http://localhost:5173;https://test.guardianexam.com;https://guardianexam.com",
+    "Blazor": "https://localhost;http://localhost;capacitor://localhost;ionic://localhost;http://localhost:8100;http://localhost:8080"
   }
 }

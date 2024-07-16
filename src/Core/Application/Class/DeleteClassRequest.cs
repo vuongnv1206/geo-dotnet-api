@@ -1,10 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.New.Spec;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class;
 public class DeleteClassRequest : IRequest<Guid>
@@ -18,17 +13,24 @@ public class DeleteClassRequestHandler : IRequestHandler<DeleteClassRequest, Gui
     private readonly IRepositoryWithEvents<Classes> _repository;
     private readonly IStringLocalizer<DeleteClassRequest> _t;
     private readonly IRepositoryWithEvents<Post> _postRepository;
+    private readonly ICurrentUser _currentUser;
 
-    public DeleteClassRequestHandler(IRepositoryWithEvents<Classes> repository, IStringLocalizer<DeleteClassRequest> t, IRepositoryWithEvents<Post> postRepository)
+    public DeleteClassRequestHandler(
+        IRepositoryWithEvents<Classes> repository,
+        IStringLocalizer<DeleteClassRequest> t,
+        IRepositoryWithEvents<Post> postRepository,
+        ICurrentUser currentUser)
     {
         _repository = repository;
         _t = t;
         _postRepository = postRepository;
+        _currentUser = currentUser;
     }
 
     public async Task<Guid> Handle(DeleteClassRequest request, CancellationToken cancellationToken)
     {
-        var classes = await _repository.FirstOrDefaultAsync(new ClassByIdSpec(request.Id), cancellationToken);
+        var userId = _currentUser.GetUserId();
+        var classes = await _repository.FirstOrDefaultAsync(new ClassByIdSpec(request.Id, userId), cancellationToken);
         _ = classes ?? throw new NotFoundException(_t["Classes {0} Not Found."]);
 
         var news = await _postRepository.ListAsync(new PostBySearchRequestWithClass(request.Id), cancellationToken);

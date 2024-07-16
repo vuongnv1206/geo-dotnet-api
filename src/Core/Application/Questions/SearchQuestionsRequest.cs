@@ -17,41 +17,19 @@ public class SearchQuestionsRequest : PaginationFilter, IRequest<PaginationRespo
 public class SearchQuestionsRequestHandler : IRequestHandler<SearchQuestionsRequest, PaginationResponse<QuestionDto>>
 {
     private readonly IReadRepository<Question> _repository;
-    private readonly IDapperRepository _dapperRepository;
+    private readonly IQuestionService _questionService;
     private readonly IUserService _userService;
 
-    public SearchQuestionsRequestHandler(IReadRepository<Question> repository, IDapperRepository dapperRepository, IUserService userService)
+    public SearchQuestionsRequestHandler(IReadRepository<Question> repository, IQuestionService questionService, IUserService userService)
     {
         _repository = repository;
-        _dapperRepository = dapperRepository;
+        _questionService = questionService;
         _userService = userService;
-    }
-
-    public async Task<List<Guid>> GetFolderIds(Guid folderId, CancellationToken cancellationToken)
-    {
-        const string sql = @"
-            WITH RECURSIVE RecursiveFolders AS (
-                SELECT ""Id""
-                FROM ""Question"".""QuestionFolders""
-                WHERE ""Id"" = @p0
-
-                UNION ALL
-
-                SELECT qf.""Id""
-                FROM ""Question"".""QuestionFolders"" qf
-                INNER JOIN RecursiveFolders rf ON qf.""ParentId"" = rf.""Id""
-            )
-            SELECT rf.""Id""
-            FROM RecursiveFolders rf;
-        ";
-
-        IReadOnlyList<Guid> folderIds = await _dapperRepository.RawQueryAsync<Guid>(sql, new { p0 = folderId }, cancellationToken: cancellationToken);
-        return folderIds.ToList();
     }
 
     public async Task<PaginationResponse<QuestionDto>> Handle(SearchQuestionsRequest request, CancellationToken cancellationToken)
     {
-        var folderIds = await GetFolderIds(request.folderId!.Value, cancellationToken);
+        var folderIds = await _questionService.GetFolderIds(request.folderId!.Value, cancellationToken);
 
         var spec = new QuestionsBySearchRequestSpec(request, folderIds);
         var res = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);

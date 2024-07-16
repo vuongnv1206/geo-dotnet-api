@@ -1,6 +1,4 @@
-﻿using FSH.WebApi.Application.Class.Dto;
-using FSH.WebApi.Application.Subjects;
-using FSH.WebApi.Domain.Assignment;
+﻿using FSH.WebApi.Application.Subjects;
 
 namespace FSH.WebApi.Application.Assignments.Dtos;
 public class AssignmentDetailsDto : IDto
@@ -9,7 +7,7 @@ public class AssignmentDetailsDto : IDto
     public string Name { get; set; } = default!;
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public string? AttachmentPath { get; set; }
+    public string? Attachment { get; set; }
     public string? Content { get; set; }
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }

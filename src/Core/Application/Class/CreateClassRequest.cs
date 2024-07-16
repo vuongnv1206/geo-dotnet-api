@@ -1,16 +1,10 @@
-﻿using FSH.WebApi.Application.Class.GroupClasses;
-using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class;
 public class CreateClassRequest : IRequest<Guid>
 {
-    public string Name { get; set; }
-    public string SchoolYear { get; set; }
+    public required string Name { get; set; }
+    public required string SchoolYear { get; set; }
     public Guid GroupClassId { get; set; }
 }
 
@@ -37,18 +31,16 @@ public class CreateClassRequestHandler : IRequestHandler<CreateClassRequest, Gui
     private readonly ICurrentUser _currentUser;
 
     public CreateClassRequestHandler(IRepositoryWithEvents<Classes> repository, ICurrentUser currentUser) =>
-        (_repository, _currentUser) =(repository, currentUser);
+        (_repository, _currentUser) = (repository, currentUser);
 
     public async Task<Guid> Handle(CreateClassRequest request, CancellationToken cancellationToken)
     {
         var user = _currentUser.GetUserId();
 
-        var classes = new Classes(request.Name, request.SchoolYear, user ,request.GroupClassId);
+        var classes = new Classes(request.Name, request.SchoolYear, user, request.GroupClassId);
 
         await _repository.AddAsync(classes);
 
         return classes.Id;
     }
 }
-
-

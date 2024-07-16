@@ -21,52 +21,30 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
 {
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
+    private readonly IQuestionService _questionService;
     private readonly IRepository<QuestionFolder> _questionFolderRepository;
     private readonly IRepository<GroupTeacher> _groupTeacherRepository;
-    private readonly IDapperRepository _repository;
     private readonly IStringLocalizer _t;
 
-    public GetFolderTreeRequestHandler(ICurrentUser currentUser, IUserService userService, IRepository<QuestionFolder> questionFolderRepository, IRepository<GroupTeacher> groupTeacherRepository, IDapperRepository repository, IStringLocalizer<GetFolderTreeRequestHandler> localizer)
+    public GetFolderTreeRequestHandler(ICurrentUser currentUser, IUserService userService, IQuestionService questionService, IRepository<QuestionFolder> questionFolderRepository, IRepository<GroupTeacher> groupTeacherRepository, IDapperRepository repository, IStringLocalizer<GetFolderTreeRequestHandler> localizer)
     {
         _currentUser = currentUser;
         _userService = userService;
+        _questionService = questionService;
         _questionFolderRepository = questionFolderRepository;
         _groupTeacherRepository = groupTeacherRepository;
-        _repository = repository;
         _t = localizer;
-    }
-
-    public async Task<int> countQuestions(Guid folderId, CancellationToken cancellationToken)
-    {
-        const string sql = @"
-            WITH RECURSIVE RecursiveFolders AS (
-                SELECT
-                    ""Id"",
-                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = ""QuestionFolders"".""Id"" AND ""DeletedOn"" IS NULL) AS question_count
-                FROM ""Question"".""QuestionFolders""
-                WHERE ""Id"" = @p0
-
-                UNION ALL
-
-                SELECT
-                    qf.""Id"",
-                    (SELECT COUNT(*) FROM ""Question"".""Questions"" WHERE ""QuestionFolderId"" = qf.""Id"" AND ""DeletedOn"" IS NULL) AS question_count
-                FROM ""Question"".""QuestionFolders"" qf
-                INNER JOIN RecursiveFolders rf ON qf.""ParentId"" = rf.""Id""
-            )
-            SELECT
-                SUM(rf.question_count) AS total_questions
-            FROM RecursiveFolders rf;
-        ";
-
-        return await _repository.RawQuerySingleAsync<int>(sql, new { p0 = folderId }, cancellationToken: cancellationToken);
     }
 
     public async Task<QuestionTreeDto> Handle(GetFolderTreeRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
 
-        var spec = new QuestionFoldersWithPermissionsSpecByUserId(userId, request.ParentId);
+        var groupTeachers = await _groupTeacherRepository.ListAsync(new GroupTeachersByUserIdSpec(userId), cancellationToken);
+
+        List<Guid> groupTeacherIds = groupTeachers.Select(x => x.Id).ToList();
+
+        var spec = new QuestionFoldersWithPermissionsSpecByUserId(userId, groupTeacherIds, request.ParentId);
         var questionFolders = await _questionFolderRepository.ListAsync(spec, cancellationToken);
         var questionFolderTree = questionFolders.Adapt<List<QuestionTreeDto>>();
         await GetDetails(questionFolderTree, cancellationToken);
@@ -82,6 +60,22 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
                 CurrentShow = true,
                 Children = questionFolderTree
             };
+
+            // get questions folder if user has no permission to view parent folder but has permission to view child folder
+            // get all folders that user has permission to view
+            var spec2 = new QuestionChildrenFoldersWithPermissionsSpecByUserId(userId);
+            var questionFolders2 = await _questionFolderRepository.ListAsync(spec2, cancellationToken);
+            // get folders that user has no permission to view but has permission to view child folder
+            foreach (var folder in questionFolders2)
+            {
+                var parentFolder2 = await _questionFolderRepository.FirstOrDefaultAsync(new QuestionFolderByIdSpec(folder.ParentId.Value), cancellationToken);
+                if (parentFolder2 != null && !parentFolder2.Permissions.Any(x => x.UserId == userId && x.CanView))
+                {
+                    var sharedFolder = folder.Adapt<QuestionTreeDto>();
+                    await GetDetails(new List<QuestionTreeDto> { sharedFolder }, cancellationToken);
+                    result.Children.Add(sharedFolder);
+                }
+            }
         }
         else
         {
@@ -95,7 +89,7 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
             var newTree = parentFolder.Adapt<QuestionTreeDto>();
 
             // Get total questions in each folder
-            int totalQuestions = await countQuestions(newTree.Id, cancellationToken);
+            int totalQuestions = await _questionService.countQuestions(newTree.Id, cancellationToken);
             newTree.TotalQuestions = totalQuestions;
             newTree.Children = questionFolderTree;
             newTree.CurrentShow = true;
@@ -138,7 +132,7 @@ public class GetFolderTreeRequestHandler : IRequestHandler<GetFolderTreeRequest,
             }
 
             // Get total questions in each folder
-            int totalQuestions = await countQuestions(tree.Id, cancellationToken);
+            int totalQuestions = await _questionService.countQuestions(tree.Id, cancellationToken);
             tree.TotalQuestions = totalQuestions;
 
             // loop through permissions and set the current user permissions

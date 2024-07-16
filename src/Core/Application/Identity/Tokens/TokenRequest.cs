@@ -1,20 +1,20 @@
 namespace FSH.WebApi.Application.Identity.Tokens;
 
-public record TokenRequest(string Email, string Password, string captchaToken);
+public record TokenRequest(string Email, string Password, string CaptchaToken, string? DeviceId);
 
 public class TokenRequestValidator : CustomValidator<TokenRequest>
 {
-    public TokenRequestValidator(IStringLocalizer<TokenRequestValidator> T)
+    public TokenRequestValidator()
     {
         RuleFor(p => p.Email).Cascade(CascadeMode.Stop)
             .NotEmpty()
             .EmailAddress()
-                .WithMessage(T["Invalid Email Address."]);
+                .WithMessage("Invalid Email Address.");
 
         RuleFor(p => p.Password).Cascade(CascadeMode.Stop)
             .NotEmpty();
 
-        RuleFor(p => p.captchaToken).Cascade(CascadeMode.Stop)
+        RuleFor(p => p.CaptchaToken).Cascade(CascadeMode.Stop)
             .NotEmpty();
     }
 }

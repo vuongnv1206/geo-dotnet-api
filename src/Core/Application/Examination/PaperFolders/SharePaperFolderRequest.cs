@@ -1,21 +1,17 @@
-﻿using FSH.WebApi.Application.Common.Models;
-using FSH.WebApi.Application.Examination.PaperFolders.Specs;
+﻿
+using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
-using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
-using Mapster;
-using MapsterMapper;
-using MediatR;
-using System.Threading;
+
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class SharePaperFolderRequest : IRequest<Guid>
 {
-    public List<Guid>? UserIds { get; set; }
+    public Guid? UserId { get; set; }
     public Guid FolderId { get; set; }
-    public List<Guid>? GroupIds { get; set; }
+    public Guid? GroupId { get; set; }
     public bool CanView { get; set; }
     public bool CanAdd { get; set; }
     public bool CanUpdate { get; set; }
@@ -43,77 +39,111 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
     private readonly ICurrentUser _currentUser;
     private readonly IStringLocalizer _t;
     private readonly IRepositoryWithEvents<PaperFolder> _paperFolderRepo;
-    public readonly IReadRepository<TeacherTeam> _teacherTeamRepo;
+    private readonly IReadRepository<TeacherTeam> _teacherTeamRepo;
+    private readonly IRepository<PaperFolderPermission> _paperFolderPermissionRepo;
+    private readonly IMediator _mediator;
 
     public SharePaperFolderRequestHandler(
         ICurrentUser currentUser,
         IStringLocalizer<SharePaperFolderRequestHandler> t,
         IRepositoryWithEvents<PaperFolder> paperFolderRepo,
-        IReadRepository<TeacherTeam> teacherTeamRepo)
+        IReadRepository<TeacherTeam> teacherTeamRepo,
+        IRepository<PaperFolderPermission> paperFolderPermissionRepo,
+        IMediator mediator
+        )
     {
         _currentUser = currentUser;
         _t = t;
         _paperFolderRepo = paperFolderRepo;
         _teacherTeamRepo = teacherTeamRepo;
+        _paperFolderPermissionRepo = paperFolderPermissionRepo;
+        _mediator = mediator;
     }
 
     public async Task<DefaultIdType> Handle(SharePaperFolderRequest request, CancellationToken cancellationToken)
     {
-        var folder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.FolderId), cancellationToken)
+        var currentUserId = _currentUser.GetUserId();
+        var folderTree = await _paperFolderRepo.ListAsync(new MyPaperFolderTreeSpec(currentUserId), cancellationToken);
+
+           var folderParent = folderTree.FirstOrDefault(x => x.Id == request.FolderId)
             ?? throw new NotFoundException(_t["The Folder {0} Not Found", request.FolderId]);
 
-        var currentUserId = _currentUser.GetUserId();
-        if (!folder.CanShare(currentUserId))
+        var folderChildrenIds = new List<Guid>();
+        
+        folderParent.ChildPaperFolderIds(null, folderChildrenIds);
+        folderChildrenIds.Add(request.FolderId);
+
+       
+        if (!folderParent.CanShare(currentUserId))
         {
             throw new ForbiddenException(_t["You do not have permission to share this folder."]);
         }
 
-        var permissionsToUpdate = new List<PaperFolderPermission>();
-
-        if (request.GroupIds.Any())
+        if (request.GroupId.HasValue)
         {
-            foreach (var groupId in request.GroupIds)
+            foreach (var folderChildrenId in folderChildrenIds)
             {
-                var existingPermission = folder.PaperFolderPermissions
-                    .FirstOrDefault(pp => pp.GroupTeacherId == groupId);
+                var folderChildren = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(folderChildrenId), cancellationToken)
+                    ?? throw new NotFoundException(_t["The Folder {0} Not Found", folderChildrenId]);
+
+                var existingPermission = folderChildren.PaperFolderPermissions.FirstOrDefault(pp => pp.GroupTeacherId == request.GroupId);
 
                 if (existingPermission != null)
                 {
                     existingPermission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
-                    permissionsToUpdate.Add(existingPermission);
+                    await _paperFolderPermissionRepo.UpdateAsync(existingPermission, cancellationToken);
                 }
                 else
                 {
-                    var newPermission = new PaperFolderPermission(null, request.FolderId, groupId, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
-                    permissionsToUpdate.Add(newPermission);
+                    var newPermission = new PaperFolderPermission(null, folderChildrenId, request.GroupId, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
+                    await _paperFolderPermissionRepo.AddAsync(newPermission);
                 }
             }
         }
 
-        if (request.UserIds.Any())
+        if (request.UserId.HasValue)
         {
-            foreach (var userId in request.UserIds)
+            foreach (var folderChildrenId in folderChildrenIds)
             {
-                var existingPermission = folder.PaperFolderPermissions
-                    .FirstOrDefault(pp => pp.UserId == userId);
+                var folderChildren = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(folderChildrenId), cancellationToken)
+                   ?? throw new NotFoundException(_t["The Folder {0} Not Found", folderChildrenId]);
+                var existingPermission = folderChildren.PaperFolderPermissions.FirstOrDefault(pp => pp.UserId == request.UserId);
 
                 if (existingPermission != null)
                 {
                     existingPermission.SetPermissions(request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
-                    permissionsToUpdate.Add(existingPermission);
+                    await _paperFolderPermissionRepo.UpdateAsync(existingPermission, cancellationToken);
+
                 }
                 else
                 {
-                    var newPermission = new PaperFolderPermission(userId, request.FolderId, null, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
-                    permissionsToUpdate.Add(newPermission);
+                    var newPermission = new PaperFolderPermission(request.UserId, folderChildrenId, null, request.CanView, request.CanAdd, request.CanUpdate, request.CanDelete, request.CanShare);
+                    await _paperFolderPermissionRepo.AddAsync(newPermission);
                 }
             }
         }
 
-        folder.UpdatePermissions(permissionsToUpdate);
+        foreach (var folderChildrenId in folderChildrenIds)
+        {
+            var folderChildren = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(folderChildrenId), cancellationToken)
+                ?? throw new NotFoundException(_t["The Folder {0} Not Found", folderChildrenId]);
 
-        await _paperFolderRepo.UpdateAsync(folder, cancellationToken);
-
-        return folder.Id;
+            foreach (var paper in folderChildren.Papers)
+            {
+               var sharePaperRequest = new SharePaperRequest
+               {
+                   PaperId = paper.Id,
+                   UserId = request.UserId,
+                   GroupId = request.GroupId,
+                   CanView = request.CanView,
+                   CanAdd = request.CanAdd,
+                   CanUpdate = request.CanUpdate,
+                   CanDelete = request.CanDelete,
+                   CanShare = request.CanShare
+               };
+                await _mediator.Send(sharePaperRequest, cancellationToken);
+            }
+        }
+        return folderParent.Id;
     }
 }

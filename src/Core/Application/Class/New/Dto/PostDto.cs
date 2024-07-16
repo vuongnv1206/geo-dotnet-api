@@ -1,10 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Comments.Dto;
-using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FSH.WebApi.Application.Identity.Users;
 
 namespace FSH.WebApi.Application.Class.New.Dto;
 public class PostDto : IDto
@@ -14,8 +9,8 @@ public class PostDto : IDto
     public DefaultIdType CreatedBy { get; set; }
     public string? Content { get; set; }
     public bool IsLockComment { get; set; }
-    public string? ClassesName { get; set; }
+    public DateTime CreatedOn { get; set; }
     public int? NumberLikeInThePost { get; set; }
-    public List<CommentDto> Comments { get; set; }
-
+    public List<CommentDto>? Comments { get; set; }
+    public UserDetailsDto? Owner { get; set; }
 }

@@ -6,9 +6,9 @@ public class PaperFolderByIdSpec : Specification<PaperFolder>, ISingleResultSpec
     public PaperFolderByIdSpec(Guid id)
     {
         Query
+        .Include(x => x.PaperFolderPermissions)
         .Include(b => b.PaperFolderChildrens)
-        .Include(p => p.PaperFolderPermissions)
-        .Include(x => x.Papers)
+        .Include(x => x.Papers).ThenInclude(x => x.PaperPermissions)
         .Where(b => b.Id == id);
     }
 }

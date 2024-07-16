@@ -10,7 +10,9 @@ public class UpdateGroupClassRequest : IRequest<Guid>
 
 public class UpdateGroupClassRequestValidator : CustomValidator<UpdateGroupClassRequest>
 {
-    public UpdateGroupClassRequestValidator(IRepository<GroupClass> repository, IStringLocalizer<UpdateGroupClassRequestValidator> T)
+    public UpdateGroupClassRequestValidator(
+        IRepository<GroupClass> repository,
+        IStringLocalizer<UpdateGroupClassRequestValidator> T)
     {
         RuleFor(g => g.Name)
             .NotEmpty()
@@ -26,7 +28,9 @@ public class UpdateGroupClassRequestHandler : IRequestHandler<UpdateGroupClassRe
     private readonly IRepositoryWithEvents<GroupClass> _repository;
     private readonly IStringLocalizer _t;
 
-    public UpdateGroupClassRequestHandler(IRepositoryWithEvents<GroupClass> repository, IStringLocalizer<UpdateGroupClassRequestHandler> localizer)
+    public UpdateGroupClassRequestHandler(
+        IRepositoryWithEvents<GroupClass> repository,
+        IStringLocalizer<UpdateGroupClassRequestHandler> localizer)
     {
         (_repository, _t) = (repository, localizer);
     }

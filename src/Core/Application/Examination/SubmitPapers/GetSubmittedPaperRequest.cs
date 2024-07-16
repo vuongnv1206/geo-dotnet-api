@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 
@@ -6,6 +7,7 @@ namespace FSH.WebApi.Application.Examination.SubmitPapers;
 public class GetSubmittedPaperRequest : PaginationFilter, IRequest<PaginationResponse<SubmitPaperDto>>
 {
     public Guid PaperId { get; set; }
+    public Guid? ClassId { get; set; }
 }
 
 public class GetSubmittedPaperRequestHandler : IRequestHandler<GetSubmittedPaperRequest, PaginationResponse<SubmitPaperDto>>

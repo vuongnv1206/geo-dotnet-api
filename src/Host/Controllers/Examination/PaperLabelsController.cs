@@ -4,7 +4,8 @@ namespace FSH.WebApi.Host.Controllers.Examination;
 public class PaperLabelsController : VersionedApiController
 {
     [HttpPost("Search")]
-    [OpenApiOperation("")]
+    [OpenApiOperation("Search paper label using available filter", "")]
+    [MustHavePermission(FSHAction.View, FSHResource.PaperLabels)]
     public Task<PaginationResponse<PaperLabelDto>> SearchPaperLabel(SearchPaperLabelRequest request)
     {
         return Mediator.Send(request);
@@ -12,6 +13,7 @@ public class PaperLabelsController : VersionedApiController
 
     [HttpGet("{id:guid}")]
     [OpenApiOperation("Get paper label details.", "")]
+    [MustHavePermission(FSHAction.View, FSHResource.PaperLabels)]
     public Task<PaperLabelDto> GetAsync(Guid id)
     {
         return Mediator.Send(new GetPaperLabelRequest(id));
@@ -19,13 +21,15 @@ public class PaperLabelsController : VersionedApiController
 
     [HttpPost]
     [OpenApiOperation("Create paper label")]
+    [MustHavePermission(FSHAction.Create, FSHResource.PaperLabels)]
     public Task<Guid> CreateAsync(CreatePaperLabelRequest request)
     {
         return Mediator.Send(request);
     }
 
     [HttpPut("{id:guid}")]
-    [OpenApiOperation("")]
+    [MustHavePermission(FSHAction.Update, FSHResource.PaperLabels)]
+    [OpenApiOperation("Update a label")]
     public async Task<ActionResult<Guid>> UpdateAsync(UpdatePaperLabelRequest request, Guid id)
     {
         return id != request.Id
@@ -34,7 +38,8 @@ public class PaperLabelsController : VersionedApiController
     }
 
     [HttpDelete("{id:guid}")]
-    [OpenApiOperation("")]
+    [OpenApiOperation("Remove a label")]
+    [MustHavePermission(FSHAction.Delete, FSHResource.PaperLabels)]
     public Task RemoveAsync(Guid id)
     {
         return Mediator.Send(new RemovePaperLabelRequest(id));

@@ -5,7 +5,7 @@ using FSH.WebApi.Domain.Subjects;
 namespace FSH.WebApi.Domain.Examination;
 public class Paper : AuditableEntity, IAggregateRoot
 {
-    //General config
+    // General config
     public string ExamName { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
@@ -15,15 +15,19 @@ public class Paper : AuditableEntity, IAggregateRoot
     public string? Content { get; set; }
     public string? Description { get; set; }
     public PaperStatus Status { get; set; }
-    //Security
+
+    // Security
     public bool Shuffle { get; set; }
-    public bool ShowMarkResult { get; set; }
-    public bool ShowQuestionAnswer { get; set; }
+    public ShowResult ShowMarkResult { get; set; }
+    public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }
     public string ExamCode { get; set; }
     public int? NumberAttempt { get; set; }
     public PaperShareType ShareType { get; set; }
-    //Navigation
+    public string? PublicIpAllowed { get; set; }
+    public string? LocalIpAllowed { get; set; }
+
+    // Navigation
     public Guid? PaperLabelId { get; set; }
     public Guid? PaperFolderId { get; set; }
     public Guid? SubjectId { get; set; }
@@ -73,6 +77,17 @@ public class Paper : AuditableEntity, IAggregateRoot
             });
         }
     }
+
+    public void AddQuestion(PaperQuestion question)
+    {
+        PaperQuestions.Add(question);   
+    }
+
+    public void RemoveQuestion(Guid questionId)
+    {
+        PaperQuestions.RemoveAll(x => x.QuestionId == questionId);
+    }
+
     public void UpdateQuestions(List<PaperQuestion> questions)
     {
         PaperQuestions.RemoveAll(pq => !questions.Any(q => q.QuestionId == pq.QuestionId));
@@ -104,8 +119,8 @@ public class Paper : AuditableEntity, IAggregateRoot
         DateTime? endTime,
         int? duration,
         bool shuffle,
-        bool showMarkResult,
-        bool showQuestionAnswer,
+        ShowResult showMarkResult,
+        ShowQuestionAnswer showQuestionAnswer,
         PaperType type,
         bool isPublish,
         string? content,
@@ -137,20 +152,6 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperFolderId = paperFolderId;
         return this;
     }
-
-    //public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
-    //{
-    //    if (shareType == PaperShareType.AssignToStudent)
-    //    {
-    //        PaperAccesses.RemoveAll(pa => pa.UserId != null);
-    //        PaperAccesses.AddRange(newPaperAccesses.Where(pa => pa.UserId != null));
-    //    }
-    //    else if (shareType == PaperShareType.AssignToClass)
-    //    {
-    //        PaperAccesses.RemoveAll(pa => pa.ClassId != null);
-    //        PaperAccesses.AddRange(newPaperAccesses.Where(pa => pa.ClassId != null));
-    //    }
-    //}
 
     public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
     {

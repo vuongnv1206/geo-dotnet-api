@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Domain.Examination;
-using FSH.WebApi.Domain.Subjects;
+﻿using FSH.WebApi.Domain.Subjects;
 namespace FSH.WebApi.Domain.Assignment;
 public class Assignment : AuditableEntity, IAggregateRoot
 {
@@ -7,31 +6,32 @@ public class Assignment : AuditableEntity, IAggregateRoot
     public string Name { get; set; } = default!;
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public string? AttachmentPath { get; set; }
+    public string? Attachment { get; set; }
     public string? Content { get; set; }
     public bool CanViewResult { get; set; }
     public bool RequireLoginToSubmit { get; set; }
     public Guid? SubjectId { get; set; }
     public virtual Subject Subject { get; set; } = default!;
     public virtual List<AssignmentClass> AssignmentClasses { get; set; } = new();
+    public virtual List<AssignmentStudent> AssignmentStudents { get; set; } = new();
 
     public Assignment()
     {
     }
 
-    public Assignment(string name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool canViewResult, bool requireLoginToSubmit, Guid subjectId)
+    public Assignment(string name, DateTime? startTime, DateTime? endTime, string? attachment, string? content, bool canViewResult, bool requireLoginToSubmit, Guid subjectId)
     {
         Name = name;
         StartTime = startTime;
         EndTime = endTime;
-        AttachmentPath = attachmentPath;
+        Attachment = attachment;
         Content = content;
         CanViewResult = canViewResult;
         RequireLoginToSubmit = requireLoginToSubmit;
         SubjectId = subjectId;
     }
 
-    public Assignment Update(string? name, DateTime? startTime, DateTime? endTime, string? attachmentPath, string? content, bool? canViewResult, bool? requireLoginToSubmit, Guid? subjectId)
+    public Assignment Update(string? name, DateTime? startTime, DateTime? endTime, string? attachment, string? content, bool? canViewResult, bool? requireLoginToSubmit, Guid? subjectId)
     {
         if (name is not null && !Name.Equals(name))
             Name = name;
@@ -39,8 +39,8 @@ public class Assignment : AuditableEntity, IAggregateRoot
             StartTime = startTime;
         if (endTime.HasValue && EndTime != endTime)
             EndTime = endTime;
-        if (attachmentPath is not null)
-            AttachmentPath = attachmentPath;
+        if (attachment is not null)
+            Attachment = attachment;
         if (content is not null && !Content.Equals(content))
             Content = content;
         if (canViewResult.HasValue && CanViewResult != canViewResult)
@@ -55,25 +55,82 @@ public class Assignment : AuditableEntity, IAggregateRoot
 
     public Assignment ClearAttachmentPath()
     {
-        AttachmentPath = string.Empty;
+        Attachment = string.Empty;
         return this;
     }
 
-    //public void AssignAssignmentToClass(AssignmentClass assignmentClass)
-    //{
-    //    AssignmentClasses.Add(assignmentClass);
-    //}
-
-    public void UpdateAssignmentFromClass(List<AssignmentClass> aClass)
+    public void AssignAssignmentToClass(Guid classId)
     {
-        AssignmentClasses.RemoveAll(ac => !aClass.Any(c => c.AssignmentId == ac.AssignmentId));
-        foreach (var ac in aClass)
+        AssignmentClasses.Add(new AssignmentClass
         {
-            AssignmentClasses.Add(new AssignmentClass
+            AssignmentId = this.Id,
+            ClassesId = classId
+        });
+    }
+
+    public void MarkScoreForSubmission(Guid studentId, float score, string? comment)
+    {
+        var submission = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
+        if (submission is not null)
+        {
+            submission.Score = score;
+            submission.Comment = comment;
+        }
+    }
+
+    public void SubmitAssignment(Guid studentId, string? answerRaw, string? attachmentPath)
+    {
+        var assignmentStudent = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
+        if (assignmentStudent is not null)
+        {
+            assignmentStudent.AnswerRaw = answerRaw;
+            assignmentStudent.AttachmentPath = attachmentPath;
+            assignmentStudent.Status = SubmitAssignmentStatus.Submmitted;
+        }
+    }
+
+    public void AssignAssignmentToStudent(Guid studentId)
+    {
+        if (!AssignmentStudents.Any(a => a.StudentId == studentId))
+        {
+            AssignmentStudents.Add(new AssignmentStudent
             {
                 AssignmentId = this.Id,
-                ClassesId = ac.ClassesId
+                StudentId = studentId
             });
         }
     }
+
+    public void AssignAssignmentToStudents(List<Guid> studentIds)
+    {
+        foreach (var studentId in studentIds)
+        {
+            if (!AssignmentStudents.Any(a => a.StudentId == studentId))
+            {
+                AssignmentStudents.Add(new AssignmentStudent
+                {
+                    AssignmentId = this.Id,
+                    StudentId = studentId
+                });
+            }
+        }
+    }
+
+    public void RemoveAssignmentFromClass(Guid classId)
+    {
+        AssignmentStudents.RemoveAll(x => AssignmentClasses.Any(ac => ac.ClassesId == classId && ac.AssignmentId == x.AssignmentId));
+    }
+
+    public void RemoveAssignmentOfStudent(Guid studentId)
+    {
+        AssignmentStudents.RemoveAll(x => x.StudentId == studentId);
+    }
+
+    public void UpdateStatusSubmitAssignment(SubmitAssignmentStatus status)
+    {
+        AssignmentStudents.Where(s => s.Status == SubmitAssignmentStatus.Doing)
+                   .ToList()
+                   .ForEach(s => s.Status = status);
+    }
+
 }

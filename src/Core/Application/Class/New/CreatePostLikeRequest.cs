@@ -4,7 +4,7 @@ namespace FSH.WebApi.Application.Class.New;
 public class CreatePostLikeRequest : IRequest<Guid>
 {
     public Guid UserId { get; set; }
-    public Guid NewsId { get; set; }
+    public Guid PostsId { get; set; }
 }
 
 public class CreateNewsReactionHandler : IRequestHandler<CreatePostLikeRequest, Guid>
@@ -25,8 +25,8 @@ public class CreateNewsReactionHandler : IRequestHandler<CreatePostLikeRequest, 
 
     public async Task<DefaultIdType> Handle(CreatePostLikeRequest request, CancellationToken cancellationToken)
     {
-        var findNews = await _newRepository.GetByIdAsync(request.NewsId, cancellationToken);
-        _ = findNews ?? throw new NotFoundException(_t["News {0} Not Found.", request.NewsId]);
+        var findPosts = await _newRepository.GetByIdAsync(request.PostsId, cancellationToken);
+        _ = findPosts ?? throw new NotFoundException(_t["News {0} Not Found.", request.PostsId]);
 
         var findUser = _currentUser.GetUserId();
         //if (findUser == Guid.Empty || findUser != request.UserId)
@@ -34,7 +34,7 @@ public class CreateNewsReactionHandler : IRequestHandler<CreatePostLikeRequest, 
         //    throw new NotFoundException(_t["User {0} Not Found.", request.UserId]);
         //}
 
-        await _newReactionRepository.AddNewsReaction(new PostLike(request.UserId, request.NewsId));
+        await _newReactionRepository.AddNewsReaction(new PostLike(request.UserId, request.PostsId));
 
         return default(DefaultIdType);
     }

@@ -39,7 +39,7 @@ public class CommentController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpDelete("like")]
+    [HttpPost("dislike")]
     [MustHavePermission(FSHAction.Delete, FSHResource.NewsReaction)]
     [OpenApiOperation("DisLike a comment", "")]
     public Task RemoveLikeInTheComment(DeleteCommentLikeRequest request)

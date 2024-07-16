@@ -35,7 +35,8 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
             if (request.ParentId.HasValue)
             {
                 parentIds.Add(request.ParentId.Value);
-                var parentFolder = await _paperFolderRepo.GetByIdAsync(request.ParentId.Value);
+                var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value));
+
                 if (parentFolder != null)
                 {
                     parentFolder.ChildPaperFolderIds(null, parentIds);
@@ -47,7 +48,7 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
         }
         else
         {
-            var spec = new PaperFolderTreeSpec(currentUserId, request);
+            var spec = new PaperFolderTreeBySearchSpec(currentUserId,request);
             count = await _paperFolderRepo.CountAsync(spec, cancellationToken);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
 

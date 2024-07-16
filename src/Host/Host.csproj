@@ -32,6 +32,9 @@
         <None Update="Files\full-stack-hero-logo.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="libwkhtmltox.dll">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Include="Email Templates\*.html">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
@@ -50,6 +53,11 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Databases\Host\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Update="PaperTemplates\paper.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Update="Roslynator.Analyzers" Version="4.2.0">

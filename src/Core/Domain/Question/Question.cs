@@ -16,6 +16,7 @@ public class Question : AuditableEntity, IAggregateRoot
     public virtual Question? QuestionParent { get; set; }
     public virtual List<Question> QuestionPassages { get; set; } = new();
     public virtual List<Answer> Answers { get; set; } = new();
+    public QuestionStatus? QuestionStatus { get; set; }
 
     public Question()
     {
@@ -71,13 +72,13 @@ public class Question : AuditableEntity, IAggregateRoot
 
     public Question Update(string? content, string? image, string? audio, Guid? questionFolderId, QuestionType? questionType, Guid? questionLableId, Guid? parentId)
     {
-        Content = content;
-        Image = image;
-        Audio = audio;
-        QuestionFolderId = questionFolderId;
-        QuestionType = questionType;
-        QuestionLableId = questionLableId;
-        QuestionParentId = parentId;
+        if(content != null && !content.Equals(Content)) Content = content;
+        if(image != null && !image.Equals(Image)) Image = image;
+        if(audio != null && !audio.Equals(Audio)) Audio = audio;
+        if(questionFolderId.HasValue && questionFolderId.Value != Guid.Empty && !questionFolderId.Equals(QuestionFolderId)) QuestionFolderId = questionFolderId;
+        if(questionType != null && !questionType.Equals(QuestionType)) QuestionType = questionType;
+        if(questionLableId.HasValue && questionLableId.Value != Guid.Empty && !questionLableId.Equals(QuestionLableId)) QuestionLableId = questionLableId;
+        if(parentId.HasValue && parentId.Value != Guid.Empty && !parentId.Equals(QuestionParentId)) QuestionParentId = parentId;
 
         return this;
     }
