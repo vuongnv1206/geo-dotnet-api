@@ -1,5 +1,4 @@
-﻿using FSH.WebApi.Application.Identity.Users;
-using FSH.WebApi.Domain.Question;
+﻿using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
 
 namespace FSH.WebApi.Application.Questions.Dtos;
@@ -11,8 +10,9 @@ public class QuestionPassagesForStudentDto : IDto
     public List<AnswerForStudentDto>? Answers { get; set; } = new();
 }
 
-public class QuestionForStudentDto : AuditableEntity, IDto
+public class QuestionForStudentDto : IDto
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string? Content { get; set; }
     public string? Image { get; set; }
     public string? Audio { get; set; }
