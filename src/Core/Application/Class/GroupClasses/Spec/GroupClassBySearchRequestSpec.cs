@@ -3,7 +3,7 @@ using FSH.WebApi.Domain.Class;
 using Mapster;
 
 namespace FSH.WebApi.Application.Class.GroupClasses.Spec;
-internal class GroupClassBySearchRequestSpec : Specification<GroupClass, GroupClassDto>, ISingleResultSpecification
+public class GroupClassBySearchRequestSpec : Specification<GroupClass, GroupClassDto>, ISingleResultSpecification
 {
     public GroupClassBySearchRequestSpec(SearchGroupClassRequest request, DefaultIdType userId)
         : base((IInMemorySpecificationEvaluator)request)

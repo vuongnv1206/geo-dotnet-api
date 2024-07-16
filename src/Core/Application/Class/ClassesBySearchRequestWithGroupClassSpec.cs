@@ -1,9 +1,5 @@
-using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Application.Class.Dto;
-using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
-using FSH.WebApi.Domain.Examination;
-using System.Xml.Linq;
 
 namespace FSH.WebApi.Application.Class;
 public class ClassesBySearchRequestWithGroupClassSpec : EntitiesByPaginationFilterSpec<Classes, ClassDto>

@@ -1,7 +1,7 @@
 ﻿using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Class.Comments.Spec;
-internal class CommentTreeSpec : Specification<Comment>
+public class CommentTreeSpec : Specification<Comment>
 {
     public CommentTreeSpec()
     {
