@@ -1,4 +1,3 @@
-using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.GroupClasses.Dto;
 using FSH.WebApi.Domain.Class;
 using Mapster;
@@ -61,17 +60,6 @@ public class GroupClassBySearchRequestSpec : EntitiesByPaginationFilterSpec<Grou
                         || c.UserClasses.Any(uc => uc.Student.StId == userId)).ToList().Adapt<List<ClassViewListDto>>(),
             CreatedBy = gc.CreatedBy
         });
-    }
-}
-
-public class GroupClassByUserSpec : Specification<GroupClass, GroupClassDto>
-{
-    public GroupClassByUserSpec(DefaultIdType userId)
-    {
-        Query
-            .Include(c => c.Classes)
-            .OrderBy(c => c.Name)
-            .Where(x => x.CreatedBy == userId);
     }
 }
 
