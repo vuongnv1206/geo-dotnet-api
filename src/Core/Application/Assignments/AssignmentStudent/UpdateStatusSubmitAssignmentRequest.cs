@@ -1,11 +1,4 @@
-﻿using FSH.WebApi.Application.Examination.SubmitPapers;
-using FSH.WebApi.Domain.Assignment;
-using FSH.WebApi.Domain.Examination;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FSH.WebApi.Domain.Assignment;
 
 namespace FSH.WebApi.Application.Assignments.AssignmentStudent;
 public class UpdateStatusSubmitAssignmentRequest : IRequest<Guid>
@@ -20,7 +13,10 @@ public class UpdateStatusSubmitAssignmentRequestHandler : IRequestHandler<Update
     private readonly ICurrentUser _currentUser;
     private readonly IStringLocalizer<UpdateStatusSubmitAssignmentRequestHandler> _t;
 
-    public UpdateStatusSubmitAssignmentRequestHandler(IRepository<Assignment> assignmentRepo, ICurrentUser currentUser, IStringLocalizer<UpdateStatusSubmitAssignmentRequestHandler> t)
+    public UpdateStatusSubmitAssignmentRequestHandler(
+        IRepository<Assignment> assignmentRepo,
+        ICurrentUser currentUser,
+        IStringLocalizer<UpdateStatusSubmitAssignmentRequestHandler> t)
     {
         _assignmentRepo = assignmentRepo;
         _currentUser = currentUser;
@@ -37,6 +33,7 @@ public class UpdateStatusSubmitAssignmentRequestHandler : IRequestHandler<Update
         {
             throw new ForbiddenException(_t["Can't update this submit."]);
         }
+
         var currentUserId = _currentUser.GetUserId();
         if (assignment.CreatedBy != currentUserId)
         {
@@ -45,8 +42,6 @@ public class UpdateStatusSubmitAssignmentRequestHandler : IRequestHandler<Update
 
         assignment.UpdateStatusSubmitAssignment(request.Status);
         await _assignmentRepo.UpdateAsync(assignment);
-
         return assignment.Id;
     }
 }
-

@@ -1,11 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Comments.Spec;
-using FSH.WebApi.Application.Class.New.Spec;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.Comments;
 public class DeleteCommentRequest : IRequest<Guid>

@@ -1,10 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class;
 public class ClassByUserSpec : Specification<Classes, ClassDto>, ISingleResultSpecification
@@ -12,6 +7,9 @@ public class ClassByUserSpec : Specification<Classes, ClassDto>, ISingleResultSp
     public ClassByUserSpec(DefaultIdType userId)
     {
 
-        Query.Include(a => a.AssignmentClasses).ThenInclude(a => a.Assignment).Where(a => a.CreatedBy == userId);
+        Query
+            .Include(a => a.AssignmentClasses)
+            .ThenInclude(a => a.Assignment)
+            .Where(a => a.CreatedBy == userId);
     }
 }

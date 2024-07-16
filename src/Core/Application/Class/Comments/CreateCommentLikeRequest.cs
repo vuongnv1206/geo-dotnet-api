@@ -1,10 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Comments.Spec;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.Comments;
 public class CreateCommentLikeRequest : IRequest<Guid>
@@ -28,13 +23,12 @@ public class CreateCommentLikeHandler : IRequestHandler<CreateCommentLikeRequest
     {
         var comment = await _repository.FirstOrDefaultAsync(new CommentByIdSpec(request.CommentId));
 
-        if(comment is null)
+        if (comment is null)
         {
             throw new NotFoundException(_t["Comment {0} Not Found.", request.CommentId]);
         }
 
         var commentLike = comment.CommentLikes.FirstOrDefault(x => x.UserId == request.UserId);
-
 
         if (commentLike is not null)
         {
@@ -51,4 +45,4 @@ public class CreateCommentLikeHandler : IRequestHandler<CreateCommentLikeRequest
 
         return default(Guid);
     }
-}   
+}

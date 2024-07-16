@@ -1,6 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Specs;
 using FSH.WebApi.Application.Class.UserStudents.Spec;
-using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -68,11 +67,10 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
         var student = await _repository.FirstOrDefaultAsync(new StudentByIdSpec(request.Id), cancellationToken);
         _ = student ?? throw new NotFoundException(_t["Student {0} Not Found.", request.Id]);
 
-        //if (request.Email is not null && !student.IsValidEmail(request.Email))
+        // if (request.Email is not null && !student.IsValidEmail(request.Email))
         //    throw new ConflictException(_t["The email address '{0}' is not valid.", request.Email]);
-        //if (request.PhoneNumber is not null && !student.IsValidPhoneNumber(request.PhoneNumber))
+        // if (request.PhoneNumber is not null && !student.IsValidPhoneNumber(request.PhoneNumber))
         //    throw new ConflictException(_t["The phone number '{0}' is not valid. It must be 10 digits.", request.PhoneNumber]);
-
 
         if (classOfStudent.UserClasses != null)
         {

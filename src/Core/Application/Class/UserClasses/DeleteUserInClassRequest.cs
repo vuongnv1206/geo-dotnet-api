@@ -10,7 +10,9 @@ public class DeleteUserInClassRequest : IRequest<Guid>
 
 public class DeleteUserInClassRequestValidator : CustomValidator<DeleteUserInClassRequest>
 {
-    public DeleteUserInClassRequestValidator(IReadRepository<Classes> classRepos, IStringLocalizer<DeleteUserInClassRequestValidator> T)
+    public DeleteUserInClassRequestValidator(
+        IReadRepository<Classes> classRepos,
+        IStringLocalizer<DeleteUserInClassRequestValidator> T)
     {
         RuleFor(p => p.ClassesId)
             .NotEmpty()
@@ -26,9 +28,13 @@ public class DeleteUserInClassRequestHandler : IRequestHandler<DeleteUserInClass
     public readonly IRepository<Classes> _classRepository;
     private readonly IUserService _userService;
 
-    public DeleteUserInClassRequestHandler(IUserClassesRepository userClassesRepository, IUserService userService,
-                                           IStringLocalizer<DeleteUserInClassRequestHandler> stringLocalizer, IRepository<Classes> classRepository) =>
-        (_userClassesRepository, _userService,_classRepository , _stringLocalizer) = (userClassesRepository, userService,classRepository ,stringLocalizer);
+    public DeleteUserInClassRequestHandler(
+        IUserClassesRepository userClassesRepository,
+        IUserService userService,
+        IStringLocalizer<DeleteUserInClassRequestHandler> stringLocalizer,
+        IRepository<Classes> classRepository) =>
+        (_userClassesRepository, _userService, _classRepository, _stringLocalizer) =
+        (userClassesRepository, userService, classRepository, stringLocalizer);
     public async Task<Guid> Handle(DeleteUserInClassRequest request, CancellationToken cancellationToken)
     {
 
