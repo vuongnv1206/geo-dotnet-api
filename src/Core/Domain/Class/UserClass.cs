@@ -1,12 +1,4 @@
-﻿using FSH.WebApi.Domain.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-namespace FSH.WebApi.Domain.Class;
+﻿namespace FSH.WebApi.Domain.Class;
 public class UserClass
 {
     public Guid ClassesId { get; set; }

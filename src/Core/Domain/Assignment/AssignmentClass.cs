@@ -11,7 +11,6 @@ public class AssignmentClass
 
     public AssignmentClass()
     {
-
     }
 
     public AssignmentClass(DefaultIdType assignmentId, DefaultIdType classesId)

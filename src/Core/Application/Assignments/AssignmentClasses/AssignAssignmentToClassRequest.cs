@@ -2,11 +2,6 @@
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Assignments.AssignmentClasses;
 
@@ -62,6 +57,7 @@ public class AssignAssignmentToClassRequestHandler : IRequestHandler<AssignAssig
             var studentIds = classroom.UserClasses.Select(x => x.StudentId).ToList();
             assignment.AssignAssignmentToStudents(studentIds);
         }
+
         await _assignmentRepository.UpdateAsync(assignment);
 
         return assignment.Id;

@@ -1,13 +1,11 @@
-﻿
-
-using FSH.WebApi.Domain.Assignment;
+﻿using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 
 namespace FSH.WebApi.Application.Assignments.AssignmentStudent;
 public class AssignAssignmentToStudentsRequest : IRequest<Guid>
 {
     public Guid AssignmentId { get; set; }
-    public List<Guid> StudentIds { get; set; }
+    public required List<Guid> StudentIds { get; set; }
 }
 
 public class AssignAssignmentToStudentRequestValidator : CustomValidator<AssignAssignmentToStudentsRequest>
@@ -43,6 +41,7 @@ public class AssignAssignmentToStudentsRequestHandler : IRequestHandler<AssignAs
             _ = student ?? throw new NotFoundException(_t["Student {0} Not Found.", studentId]);
             assignment.AssignAssignmentToStudent(student.Id);
         }
+
         await _assignmentRepository.UpdateAsync(assignment);
 
         return assignment.Id;

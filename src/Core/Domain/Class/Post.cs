@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace FSH.WebApi.Domain.Class;
+﻿namespace FSH.WebApi.Domain.Class;
 public class Post : AuditableEntity, IAggregateRoot
 {
     public string Content { get; private set; }

@@ -14,7 +14,6 @@ public class SearchAssignmentsRequestHandler : IRequestHandler<SearchAssignments
     private readonly IReadRepository<Assignment> _repository;
     private readonly ICurrentUser _currentUser;
 
-
     public SearchAssignmentsRequestHandler(IReadRepository<Assignment> repository, ICurrentUser currentUser)
     {
         _repository = repository;
