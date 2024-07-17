@@ -10,7 +10,7 @@ public class ClassByIdSpec : Specification<Classes>, ISingleResultSpecification
 {
     public ClassByIdSpec(Guid id, Guid userId)
     {
-        Query.Where(b => b.Id == id).Include(x => x.UserClasses)
+        Query.Where(b => b.Id == id)
             .Include(c => c.TeacherPermissionInClasses)
                 .ThenInclude(tp => tp.TeacherTeam)
             .Include(c => c.GroupPermissionInClasses)

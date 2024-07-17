@@ -3,10 +3,10 @@ using FSH.WebApi.Domain.Class;
 using Mapster;
 
 namespace FSH.WebApi.Application.Class.GroupClasses.Spec;
-public class GroupClassBySearchRequestSpec : Specification<GroupClass, GroupClassDto>, ISingleResultSpecification
+public class GroupClassBySearchRequestSpec : EntitiesByPaginationFilterSpec<GroupClass, GroupClassDto>
 {
     public GroupClassBySearchRequestSpec(SearchGroupClassRequest request, DefaultIdType userId)
-        : base((IInMemorySpecificationEvaluator)request)
+        : base(request)
     {
         Query.Include(gc => gc.Classes)
                 .ThenInclude(c => c.TeacherPermissionInClasses)
