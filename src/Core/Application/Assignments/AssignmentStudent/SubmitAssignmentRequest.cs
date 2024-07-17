@@ -1,16 +1,11 @@
 ﻿using FSH.WebApi.Domain.Assignment;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Assignments.AssignmentStudent;
 public class SubmitAssignmentRequest : IRequest
 {
     public Guid AssignmentId { get; set; }
     public string? AnswerRaw { get; set; }
-    public string? AttachmentPath { get;  set; }
+    public string? AttachmentPath { get; set; }
 }
 
 public class SubmitAssignmentRequestValidator : CustomValidator<SubmitAssignmentRequest>
@@ -58,4 +53,3 @@ public class SubmitAssignmentRequestHandler : IRequestHandler<SubmitAssignmentRe
         return Unit.Value;
     }
 }
-                

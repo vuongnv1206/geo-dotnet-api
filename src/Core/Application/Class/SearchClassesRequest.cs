@@ -1,7 +1,5 @@
 using FSH.WebApi.Application.Class.Dto;
-using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Domain.Class;
-using Mapster;
 
 namespace FSH.WebApi.Application.Class;
 public class SearchClassesRequest : PaginationFilter, IRequest<PaginationResponse<ClassDto>>
@@ -30,6 +28,5 @@ public class SearchClassesRequestHandler : IRequestHandler<SearchClassesRequest,
         var spec = new ClassesBySearchRequestWithGroupClassSpec(request, userId);
         var data = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
         return data;
-
     }
 }

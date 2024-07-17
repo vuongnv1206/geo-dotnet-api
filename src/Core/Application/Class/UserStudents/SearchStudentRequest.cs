@@ -11,7 +11,9 @@ public class SearchUserStudentRequestHandler : IRequestHandler<SearchStudentRequ
 {
     private readonly IReadRepository<Student> _repository;
     private readonly ICurrentUser _currentUser;
-    public SearchUserStudentRequestHandler(IReadRepository<Student> repository, ICurrentUser currentUser)
+    public SearchUserStudentRequestHandler(
+        IReadRepository<Student> repository,
+        ICurrentUser currentUser)
     {
         _repository = repository;
         _currentUser = currentUser;

@@ -20,18 +20,11 @@ public class SubmitPaperAnswer
     public string? QuestionId { get; set; }
 }
 
-public class SubmitPaperQuestionPassage
-{
-    public List<SubmitPaperAnswer>? Answers { get; set; }
-    public string? Id { get; set; }
-    public List<SubmitPaperQuestionPassage>? QuestionPassages { get; set; }
-}
-
 public class SubmitPaperQuestion
 {
     public List<SubmitPaperAnswer>? Answers { get; set; }
     public string? Id { get; set; }
-    public List<SubmitPaperQuestionPassage>? QuestionPassages { get; set; }
+    public List<SubmitPaperQuestion>? QuestionPassages { get; set; }
 }
 
 public class SubmitPaperData

@@ -1,10 +1,8 @@
 ﻿using FSH.WebApi.Application.Assignments.AssignmentClasses;
 using FSH.WebApi.Application.Assignments.AssignmentStudent;
 using FSH.WebApi.Application.Class;
-using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Assignment;
-using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
 
@@ -99,16 +97,20 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
         {
             // Lấy danh sách các lớp hiện tại được giao bài tập
             var currentClassIds = updatedAssignment.AssignmentClasses.Select(ac => ac.ClassesId).ToList();
+
             // Lấy danh sách các lớp cần thêm mới
             var newClassIds = request.ClassIds.Except(currentClassIds).ToList();
+
             // Lấy danh sách các lớp cần xóa
             var removedClassIds = currentClassIds.Except(request.ClassIds).ToList();
+
             // Thêm các lớp mới vào AssignmentClasses
             if (newClassIds.Any())
             {
                 var assignRequest = new AssignAssignmentToClassRequest(request.Id, newClassIds);
                 await _mediator.Send(assignRequest, cancellationToken);
             }
+
             // Xóa các lớp không còn trong danh sách
             if (removedClassIds.Any())
             {
@@ -135,8 +137,10 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
         {
             // Lấy danh sách các học sinh hiện tại được giao bài tập
             var currentStudentIds = updatedAssignment.AssignmentStudents.Select(a => a.StudentId).ToList();
+
             // Lấy danh sách các học sinh cần thêm mới
             var newStudentIds = request.StudentIds.Except(currentStudentIds).ToList();
+
             // Lấy danh sách các học sinh cần xóa
             var removedStudentIds = currentStudentIds.Except(request.StudentIds).ToList();
 

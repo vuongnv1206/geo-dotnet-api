@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FSH.WebApi.Application.Class.UserStudents.Dto;
+﻿namespace FSH.WebApi.Application.Class.UserStudents.Dto;
 public class UserStudentDto : IDto
 {
     public Guid Id { get; set; }

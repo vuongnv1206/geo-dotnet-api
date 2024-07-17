@@ -19,7 +19,8 @@ public class DeleteNewsReactionRequestHandler : IRequestHandler<DeletePostReacti
         IRepository<Post> postRepository,
         IPostLikeRepository newReactionRepository,
         IStringLocalizer<CreateNewsReactionHandler> localizer) =>
-        (_currentUser, _newReactionRepository, _postRepository, _t) = (currentUser, newReactionRepository, postRepository, localizer);
+        (_currentUser, _newReactionRepository, _postRepository, _t) =
+        (currentUser, newReactionRepository, postRepository, localizer);
     public async Task<DefaultIdType> Handle(DeletePostReactionRequest request, CancellationToken cancellationToken)
     {
         var findNews = await _postRepository.GetByIdAsync(request.PostsId, cancellationToken);

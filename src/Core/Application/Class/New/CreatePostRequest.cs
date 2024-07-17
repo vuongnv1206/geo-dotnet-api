@@ -1,9 +1,4 @@
 ﻿using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New;
 public class CreatePostRequest : IRequest<Guid>
@@ -15,7 +10,9 @@ public class CreatePostRequest : IRequest<Guid>
 
 public class CreateNewsRequestValidator : CustomValidator<CreatePostRequest>
 {
-    public CreateNewsRequestValidator(IReadRepository<Classes> classRepos, IStringLocalizer<CreateNewsRequestValidator> T)
+    public CreateNewsRequestValidator(
+        IReadRepository<Classes> classRepos,
+        IStringLocalizer<CreateNewsRequestValidator> T)
     {
         RuleFor(p => p.ClassesId)
             .NotEmpty()

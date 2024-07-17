@@ -1,6 +1,7 @@
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
@@ -38,35 +39,51 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
     {
         var userId = _currentUser.GetUserId();
 
-        var classroom = await _repository.FirstOrDefaultAsync(new ClassByIdWithGroupClassSpec(request.Id), cancellationToken)
+        var classroom = await _repository.FirstOrDefaultAsync(new ClassByIdSpec(request.Id, userId), cancellationToken)
              ?? throw new NotFoundException(_t["Classes {0} Not Found.", request.Id]);
-        if (userId != classroom.OwnerId)
+
+        var classdto = classroom.Adapt<ClassDto>();
+
+        if (userId != classdto.OwnerId)
         {
-            var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, request.Id);
-            var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, request.Id);
-
-            var listPermission = new List<PermissionInClassDto>();
-
-            listPermission.AddRange(await _groupPermissionRepo.ListAsync(groupPermissionSpec));
-            listPermission.AddRange((await _teacherPermissionRepo
-                                            .ListAsync(teacherPermissionSpec))
-                                            .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
-
-            if (!listPermission.Any())
-                throw new NotFoundException(_t["Classes {0} Not Found.", request.Id]);
-
-            if (!listPermission.Any(x => x.PermissionType == PermissionType.ManageStudentList))
+            if (_currentUser.IsInRole("Teacher"))
             {
-                classroom.Students = null;
-            }
-            if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment
-                                        && x.PermissionType == PermissionType.Marking))
-            {
-                classroom.Assignments = null;
-            }
 
-            classroom.Permissions = listPermission;
+                var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, request.Id);
+                var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, request.Id);
+
+                var listPermission = new List<PermissionInClassDto>();
+
+                listPermission.AddRange(await _groupPermissionRepo.ListAsync(groupPermissionSpec));
+                listPermission.AddRange((await _teacherPermissionRepo
+                                                .ListAsync(teacherPermissionSpec))
+                                                .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
+
+                if (!listPermission.Any())
+                    throw new NotFoundException(_t["Classes {0} Not Found.", request.Id]);
+
+                if (!listPermission.Any(x => x.PermissionType == PermissionType.ManageStudentList))
+                {
+                    classdto.Students = null;
+                }
+
+                if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment
+                                            && x.PermissionType == PermissionType.Marking))
+                {
+                    classdto.Assignments = null;
+                    classdto.Papers = null;
+                }
+
+                classdto.Permissions = listPermission;
+            }
+            else
+            {
+                //classdto.Assignments = null;
+                //classdto.Papers = null;
+                classdto.Students = null;
+            }
         }
-        return classroom;
+
+        return classdto;
     }
 }

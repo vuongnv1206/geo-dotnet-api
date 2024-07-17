@@ -1,6 +1,4 @@
-﻿using FSH.WebApi.Domain.Class;
-using FSH.WebApi.Domain.Examination;
-using FSH.WebApi.Domain.Subjects;
+﻿using FSH.WebApi.Domain.Subjects;
 namespace FSH.WebApi.Domain.Assignment;
 public class Assignment : AuditableEntity, IAggregateRoot
 {
@@ -70,7 +68,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
         });
     }
 
-    public void MarkScoreForSubmission(Guid studentId, float score,string? comment)
+    public void MarkScoreForSubmission(Guid studentId, float score, string? comment)
     {
         var submission = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
         if (submission is not null)
@@ -80,7 +78,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
         }
     }
 
-    public void SubmitAssignment(Guid studentId, string? answerRaw,string? attachmentPath)
+    public void SubmitAssignment(Guid studentId, string? answerRaw, string? attachmentPath)
     {
         var assignmentStudent = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
         if (assignmentStudent is not null)
@@ -123,13 +121,10 @@ public class Assignment : AuditableEntity, IAggregateRoot
         AssignmentStudents.RemoveAll(x => AssignmentClasses.Any(ac => ac.ClassesId == classId && ac.AssignmentId == x.AssignmentId));
     }
 
-
- 
     public void RemoveAssignmentOfStudent(Guid studentId)
     {
         AssignmentStudents.RemoveAll(x => x.StudentId == studentId);
     }
-
 
     public void UpdateStatusSubmitAssignment(SubmitAssignmentStatus status)
     {
@@ -137,5 +132,5 @@ public class Assignment : AuditableEntity, IAggregateRoot
                    .ToList()
                    .ForEach(s => s.Status = status);
     }
-    
+
 }

@@ -1,6 +1,4 @@
-﻿
-
-using FSH.WebApi.Application.Identity.Users;
+﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Assignment;
 using Mapster;
 

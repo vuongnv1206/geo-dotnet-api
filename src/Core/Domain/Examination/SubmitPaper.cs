@@ -16,6 +16,7 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
     public string? DeviceType { get; set; }
     public string? PublicIp { get; set; }
     public string? LocalIp { get; set; }
+    public bool canResume { get; set; }
 
     public SubmitPaper()
     {

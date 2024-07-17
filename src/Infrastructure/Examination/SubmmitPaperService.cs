@@ -5,11 +5,13 @@ using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
+using FSH.WebApi.Application.Examination.SubmitPapers.Specs;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Questions;
+using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
-using FSH.WebApi.Host.Controllers.Examination;
 using FSH.WebApi.Infrastructure.Common.Utils;
 using Mapster;
 using Microsoft.Extensions.Localization;
@@ -123,6 +125,38 @@ public class SubmmitPaperService : ISubmmitPaperService
 
         var userId = _currentUser.GetUserId();
 
+        var submitPaper1 = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
+
+        // If resume, check user has permission to resume exam
+        if (request.IsResume)
+        {
+            // Get last submit paper
+            if (submitPaper1 == null)
+            {
+                throw new NotFoundException("You do not have permission to resume this exam.");
+            }
+
+            // check can resume
+            if (submitPaper1.Status != SubmitPaperStatus.Doing)
+            {
+                throw new ConflictException("Exam is not in progress.");
+            }
+
+            if (submitPaper1.canResume == false)
+            {
+                throw new ConflictException("You do not have permission to resume this exam.");
+            }
+        }
+        else
+        {
+            // check user has not submitted this paper
+            var submitPapers = await _submitPaperRepository.ListAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
+            if (submitPapers.Count >= paper.NumberAttempt)
+            {
+                throw new ConflictException("Have used up all your attempts");
+            }
+        }
+
         //// check user has permission to start exam
         // bool hasPermission = false;
         // if (!paper.PaperAccesses.Any(x => x.UserId == userId))
@@ -140,13 +174,6 @@ public class SubmmitPaperService : ISubmmitPaperService
         //    throw new ForbiddenException("You do not have permission to start this exam.");
         // }
 
-        // check user has not submitted this paper
-        var submitPapers = await _submitPaperRepository.ListAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
-        if (submitPapers.Count >= paper.NumberAttempt)
-        {
-            throw new ConflictException("Have used up all your attempts");
-        }
-
         // check local ip
         if (!string.IsNullOrEmpty(paper.LocalIpAllowed) && !string.IsNullOrEmpty(request.LocalIp) && !IsLocalIpAllowed(request.LocalIp, paper.LocalIpAllowed))
         {
@@ -159,23 +186,40 @@ public class SubmmitPaperService : ISubmmitPaperService
         //    throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
         // }
 
-        var submitPaper = new SubmitPaper
+        if (request.IsResume)
         {
-            PaperId = paper.Id,
-            DeviceId = request.DeviceId,
-            DeviceName = request.DeviceName,
-            DeviceType = request.DeviceType,
-            PublicIp = request.PublicIp,
-            LocalIp = request.LocalIp
-        };
+            var paperDot = paper.Adapt<PaperForStudentDto>();
 
-        _ = await _submitPaperRepository.AddAsync(submitPaper, cancellationToken);
+            // Refill submit paper details
+            FillPaperDetails(paperDot, submitPaper1);
 
-        var paperDot = paper.Adapt<PaperForStudentDto>();
-        var user = await _userService.GetAsync(submitPaper.CreatedBy.ToString(), cancellationToken);
-        paperDot.SubmitPaperId = submitPaper.Id;
-        paperDot.UserDetails = user.Adapt<UserDetailsDto>();
-        return paperDot;
+            var user = await _userService.GetAsync(submitPaper1.CreatedBy.ToString(), cancellationToken);
+            paperDot.SubmitPaperId = submitPaper1.Id;
+            paperDot.UserDetails = user.Adapt<UserDetailsDto>();
+            return paperDot;
+        }
+        else
+        {
+            var submitPaper = new SubmitPaper
+            {
+                PaperId = paper.Id,
+                Status = SubmitPaperStatus.Doing,
+                DeviceId = request.DeviceId,
+                DeviceName = request.DeviceName,
+                DeviceType = request.DeviceType,
+                PublicIp = request.PublicIp,
+                LocalIp = request.LocalIp
+            };
+
+            _ = await _submitPaperRepository.AddAsync(submitPaper, cancellationToken);
+
+            var paperDot = paper.Adapt<PaperForStudentDto>();
+            var user = await _userService.GetAsync(submitPaper.CreatedBy.ToString(), cancellationToken);
+            paperDot.SubmitPaperId = submitPaper.Id;
+            paperDot.UserDetails = user.Adapt<UserDetailsDto>();
+            return paperDot;
+        }
+
     }
 
     public async Task<DefaultIdType> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
@@ -198,14 +242,15 @@ public class SubmmitPaperService : ISubmmitPaperService
         {
             // check question is exist in paper
             var question = submitPaper.SubmitPaperDetails?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!));
+            var questionDb = submitPaper.Paper?.PaperQuestions?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!)).Question;
             if (question == null)
             {
-                var questionDb = submitPaper.Paper?.PaperQuestions?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!)).Question;
-
                 // Add new submit paper detail
-                SubmitPaperDetail submitPaperDetail;
                 if (questionDb != null)
                 {
+
+                    // Add new submit paper detail
+                    SubmitPaperDetail submitPaperDetail;
                     submitPaperDetail = new SubmitPaperDetail
                     {
                         QuestionId = Guid.Parse(q.Id!),
@@ -214,12 +259,52 @@ public class SubmmitPaperService : ISubmmitPaperService
                     };
 
                     submitPaper.SubmitPaperDetails.Add(submitPaperDetail);
+
+                    if (questionDb.QuestionType == QuestionType.Reading)
+                    {
+                        foreach (var pq in questionDb.QuestionPassages)
+                        {
+                            foreach (var q1 in q.QuestionPassages)
+                            {
+                                if (pq.Id == Guid.Parse(q1.Id!))
+                                {
+                                    SubmitPaperDetail spdp;
+                                    spdp = new SubmitPaperDetail
+                                    {
+                                        QuestionId = Guid.Parse(q1.Id!),
+                                        AnswerRaw = FormatAnswerRaw(q1, pq),
+                                        SubmitPaperId = submitPaper.Id
+                                    };
+
+                                    submitPaper.SubmitPaperDetails.Add(spdp);
+                                }
+                            }
+                        }
+                    }
+
                 }
+
             }
             else
             {
-                // Update submit paper detail
                 question.AnswerRaw = FormatAnswerRaw(q, question.Question!);
+                if (questionDb.QuestionType == QuestionType.Reading)
+                {
+                    foreach (var pq in questionDb.QuestionPassages)
+                    {
+                        foreach (var q1 in q.QuestionPassages)
+                        {
+                            if (pq.Id == Guid.Parse(q1.Id!))
+                            {
+                                var spdp = submitPaper.SubmitPaperDetails!.FirstOrDefault(x => x.QuestionId == Guid.Parse(q1.Id!));
+                                if (spdp != null)
+                                {
+                                    spdp.AnswerRaw = FormatAnswerRaw(q1, pq);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -325,4 +410,124 @@ public class SubmmitPaperService : ISubmmitPaperService
         return _serializerService.Serialize(answers);
     }
 
+    private void FillPaperDetails(PaperForStudentDto paperDot, SubmitPaper? submitPaper1)
+    {
+        if (submitPaper1 == null)
+        {
+            return;
+        }
+
+        foreach (var pq in paperDot.Questions)
+        {
+            var spq = submitPaper1.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == pq.Id);
+            if (spq != null)
+            {
+                // AnswerRaw to AnswerForStudentDto
+                AnswerRawToAnswerForStudentDto(spq, pq);
+            }
+
+            if (pq.QuestionType == QuestionType.Reading)
+            {
+                foreach (var qp in pq.QuestionPassages)
+                {
+                    var spq1 = submitPaper1.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == qp.Id);
+                    if (spq1 != null)
+                    {
+                        // AnswerRaw to AnswerForStudentDto
+                        AnswerRawToAnswerForStudentDto(spq1, qp);
+                    }
+                }
+            }
+        }
+    }
+
+    private void AnswerRawToAnswerForStudentDto(SubmitPaperDetail spq1, QuestionPassagesForStudentDto qp)
+    {
+        // Deserialize AnswerRaw to AnswerForStudentDto
+        List<string> answerIds = new List<string>();
+        if (!string.IsNullOrEmpty(spq1.AnswerRaw))
+        {
+            // split answerIds
+            string[] answerIdStrs = spq1.AnswerRaw.Split('|');
+            foreach (string answerIdStr in answerIdStrs)
+            {
+                answerIds.Add(answerIdStr);
+            }
+
+            // AnswerForStudentDto
+            foreach (var a in qp.Answers)
+            {
+                if (answerIds.Contains(a.Id.ToString()))
+                {
+                    a.IsCorrect = true;
+                }
+            }
+        }
+    }
+
+    private void AnswerRawToAnswerForStudentDto(SubmitPaperDetail spq, QuestionForStudentDto pq)
+    {
+        // SingleChoice
+        if (pq.QuestionType == QuestionType.SingleChoice)
+        {
+            // AnswerRaw to AnswerForStudentDto
+            foreach (var a in pq.Answers)
+            {
+                if (a.Id == Guid.Parse(spq.AnswerRaw))
+                {
+                    a.IsCorrect = true;
+                }
+            }
+        }
+
+        // MultipleChoice
+        if (pq.QuestionType == QuestionType.MultipleChoice)
+        {
+            // AnswerRaw to AnswerForStudentDto
+            List<string> answerIds = new List<string>();
+            if (!string.IsNullOrEmpty(spq.AnswerRaw))
+            {
+                // split answerIds
+                string[] answerIdStrs = spq.AnswerRaw.Split('|');
+                foreach (string answerIdStr in answerIdStrs)
+                {
+                    answerIds.Add(answerIdStr);
+                }
+
+                // AnswerForStudentDto
+                foreach (var a in pq.Answers)
+                {
+                    if (answerIds.Contains(a.Id.ToString()))
+                    {
+                        a.IsCorrect = true;
+                    }
+                }
+            }
+        }
+
+        // FillBlank
+        if (pq.QuestionType == QuestionType.FillBlank)
+        {
+            // AnswerRaw to AnswerForStudentDto
+            List<Dictionary<string, string>> answers = _serializerService.Deserialize<List<Dictionary<string, string>>>(spq.AnswerRaw);
+            for (int i = 0; i < pq.Answers.Count; i++)
+            {
+                pq.Answers[i].Content = answers[i].Values.First();
+            }
+        }
+
+        // Writing
+        if (pq.QuestionType == QuestionType.Writing)
+        {
+            // AnswerRaw to AnswerForStudentDto
+            // Create AnswerForStudentDto
+            pq.Answers = new List<AnswerForStudentDto>
+            {
+                new()
+                {
+                    Content = spq.AnswerRaw
+                }
+            };
+        }
+    }
 }

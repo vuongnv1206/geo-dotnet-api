@@ -1,14 +1,7 @@
-﻿using FSH.WebApi.Application.Class.Dto;
-using FSH.WebApi.Application.Class.New.Dto;
+﻿using FSH.WebApi.Application.Class.New.Dto;
 using FSH.WebApi.Application.Class.New.Spec;
-using FSH.WebApi.Application.Class.UserClasses;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.New;
 public class GetPostRequest : PaginationFilter, IRequest<PaginationResponse<PostDto>>
@@ -50,7 +43,6 @@ public class GetNewsRequestHandler : IRequestHandler<GetPostRequest, PaginationR
 
         var spec = new PostByClassIdSpec(request);
         var data = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
-
 
         foreach (var posts in data.Data)
         {

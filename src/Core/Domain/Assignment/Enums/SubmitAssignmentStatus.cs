@@ -1,6 +1,4 @@
-﻿
-
-namespace FSH.WebApi.Domain.Assignment;
+﻿namespace FSH.WebApi.Domain.Assignment;
 public enum SubmitAssignmentStatus
 {
     Doing = 0,

@@ -1,16 +1,8 @@
 ﻿using FSH.WebApi.Application.Class.UserStudents.Spec;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
-using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
-using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
-using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserStudents;
 public class CreateStudentRequest : IRequest<Guid>
@@ -35,7 +27,6 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
     private readonly ICurrentUser _currentUser;
     private readonly IRepository<GroupPermissionInClass> _groupPermissionRepo;
     private readonly IRepository<TeacherPermissionInClass> _teacherPermissionRepo;
-
 
     public CreateUserStudentRequestHandler(
         IUserService userService,
@@ -94,7 +85,7 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
             Gender = request.Gender,
         };
 
-        var existDuplicate = await _userStudentRepository
+        string existDuplicate = await _userStudentRepository
             .AnyAsync(new StudentByStudentCodeSpec(request.StudentCode))
             ? throw new ConflictException(_t["The student code '{0}' is already in use.", request.StudentCode])
             : userStudent.StudentCode = request.StudentCode;

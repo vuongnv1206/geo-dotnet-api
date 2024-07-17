@@ -1,10 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.GroupClasses;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.Comments;
 public class UpdateCommentRequest : IRequest<Guid>
@@ -42,4 +37,3 @@ public class UpdateCommentRequestHandler : IRequestHandler<UpdateCommentRequest,
         return comment.Id;
     }
 }
-

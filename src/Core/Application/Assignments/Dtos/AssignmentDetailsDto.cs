@@ -1,6 +1,4 @@
-﻿using FSH.WebApi.Application.Class.Dto;
-using FSH.WebApi.Application.Subjects;
-using FSH.WebApi.Domain.Assignment;
+﻿using FSH.WebApi.Application.Subjects;
 
 namespace FSH.WebApi.Application.Assignments.Dtos;
 public class AssignmentDetailsDto : IDto

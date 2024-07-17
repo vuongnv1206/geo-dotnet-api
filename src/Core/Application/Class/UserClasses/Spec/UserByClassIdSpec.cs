@@ -1,10 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Domain.Class;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Class.UserClasses.Spec;
 public class UserByClassIdSpec : Specification<UserClass, UserClassDto>, ISingleResultSpecification

@@ -1,12 +1,10 @@
 ﻿using FSH.WebApi.Application.Examination.Papers.Dtos;
-using FSH.WebApi.Application.Examination.Reviews;
-using FSH.WebApi.Application.Examination.SubmitPapers;
 
-namespace FSH.WebApi.Host.Controllers.Examination;
+namespace FSH.WebApi.Application.Examination.SubmitPapers;
 
 public class StartExamRequest : IRequest<PaperForStudentDto>
 {
-    public Guid PaperId { get; set; }
+    public DefaultIdType PaperId { get; set; }
 
     public required string DeviceId { get; set; }
 
@@ -14,15 +12,16 @@ public class StartExamRequest : IRequest<PaperForStudentDto>
     public string? DeviceType { get; set; }
     public string? PublicIp { get; set; }
     public string? LocalIp { get; set; }
+    public bool IsResume { get; set; }
 }
 
 public class StartExamRequestValidator : CustomValidator<StartExamRequest>
 {
     public StartExamRequestValidator()
     {
-        RuleFor(x => x.PaperId)
+        _ = RuleFor(x => x.PaperId)
             .NotEmpty();
-        RuleFor(x => x.DeviceId)
+        _ = RuleFor(x => x.DeviceId)
             .NotEmpty();
     }
 }
