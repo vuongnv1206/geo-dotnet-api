@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
+using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.PaperStudents.Specs;
 public class PaperByIdsAndPublishSpec : EntitiesByPaginationFilterSpec<Paper>

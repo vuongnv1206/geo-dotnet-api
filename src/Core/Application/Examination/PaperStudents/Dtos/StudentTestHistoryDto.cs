@@ -1,14 +1,14 @@
 ﻿using FSH.WebApi.Domain.Examination;
 
-namespace FSH.WebApi.Application.Examination.PaperStudents;
+namespace FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 public class StudentTestHistoryDto : IDto
 {
-    public Guid Id { get; set; }
-    public string ExamName { get; set; }
+    public DefaultIdType Id { get; set; }
+    public required string ExamName { get; set; }
     public int? Duration { get; set; }
-    public Guid? PaperLabelId { get; set; }
+    public DefaultIdType? PaperLabelId { get; set; }
     public string? PaperLabelName { get; set; }
-    public Guid? SubjectId { get; set; }
+    public DefaultIdType? SubjectId { get; set; }
     public string? SubjectName { get; set; }
     public DateTime? StartedTime { get; set; }
     public DateTime? SubmittedTime { get; set; }
