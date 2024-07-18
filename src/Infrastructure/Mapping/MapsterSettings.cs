@@ -8,7 +8,6 @@ using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
-using FSH.WebApi.Application.Examination.PaperStudents;
 using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.Services.Models;
@@ -176,7 +175,7 @@ public class MapsterSettings
             .Map(dest => dest.StartedTime, src => src.StartTime)
             .Map(dest => dest.SubmittedTime, src => src.EndTime)
             .Map(dest => dest.CompletionStatus, src => src.Status)
-            .Map(dest => dest.Score, src => src.TotalMark)
+            .Map(dest => dest.Score, src => src.getScore())
             .Map(dest => dest.ShowMarkResult, src => src.Paper.ShowMarkResult);
 
         _ = TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
@@ -220,7 +219,7 @@ public class MapsterSettings
         _ = TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         _ = TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();
 
-        //Examination.Services.Models
+        // Examination.Services.Models
         _ = TypeAdapterConfig<QuestionModel, QuestionDto>.NewConfig()
             .Map(dest => dest.Answers, src => src.Answers)
             .Map(dest => dest.QuestionPassages, src => src.QuestionPassages);

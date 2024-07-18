@@ -66,4 +66,27 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         }
     }
 
+    public float getScore()
+    {
+        if (SubmitPaperDetails == null || SubmitPaperDetails.Count == 0)
+        {
+            return 0;
+        }
+
+        if (Paper.ShowMarkResult == ShowResult.No)
+        {
+            return 0;
+        }
+
+        float totalMark = 0;
+        foreach (var item in SubmitPaperDetails)
+        {
+            if (item.Mark.HasValue)
+            {
+                totalMark += item.Mark.Value;
+            }
+        }
+
+        return totalMark;
+    }
 }

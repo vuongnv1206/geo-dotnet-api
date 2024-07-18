@@ -108,247 +108,59 @@ public class SubmmitPaperService : ISubmmitPaperService
         return false;
     }
 
-    public async Task<PaperForStudentDto> StartExamAsync(StartExamRequest request, CancellationToken cancellationToken)
+    private void ShuffleQuestions(PaperForStudentDto paperDot)
     {
-        // check current user is allowed to start exam
-        // check paper is available
-        // check user has not submitted this paper
-        // create new submit paper
-        // return paper for student dto
-
-        var spec = new PaperByIdWithAccessesSpec(request.PaperId);
-        var paper = await _paperRepository.FirstOrDefaultAsync(spec, cancellationToken);
-        if (paper == null)
+        // Shuffle questions passges and answers
+        foreach (var q in paperDot.Questions)
         {
-            throw new NotFoundException($"Paper {request.PaperId} Not Found.");
-        }
-
-        var userId = _currentUser.GetUserId();
-
-        var submitPaper1 = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
-
-        // If resume, check user has permission to resume exam
-        if (request.IsResume)
-        {
-            // Get last submit paper
-            if (submitPaper1 == null)
+            // Reading question
+            if (q.QuestionType == QuestionType.Reading)
             {
-                throw new NotFoundException("You do not have permission to resume this exam.");
-            }
-
-            // check can resume
-            if (submitPaper1.Status != SubmitPaperStatus.Doing)
-            {
-                throw new ConflictException("Exam is not in progress.");
-            }
-
-            if (submitPaper1.canResume == false)
-            {
-                throw new ConflictException("You do not have permission to resume this exam.");
-            }
-        }
-        else
-        {
-            // check user has not submitted this paper
-            var submitPapers = await _submitPaperRepository.ListAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
-            if (submitPapers.Count >= paper.NumberAttempt)
-            {
-                throw new ConflictException("Have used up all your attempts");
-            }
-        }
-
-        //// check user has permission to start exam
-        // bool hasPermission = false;
-        // if (!paper.PaperAccesses.Any(x => x.UserId == userId))
-        // {
-        //    hasPermission = true;
-        // }
-
-        // if (!paper.PaperAccesses.Any(x => x.Class.UserClasses.Any(y => y.StudentId == userId)))
-        // {
-        //    hasPermission = true;
-        // }
-
-        // if (!hasPermission)
-        // {
-        //    throw new ForbiddenException("You do not have permission to start this exam.");
-        // }
-
-        // check local ip
-        if (!string.IsNullOrEmpty(paper.LocalIpAllowed) && !string.IsNullOrEmpty(request.LocalIp) && !IsLocalIpAllowed(request.LocalIp, paper.LocalIpAllowed))
-        {
-            throw new ForbiddenException("Your local IP: " + request.LocalIp + " is not allowed to start this exam.");
-        }
-
-        // check public ip
-        // if (!string.IsNullOrEmpty(paper.PublicIpAllowed) && !string.IsNullOrEmpty(request.PublicIp) && !IsIpInRange(request.PublicIp, paper.PublicIpAllowed))
-        // {
-        //    throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
-        // }
-
-        if (request.IsResume)
-        {
-            var paperDot = paper.Adapt<PaperForStudentDto>();
-
-            // Refill submit paper details
-            FillPaperDetails(paperDot, submitPaper1);
-
-            var user = await _userService.GetAsync(submitPaper1.CreatedBy.ToString(), cancellationToken);
-            paperDot.SubmitPaperId = submitPaper1.Id;
-            paperDot.UserDetails = user.Adapt<UserDetailsDto>();
-            return paperDot;
-        }
-        else
-        {
-            var submitPaper = new SubmitPaper
-            {
-                PaperId = paper.Id,
-                Status = SubmitPaperStatus.Doing,
-                DeviceId = request.DeviceId,
-                DeviceName = request.DeviceName,
-                DeviceType = request.DeviceType,
-                PublicIp = request.PublicIp,
-                LocalIp = request.LocalIp
-            };
-
-            _ = await _submitPaperRepository.AddAsync(submitPaper, cancellationToken);
-
-            var paperDot = paper.Adapt<PaperForStudentDto>();
-            var user = await _userService.GetAsync(submitPaper.CreatedBy.ToString(), cancellationToken);
-            paperDot.SubmitPaperId = submitPaper.Id;
-            paperDot.UserDetails = user.Adapt<UserDetailsDto>();
-            return paperDot;
-        }
-
-    }
-
-    public async Task<DefaultIdType> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
-    {
-        // Decrypt and validate submit paper data
-        string submitPaperDataDecrypted = EncryptionUtils.SimpleDec(request.SubmitPaperData);
-        if (string.IsNullOrEmpty(submitPaperDataDecrypted))
-        {
-            throw new BadRequestException("Submit paper data is invalid.");
-        }
-
-        // Json to object SubmitPaperData
-        var sbp = _serializerService.Deserialize<SubmitPaperData>(submitPaperDataDecrypted);
-
-        // Get submit paper
-        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByIdSpec(Guid.Parse(sbp.SubmitPaperId!)), cancellationToken);
-
-        // Update or Add submit paper details
-        foreach (var q in sbp.Questions)
-        {
-            // check question is exist in paper
-            var question = submitPaper.SubmitPaperDetails?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!));
-            var questionDb = submitPaper.Paper?.PaperQuestions?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!)).Question;
-            if (question == null)
-            {
-                // Add new submit paper detail
-                if (questionDb != null)
+                Random random = new Random();
+                int n = q.QuestionPassages.Count;
+                while (n > 1)
                 {
-
-                    // Add new submit paper detail
-                    SubmitPaperDetail submitPaperDetail;
-                    submitPaperDetail = new SubmitPaperDetail
-                    {
-                        QuestionId = Guid.Parse(q.Id!),
-                        AnswerRaw = FormatAnswerRaw(q, questionDb),
-                        SubmitPaperId = submitPaper.Id
-                    };
-
-                    submitPaper.SubmitPaperDetails.Add(submitPaperDetail);
-
-                    if (questionDb.QuestionType == QuestionType.Reading)
-                    {
-                        foreach (var pq in questionDb.QuestionPassages)
-                        {
-                            foreach (var q1 in q.QuestionPassages)
-                            {
-                                if (pq.Id == Guid.Parse(q1.Id!))
-                                {
-                                    SubmitPaperDetail spdp;
-                                    spdp = new SubmitPaperDetail
-                                    {
-                                        QuestionId = Guid.Parse(q1.Id!),
-                                        AnswerRaw = FormatAnswerRaw(q1, pq),
-                                        SubmitPaperId = submitPaper.Id
-                                    };
-
-                                    submitPaper.SubmitPaperDetails.Add(spdp);
-                                }
-                            }
-                        }
-                    }
-
+                    n--;
+                    int k = random.Next(n + 1);
+                    (q.QuestionPassages[n], q.QuestionPassages[k]) = (q.QuestionPassages[k], q.QuestionPassages[n]);
                 }
 
-            }
-            else
-            {
-                question.AnswerRaw = FormatAnswerRaw(q, question.Question!);
-                if (questionDb.QuestionType == QuestionType.Reading)
+                // Shuffle answers
+                foreach (var qp in q.QuestionPassages)
                 {
-                    foreach (var pq in questionDb.QuestionPassages)
+                    n = qp.Answers.Count;
+                    while (n > 1)
                     {
-                        foreach (var q1 in q.QuestionPassages)
-                        {
-                            if (pq.Id == Guid.Parse(q1.Id!))
-                            {
-                                var spdp = submitPaper.SubmitPaperDetails!.FirstOrDefault(x => x.QuestionId == Guid.Parse(q1.Id!));
-                                if (spdp != null)
-                                {
-                                    spdp.AnswerRaw = FormatAnswerRaw(q1, pq);
-                                }
-                            }
-                        }
+                        n--;
+                        int k = random.Next(n + 1);
+                        (qp.Answers[n], qp.Answers[k]) = (qp.Answers[k], qp.Answers[n]);
                     }
+                }
+            }
+
+            // SingleChoice - MultipleChoice
+            if (q.QuestionType is QuestionType.SingleChoice or QuestionType.MultipleChoice)
+            {
+                Random random = new Random();
+                int n = q.Answers.Count;
+                while (n > 1)
+                {
+                    n--;
+                    int k = random.Next(n + 1);
+                    (q.Answers[n], q.Answers[k]) = (q.Answers[k], q.Answers[n]);
                 }
             }
         }
 
-        // Update submit paper
-        await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
-
-        return submitPaper == null
-            ? throw new NotFoundException("Submit Paper " + sbp.SubmitPaperId + " Not Found.")
-            : await Task.FromResult(submitPaper.Id);
-    }
-
-    public string FormatAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
-    {
-        if (question == null)
+        // Shuffle questions
+        Random random1 = new Random();
+        int n1 = paperDot.Questions.Count;
+        while (n1 > 1)
         {
-            return string.Empty;
+            n1--;
+            int k1 = random1.Next(n1 + 1);
+            (paperDot.Questions[n1], paperDot.Questions[k1]) = (paperDot.Questions[k1], paperDot.Questions[n1]);
         }
-
-        // SingleChoice
-        if (question.QuestionType == QuestionType.SingleChoice)
-        {
-            return FormatSingleChoiceAnswerRaw(spq, question);
-        }
-
-        // MultipleChoice - Reading - Question Passage
-        if (question.QuestionType is QuestionType.MultipleChoice or QuestionType.ReadingQuestionPassage)
-        {
-            return FormatMultipleChoiceAnswerRaw(spq, question);
-        }
-
-        // FillBlank
-        if (question.QuestionType == QuestionType.FillBlank)
-        {
-            return FormatFillBlankAnswerRaw(spq, question);
-        }
-
-        // Matching
-        if (question.QuestionType == QuestionType.Matching)
-        {
-            return spq.Answers!.FirstOrDefault()?.Content ?? string.Empty;
-        }
-
-        // Writing
-        return question.QuestionType == QuestionType.Writing ? spq.Answers!.FirstOrDefault()?.Content ?? string.Empty : string.Empty;
     }
 
     private string FormatSingleChoiceAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
@@ -530,4 +342,307 @@ public class SubmmitPaperService : ISubmmitPaperService
             };
         }
     }
+
+    public async Task<PaperForStudentDto> StartExamAsync(StartExamRequest request, CancellationToken cancellationToken)
+    {
+        var spec = new PaperByIdWithAccessesSpec(request.PaperId);
+        var paper = await _paperRepository.FirstOrDefaultAsync(spec, cancellationToken);
+        if (paper == null)
+        {
+            throw new NotFoundException($"Paper {request.PaperId} Not Found.");
+        }
+
+        var userId = _currentUser.GetUserId();
+
+        var submitPaper1 = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
+
+        // Check time to do this exam
+        var timeNow = DateTime.Now;
+        if (paper.StartTime.HasValue && paper.StartTime > timeNow)
+        {
+            throw new ConflictException(_t["Exam has not started yet."]);
+        }
+
+        if (paper.EndTime.HasValue && paper.EndTime < timeNow)
+        {
+            throw new ConflictException(_t["Exam has ended."]);
+        }
+
+        // If resume, check user has permission to resume exam
+        if (request.IsResume)
+        {
+            // Get last submit paper
+            if (submitPaper1 == null)
+            {
+                throw new NotFoundException(_t["You do not have permission to resume this exam."]);
+            }
+
+            // check can resume
+            if (submitPaper1.Status != SubmitPaperStatus.Doing)
+            {
+                throw new ConflictException(_t["Exam is not in progress."]);
+            }
+
+            if (submitPaper1.canResume == false)
+            {
+                throw new ConflictException(_t["You do not have permission to resume this exam."]);
+            }
+        }
+        else
+        {
+            // check user has not submitted this paper
+            var submitPapers = await _submitPaperRepository.ListAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
+            if (submitPapers.Count >= paper.NumberAttempt)
+            {
+                throw new ConflictException(_t["Have used up all your attempts"]);
+            }
+        }
+
+        //// check user has permission to start exam
+        // bool hasPermission = false;
+        // if (!paper.PaperAccesses.Any(x => x.UserId == userId))
+        // {
+        //    hasPermission = true;
+        // }
+
+        // if (!paper.PaperAccesses.Any(x => x.Class.UserClasses.Any(y => y.StudentId == userId)))
+        // {
+        //    hasPermission = true;
+        // }
+
+        // if (!hasPermission)
+        // {
+        //    throw new ForbiddenException("You do not have permission to start this exam.");
+        // }
+
+        // check local ip
+        if (!string.IsNullOrEmpty(paper.LocalIpAllowed) && !string.IsNullOrEmpty(request.LocalIp) && !IsLocalIpAllowed(request.LocalIp, paper.LocalIpAllowed))
+        {
+            throw new ForbiddenException(_t["Your local IP: {0} is not allowed to start this exam.", request.LocalIp]);
+        }
+
+        // check public ip
+        // if (!string.IsNullOrEmpty(paper.PublicIpAllowed) && !string.IsNullOrEmpty(request.PublicIp) && !IsIpInRange(request.PublicIp, paper.PublicIpAllowed))
+        // {
+        //    throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
+        // }
+
+        if (request.IsResume)
+        {
+            var paperDot = paper.Adapt<PaperForStudentDto>();
+
+            // Refill submit paper details
+            FillPaperDetails(paperDot, submitPaper1);
+
+            // Set Resume to false
+            submitPaper1.canResume = false;
+            submitPaper1.StartTime = timeNow;
+            await _submitPaperRepository.UpdateAsync(submitPaper1, cancellationToken);
+
+            var user = await _userService.GetAsync(submitPaper1.CreatedBy.ToString(), cancellationToken);
+            paperDot.SubmitPaperId = submitPaper1.Id;
+            paperDot.UserDetails = user.Adapt<UserDetailsDto>();
+
+            // Shuffle questions
+            if (paper.Shuffle)
+            {
+                ShuffleQuestions(paperDot);
+            }
+
+            return paperDot;
+        }
+        else
+        {
+            // Create new submit paper
+            var submitPaper = new SubmitPaper
+            {
+                PaperId = paper.Id,
+                Status = SubmitPaperStatus.Doing,
+                DeviceId = request.DeviceId,
+                DeviceName = request.DeviceName,
+                DeviceType = request.DeviceType,
+                PublicIp = request.PublicIp,
+                LocalIp = request.LocalIp
+            };
+
+            _ = await _submitPaperRepository.AddAsync(submitPaper, cancellationToken);
+
+            var paperDot = paper.Adapt<PaperForStudentDto>();
+            var user = await _userService.GetAsync(submitPaper.CreatedBy.ToString(), cancellationToken);
+            paperDot.SubmitPaperId = submitPaper.Id;
+            paperDot.UserDetails = user.Adapt<UserDetailsDto>();
+
+            // Shuffle questions
+            if (paper.Shuffle)
+            {
+                ShuffleQuestions(paperDot);
+            }
+
+            return paperDot;
+        }
+
+    }
+
+    public async Task<DefaultIdType> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
+    {
+        // Decrypt and validate submit paper data
+        string submitPaperDataDecrypted = EncryptionUtils.SimpleDec(request.SubmitPaperData);
+        if (string.IsNullOrEmpty(submitPaperDataDecrypted))
+        {
+            throw new BadRequestException(_t["Submit paper data is invalid."]);
+        }
+
+        // Json to object SubmitPaperData
+        var sbp = _serializerService.Deserialize<SubmitPaperData>(submitPaperDataDecrypted);
+
+        // Get submit paper
+        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByIdSpec(Guid.Parse(sbp.SubmitPaperId!)), cancellationToken);
+
+        // Check current user has permission to submit this exam
+        if (submitPaper == null || submitPaper.CreatedBy != _currentUser.GetUserId())
+        {
+            throw new ForbiddenException(_t["You do not have permission to submit this exam."]);
+        }
+
+        // Check submit paper status
+        if (submitPaper.Status != SubmitPaperStatus.Doing)
+        {
+            throw new ConflictException(_t["Exam is not in progress."]);
+        }
+
+        // Check time to do this exam
+        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
+        var timeNow = DateTime.Now;
+        int duration = (int)(timeNow - submitPaper.StartTime).TotalMinutes;
+        if (paper.Duration.HasValue && duration > paper.Duration)
+        {
+            // Update submit paper status
+            submitPaper.Status = SubmitPaperStatus.End;
+            submitPaper.EndTime = timeNow;
+            await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
+            throw new ConflictException(_t["Over time to do this exam."]);
+        }
+
+        // Update or Add submit paper details
+        foreach (var q in sbp.Questions)
+        {
+            // check question is exist in paper
+            var question = submitPaper.SubmitPaperDetails?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!));
+            var questionDb = submitPaper.Paper?.PaperQuestions?.FirstOrDefault(x => x.QuestionId == Guid.Parse(q.Id!)).Question;
+            if (question == null)
+            {
+                // Add new submit paper detail
+                if (questionDb != null)
+                {
+
+                    // Add new submit paper detail
+                    SubmitPaperDetail submitPaperDetail;
+                    submitPaperDetail = new SubmitPaperDetail
+                    {
+                        QuestionId = Guid.Parse(q.Id!),
+                        AnswerRaw = FormatAnswerRaw(q, questionDb),
+                        SubmitPaperId = submitPaper.Id
+                    };
+
+                    submitPaper.SubmitPaperDetails.Add(submitPaperDetail);
+
+                    if (questionDb.QuestionType == QuestionType.Reading)
+                    {
+                        foreach (var pq in questionDb.QuestionPassages)
+                        {
+                            foreach (var q1 in q.QuestionPassages)
+                            {
+                                if (pq.Id == Guid.Parse(q1.Id!))
+                                {
+                                    SubmitPaperDetail spdp;
+                                    spdp = new SubmitPaperDetail
+                                    {
+                                        QuestionId = Guid.Parse(q1.Id!),
+                                        AnswerRaw = FormatAnswerRaw(q1, pq),
+                                        SubmitPaperId = submitPaper.Id
+                                    };
+
+                                    submitPaper.SubmitPaperDetails.Add(spdp);
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            else
+            {
+                question.AnswerRaw = FormatAnswerRaw(q, question.Question!);
+                if (questionDb.QuestionType == QuestionType.Reading)
+                {
+                    foreach (var pq in questionDb.QuestionPassages)
+                    {
+                        foreach (var q1 in q.QuestionPassages)
+                        {
+                            if (pq.Id == Guid.Parse(q1.Id!))
+                            {
+                                var spdp = submitPaper.SubmitPaperDetails!.FirstOrDefault(x => x.QuestionId == Guid.Parse(q1.Id!));
+                                if (spdp != null)
+                                {
+                                    spdp.AnswerRaw = FormatAnswerRaw(q1, pq);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // if isEnd
+        if (request.IsEnd)
+        {
+            // Update submit paper status
+            submitPaper.Status = SubmitPaperStatus.End;
+            submitPaper.EndTime = timeNow;
+        }
+
+        // Update submit paper
+        await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
+
+        return submitPaper == null
+            ? throw new NotFoundException(_t["Submit paper {0} not found.", sbp.SubmitPaperId])
+            : await Task.FromResult(submitPaper.Id);
+    }
+
+    public string FormatAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    {
+        if (question == null)
+        {
+            return string.Empty;
+        }
+
+        // SingleChoice
+        if (question.QuestionType == QuestionType.SingleChoice)
+        {
+            return FormatSingleChoiceAnswerRaw(spq, question);
+        }
+
+        // MultipleChoice - Reading - Question Passage
+        if (question.QuestionType is QuestionType.MultipleChoice or QuestionType.ReadingQuestionPassage)
+        {
+            return FormatMultipleChoiceAnswerRaw(spq, question);
+        }
+
+        // FillBlank
+        if (question.QuestionType == QuestionType.FillBlank)
+        {
+            return FormatFillBlankAnswerRaw(spq, question);
+        }
+
+        // Matching
+        if (question.QuestionType == QuestionType.Matching)
+        {
+            return spq.Answers!.FirstOrDefault()?.Content ?? string.Empty;
+        }
+
+        // Writing
+        return question.QuestionType == QuestionType.Writing ? spq.Answers!.FirstOrDefault()?.Content ?? string.Empty : string.Empty;
+    }
+
 }
