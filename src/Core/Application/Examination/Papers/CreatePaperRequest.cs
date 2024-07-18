@@ -18,6 +18,19 @@ public class CreatePaperRequest : IRequest<Guid>
     public Guid? PaperFolderId { get; set; }
     public Guid? SubjectId { get; set; }
     public List<CreateUpdateQuestionInPaperDto>? Questions { get; set; } = new(); // Thêm danh sách câu hỏi đã có
+
+    public CreatePaperRequest(string examName, PaperStatus status, string? password, PaperType type, string? content, string? description, DefaultIdType? paperLabelId, DefaultIdType? paperFolderId, DefaultIdType? subjectId)
+    {
+        ExamName = examName;
+        Status = status;
+        Password = password;
+        Type = type;
+        Content = content;
+        Description = description;
+        PaperLabelId = paperLabelId;
+        PaperFolderId = paperFolderId;
+        SubjectId = subjectId;
+    }
 }
 
 public class CreatePaperRequestValidator : CustomValidator<CreatePaperRequest>

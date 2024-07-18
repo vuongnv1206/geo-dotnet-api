@@ -1,4 +1,5 @@
 ﻿
+using FSH.WebApi.Application.Examination.Matrices;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 
@@ -143,6 +144,15 @@ public class PapersController : VersionedApiController
 
         //return File(fileBytes, "application/pdf");  //Get file in pdf format
         return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
+    }
+
+    //Write controller for CreatePaperFromMatrixRequest
+    [HttpPost("create-from-matrix")]
+    [OpenApiOperation("Create a paper from a matrix.")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Papers)]
+    public async Task<ActionResult<Guid>> CreateFromMatrixAsync(CreatePaperFromMatrixRequest request)
+    {
+        return Ok(await Mediator.Send(request));
     }
 
 }

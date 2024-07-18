@@ -1,3 +1,5 @@
+using FSH.WebApi.Domain.Examination;
+
 namespace FSH.WebApi.Domain.Question;
 
 public class QuestionFolder : AuditableEntity, IAggregateRoot
@@ -94,6 +96,18 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
                 descendants.Add(child);
                 AddDescendants(child, descendants);
             }
+        }
+    }
+
+    public void ChildQuestionFolderIds(ICollection<QuestionFolder> childs, List<Guid> ids)
+    {
+        if (childs == null)
+            childs = this.Children;
+
+        foreach (QuestionFolder questionFolder in childs)
+        {
+            ids.Add(questionFolder.Id);
+            ChildQuestionFolderIds(questionFolder.Children, ids);
         }
     }
 }

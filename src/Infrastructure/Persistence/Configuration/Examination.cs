@@ -90,3 +90,12 @@ public class PaperPermissionConfig : IEntityTypeConfiguration<PaperPermission>
         builder.ToTable("PaperPermissions", SchemaNames.Examination);
     }
 }
+
+public class PaperMatrixConfig : IEntityTypeConfiguration<PaperMatrix>
+{
+    public void Configure(EntityTypeBuilder<PaperMatrix> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("PaperMatrices", SchemaNames.Examination);
+    }
+}
