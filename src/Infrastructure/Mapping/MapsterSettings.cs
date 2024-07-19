@@ -22,6 +22,7 @@ using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.Question.Enums;
 using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
@@ -125,7 +126,8 @@ public class MapsterSettings
            .Map(dest => dest.Answers, src => src.AnswerClones);
 
         _ = TypeAdapterConfig<AnswerClone, AnswerForStudentDto>.NewConfig()
-           .Map(dest => dest.IsCorrect, src => false);
+           .Map(dest => dest.IsCorrect, src => false)
+           .Map(dest => dest.Content, src => (src.QuestionClone.QuestionType == QuestionType.FillBlank || src.QuestionClone.QuestionType == QuestionType.Matching) ? string.Empty : src.Content);
 
         _ = TypeAdapterConfig<TeacherTeam, TeacherTeamDto>.NewConfig()
             .Map(dest => dest.TeacherPermissionInClassDto, src => src.TeacherPermissionInClasses);
