@@ -12,4 +12,5 @@ public interface ISubmmitPaperService : ITransientService
 
     Task<float> CalculateScoreSubmitPaper(Guid submitPaperId);
     Task<List<SubmitPaper>> CalculateScorePaperAsync(Guid paperId, CancellationToken cancellationToken);
+    Task<DefaultIdType> SendLogAsync(SendLogRequest request, CancellationToken cancellationToken);
 }

@@ -23,15 +23,17 @@ public class SubmmitPaperService : ISubmmitPaperService
 {
     private readonly IRepository<Paper> _paperRepository;
     private readonly IRepository<SubmitPaper> _submitPaperRepository;
+    private readonly IRepository<SubmitPaperLog> _submitPaperLogRepository;
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
     private readonly IStringLocalizer<SubmmitPaperService> _t;
     private readonly ISerializerService _serializerService;
 
-    public SubmmitPaperService(IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, ICurrentUser currentUser, IUserService userService, IStringLocalizer<SubmmitPaperService> t, ISerializerService serializerService)
+    public SubmmitPaperService(IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, IRepository<SubmitPaperLog> submitPaperLogRepository, ICurrentUser currentUser, IUserService userService, IStringLocalizer<SubmmitPaperService> t, ISerializerService serializerService)
     {
         _paperRepository = paperRepository;
         _submitPaperRepository = submitPaperRepository;
+        _submitPaperLogRepository = submitPaperLogRepository;
         _currentUser = currentUser;
         _userService = userService;
         _t = t;
@@ -906,5 +908,15 @@ public class SubmmitPaperService : ISubmmitPaperService
     public Task<List<SubmitPaper>> CalculateScorePaperAsync(DefaultIdType paperId, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<DefaultIdType> SendLogAsync(SendLogRequest request, CancellationToken cancellationToken)
+    {
+        SubmitPaperLog spl = request.Adapt<SubmitPaperLog>();
+
+        // Add new submit paper log
+        _ = await _submitPaperLogRepository.AddAsync(spl, cancellationToken);
+
+        return spl.Id;
     }
 }

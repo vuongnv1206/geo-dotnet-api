@@ -76,6 +76,14 @@ public class SubmitPapersController : VersionedApiController
         return await Mediator.Send(request);
     }
 
+    [HttpPost("send-log")]
+    [OpenApiOperation("Send log")]
+    public async Task<ActionResult<Guid>> SendLog(SendLogRequest request)
+    {
+        request.PublicIp = GetIpAddress();
+        return await Mediator.Send(request);
+    }
+
     public string? GetIpAddress() =>
     Request.Headers.ContainsKey("X-Forwarded-For")
         ? Request.Headers["X-Forwarded-For"]

@@ -47,16 +47,17 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<PaperQuestion> PaperQuestions { get; set; }
     public DbSet<SubmitPaper> SubmitPapers { get; set; }
     public DbSet<SubmitPaperDetail> SubmitPaperDetails { get; set; }
+    public DbSet<SubmitPaperLog> SubmitPaperLogs { get; set; }
     public DbSet<PaperAccess> PaperAccesses { get; set; }
     public DbSet<PaperPermission> PaperPermissions { get; set; }
     public DbSet<Notification> Notifications { get; set; }
-    public DbSet<Student> Students{ get; set; }
+    public DbSet<Student> Students { get; set; }
     public DbSet<QuestionClone> QuestionClones { get; set; }
     public DbSet<AnswerClone> AnswerClones { get; set; }
     public DbSet<PaperMatrix> PaperMatrices { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.HasDefaultSchema(SchemaNames.Catalog);
+        _ = modelBuilder.HasDefaultSchema(SchemaNames.Catalog);
     }
 }

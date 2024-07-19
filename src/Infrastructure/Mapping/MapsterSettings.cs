@@ -189,6 +189,8 @@ public class MapsterSettings
         _ = TypeAdapterConfig<SubmitPaperDetail, SubmitPaperDetailDto>.NewConfig()
            .Map(dest => dest.IsCorrect, src => src.IsAnswerCorrect(src.Question, src.Question.AnswerClones.ToList()));
 
+        _ = TypeAdapterConfig<SubmitPaperLog, SendLogRequest>.NewConfig();
+
         _ = TypeAdapterConfig<PaperAccess, PaperAccessDto>.NewConfig();
 
         _ = TypeAdapterConfig<Answer, CreateAnswerDto>.NewConfig();

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Localization;
 namespace Infrastructure.Test.Examination;
 public class SubmmitPaperServiceTests
 {
-    private readonly ISubmmitPaperService _submmitPaperService;
+    private readonly ISubmmitPaperService? _submmitPaperService;
 
     // Create mock objects for the above fields
     private readonly Moq.Mock<IRepository<Paper>> _paperRepository = new();
@@ -17,10 +17,5 @@ public class SubmmitPaperServiceTests
     private readonly Moq.Mock<IUserService> _userService = new();
     private readonly Moq.Mock<IStringLocalizer<SubmmitPaperService>> _t = new();
     private readonly Moq.Mock<ISerializerService> _serializerService = new();
-
-    public SubmmitPaperServiceTests()
-    {
-        _submmitPaperService = new SubmmitPaperService(_paperRepository.Object, _submitPaperRepository.Object, _currentUser.Object, _userService.Object, _t.Object, _serializerService.Object);
-    }
 
 }
