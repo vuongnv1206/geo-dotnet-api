@@ -16,6 +16,7 @@ using FSH.WebApi.Infrastructure.Common.Utils;
 using Mapster;
 using Microsoft.Extensions.Localization;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace FSH.WebApi.Infrastructure.Examination;
 public class SubmmitPaperService : ISubmmitPaperService
@@ -285,7 +286,13 @@ public class SubmmitPaperService : ISubmmitPaperService
             // AnswerRaw to AnswerForStudentDto
             foreach (var a in pq.Answers)
             {
-                if (a.Id == Guid.Parse(spq.AnswerRaw))
+                // check if not null
+                if (string.IsNullOrEmpty(spq.AnswerRaw!))
+                {
+                    continue;
+                }
+
+                if (a.Id == Guid.Parse(spq.AnswerRaw!))
                 {
                     a.IsCorrect = true;
                 }
@@ -309,7 +316,7 @@ public class SubmmitPaperService : ISubmmitPaperService
                 // AnswerForStudentDto
                 foreach (var a in pq.Answers)
                 {
-                    if (answerIds.Contains(a.Id.ToString()))
+                    if (answerIds.Contains(a.Id.ToString()!))
                     {
                         a.IsCorrect = true;
                     }
@@ -322,9 +329,18 @@ public class SubmmitPaperService : ISubmmitPaperService
         {
             // AnswerRaw to AnswerForStudentDto
             List<Dictionary<string, string>> answers = _serializerService.Deserialize<List<Dictionary<string, string>>>(spq.AnswerRaw);
-            for (int i = 0; i < pq.Answers.Count; i++)
+            for (int i = 0; i < answers.Count; i++)
             {
                 pq.Answers[i].Content = answers[i].Values.First();
+            }
+        }
+
+        // Matching
+        if (pq.QuestionType == QuestionType.Matching)
+        {
+            if (pq.Answers.Count > 0)
+            {
+                pq.Answers[0].Content = spq.AnswerRaw;
             }
         }
 
@@ -600,6 +616,12 @@ public class SubmmitPaperService : ISubmmitPaperService
             // Update submit paper status
             submitPaper.Status = SubmitPaperStatus.End;
             submitPaper.EndTime = timeNow;
+
+            // Calculate score
+            submitPaper.TotalMark = await CalculateScoreSubmitPaper(submitPaper);
+
+            // Update submit paper
+            await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
         }
 
         // Update submit paper
@@ -645,4 +667,244 @@ public class SubmmitPaperService : ISubmmitPaperService
         return question.QuestionType == QuestionType.Writing ? spq.Answers!.FirstOrDefault()?.Content ?? string.Empty : string.Empty;
     }
 
+    public async Task<float> CalculateScoreSubmitPaper(DefaultIdType submitPaperId)
+    {
+        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByIdSpec(submitPaperId));
+        return submitPaper == null
+            ? throw new NotFoundException(_t["Submit paper {0} not found.", submitPaperId])
+            : await CalculateScoreSubmitPaper(submitPaper);
+    }
+
+    private async Task<float> CalculateScoreSubmitPaper(SubmitPaper submitPaper)
+    {
+        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId));
+        if (paper == null)
+        {
+            throw new NotFoundException(_t["Paper {0} not found.", submitPaper.PaperId]);
+        }
+
+        foreach (var question in paper.PaperQuestions)
+        {
+            var detail = submitPaper.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == question.QuestionId);
+            if (detail != null)
+            {
+                // if question is Reading
+                if (question.Question!.QuestionType == QuestionType.Reading)
+                {
+                    // list of question passages detail
+                    List<SubmitPaperDetail> details = new();
+                    foreach (var qp in question.Question!.QuestionPassages)
+                    {
+                        var detail1 = submitPaper.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == qp.Id);
+                        if (detail1 != null)
+                        {
+                            details.Add(detail1);
+                        }
+                    }
+
+                    detail.Mark = CalculateScore(detail, question.Question!, question.Mark, details);
+                }
+                else
+                {
+                    detail.Mark = CalculateScore(detail, question.Question!, question.Mark);
+                }
+
+            }
+        }
+
+        float totalMark = 0;
+        foreach (var item in submitPaper.SubmitPaperDetails)
+        {
+            if (item.Mark.HasValue)
+            {
+                totalMark += item.Mark.Value;
+            }
+        }
+
+        return totalMark;
+    }
+
+    private float CalculateScore(SubmitPaperDetail detail, QuestionClone question, float mark, List<SubmitPaperDetail>? details = null)
+    {
+        return question.QuestionType switch
+        {
+            QuestionType.SingleChoice => CalculateSingleChoiceScore(detail, question, mark),
+            QuestionType.MultipleChoice => CalculateMultipleChoiceScore(detail, question, mark),
+            QuestionType.FillBlank => CalculateFillBlankScore(detail, question, mark),
+            QuestionType.Matching => CalculateMatchingScore(detail, question, mark),
+            QuestionType.Writing => CalculateWritingScore(detail),
+            QuestionType.Reading => CalculateReadingScore(question, mark, details),
+            _ => 0,
+        };
+    }
+
+    private float CalculateMultipleChoiceScore(SubmitPaperDetail detail, QuestionClone question, float mark)
+    {
+        // MultipleChoice
+        // Get answerIds from AnswerRaw
+        string[] answerIdStrs = detail.AnswerRaw!.Split('|');
+        bool isCorrect = true;
+        foreach (var a in question.AnswerClones)
+        {
+            if (a.IsCorrect && !answerIdStrs.Contains(a.Id.ToString()))
+            {
+                isCorrect = false;
+                break;
+            }
+        }
+
+        return isCorrect ? mark : 0;
+    }
+
+    private float CalculateSingleChoiceScore(SubmitPaperDetail detail, QuestionClone question, float mark)
+    {
+        // SingleChoice
+        foreach (var a in question.AnswerClones)
+        {
+            if (a.Id == Guid.Parse(detail.AnswerRaw!) && a.IsCorrect)
+            {
+                return mark;
+            }
+        }
+
+        return 0;
+    }
+
+    private float CalculateFillBlankScore(SubmitPaperDetail detail, QuestionClone question, float mark)
+    {
+        // FillBlank
+        List<Dictionary<string, string>> answers = _serializerService.Deserialize<List<Dictionary<string, string>>>(detail.AnswerRaw!);
+
+        // question.AnswerClones array = ["$_[1]Sahara", "$_[2]Africa"]
+        // Convert to dictionary
+        List<Dictionary<string, string>> correctAnswers = new();
+
+        // 1. Sahara 2. Africa
+        Regex regex = new Regex(@"\$_\[(\d+)\](.*)");
+        foreach (var a in question.AnswerClones)
+        {
+            Match match = regex.Match(a.Content!);
+            if (match.Success)
+            {
+                correctAnswers.Add(new Dictionary<string, string> { { match.Groups[1].Value, match.Groups[2].Value } });
+            }
+        }
+
+        int correctCount = 0;
+
+        // Check correct answers
+        foreach (var a in answers)
+        {
+            foreach (var ca in correctAnswers)
+            {
+                // Check key
+                if (a.Keys.First() == ca.Keys.First())
+                {
+                    // Check value
+                    string normalizedAnswer = a.Values.First().Trim().ToLower();
+                    string normalizedCorrectAnswer = ca.Values.First().Trim().ToLower();
+                    if (normalizedAnswer == normalizedCorrectAnswer)
+                    {
+                        correctCount++;
+                    }
+                }
+            }
+        }
+
+        return correctCount == 0 ? 0 : mark / correctAnswers.Count * correctCount;
+    }
+
+    private float CalculateMatchingScore(SubmitPaperDetail detail, QuestionClone question, float mark)
+    {
+        // if detail.AnswerRaw is empty
+        if (string.IsNullOrEmpty(detail.AnswerRaw))
+        {
+            return 0;
+        }
+
+        // Deserialize the AnswerRaw to get the user's answers
+        var userAnswers = detail.AnswerRaw.Split('|')
+                                          .Select(pair => pair.Split('_'))
+                                          .ToDictionary(parts => parts[0], parts => parts[1]);
+
+        // Initialize a counter for correct answers
+        int correctCount = 0;
+
+        // Iterate through each correct answer and check if the user's answer matches
+        var correctAnswers = question.AnswerClones.FirstOrDefault();
+        int numCorrectAnswers = 0;
+        if (correctAnswers != null)
+        {
+            Dictionary<string, string> correctAnswersDict = new();
+
+            // Deserialize the correct answers
+            foreach (string answer in correctAnswers.Content!.Split('|'))
+            {
+                string[] parts = answer.Split('_');
+                correctAnswersDict.Add(parts[0], parts[1]);
+            }
+
+            numCorrectAnswers = correctAnswersDict.Count;
+
+            // Check if the user's answer matches the correct answer
+            foreach (var userAnswer in userAnswers)
+            {
+                // ignore case, trim and compare
+                if (correctAnswersDict.TryGetValue(userAnswer.Key, out string? correctAnswer) &&
+                                       userAnswer.Value.Trim().Equals(correctAnswer.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    correctCount++;
+                }
+            }
+        }
+
+        // Calculate the score: total marks divided by the number of correct answers
+        return correctCount == 0 ? 0 : mark / numCorrectAnswers * correctCount;
+    }
+
+    private float CalculateReadingScore(QuestionClone question, float mark, List<SubmitPaperDetail>? details = null)
+    {
+        // Reading
+        float correctCount = 0;
+        foreach (var qp in question.QuestionPassages)
+        {
+            var detail1 = details!.FirstOrDefault(x => x.QuestionId == qp.Id);
+            if (detail1 != null)
+            {
+                bool isCorrect = true;
+                foreach (var a in qp.AnswerClones)
+                {
+                    if (a.IsCorrect && !detail1.AnswerRaw!.Split('|').Contains(a.Id.ToString()))
+                    {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+
+                if (isCorrect)
+                {
+                    correctCount += 1;
+                }
+            }
+        }
+
+        return correctCount == 0 ? 0 : mark / question.QuestionPassages.Count * correctCount;
+    }
+
+    private float CalculateWritingScore(SubmitPaperDetail detail)
+    {
+        // if answer is empty
+        if (string.IsNullOrEmpty(detail.AnswerRaw))
+        {
+            return 0;
+        }
+
+        // if answer is nomal grade before
+        return detail.Mark.HasValue && detail.Mark > 0 ? detail.Mark ?? 0 : 0;
+    }
+
+    public Task<List<SubmitPaper>> CalculateScorePaperAsync(DefaultIdType paperId, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }
