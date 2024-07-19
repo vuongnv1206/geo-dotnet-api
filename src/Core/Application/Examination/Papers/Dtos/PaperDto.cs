@@ -34,6 +34,8 @@ public class PaperDto : IDto
     public DateTime? LastModifiedOn { get; set; }
     public SubjectDto Subject { get; set; }
     public float? MaxPoint => Questions.Sum(x => x.Mark);
+    public string? PublicIpAllowed { get; set; }
+    public string? LocalIpAllowed { get; set; }
     public PaperLabelDto PaperLable { get; set; }
     public PaperFolderDto PaperFolder { get; set; }
     public List<QuestionDto> Questions { get; set; }
