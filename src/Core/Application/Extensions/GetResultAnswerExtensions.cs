@@ -1,6 +1,9 @@
-﻿using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
+using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace FSH.WebApi.Application.Extensions;
 public static class GetResultAnswerExtensions
@@ -45,7 +48,8 @@ public static class GetResultAnswerExtensions
             QuestionType.FillBlank => CalculateFillBlankScore(submitDetail, question, mark),
             QuestionType.Reading => CalculateReadingScore(submitDetail, question, mark),
             QuestionType.Matching => CalculateMatchingScore(submitDetail, question, mark),
-            QuestionType.Writing or QuestionType.Other => 0,
+            QuestionType.Writing => submitDetail.Mark ?? 0,
+            QuestionType.Other => 0,
             _ => throw new NotImplementedException($"Question type {question.QuestionType} is not supported."),
         };
     }
@@ -97,6 +101,30 @@ public static class GetResultAnswerExtensions
 
     private static float CalculateFillBlankScore(SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {
-        return 0;
+        float achieveMark = 0;
+        float averageScore = mark / question.AnswerClones.Count;
+        var answerRaw = JArray.Parse(submitDetail.AnswerRaw);
+
+        Regex regex = new Regex(@"\$_\[(\d+)\](.+)");
+        foreach (var answer in question.AnswerClones)
+        {
+            Match match = regex.Match(answer.Content);
+
+            if (match.Success)
+            {
+                string key = match.Groups[1].Value;
+                string answerCorrent = match.Groups[2].Value;
+
+                foreach(JObject obj in answerRaw)
+                {
+                    if (obj[key]?.ToString() == answerCorrent)
+                    {
+                        achieveMark += averageScore;
+                    }
+                }
+            }
+        }
+
+        return achieveMark;
     }
 }
