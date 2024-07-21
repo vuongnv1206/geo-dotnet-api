@@ -42,7 +42,6 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
 
         var student = await _userService.GetAsync(request.UserId.ToString(), cancellationToken);
 
-        var examResultDto = submitPaper.Adapt<LastResultExamDto>();
 
         if (submitPaper.TotalMark == 0)
         {
@@ -50,11 +49,12 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
 
             foreach (var submit in submitPaper.SubmitPaperDetails)
             {
+                float achieveMark = 0;
                 if (submit.Question.QuestionParentId is null
                     || submit.Question.QuestionParentId == Guid.Empty)
                 {
-                    totalMark += submit.GetPointQuestion(submit.Question,
-                        paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+                    achieveMark = submit.GetPointQuestion(submit.Question, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+                    totalMark += achieveMark;
                 }
                 else
                 {
@@ -62,16 +62,20 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
                     .FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
 
                     float avgMark = paperQuestionParent.Mark / paperQuestionParent.Question.QuestionPassages.Count;
-
-                    totalMark += submit.GetPointQuestion(submit.Question, avgMark);
+                    achieveMark = submit.GetPointQuestion(submit.Question, avgMark);
+                    totalMark += achieveMark;
                 }
 
-                examResultDto.TotalMark = totalMark;
+                submit.Mark = achieveMark;
             }
 
+            var examResultDto = submitPaper.Adapt<LastResultExamDto>();
+            examResultDto.TotalMark = totalMark;
             examResultDto.Student = student;
 
+            return examResultDto;
         }
-        return examResultDto;
+
+        return submitPaper.Adapt<LastResultExamDto>();
     }
 }
