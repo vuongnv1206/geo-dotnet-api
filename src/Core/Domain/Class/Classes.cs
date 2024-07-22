@@ -68,4 +68,10 @@ public class Classes : AuditableEntity, IAggregateRoot
     {
         AssignmentClasses.Remove(assignmentClass);
     }
+
+    //write function to get studentIds from class
+    public List<Guid> GetStudentIds()
+    {
+        return UserClasses.Select(x => x.StudentId).ToList();
+    }
 }
