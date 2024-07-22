@@ -8,6 +8,7 @@ using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
+using FSH.WebApi.Application.Examination.PaperStatistics;
 using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.Services.Models;
@@ -229,5 +230,25 @@ public class MapsterSettings
             .Map(dest => dest.QuestionPassages, src => src.QuestionPassages);
         _ = TypeAdapterConfig<QuestionPassageModel, QuestionPassagesDto>.NewConfig();
         _ = TypeAdapterConfig<AnswerModel, AnswerDto>.NewConfig();
+
+        // paper statistic
+        _ = TypeAdapterConfig<Paper, PaperInfoStatistic>.NewConfig()
+            .Map(dest => dest.TotalAttendee, src => src.SubmitPapers.GroupBy(x => x.CreatedBy).Count())
+            .Map(dest => dest.TotalRegister, src => src.SubmitPapers.GroupBy(x => x.CreatedBy).Count())
+            .Map(dest => dest.MarkPopular, src =>
+                src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End)
+                                .GroupBy(x => Math.Ceiling(x.TotalMark))
+                                .OrderByDescending(g => g.Count())
+                                .Select(g => g.Key)
+                                .FirstOrDefault())
+            .Map(dest => dest.TotalPopular, src =>
+                src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End)
+                                .GroupBy(x => Math.Ceiling(x.TotalMark))
+                                .OrderByDescending(g => g.Count())
+                                .Select(g => g.Count())
+                                .FirstOrDefault())
+            .Map(dest => dest.TotalDoing, src => src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.Doing).Count())
+            .Map(dest => dest.AverageMark, src => src.SubmitPapers.Sum(x => x.TotalMark)
+            / src.SubmitPapers.Where(sb => sb.Status == SubmitPaperStatus.End).Count());
     }
 }
