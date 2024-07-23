@@ -250,5 +250,9 @@ public class MapsterSettings
             .Map(dest => dest.TotalDoing, src => src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.Doing).Count())
             .Map(dest => dest.AverageMark, src => src.SubmitPapers.Sum(x => x.TotalMark)
             / src.SubmitPapers.Where(sb => sb.Status == SubmitPaperStatus.End).Count());
+
+        _ = TypeAdapterConfig<QuestionClone, QuestionStatisticDto>.NewConfig()
+            .Map(dest => dest.Answers, src => src.AnswerClones);
+
     }
 }
