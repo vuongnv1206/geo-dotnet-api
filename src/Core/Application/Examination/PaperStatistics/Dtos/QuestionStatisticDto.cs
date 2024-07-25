@@ -30,6 +30,6 @@ public class QuestionStatisticDto : IDto
 
     public int TotalCorrect { get; set; }
     public int TotalWrong { get; set; }
-    public List<StudentInfo>? WrongStudents { get; set; }
+    public List<StudentInfo>? WrongStudents { get; set; } = new();
 }
 
