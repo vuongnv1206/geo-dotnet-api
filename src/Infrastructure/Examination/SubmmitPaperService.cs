@@ -730,7 +730,7 @@ public class SubmmitPaperService : ISubmmitPaperService
     {
         return question.QuestionType switch
         {
-            QuestionType.SingleChoice => CalculateSingleChoiceScore(detail, question, mark),
+            QuestionType.SingleChoice or QuestionType.ReadingQuestionPassage => CalculateSingleChoiceScore(detail, question, mark),
             QuestionType.MultipleChoice => CalculateMultipleChoiceScore(detail, question, mark),
             QuestionType.FillBlank => CalculateFillBlankScore(detail, question, mark),
             QuestionType.Matching => CalculateMatchingScore(detail, question, mark),
@@ -918,5 +918,12 @@ public class SubmmitPaperService : ISubmmitPaperService
         _ = await _submitPaperLogRepository.AddAsync(spl, cancellationToken);
 
         return spl.Id;
+    }
+
+    public bool IsCorrectAnswer(SubmitPaperDetail submitDetail, QuestionClone question)
+    {
+        float markFlag = 10f;
+        var x = CalculateScore(submitDetail, question, markFlag);
+        return x == markFlag;
     }
 }
