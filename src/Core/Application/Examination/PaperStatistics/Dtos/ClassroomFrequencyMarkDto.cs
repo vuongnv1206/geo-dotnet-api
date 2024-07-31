@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace FSH.WebApi.Application.Examination.PaperStatistics;
 public class ClassroomFrequencyMarkDto
 {
-    public ClassDto Class { get; set; }
-    public List<StudentDto> Students { get; set; }
+    public string ClassName { get; set; }
     public int TotalRegister { get; set; }
     public int TotalAttendee { get; set; }
     public List<FrequencyMarkDto> FrequencyMarks { get; set; }
