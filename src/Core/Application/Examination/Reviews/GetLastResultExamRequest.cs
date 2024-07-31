@@ -43,39 +43,34 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
         var student = await _userService.GetAsync(request.UserId.ToString(), cancellationToken);
 
 
-        if (submitPaper.TotalMark == 0)
+        float totalMark = 0;
+
+        foreach (var submit in submitPaper.SubmitPaperDetails)
         {
-            float totalMark = 0;
-
-            foreach (var submit in submitPaper.SubmitPaperDetails)
+            float achieveMark = 0;
+            if (submit.Question.QuestionParentId is null
+                || submit.Question.QuestionParentId == Guid.Empty)
             {
-                float achieveMark = 0;
-                if (submit.Question.QuestionParentId is null
-                    || submit.Question.QuestionParentId == Guid.Empty)
-                {
-                    achieveMark = submit.GetPointQuestion(submit.Question, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
-                    totalMark += achieveMark;
-                }
-                else
-                {
-                    var paperQuestionParent = paper.PaperQuestions
-                    .FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
+                achieveMark = submit.GetPointQuestion(submit.Question, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+                totalMark += achieveMark;
+            }
+            else
+            {
+                var paperQuestionParent = paper.PaperQuestions
+                .FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
 
-                    float avgMark = paperQuestionParent.Mark / paperQuestionParent.Question.QuestionPassages.Count;
-                    achieveMark = submit.GetPointQuestion(submit.Question, avgMark);
-                    totalMark += achieveMark;
-                }
-
-                submit.Mark = achieveMark;
+                float avgMark = paperQuestionParent.Mark / paperQuestionParent.Question.QuestionPassages.Count;
+                achieveMark = submit.GetPointQuestion(submit.Question, avgMark);
+                totalMark += achieveMark;
             }
 
-            var examResultDto = submitPaper.Adapt<LastResultExamDto>();
-            examResultDto.TotalMark = totalMark;
-            examResultDto.Student = student;
-
-            return examResultDto;
+            submit.Mark = achieveMark;
         }
 
-        return submitPaper.Adapt<LastResultExamDto>();
+        var examResultDto = submitPaper.Adapt<LastResultExamDto>();
+        examResultDto.TotalMark = totalMark;
+        examResultDto.Student = student;
+
+        return examResultDto;
     }
 }
