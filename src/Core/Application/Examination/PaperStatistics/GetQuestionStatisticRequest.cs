@@ -1,6 +1,4 @@
 ﻿using FSH.WebApi.Application.Class;
-using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Identity.Users;
@@ -66,6 +64,7 @@ public class GetQuestionStatisticRequestHandler : IRequestHandler<GetQuestionSta
             var classroom = request.ClassId.HasValue
                 ? await _classRepo.FirstOrDefaultAsync(new ClassByIdSpec(request.ClassId.Value, userId))
                 : null;
+            dto.RawIndex = paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == dto.Id).RawIndex;
 
             int totalTest = paper.SubmitPapers.Count(x => classroom == null
             || classroom.UserClasses.Any(uc => uc.Student.StId == x.CreatedBy));
