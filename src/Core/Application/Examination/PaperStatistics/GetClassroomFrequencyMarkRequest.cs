@@ -41,48 +41,47 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
     {
         var paper = await _repoPaper.FirstOrDefaultAsync(new PaperByIdSpec(request.PaperId), cancellationToken);
         _ = paper ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.PaperId]);
-        var currentUserId = _currentUser.GetUserId();
-        var classroom = new Classes();
-        List<SubmitPaper> submissions = new List<SubmitPaper>();
 
-        var accessibleStudentIds = new List<Guid>();
-        //Filter theo classroom
-        if (request.ClassroomId.HasValue)
-        {
-            classroom = await _repoClass.FirstOrDefaultAsync(new ClassByIdSpec(request.ClassroomId.Value, currentUserId));
-            var studentIdsInClass = classroom.GetStudentIds();
-            accessibleStudentIds.AddRange(studentIdsInClass);
-            submissions.AddRange(await _repoSubmitPaper.ListAsync(new SubmitPaperByUserIdsSpec(request.PaperId, accessibleStudentIds), cancellationToken));
-        }
-        else
-        {
-            submissions.AddRange(paper.SubmitPapers);
-        }
-    
+        // Lấy danh sách PaperAccess
+        var paperAccesses = paper.PaperAccesses.ToList();
 
         // Tạo một dictionary để lưu danh sách bài nộp theo lớp
         var classSubmissionsMap = new Dictionary<string, List<SubmitPaper>>();
 
-        foreach (var submission in submissions)
+        // Duyệt qua các lớp có trong PaperAccess
+        foreach (var paperAccess in paperAccesses)
         {
-            // Tìm lớp của học sinh từ bảng Classes thông qua CreatedBy
-            var studentClasses = await _repoClass.ListAsync(new ClassesByStudentIdSpec(submission.CreatedBy), cancellationToken);
-            var classNames = studentClasses.Select(c => c.Name).ToList();
-
-            // Nếu học sinh không thuộc lớp nào, gán "Thí sinh tự do"
-            if (classNames.Count == 0)
+            if (paperAccess.ClassId.HasValue)
             {
-                classNames.Add("Thí sinh tự do");
-            }
-
-            // Nhóm bài nộp theo các lớp tìm được
-            foreach (var className in classNames)
-            {
-                if (!classSubmissionsMap.ContainsKey(className))
+                var classroom = await _repoClass.FirstOrDefaultAsync(new ClassesByIdSpec(paperAccess.ClassId.Value), cancellationToken);
+                if (classroom != null)
                 {
-                    classSubmissionsMap[className] = new List<SubmitPaper>();
+                    // Lấy danh sách các bài nộp của lớp này
+                    var studentIdsInClass = classroom.GetStudentIds();
+                    var classSubmissions = await _repoSubmitPaper.ListAsync(new SubmitPaperByUserIdsSpec(request.PaperId, studentIdsInClass));
+                    
+                    // Nếu lớp chưa tồn tại trong từ điển thì thêm vào
+                    if (!classSubmissionsMap.ContainsKey(classroom.Name))
+                    {
+                        classSubmissionsMap[classroom.Name] = new List<SubmitPaper>();
+                    }
+
+                    // Thêm bài nộp vào danh sách
+                    classSubmissionsMap[classroom.Name].AddRange(classSubmissions);
                 }
-                classSubmissionsMap[className].Add(submission);
+            }
+            else if (paperAccess.UserId.HasValue)
+            {
+                // Xử lý trường hợp thí sinh tự do (không thuộc lớp nào)
+                var submission = paper.SubmitPapers.FirstOrDefault(s => s.CreatedBy == paperAccess.UserId);
+                if (submission != null)
+                {
+                    if (!classSubmissionsMap.ContainsKey("Thí sinh tự do"))
+                    {
+                        classSubmissionsMap["Thí sinh tự do"] = new List<SubmitPaper>();
+                    }
+                    classSubmissionsMap["Thí sinh tự do"].Add(submission);
+                }
             }
         }
 
@@ -128,10 +127,7 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
                     Total = count,
                     Rate = rate
                 });
-
-     
             }
-
 
             // Thêm thông tin tần số điểm vào danh sách kết quả
             classFrequencyMarks.Add(new ClassroomFrequencyMarkDto
@@ -146,6 +142,7 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
         // Trả về danh sách các tần số điểm theo lớp
         return classFrequencyMarks;
     }
+
 
 }
 
