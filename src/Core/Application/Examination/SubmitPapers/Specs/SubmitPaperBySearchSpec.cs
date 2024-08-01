@@ -15,6 +15,17 @@ public class SubmitPaperBySearchSpec : EntitiesByPaginationFilterSpec<SubmitPape
             .Include(x => x.SubmitPaperDetails)
             .Where(x => x.PaperId == request.PaperId);
 
+        if (request.ClassId.HasValue)
+        {
+            Query
+            .Include(x => x.Paper)
+            .ThenInclude(p => p.PaperAccesses)
+            .ThenInclude(pa => pa.Class)
+            .ThenInclude(c => c.UserClasses)
+            .ThenInclude(uc => uc.Student)
+            .Where(x => x.Paper.PaperAccesses.FirstOrDefault(pa => pa.ClassId == request.ClassId.Value).Class.UserClasses.Any(uc => uc.Student.StId == x.CreatedBy));
+        }
+
         if (accessibleIds.Any())
         {
             Query.Where(x => accessibleIds.Contains(x.CreatedBy));
