@@ -13,6 +13,7 @@ public class ClassesByIdSpec : Specification<Classes>, ISingleResultSpecificatio
     {
         Query
             .Include(x => x.AssignmentClasses)
+            .Include(x => x.UserClasses).ThenInclude(x => x.Student)
             .Where(x => x.Id == id);
     }
 }

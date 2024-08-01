@@ -70,8 +70,10 @@ public class Classes : AuditableEntity, IAggregateRoot
     }
 
     //write function to get studentIds from class
-    public List<Guid> GetStudentIds()
+    public List<Guid?> GetStudentIds()
     {
-        return UserClasses.Select(x => x.StudentId).ToList();
+        // Truy vấn các StudentIds từ UserClasses, sau đó lấy danh sách StId từ các Student tương ứng
+        return UserClasses.Select(x => x.Student.StId).ToList();
     }
+
 }
