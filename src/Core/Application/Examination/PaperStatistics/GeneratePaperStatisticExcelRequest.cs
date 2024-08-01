@@ -173,7 +173,7 @@ public class GeneratePaperStatisticExcelRequestHandler : IRequestHandler<Generat
         {
             worksheet.Cells[row, 1].Value = index++;
             worksheet.Cells[row, 2].Value = $"{transcript.Attendee.FirstName} {transcript.Attendee.LastName}";
-            worksheet.Cells[row, 3].Value = transcript.Classroom != null ? transcript.Classroom.Name : "Thí sinh tự do";
+            worksheet.Cells[row, 3].Value = transcript.Classrooms != null ? string.Join(", ", transcript.Classrooms.Select(x => x.Name)) : "Thí sinh tự do";
             worksheet.Cells[row, 4].Value = transcript.Mark;
             worksheet.Cells[row, 5].Value = transcript.StartedTest.ToString("dd/MM/yyyy HH:mm:ss");
             worksheet.Cells[row, 6].Value = transcript.FinishedTest?.ToString("dd/MM/yyyy HH:mm:ss") ?? "Chưa hoàn thành";

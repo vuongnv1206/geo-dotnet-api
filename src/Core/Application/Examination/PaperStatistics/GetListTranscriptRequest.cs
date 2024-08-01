@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Class.Dto;
+﻿using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.UserStudents;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.PaperStatistics.Dtos;
@@ -14,6 +15,7 @@ namespace FSH.WebApi.Application.Examination.PaperStatistics;
 public class GetListTranscriptRequest : PaginationFilter, IRequest<TranscriptPaginationResponse>
 {
     public Guid PaperId { get; set; }
+    public Guid? ClassId { get; set; }
 }
 
 
@@ -50,13 +52,15 @@ public class GetListTranscriptRequestHandler : IRequestHandler<GetListTranscript
 
     public async Task<TranscriptPaginationResponse> Handle(GetListTranscriptRequest request, CancellationToken cancellationToken)
     {
-        var paper = await _repoPaper.FirstOrDefaultAsync(new PaperByIdSpec(request.PaperId), cancellationToken);
-        _ = paper ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.PaperId]);
+        var paper = await _repoPaper.FirstOrDefaultAsync(new PaperByIdSpec(request.PaperId), cancellationToken)
+            ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.PaperId]);
+
         var currentUserId = _currentUser.GetUserId();
-        List<SubmitPaper> submissions = new List<SubmitPaper>();
-        var count = 0;
+        var submissions = new List<SubmitPaper>();
+        int count = 0;
 
         var spec = new SubmitPaperBySearchSpec(request, Enumerable.Empty<Guid>());
+        var x = await _repoSubmitPaper.ListAsync(spec, cancellationToken);
         count = await _repoSubmitPaper.CountAsync(spec, cancellationToken);
         submissions.AddRange(await _repoSubmitPaper.ListAsync(spec, cancellationToken));
 
@@ -97,13 +101,17 @@ public class GetListTranscriptRequestHandler : IRequestHandler<GetListTranscript
             {
                 Attendee = student.Adapt<StudentDto>(),
                 Mark = submission.TotalMark,
+                Classrooms = paper.PaperAccesses
+                                    .Where(x => x.Class.UserClasses
+                                    .Any(uc => uc.Student.StId == submission.CreatedBy))
+                                    .Select(x => x.Class).Adapt<List<ClassViewListDto>>(),
                 StartedTest = submission.StartTime,
                 FinishedTest = submission.EndTime,
                 QuestionResults = questionResults // Thêm kết quả câu hỏi vào DTO
             });
         }
 
-        var averageMark = results.Any() ? results.Average(r => r.Mark) : 0f;
+        float averageMark = results.Any() ? results.Average(r => r.Mark) : 0f;
         var paginatedResponse = new TranscriptPaginationResponse(
                  data: results,
                  count: count,
