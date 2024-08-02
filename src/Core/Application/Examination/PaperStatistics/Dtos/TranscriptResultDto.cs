@@ -11,6 +11,5 @@ public class TranscriptResultDto
     public float Mark { get; set; }
     public DateTime StartedTest { get; set; }
     public DateTime? FinishedTest { get; set; }
-    public List<QuestionResultDto> QuestionResults { get; set; }
 
 }

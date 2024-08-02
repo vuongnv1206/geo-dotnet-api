@@ -5,5 +5,5 @@ public enum RequestStatisticType
 {
     GetClassroomFrequencyMark = 1,
     GetListTranscript = 2,
-    GetPaperInfo = 3
+    GetQuestionStatistic = 3
 }

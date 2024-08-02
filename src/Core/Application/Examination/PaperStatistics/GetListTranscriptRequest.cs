@@ -69,32 +69,6 @@ public class GetListTranscriptRequestHandler : IRequestHandler<GetListTranscript
         var results = new List<TranscriptResultDto>();
         foreach (var submission in submissions)
         {
-            var questionResults = new List<QuestionResultDto>();
-
-            foreach (var paperQuestion in questionsInPaper)
-            {
-                var studentAnswer = submission.SubmitPaperDetails.FirstOrDefault(a => a.QuestionId == paperQuestion.QuestionId);
-                var questionResult = new QuestionResultDto
-                {
-                    RawIndex = paperQuestion.RawIndex.Value,
-                    IsCorrect = studentAnswer != null ? (_submmitPaperService.IsCorrectAnswer(studentAnswer, paperQuestion.Question) ? "Đúng" : "Sai") : "Không trả lời",
-                    Score = studentAnswer != null ? paperQuestion.Mark : 0
-                };
-
-                // Xử lý các câu hỏi Reading và thêm QuestionPassage nếu có
-                if (paperQuestion.Question.QuestionType == Domain.Question.Enums.QuestionType.Reading)
-                {
-                    questionResult.QuestionPassages = new List<QuestionResultDto>();
-                    await HandleReadingQuestion(paperQuestion.Question.QuestionPassages, paperQuestion.Mark, questionResult.QuestionPassages, submission.SubmitPaperDetails, cancellationToken);
-                }
-                else if (paperQuestion.Question.QuestionType == Domain.Question.Enums.QuestionType.Writing)
-                {
-                    questionResult.IsCorrect = "Không có thông tin";
-                }
-
-                questionResults.Add(questionResult);
-            }
-
             var student = await _repoStudent.FirstOrDefaultAsync(new StudentByStIdSpec(submission.CreatedBy), cancellationToken);
 
             results.Add(new TranscriptResultDto
@@ -106,8 +80,7 @@ public class GetListTranscriptRequestHandler : IRequestHandler<GetListTranscript
                                     .Any(uc => uc.Student.StId == submission.CreatedBy))
                                     .Select(x => x.Class).Adapt<List<ClassViewListDto>>(),
                 StartedTest = submission.StartTime,
-                FinishedTest = submission.EndTime,
-                QuestionResults = questionResults // Thêm kết quả câu hỏi vào DTO
+                FinishedTest = submission.EndTime
             });
         }
 
@@ -122,27 +95,5 @@ public class GetListTranscriptRequestHandler : IRequestHandler<GetListTranscript
         return paginatedResponse;
     }
 
-    private async Task HandleReadingQuestion(List<QuestionClone> questionPassages, float mark, List<QuestionResultDto> questionResult, List<SubmitPaperDetail> studentAnswers, CancellationToken cancellationToken)
-    {
-
-        foreach (var passageQuestion in questionPassages)
-        {
-            var studentAnswer = studentAnswers.FirstOrDefault(a => a.QuestionId == passageQuestion.Id);
-            var markOfQuestionPassage = mark / questionPassages.Count;
-            var passageResult = new QuestionResultDto
-            {
-                IsCorrect = studentAnswer != null ? (_submmitPaperService.IsCorrectAnswer(studentAnswer, passageQuestion) ? "Đúng" : "Sai") : "Không trả lời",
-                Score = studentAnswer != null ? markOfQuestionPassage : 0,
-                QuestionPassages = new List<QuestionResultDto>()
-            };
-
-            // Đệ quy xử lý các câu hỏi con bên trong đoạn văn
-            if (passageQuestion.QuestionPassages.Any())
-            {
-                await HandleReadingQuestion(passageQuestion.QuestionPassages, markOfQuestionPassage, passageResult.QuestionPassages, studentAnswers, cancellationToken);
-            }
-
-            questionResult.Add(passageResult);
-        }
-    }
+   
 }
