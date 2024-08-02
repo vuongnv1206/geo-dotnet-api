@@ -24,6 +24,7 @@ public class PaperInListDto : IDto
     public Guid? PaperFolderId { get; set; }
     public Guid? SubjectId { get; set; }
     public Guid? PaperLabelId { get; set; }
+    public string? CreatorName { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime CreatedOn { get; private set; }
     public Guid? LastModifiedBy { get; set; }
