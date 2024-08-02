@@ -4,6 +4,7 @@ using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
+using System.Reflection.Metadata;
 
 namespace FSH.WebApi.Application.Examination.PaperStatistics;
 public class GetClassroomFrequencyMarkRequest : IRequest<List<ClassroomFrequencyMarkDto>>
@@ -47,6 +48,7 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
 
         // Tạo một dictionary để lưu danh sách bài nộp theo lớp
         var classSubmissionsMap = new Dictionary<string, List<SubmitPaper>>();
+        var submitPaperInClass = new List<SubmitPaper>();
 
         // Duyệt qua các lớp có trong PaperAccess
         foreach (var paperAccess in paperAccesses)
@@ -59,7 +61,7 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
                     // Lấy danh sách các bài nộp của lớp này
                     var studentIdsInClass = classroom.GetStudentIds();
                     var classSubmissions = await _repoSubmitPaper.ListAsync(new SubmitPaperByUserIdsSpec(request.PaperId, studentIdsInClass));
-                    
+                    submitPaperInClass.AddRange(classSubmissions);
                     // Nếu lớp chưa tồn tại trong từ điển thì thêm vào
                     if (!classSubmissionsMap.ContainsKey(classroom.Name))
                     {
@@ -70,19 +72,30 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
                     classSubmissionsMap[classroom.Name].AddRange(classSubmissions);
                 }
             }
-            else if (paperAccess.UserId.HasValue)
+            else
             {
                 // Xử lý trường hợp thí sinh tự do (không thuộc lớp nào)
                 var submission = paper.SubmitPapers.FirstOrDefault(s => s.CreatedBy == paperAccess.UserId);
                 if (submission != null)
                 {
-                    if (!classSubmissionsMap.ContainsKey("Thí sinh tự do"))
+                    submitPaperInClass.Add(submission);
+                    if (!classSubmissionsMap.ContainsKey(_t["Freelance contestant"]))
                     {
-                        classSubmissionsMap["Thí sinh tự do"] = new List<SubmitPaper>();
+                        classSubmissionsMap[_t["Freelance contestant"]] = new List<SubmitPaper>();
                     }
-                    classSubmissionsMap["Thí sinh tự do"].Add(submission);
+                    classSubmissionsMap[_t["Freelance contestant"]].Add(submission);
                 }
             }
+        }
+
+        // set freeblance who no t in paper access
+        if (submitPaperInClass.Any())
+        {
+            if (!classSubmissionsMap.ContainsKey(_t["Freelance contestant"]))
+            {
+                classSubmissionsMap[_t["Freelance contestant"]] = new List<SubmitPaper>();
+            }
+            classSubmissionsMap[_t["Freelance contestant"]].AddRange(paper.SubmitPapers.Except(submitPaperInClass));
         }
 
         var classFrequencyMarks = new List<ClassroomFrequencyMarkDto>();

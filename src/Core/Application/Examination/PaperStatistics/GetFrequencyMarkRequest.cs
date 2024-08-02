@@ -1,4 +1,5 @@
 ﻿
+using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
@@ -7,6 +8,7 @@ namespace FSH.WebApi.Application.Examination.PaperStatistics;
 public class GetFrequencyMarkRequest : IRequest<ClassroomFrequencyMarkDto>
 {
     public Guid PaperId { get; set; }
+    public Guid? classroomId { get; set; }
 }
 
 public class GetFrequencyMarkRequestHandler : IRequestHandler<GetFrequencyMarkRequest, ClassroomFrequencyMarkDto>
@@ -44,7 +46,17 @@ public class GetFrequencyMarkRequestHandler : IRequestHandler<GetFrequencyMarkRe
 
         var accessibleStudentIds = new List<Guid>();
 
-        submissions.AddRange(paper.SubmitPapers);
+        if (request.classroomId.HasValue)
+        {
+            classroom = await _repoClass.FirstOrDefaultAsync(new ClassByIdSpec(request.classroomId.Value,currentUserId))
+                ?? throw new NotFoundException(_t["Classroom {0} Not Found.", request.classroomId]);
+
+            submissions.AddRange(paper.SubmitPapers.Where(sp => classroom.UserClasses.Any(uc => uc.Student.StId == sp.CreatedBy)));
+
+        }else
+        {
+            submissions.AddRange(paper.SubmitPapers);
+        }
 
 
 
@@ -88,6 +100,7 @@ public class GetFrequencyMarkRequestHandler : IRequestHandler<GetFrequencyMarkRe
 
         return new ClassroomFrequencyMarkDto
         {
+            ClassName = classroom.Name,
             TotalRegister = totalRegister,
             TotalAttendee = totalAttendee,
             FrequencyMarks = frequencyMarks
