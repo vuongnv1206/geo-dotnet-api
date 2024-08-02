@@ -16,6 +16,7 @@ using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.Questions.QuestionLabel;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
@@ -254,5 +255,9 @@ public class MapsterSettings
         _ = TypeAdapterConfig<QuestionClone, QuestionStatisticDto>.NewConfig()
             .Map(dest => dest.Answers, src => src.AnswerClones);
 
+
+        //Question Label
+        _ = TypeAdapterConfig<QuestionLable, QuestionLabelDto>.NewConfig()
+        ;
     }
 }

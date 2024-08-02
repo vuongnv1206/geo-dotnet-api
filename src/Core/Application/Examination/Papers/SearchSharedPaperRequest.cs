@@ -1,6 +1,7 @@
 ﻿
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers.Specs;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -23,13 +24,15 @@ public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaper
 
     private readonly ICurrentUser _currentUser;
     private readonly IStringLocalizer _t;
-    
+    private readonly IUserService _userService;
+
 
     public SearchSharedPaperRequestHandler(IReadRepository<Paper> repository,
         IReadRepository<PaperFolder> paperFolderRepo, IReadRepository<GroupTeacher>
         groupTeacherRepo, IReadRepository<PaperPermission> paperPermissionRepo,
         ICurrentUser currentUser, IReadRepository<PaperFolderPermission> paperFolderPermissionRepo,
-        IStringLocalizer<SearchSharedPaperRequestHandler> t)
+        IStringLocalizer<SearchSharedPaperRequestHandler> t,
+        IUserService userService)
     {
         _repository = repository;
         _paperFolderRepo = paperFolderRepo;
@@ -38,7 +41,7 @@ public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaper
         _currentUser = currentUser;
         _paperFolderPermissionRepo = paperFolderPermissionRepo;
         _t = t;
-
+        _userService = userService;
     }
 
     public async Task<List<PaperInListDto>> Handle(SearchSharedPaperRequest request, CancellationToken cancellationToken)
@@ -116,6 +119,7 @@ public class SearchSharedPaperRequestHandler : IRequestHandler<SearchSharedPaper
                 var parents = paper.PaperFolder.ListParents();
                 dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
             }
+            dto.CreatorName = await _userService.GetFullName(paper.CreatedBy);
             dtos.Add(dto);
         }
         return dtos;

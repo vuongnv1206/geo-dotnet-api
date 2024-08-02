@@ -38,9 +38,9 @@ public class GeneratePaperStatisticExcelRequestHandler : IRequestHandler<Generat
                         AddTranscriptSheet(package, transcriptData);
                         break;
 
-                    case RequestStatisticType.GetPaperInfo:
-                        var paperInfoData = await _mediator.Send(new GetPaperInfoRequest(request.PaperId, null), cancellationToken);
-                        AddPaperInfoSheet(package, paperInfoData);
+                    case RequestStatisticType.GetQuestionStatistic:
+                        var questionStatisticData = await _mediator.Send(new GetQuestionStatisticRequest { PaperId = request.PaperId }, cancellationToken);
+                        AddQuestionStatisticSheet(package, questionStatisticData);
                         break;
 
                     default:
@@ -148,7 +148,7 @@ public class GeneratePaperStatisticExcelRequestHandler : IRequestHandler<Generat
     {
         var worksheet = package.Workbook.Worksheets.Add("Transcripts");
 
-        // Đặt tiêu đề cho các cột
+        // Set up headers
         worksheet.Cells[1, 1].Value = "STT";
         worksheet.Cells[1, 2].Value = "Học sinh";
         worksheet.Cells[1, 3].Value = "Lớp";
@@ -156,16 +156,18 @@ public class GeneratePaperStatisticExcelRequestHandler : IRequestHandler<Generat
         worksheet.Cells[1, 5].Value = "Bắt đầu làm bài";
         worksheet.Cells[1, 6].Value = "Kết thúc bài làm";
 
-        // Định dạng tiêu đề
+        // Format headers
         using (var range = worksheet.Cells[1, 1, 1, 6])
         {
             range.Style.Font.Bold = true;
             range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
             range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
             range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            range.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
             range.Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
         }
 
+        // Fill in data
         int row = 2;
         int index = 1;
 
@@ -173,55 +175,105 @@ public class GeneratePaperStatisticExcelRequestHandler : IRequestHandler<Generat
         {
             worksheet.Cells[row, 1].Value = index++;
             worksheet.Cells[row, 2].Value = $"{transcript.Attendee.FirstName} {transcript.Attendee.LastName}";
-            worksheet.Cells[row, 3].Value = transcript.Classrooms != null ? string.Join(", ", transcript.Classrooms.Select(x => x.Name)) : "Thí sinh tự do";
+            worksheet.Cells[row, 3].Value = transcript.Classrooms != null && transcript.Classrooms.Any() ? string.Join(", ", transcript.Classrooms.Select(x => x.Name)) : "Thí sinh tự do";
             worksheet.Cells[row, 4].Value = transcript.Mark;
             worksheet.Cells[row, 5].Value = transcript.StartedTest.ToString("dd/MM/yyyy HH:mm:ss");
             worksheet.Cells[row, 6].Value = transcript.FinishedTest?.ToString("dd/MM/yyyy HH:mm:ss") ?? "Chưa hoàn thành";
 
-            int colIndex = 7; // Bắt đầu cột câu hỏi từ cột thứ 7
-
-            foreach (var questionResult in transcript.QuestionResults)
-            {
-                // Hiển thị câu hỏi chính
-                worksheet.Cells[row - 1, colIndex].Value = $"Câu {questionResult.RawIndex} ({questionResult.Score} Điểm)";
-                worksheet.Cells[row - 1, colIndex].Style.Font.Bold = true;
-
-                // Chuỗi để chứa kết quả của các câu hỏi con
-                if (questionResult.QuestionPassages != null && questionResult.QuestionPassages.Any())
-                {
-                    string subQuestionContent = "";
-                    int subIndex = 1;
-                    foreach (var subQuestion in questionResult.QuestionPassages)
-                    {
-                        subQuestionContent += $"Câu {questionResult.RawIndex}.{subIndex} ({subQuestion.Score} Điểm): {subQuestion.IsCorrect}\n";
-                        subIndex++;
-                    }
-                    worksheet.Cells[row , colIndex].Value = subQuestionContent.Trim();
-                    worksheet.Cells[row , colIndex].Style.WrapText = true; // Gói văn bản trong ô
-                }
-
-                colIndex++; // Chuyển sang cột câu hỏi tiếp theo
-            }
-
-            row += 2; // Chuyển sang hàng mới cho học sinh tiếp theo
+            row++;
         }
 
-        // Tự động căn chỉnh độ rộng cột cho phù hợp với nội dung
+        // Add average mark row
+        worksheet.Cells[row, 3].Value = "Điểm trung bình:";
+        worksheet.Cells[row, 4].Value = data.AverageMark;
+
+        // Format average mark row
+        using (var range = worksheet.Cells[row, 3, row, 4])
+        {
+            range.Style.Font.Bold = true;
+            range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            range.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+        }
+
+        // Auto fit columns
         worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
     }
 
-    private void AddPaperInfoSheet(ExcelPackage package, PaperInfoStatistic data)
+
+
+
+    private void AddQuestionStatisticSheet(ExcelPackage package, PaginationResponse<QuestionStatisticDto> data)
     {
-        var worksheet = package.Workbook.Worksheets.Add("Paper Info");
+        var worksheet = package.Workbook.Worksheets.Add("Question Statistic");
 
-        worksheet.Cells[1, 1].Value = "Exam Name";
-        worksheet.Cells[1, 2].Value = "Total Register";
-        worksheet.Cells[1, 3].Value = "Total Attendee";
-        worksheet.Cells[1, 4].Value = "Total Not Complete";
+        // Tạo tiêu đề cho các cột
+        worksheet.Cells[1, 1].Value = "ID";
+        worksheet.Cells[1, 2].Value = "Content";
+        worksheet.Cells[1, 3].Value = "Question Type";
+        worksheet.Cells[1, 4].Value = "Total Test";
+        worksheet.Cells[1, 5].Value = "Total Answered";
+        worksheet.Cells[1, 6].Value = "Total Correct";
+        worksheet.Cells[1, 7].Value = "Total Wrong";
+        worksheet.Cells[1, 8].Value = "Total Not Answered";
+        worksheet.Cells[1, 9].Value = "Wrong Students";
 
-        worksheet.Cells[2, 1].Value = data.ExamName;
-        worksheet.Cells[2, 2].Value = data.TotalRegister;
-        worksheet.Cells[2, 3].Value = data.TotalAttendee;
-        worksheet.Cells[2, 4].Value = data.TotalNotComplete;
+        // Đặt định dạng cho các tiêu đề
+        using (var range = worksheet.Cells[1, 1, 1, 11])
+        {
+            range.Style.Font.Bold = true;
+            range.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+            range.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+            range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+            range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+        }
+
+        int row = 2;
+
+        foreach (var question in data.Data)
+        {
+            worksheet.Cells[row, 1].Value = question.Id;
+            worksheet.Cells[row, 2].Value = question.Content;
+            worksheet.Cells[row, 3].Value = question.QuestionType.ToString();
+            worksheet.Cells[row, 4].Value = question.TotalTest;
+            worksheet.Cells[row, 5].Value = question.TotalAnswered;
+            worksheet.Cells[row, 6].Value = question.TotalCorrect;
+            worksheet.Cells[row, 7].Value = question.TotalWrong;
+            worksheet.Cells[row, 8].Value = question.TotalNotAnswered;
+
+            // Điền danh sách thí sinh làm sai vào một cột
+            if (question.WrongStudents != null && question.WrongStudents.Any())
+            {
+                var wrongStudentNames = question.WrongStudents.Select(s => $"{s.FirstName} {s.LastName}");
+                worksheet.Cells[row, 9].Value = string.Join(", ", wrongStudentNames);
+            }
+            // Điền các câu hỏi con (QuestionPassages) nếu có
+            if (question.QuestionPassages != null && question.QuestionPassages.Any())
+            {
+                foreach (var passage in question.QuestionPassages)
+                {
+                    row++;
+                    worksheet.Cells[row, 1].Value = passage.Id;
+                    worksheet.Cells[row, 2].Value = "   " + passage.Content; // Thụt lề để dễ nhận biết là câu hỏi con
+                    worksheet.Cells[row, 3].Value = passage.QuestionType.ToString();
+                    worksheet.Cells[row, 4].Value = passage.TotalTest;
+                    worksheet.Cells[row, 5].Value = passage.TotalAnswered;
+                    worksheet.Cells[row, 6].Value = passage.TotalCorrect;
+                    worksheet.Cells[row, 7].Value = passage.TotalWrong;
+                    worksheet.Cells[row, 8].Value = passage.TotalNotAnswered;
+                    // Điền danh sách thí sinh làm sai cho câu hỏi con
+                    if (passage.WrongStudents != null && passage.WrongStudents.Any())
+                    {
+                        var wrongStudentNames = passage.WrongStudents.Select(s => $"{s.FirstName} {s.LastName}");
+                        worksheet.Cells[row, 9].Value = string.Join(", ", wrongStudentNames);
+                    }
+                }
+            }
+
+            row++;
+        }
+
+        // Đặt định dạng cho các cột
+        worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
     }
+
 }
