@@ -29,6 +29,7 @@ public static class FSHResource
     public const string Brands = nameof(Brands);
     public const string QuestionFolders = nameof(QuestionFolders);
     public const string Question = nameof(Question);
+    public const string QuestionLabel = nameof(QuestionLabel);
     public const string GroupTeachers = nameof(GroupTeachers);
     public const string Assignments = nameof(Assignments);
     public const string Subjects = nameof(Subjects);
@@ -125,6 +126,15 @@ public static class FSHPermissions
         new("Create News", FSHAction.Create, FSHResource.News),
         new("Update News", FSHAction.Update, FSHResource.News),
         new("Delete News", FSHAction.Delete, FSHResource.News),
+
+
+        // QUESTION LABELS
+        new("View QuestionLabels", FSHAction.View, FSHResource.QuestionLabel, IsStudent: true),
+        new("Search QuestionLabels", FSHAction.Search, FSHResource.QuestionLabel, IsStudent: true),
+        new("Create QuestionLabels", FSHAction.Create, FSHResource.QuestionLabel),
+        new("Update QuestionLabels", FSHAction.Update, FSHResource.QuestionLabel),
+        new("Delete QuestionLabels", FSHAction.Delete, FSHResource.QuestionLabel),
+
         //NEWS REACTIONS
         new("View NewsReaction", FSHAction.View, FSHResource.NewsReaction, new[] { STUDENT }),
         new("Search NewsReaction", FSHAction.Search, FSHResource.NewsReaction, new[] { STUDENT }),

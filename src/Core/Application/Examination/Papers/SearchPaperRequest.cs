@@ -13,15 +13,19 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
 {
     private readonly IReadRepository<Paper> _repository;
     public readonly IReadRepository<PaperFolder> _paperFolderRepo;
-    public SearchPaperRequestHandler(IReadRepository<Paper> repository, IReadRepository<PaperFolder> paperFolderRepo)
+    public readonly ICurrentUser _currentUser;
+    private readonly IUserService _userService;
+    public SearchPaperRequestHandler(IReadRepository<Paper> repository, IReadRepository<PaperFolder> paperFolderRepo, ICurrentUser currentUser, IUserService userService)
     {
         _repository = repository;
         _paperFolderRepo = paperFolderRepo;
+        _currentUser = currentUser;
+        _userService = userService;
     }
 
     public async Task<PaginationResponse<PaperInListDto>> Handle(SearchPaperRequest request, CancellationToken cancellationToken)
     {
-       
+        var currentUserId = _currentUser.GetUserId();
 
         var data = new List<Paper>();
         var parentIds = new List<Guid>();
@@ -54,6 +58,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
                 var parents = paper.PaperFolder.ListParents();
                 dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
             }
+            dto.CreatorName = await _userService.GetFullName(paper.CreatedBy);
             dtos.Add(dto);
         }
         return new PaginationResponse<PaperInListDto>(dtos, count, request.PageNumber, request.PageSize);
