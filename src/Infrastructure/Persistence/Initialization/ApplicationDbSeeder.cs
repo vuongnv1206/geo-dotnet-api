@@ -133,13 +133,6 @@ internal class ApplicationDbSeeder
             _logger.LogInformation("Assigning Admin Role to Admin User for '{tenantId}' Tenant.", _currentTenant.Id);
             await _userManager.AddToRoleAsync(adminUser, FSHRoles.Teacher);
         }
-
-        // Assign role to professional
-        if (!await _userManager.IsInRoleAsync(adminUser, FSHRoles.Professional))
-        {
-            _logger.LogInformation("Assigning Professional Role to Admin User for '{tenantId}' Tenant.", _currentTenant.Id);
-            await _userManager.AddToRoleAsync(adminUser, FSHRoles.Professional);
-        }
     }
 
     private async Task SeedAdmin2UserAsync()

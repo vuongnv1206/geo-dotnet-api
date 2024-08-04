@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Payment;
+using MediatR;
 
 namespace FSH.WebApi.Host.Controllers.Payment;
 public class PaymentController : VersionedApiController
@@ -48,5 +49,10 @@ public class PaymentController : VersionedApiController
         return await Mediator.Send(request);
     }
 
+    [HttpPut("cancel-order/{orderId}")]
+    [OpenApiOperation("Cancel an order.", "")]
+    public async Task<Unit> CancelOrderAsync(Guid orderId)
+    {
+        return await Mediator.Send(new CancelOrderRequest(orderId));
+    }
 }
-

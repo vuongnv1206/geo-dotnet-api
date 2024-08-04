@@ -204,4 +204,35 @@ public class PaymentService : IPaymentService
         int lastestOrderNoNumber = int.Parse(lastestOrderNo.Replace("ORD", string.Empty));
         return $"ORD{lastestOrderNoNumber + 1}";
     }
+
+    public async Task CancelOrder(Guid userId, Guid orderId)
+    {
+        Order order = await _context.Orders.Include(o => o.Subscription).FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId) ?? throw new NotFoundException("Order not found.");
+
+        if (order.Status == OrderStatus.COMPLETED)
+        {
+            throw new BadRequestException("Order already completed.");
+        }
+
+        if (order.Status == OrderStatus.CANCELLED)
+        {
+            throw new BadRequestException("Order already canceled.");
+        }
+
+        order.Status = OrderStatus.CANCELLED;
+
+        BasicNotification notification = new BasicNotification
+        {
+            Message = $"Your order {order.OrderNo} has been canceled.",
+            Label = BasicNotification.LabelType.Warning,
+            Title = "Order Canceled",
+            Url = "/orders"
+        };
+
+        await _notificationService.SendNotificationToUser(userId.ToString(), notification, null, default);
+
+        _context.Update(order);
+
+        await _context.SaveChangesAsync();
+    }
 }
