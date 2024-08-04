@@ -45,6 +45,7 @@ public static class FSHResource
     public const string Files = nameof(Files);
     public const string Notifications = nameof(Notifications);
     public const string AuditLogs = nameof(AuditLogs);
+    public const string Orders = nameof(Orders);
 }
 
 public static class FSHPermissions
@@ -129,8 +130,8 @@ public static class FSHPermissions
 
 
         // QUESTION LABELS
-        new("View QuestionLabels", FSHAction.View, FSHResource.QuestionLabel, IsStudent: true),
-        new("Search QuestionLabels", FSHAction.Search, FSHResource.QuestionLabel, IsStudent: true),
+        new("View QuestionLabels", FSHAction.View, FSHResource.QuestionLabel, new[] { STUDENT }),
+        new("Search QuestionLabels", FSHAction.Search, FSHResource.QuestionLabel, new[] { STUDENT }),
         new("Create QuestionLabels", FSHAction.Create, FSHResource.QuestionLabel),
         new("Update QuestionLabels", FSHAction.Update, FSHResource.QuestionLabel),
         new("Delete QuestionLabels", FSHAction.Delete, FSHResource.QuestionLabel),
@@ -197,6 +198,8 @@ public static class FSHPermissions
         // AUDIT LOGS
         new("View AuditLogs", FSHAction.View, FSHResource.AuditLogs),
 
+        // ORDERS
+        new("View Orders", FSHAction.View, FSHResource.Orders),
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);
