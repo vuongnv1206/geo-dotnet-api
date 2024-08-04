@@ -1,5 +1,5 @@
 ﻿namespace FSH.WebApi.Application.Payment;
-public class SubcriptionDto
+public class SubscriptionDto : IDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

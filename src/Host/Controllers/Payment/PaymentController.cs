@@ -29,9 +29,24 @@ public class PaymentController : VersionedApiController
     [HttpGet("subcriptions")]
     [AllowAnonymous]
     [OpenApiOperation("Get all subcriptions.", "")]
-    public async Task<List<SubcriptionDto>> GetSubcriptionsAsync()
+    public async Task<List<SubscriptionDto>> GetSubcriptionsAsync()
     {
         return await _paymentService.GetSubcriptions();
     }
+
+    [HttpPost("create-order")]
+    [OpenApiOperation("Create an order.", "")]
+    public async Task<string> CreateOrderAsync(CreateOrderRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("get-orders")]
+    [OpenApiOperation("Get orders.", "")]
+    public async Task<PaginationResponse<OrderDto>> GetOrdersAsync(GetOrdersRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
 }
 

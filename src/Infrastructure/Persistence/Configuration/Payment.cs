@@ -17,7 +17,7 @@ public class OrderConfig : IEntityTypeConfiguration<Order>
 
         builder.HasOne(x => x.Subscription)
             .WithMany()
-            .HasForeignKey(x => x.SupscriptionId)
+            .HasForeignKey(x => x.SubscriptionId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

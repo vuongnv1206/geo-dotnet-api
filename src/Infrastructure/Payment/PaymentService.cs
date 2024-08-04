@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Notifications;
+﻿using FSH.WebApi.Application.Common.Exceptions;
+using FSH.WebApi.Application.Notifications;
 using FSH.WebApi.Application.Payment;
 using FSH.WebApi.Domain.Payment;
 using FSH.WebApi.Infrastructure.Identity;
@@ -48,7 +49,7 @@ public class PaymentService : IPaymentService
                 transaction.ErrorMessage = "Order not found.";
             }
 
-            if (order != null && order.Subscription.Price > transaction.Amount)
+            if (order != null && order.Total > transaction.Amount)
             {
                 transaction.IsSuccess = false;
                 transaction.ErrorMessage = "Amount not enough.";
@@ -126,9 +127,12 @@ public class PaymentService : IPaymentService
 
     public async Task DeactiveExpiredUser()
     {
-        foreach (var order in await _context.Orders.Include(o => o.Subscription).Where(o => o.EndDate < DateOnly.FromDateTime(DateTime.Now) && !o.IsExpired).ToListAsync())
+        foreach (var order in await _context.Orders.Include(o => o.Subscription)
+            .Where(o => o.Status == OrderStatus.COMPLETED
+                    && o.EndDate < DateOnly.FromDateTime(DateTime.Now)
+                    && !o.IsExpired).ToListAsync())
         {
-            var user = _userManager.FindByIdAsync(order.UserId.ToString()).Result;
+            var user = await _userManager.FindByIdAsync(order.UserId.ToString());
             await _userManager.RemoveFromRoleAsync(user, order.Subscription.Role);
             order.IsExpired = true;
             _context.Update(order);
@@ -146,9 +150,9 @@ public class PaymentService : IPaymentService
         }
     }
 
-    public async Task<List<SubcriptionDto>> GetSubcriptions()
+    public async Task<List<SubscriptionDto>> GetSubcriptions()
     {
-        return await _context.Subscriptions.Select(s => new SubcriptionDto
+        return await _context.Subscriptions.OrderBy(s => s.Price).Select(s => new SubscriptionDto
         {
             Id = s.Id,
             Name = s.Name,
@@ -157,5 +161,47 @@ public class PaymentService : IPaymentService
             Duration = s.Duration,
             Image = s.Image
         }).ToListAsync();
+    }
+
+    public async Task<string> CreateOrder(Guid userId, Guid subscriptionId)
+    {
+        Subscription subscription = await _context.Subscriptions.FirstOrDefaultAsync(s => s.Id == subscriptionId) ?? throw new NotFoundException("Subscription not found.");
+
+        string orderNo = GenerateUniqueOrderNo();
+
+        Order order = new Order
+        {
+            OrderNo = orderNo,
+            UserId = userId,
+            SubscriptionId = subscription.Id,
+            Status = OrderStatus.PENDING,
+            Total = subscription.Price,
+        };
+
+        BasicNotification notification = new BasicNotification
+        {
+            Message = $"Your order {orderNo} has been created.",
+            Label = BasicNotification.LabelType.Information,
+            Title = "Order Created",
+            Url = "/orders"
+        };
+
+        await _notificationService.SendNotificationToUser(userId.ToString(), notification, null, default);
+        await _context.AddAsync(order);
+        await _context.SaveChangesAsync();
+        return orderNo;
+    }
+
+    private string GenerateUniqueOrderNo()
+    {
+        string? lastestOrderNo = _context.Orders.OrderByDescending(o => o.CreatedOn).FirstOrDefault()?.OrderNo;
+
+        if (string.IsNullOrEmpty(lastestOrderNo))
+        {
+            return "ORD1";
+        }
+
+        int lastestOrderNoNumber = int.Parse(lastestOrderNo.Replace("ORD", string.Empty));
+        return $"ORD{lastestOrderNoNumber + 1}";
     }
 }
