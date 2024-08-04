@@ -26,6 +26,8 @@ try
     await app.Services.InitializeDatabasesAsync();
 
     app.UseInfrastructure(builder.Configuration);
+    //if (app.Environment.IsProduction())
+    app.Services.InitializeJob(builder.Configuration);
     app.MapEndpoints();
     app.Run();
 }

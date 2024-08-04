@@ -62,6 +62,18 @@ internal class ApplicationDbSeeder
                     await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Root, role);
                 }
             }
+            else if (roleName == FSHRoles.Basic)
+            {
+                await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Basic, role);
+            }
+            else if (roleName == FSHRoles.Standard)
+            {
+                await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Standard, role);
+            }
+            else if (roleName == FSHRoles.Professional)
+            {
+                await AssignPermissionsToRoleAsync(dbContext, FSHPermissions.Professional, role);
+            }
         }
     }
 
@@ -120,6 +132,13 @@ internal class ApplicationDbSeeder
         {
             _logger.LogInformation("Assigning Admin Role to Admin User for '{tenantId}' Tenant.", _currentTenant.Id);
             await _userManager.AddToRoleAsync(adminUser, FSHRoles.Teacher);
+        }
+
+        // Assign role to professional
+        if (!await _userManager.IsInRoleAsync(adminUser, FSHRoles.Professional))
+        {
+            _logger.LogInformation("Assigning Professional Role to Admin User for '{tenantId}' Tenant.", _currentTenant.Id);
+            await _userManager.AddToRoleAsync(adminUser, FSHRoles.Professional);
         }
     }
 

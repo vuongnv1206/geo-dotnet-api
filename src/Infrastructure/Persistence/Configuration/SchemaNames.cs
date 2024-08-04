@@ -14,4 +14,5 @@ internal static class SchemaNames
     public static string GroupTeacher = nameof(GroupTeacher); // "GROUPTEACHER";
     public static string Examination = nameof(Examination); // "EXAMINATION";
     public static string Notification = nameof(Notification); // "NOTIFICATION";
+    public static string Payment = nameof(Payment); // "PAYMENT";
 }

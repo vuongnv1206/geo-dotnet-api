@@ -48,6 +48,13 @@ public static class FSHResource
 
 public static class FSHPermissions
 {
+    private const string ROOT = nameof(ROOT);
+    private const string TEACHER = nameof(TEACHER);
+    private const string STUDENT = nameof(STUDENT);
+    private const string BASIC = nameof(BASIC);
+    private const string STANDARD = nameof(STANDARD);
+    private const string PROFESSIONAL = nameof(PROFESSIONAL);
+
     private static readonly FSHPermission[] _all = new FSHPermission[]
     {
         new("View Dashboard", FSHAction.View, FSHResource.Dashboard),
@@ -78,15 +85,15 @@ public static class FSHPermissions
         new("Update GroupTeachers", FSHAction.Update, FSHResource.GroupTeachers),
         new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
 
-        new("View Tenants", FSHAction.View, FSHResource.Tenants, IsRoot: true),
-        new("Create Tenants", FSHAction.Create, FSHResource.Tenants, IsRoot: true),
-        new("Update Tenants", FSHAction.Update, FSHResource.Tenants, IsRoot: true),
-        new("Upgrade Tenant Subscription", FSHAction.UpgradeSubscription, FSHResource.Tenants, IsRoot: true),
+        new("View Tenants", FSHAction.View, FSHResource.Tenants, new[] { ROOT }),
+        new("Create Tenants", FSHAction.Create, FSHResource.Tenants, new[] { ROOT }),
+        new("Update Tenants", FSHAction.Update, FSHResource.Tenants, new[] { ROOT }),
+        new("Upgrade Tenant Subscription", FSHAction.UpgradeSubscription, FSHResource.Tenants, new[] { ROOT }),
         new("View QuestionFolders", FSHAction.View, FSHResource.QuestionFolders),
 
         // ASSIGNMENTS
-        new("View Assignments", FSHAction.View, FSHResource.Assignments, IsStudent: true),
-        new("Search Assignments", FSHAction.Search, FSHResource.Assignments, IsStudent: true),
+        new("View Assignments", FSHAction.View, FSHResource.Assignments, new[] { STUDENT }),
+        new("Search Assignments", FSHAction.Search, FSHResource.Assignments, new[] { STUDENT }),
         new("Create Assignments", FSHAction.Create, FSHResource.Assignments),
         new("Update Assignments", FSHAction.Update, FSHResource.Assignments),
         new("Delete Assignments", FSHAction.Delete, FSHResource.Assignments),
@@ -100,13 +107,13 @@ public static class FSHPermissions
         new("Delete Subjects", FSHAction.Delete, FSHResource.Subjects),
 
         // CLASSES
-        new("View Classes", FSHAction.View, FSHResource.Classes, IsStudent: true),
-        new("Search Classes", FSHAction.Search, FSHResource.Classes, IsStudent: true),
+        new("View Classes", FSHAction.View, FSHResource.Classes, new[] { STUDENT }),
+        new("Search Classes", FSHAction.Search, FSHResource.Classes, new[] { STUDENT }),
         new("Create Classes", FSHAction.Create, FSHResource.Classes),
         new("Update Classes", FSHAction.Update, FSHResource.Classes),
         new("Delete Classes", FSHAction.Delete, FSHResource.Classes),
-        new("View GroupClasses", FSHAction.View, FSHResource.GroupClasses, IsStudent: true),
-        new("Search GroupClasses", FSHAction.Search, FSHResource.GroupClasses, IsStudent: true),
+        new("View GroupClasses", FSHAction.View, FSHResource.GroupClasses, new[] { STUDENT }),
+        new("Search GroupClasses", FSHAction.Search, FSHResource.GroupClasses, new[] { STUDENT }),
         new("Create GroupClasses", FSHAction.Create, FSHResource.GroupClasses),
         new("Update GroupClasses", FSHAction.Update, FSHResource.GroupClasses),
         new("Delete GroupClasses", FSHAction.Delete, FSHResource.GroupClasses),
@@ -119,8 +126,8 @@ public static class FSHPermissions
         new("Update News", FSHAction.Update, FSHResource.News),
         new("Delete News", FSHAction.Delete, FSHResource.News),
         //NEWS REACTIONS
-        new("View NewsReaction", FSHAction.View, FSHResource.NewsReaction, IsStudent: true),
-        new("Search NewsReaction", FSHAction.Search, FSHResource.NewsReaction, IsStudent: true),
+        new("View NewsReaction", FSHAction.View, FSHResource.NewsReaction, new[] { STUDENT }),
+        new("Search NewsReaction", FSHAction.Search, FSHResource.NewsReaction, new[] { STUDENT }),
         new("Create NewsReaction", FSHAction.Create, FSHResource.NewsReaction),
         new("Update NewsReaction", FSHAction.Update, FSHResource.NewsReaction),
         new("Delete NewsReaction", FSHAction.Delete, FSHResource.NewsReaction),
@@ -135,7 +142,7 @@ public static class FSHPermissions
         new("Delete Question", FSHAction.Delete, FSHResource.Question),
 
         // USER CLASSES
-        new("View UserClasses", FSHAction.View, FSHResource.UserClasses, IsStudent: true),
+        new("View UserClasses", FSHAction.View, FSHResource.UserClasses, new[] { STUDENT }),
         new("Search UserClasses", FSHAction.Search, FSHResource.UserClasses),
         new("Create UserClasses", FSHAction.Create, FSHResource.UserClasses),
         new("Update UserClasses", FSHAction.Update, FSHResource.UserClasses),
@@ -172,10 +179,10 @@ public static class FSHPermissions
         new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
 
         // FILES
-        new("Upload files", FSHAction.Upload, FSHResource.Files, IsRoot: true),
+        new("Upload files", FSHAction.Upload, FSHResource.Files, new[] { ROOT }),
 
         // NOTIFICATIONS
-        new("Send Notifications", FSHAction.Create, FSHResource.Notifications, IsRoot: true),
+        new("Send Notifications", FSHAction.Create, FSHResource.Notifications,  new[] { ROOT }),
 
         // AUDIT LOGS
         new("View AuditLogs", FSHAction.View, FSHResource.AuditLogs),
@@ -183,14 +190,22 @@ public static class FSHPermissions
     };
 
     public static IReadOnlyList<FSHPermission> All { get; } = new ReadOnlyCollection<FSHPermission>(_all);
-    public static IReadOnlyList<FSHPermission> Root { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsRoot).ToArray());
-    public static IReadOnlyList<FSHPermission> Teacher { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => !p.IsRoot).ToArray());
-    public static IReadOnlyList<FSHPermission> Student { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.IsStudent).ToArray());
+    public static IReadOnlyList<FSHPermission> Root { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.role.Contains(ROOT)).ToArray());
+    public static IReadOnlyList<FSHPermission> Teacher { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => !p.role.Contains(ROOT)).ToArray());
+    public static IReadOnlyList<FSHPermission> Student { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.role.Contains(STUDENT)).ToArray());
+    public static IReadOnlyList<FSHPermission> Basic { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.role.Contains(BASIC)).ToArray());
+    public static IReadOnlyList<FSHPermission> Standard { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.role.Contains(STANDARD)).ToArray());
+    public static IReadOnlyList<FSHPermission> Professional { get; } = new ReadOnlyCollection<FSHPermission>(_all.Where(p => p.role.Contains(PROFESSIONAL)).ToArray());
 
 }
 
-public record FSHPermission(string Description, string Action, string Resource, bool IsStudent = false, bool IsRoot = false)
+public record FSHPermission(string Description, string Action, string Resource, string[] role)
 {
+    public FSHPermission(string Description, string Action, string Resource)
+        : this(Description, Action, Resource, Array.Empty<string>())
+    {
+    }
+
     public string Name => NameFor(Action, Resource);
     public static string NameFor(string action, string resource) => $"Permissions.{resource}.{action}";
 }
