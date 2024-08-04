@@ -11,12 +11,14 @@ using FSH.WebApi.Infrastructure.Middleware;
 using FSH.WebApi.Infrastructure.Multitenancy;
 using FSH.WebApi.Infrastructure.Notifications;
 using FSH.WebApi.Infrastructure.OpenApi;
+using FSH.WebApi.Infrastructure.Payment;
 using FSH.WebApi.Infrastructure.Persistence;
 using FSH.WebApi.Infrastructure.Persistence.Initialization;
 using FSH.WebApi.Infrastructure.reCAPTCHAv3;
 using FSH.WebApi.Infrastructure.SecurityHeaders;
 using FSH.WebApi.Infrastructure.SpeedSMS;
 using FSH.WebApi.Infrastructure.Validations;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +51,7 @@ public static class Startup
             .AddMailing(config)
             .AddReCaptchav3(config)
             .AddSpeedSMS(config)
+            .AddPayment(config)
             .AddMediatR(Assembly.GetExecutingAssembly())
             .AddMultitenancy()
             .AddNotifications(config)
@@ -78,6 +81,13 @@ public static class Startup
 
         await scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>()
             .InitializeDatabasesAsync(cancellationToken);
+    }
+
+    public static void InitializeJob(this IServiceProvider services, IConfiguration config)
+    {
+        var settings = config.GetSection(nameof(PaymentSettings)).Get<PaymentSettings>();
+        RecurringJob.AddOrUpdate("CheckTransactionJob", () => TransactionsUtils.CallAPIChecking($"{settings.SyncJobURL}/api/v1/payment/check-new-transactions"), settings.CheckTransCron);
+        RecurringJob.AddOrUpdate("DeactiveExpiredUser", () => TransactionsUtils.CallAPIChecking($"{settings.SyncJobURL}/api/v1/payment/deactive-expired-user"), settings.DisableSubCron);
     }
 
     public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder, IConfiguration config) =>

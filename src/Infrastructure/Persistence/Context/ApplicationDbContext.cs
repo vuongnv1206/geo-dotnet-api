@@ -5,6 +5,7 @@ using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Notification;
+using FSH.WebApi.Domain.Payment;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Subjects;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -55,6 +56,9 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<QuestionClone> QuestionClones { get; set; }
     public DbSet<AnswerClone> AnswerClones { get; set; }
     public DbSet<PaperMatrix> PaperMatrices { get; set; }
+    public DbSet<Subscription> Subscriptions { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<Order> Orders { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
