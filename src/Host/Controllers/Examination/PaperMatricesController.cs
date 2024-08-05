@@ -76,4 +76,15 @@ public class PaperMatricesController  : VersionedApiController
         var result = await Mediator.Send(request);
         return Ok(result);
     }
+
+    //write controller for GetMyMatricesRequest
+    [HttpGet]
+    [OpenApiOperation("Get all matrices of current user.")]
+    public async Task<IActionResult> GetMyMatrices()
+    {
+        var request = new GetMyMatricesRequest();
+        var result = await Mediator.Send(request);
+        return Ok(result);
+    }
+
 }
