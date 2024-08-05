@@ -20,4 +20,10 @@ public class FilesController : VersionedApiController
     {
         return await Mediator.Send(request);
     }
+
+    [HttpGet("test")]
+    public async Task<string> TestAsync()
+    {
+        return "Test";
+    }
 }

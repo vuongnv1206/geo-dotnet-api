@@ -51,4 +51,5 @@ public class OrderDto : IDto
     public OrderStatus Status { get; set; }
     public bool IsExpired { get; set; }
     public SubscriptionDto Subscription { get; set; }
+    public DateTime CreatedOn { get; set; }
 }
