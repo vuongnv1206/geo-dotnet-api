@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <None Update="appsettings.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Localization\Resources\nl-BE\test.po">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
