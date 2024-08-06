@@ -66,7 +66,6 @@ public class CreateMatrixRequestHandler : IRequestHandler<CreateMatrixRequest, G
                 var questionLabelExists = await _repositoryQuestionLabel.FirstOrDefaultAsync(new QuestionLabelByIdSpec(criteria.QuestionLabelId), cancellationToken);
                 _ = questionLabelExists ?? throw new NotFoundException($"Question Label with ID {criteria.QuestionLabelId} not found.");
             }
-
         }
 
 
