@@ -23,33 +23,33 @@ public class GeneratePaperStatisticExcelRequestHandler : IRequestHandler<Generat
 
     public async Task<byte[]> Handle(GeneratePaperStatisticExcelRequest request, CancellationToken cancellationToken)
     {
-        byte[] result = null;
+        List<ClassroomFrequencyMarkDto> frequencyMarkData = null;
+        TranscriptPaginationResponse transcriptData = null;
+        PaperInfoStatistic paperInfoData = null;
 
         foreach (var requestType in request.RequestStatisticTypes)
         {
             switch (requestType)
             {
                 case RequestStatisticType.GetClassroomFrequencyMark:
-                    var frequencyMarkData = await _mediator.Send(new GetClassroomFrequencyMarkRequest { PaperId = request.PaperId }, cancellationToken);
-                    result = _paperTemplateService.GenerateFrequencyMarkSheet(frequencyMarkData);
+                    frequencyMarkData = await _mediator.Send(new GetClassroomFrequencyMarkRequest { PaperId = request.PaperId }, cancellationToken);
                     break;
 
                 case RequestStatisticType.GetListTranscript:
-                    var transcriptData = await _mediator.Send(new GetListTranscriptRequest { PaperId = request.PaperId }, cancellationToken);
-                    result = _paperTemplateService.GenerateTranscriptSheet(transcriptData);
+                    transcriptData = await _mediator.Send(new GetListTranscriptRequest { PaperId = request.PaperId }, cancellationToken);
                     break;
 
                 case RequestStatisticType.GetPaperInfor:
-                    var questionStatisticData = await _mediator.Send(new GetPaperInfoRequest(request.PaperId, null), cancellationToken);
-                    result = _paperTemplateService.GeneratePaperInfoSheet(questionStatisticData);
+                    paperInfoData = await _mediator.Send(new GetPaperInfoRequest(request.PaperId, null), cancellationToken);
                     break;
-
 
                 default:
                     throw new ArgumentException("Invalid request type");
             }
         }
 
+        // Generate the Excel file with the collected data
+        var result = _paperTemplateService.GeneratePaperStatisticExcel(frequencyMarkData, transcriptData, paperInfoData);
         return result;
     }
 }
