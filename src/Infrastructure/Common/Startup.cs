@@ -1,5 +1,5 @@
-﻿using DinkToPdf;
-using DinkToPdf.Contracts;
+﻿// using DinkToPdf;
+// using DinkToPdf.Contracts;
 using FSH.WebApi.Application.Common.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,10 +10,9 @@ internal static class Startup
     internal static IServiceCollection AddServices(this IServiceCollection services) =>
         services
             .AddServices(typeof(ITransientService), ServiceLifetime.Transient)
-            .AddServices(typeof(IScopedService), ServiceLifetime.Scoped)
-            .AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-        
+            .AddServices(typeof(IScopedService), ServiceLifetime.Scoped);
 
+    // .AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
     internal static IServiceCollection AddServices(this IServiceCollection services, Type interfaceType, ServiceLifetime lifetime)
     {
         var interfaceTypes =
@@ -31,7 +30,7 @@ internal static class Startup
 
         foreach (var type in interfaceTypes)
         {
-            services.AddService(type.Service!, type.Implementation, lifetime);
+            _ = services.AddService(type.Service!, type.Implementation, lifetime);
         }
 
         return services;
