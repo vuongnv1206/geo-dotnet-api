@@ -257,7 +257,8 @@ public class MapsterSettings
 
 
         //Question Label
-        _ = TypeAdapterConfig<QuestionLable, QuestionLabelDto>.NewConfig()
-        ;
+        _ = TypeAdapterConfig<QuestionLable, QuestionLabelDto>.NewConfig();
+
+        _ = TypeAdapterConfig<Paper, PaperInListDto>.NewConfig();
     }
 }

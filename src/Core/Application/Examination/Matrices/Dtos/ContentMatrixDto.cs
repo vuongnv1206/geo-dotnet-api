@@ -5,6 +5,7 @@ namespace FSH.WebApi.Application.Examination.Matrices;
 public class ContentMatrixDto
 {
     public Guid QuestionFolderId { get; set; }
+    public string? QuestionFolderName { get; set; }
     public List<CriteriaQuestionDto> CriteriaQuestions { get; set; }
     public float TotalPoint { get; set; }
 }
