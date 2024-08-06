@@ -1,6 +1,4 @@
-﻿// using DinkToPdf;
-// using DinkToPdf.Contracts;
-using FSH.WebApi.Application.Common.Interfaces;
+﻿using FSH.WebApi.Application.Common.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FSH.WebApi.Infrastructure.Common;
