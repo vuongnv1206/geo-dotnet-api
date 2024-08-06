@@ -21,6 +21,7 @@ public class PaperDto : IDto
     public string Type { get; set; }
     public PaperShareType ShareType { get; set; }
     public bool IsPublish { get; set; }
+    public PaperStatus Status { get; set; }
     public string ExamCode { get; set; }
     public string? Content { get; set; }
     public string? Description { get; set; }
