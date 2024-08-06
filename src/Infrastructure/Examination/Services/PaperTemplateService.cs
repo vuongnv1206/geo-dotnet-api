@@ -133,7 +133,10 @@ public class PaperTemplateService : IPaperTemplateService
             foreach (var transcript in data.Data)
             {
                 worksheet.Cell(row, 1).Value = index++;
-                worksheet.Cell(row, 2).Value = $"{transcript.Attendee.FirstName} {transcript.Attendee.LastName}";
+                worksheet.Cell(row, 2).Value = transcript.Attendee != null
+                    ? $"{transcript.Attendee.FirstName ?? ""} {transcript.Attendee.LastName ?? ""}"
+                    : "Thông tin học sinh không có";
+
                 worksheet.Cell(row, 3).Value = transcript.Classrooms != null ? string.Join(", ", transcript.Classrooms.Select(x => x.Name)) : "Thí sinh tự do";
                 worksheet.Cell(row, 4).Value = transcript.Mark;
                 worksheet.Cell(row, 5).Value = transcript.StartedTest.ToString("dd/MM/yyyy HH:mm:ss");
