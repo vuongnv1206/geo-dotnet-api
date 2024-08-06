@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class @base : Migration
+    public partial class payment : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,6 +29,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.EnsureSchema(
                 name: "Notification");
+
+            migrationBuilder.EnsureSchema(
+                name: "Payment");
 
             migrationBuilder.EnsureSchema(
                 name: "Examination");
@@ -173,6 +176,28 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaperMatrices",
+                schema: "Examination",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    TotalPoint = table.Column<float>(type: "real", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaperMatrices", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "QuestionFolders",
                 schema: "Question",
                 columns: table => new
@@ -260,6 +285,31 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "Subscriptions",
+                schema: "Payment",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    Duration = table.Column<int>(type: "integer", nullable: false),
+                    Role = table.Column<string>(type: "text", nullable: false),
+                    Image = table.Column<string>(type: "text", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TeacherTeams",
                 schema: "GroupTeacher",
                 columns: table => new
@@ -280,6 +330,26 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TeacherTeams", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transactions",
+                schema: "Payment",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TransactionID = table.Column<int>(type: "integer", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    TransactionDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    IsSuccess = table.Column<bool>(type: "boolean", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "text", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transactions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -582,6 +652,40 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         principalSchema: "Subject",
                         principalTable: "Subject",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                schema: "Payment",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderNo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubscriptionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Total = table.Column<decimal>(type: "numeric", nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    IsExpired = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_Subscriptions_SubscriptionId",
+                        column: x => x.SubscriptionId,
+                        principalSchema: "Payment",
+                        principalTable: "Subscriptions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1039,6 +1143,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     DeviceType = table.Column<string>(type: "text", nullable: true),
                     PublicIp = table.Column<string>(type: "text", nullable: true),
                     LocalIp = table.Column<string>(type: "text", nullable: true),
+                    canResume = table.Column<bool>(type: "boolean", nullable: false),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1278,6 +1383,43 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "SubmitPaperLogs",
+                schema: "Examination",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubmitPaperId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DeviceId = table.Column<string>(type: "text", nullable: true),
+                    DeviceName = table.Column<string>(type: "text", nullable: true),
+                    DeviceType = table.Column<string>(type: "text", nullable: true),
+                    PublicIp = table.Column<string>(type: "text", nullable: true),
+                    LocalIp = table.Column<string>(type: "text", nullable: true),
+                    ProcessLog = table.Column<string>(type: "text", nullable: true),
+                    MouseLog = table.Column<string>(type: "text", nullable: true),
+                    KeyboardLog = table.Column<string>(type: "text", nullable: true),
+                    NetworkLog = table.Column<string>(type: "text", nullable: true),
+                    IsSuspicious = table.Column<bool>(type: "boolean", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubmitPaperLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubmitPaperLogs_SubmitPapers_SubmitPaperId",
+                        column: x => x.SubmitPaperId,
+                        principalSchema: "Examination",
+                        principalTable: "SubmitPapers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CommentLikes",
                 schema: "Classroom",
                 columns: table => new
@@ -1363,6 +1505,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "GroupTeacher",
                 table: "GroupPermissionInClasses",
                 column: "GroupTeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_SubscriptionId",
+                schema: "Payment",
+                table: "Orders",
+                column: "SubscriptionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PaperAccesses_ClassId",
@@ -1522,6 +1670,12 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "SubmitPaperId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SubmitPaperLogs_SubmitPaperId",
+                schema: "Examination",
+                table: "SubmitPaperLogs",
+                column: "SubmitPaperId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubmitPapers_PaperId",
                 schema: "Examination",
                 table: "SubmitPapers",
@@ -1626,11 +1780,19 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Notification");
 
             migrationBuilder.DropTable(
+                name: "Orders",
+                schema: "Payment");
+
+            migrationBuilder.DropTable(
                 name: "PaperAccesses",
                 schema: "Examination");
 
             migrationBuilder.DropTable(
                 name: "PaperFolderPermissions",
+                schema: "Examination");
+
+            migrationBuilder.DropTable(
+                name: "PaperMatrices",
                 schema: "Examination");
 
             migrationBuilder.DropTable(
@@ -1658,12 +1820,20 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 schema: "Examination");
 
             migrationBuilder.DropTable(
+                name: "SubmitPaperLogs",
+                schema: "Examination");
+
+            migrationBuilder.DropTable(
                 name: "TeacherInGroups",
                 schema: "GroupTeacher");
 
             migrationBuilder.DropTable(
                 name: "TeacherPermissionInClasses",
                 schema: "GroupTeacher");
+
+            migrationBuilder.DropTable(
+                name: "Transactions",
+                schema: "Payment");
 
             migrationBuilder.DropTable(
                 name: "UserClaims",
@@ -1692,6 +1862,10 @@ namespace Migrators.PostgreSQL.Migrations.Application
             migrationBuilder.DropTable(
                 name: "Comments",
                 schema: "Classroom");
+
+            migrationBuilder.DropTable(
+                name: "Subscriptions",
+                schema: "Payment");
 
             migrationBuilder.DropTable(
                 name: "QuestionClones",

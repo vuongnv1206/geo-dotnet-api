@@ -36,6 +36,8 @@ internal static class Startup
                 .AddJsonFile($"{configurationsDirectory}/reCAPTCHAv3.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"{configurationsDirectory}/speedSMS.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"{configurationsDirectory}/speedSMS.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"{configurationsDirectory}/payment.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"{configurationsDirectory}/payment.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
         return builder;
     }

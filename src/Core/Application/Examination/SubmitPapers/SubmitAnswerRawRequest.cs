@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 using FSH.WebApi.Application.Extensions;
+using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
@@ -18,7 +19,7 @@ public class SubmitAnswerRawRequestValidator : CustomValidator<SubmitAnswerRawRe
 {
     public SubmitAnswerRawRequestValidator(
         IRepository<SubmitPaper> submitPaperRepo,
-        IRepository<Question> questionRepo,
+        IRepository<QuestionClone> questionRepo,
         IStringLocalizer<SubmitAnswerRawRequestValidator> T)
     {
         RuleFor(x => x.SubmitPaperId)
@@ -34,18 +35,21 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
 {
     private readonly IRepository<SubmitPaper> _submitPaperRepo;
     private readonly IRepository<Question> _questionRepo;
+    private readonly IRepository<QuestionClone> _questionCloneRepo;
     private readonly IStringLocalizer _t;
     private readonly ISerializerService _serializerService;
     public SubmitAnswerRawRequestHandler(
         IRepository<SubmitPaper> submitPaperRepo,
         IStringLocalizer<SubmitAnswerRawRequestHandler> t,
         IRepository<Question> questionRepo,
-        ISerializerService serializerService)
+        ISerializerService serializerService,
+        IRepository<QuestionClone> questionCloneRepo)
     {
         _submitPaperRepo = submitPaperRepo;
         _t = t;
         _questionRepo = questionRepo;
         _serializerService = serializerService;
+        _questionCloneRepo = questionCloneRepo;
     }
 
     public async Task<DefaultIdType> Handle(SubmitAnswerRawRequest request, CancellationToken cancellationToken)
@@ -63,7 +67,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
             submitPaper.Status = SubmitPaperStatus.Doing;
         }
 
-        var question = await _questionRepo.FirstOrDefaultAsync(new QuestionByIdSpec(request.QuestionId));
+        var question = await _questionCloneRepo.FirstOrDefaultAsync(new QuestionCloneByIdSpec(request.QuestionId));
         if (question is null)
             throw new NotFoundException(_t["Question {0} Not Found.", request.QuestionId]);
 
@@ -79,7 +83,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
         return submitPaper.Id;
     }
 
-    private string FormatAnswerRaw(string? answerRaw, Question question)
+    private string FormatAnswerRaw(string? answerRaw, QuestionClone question)
     {
         // SingleChoice : answerId
         // MultipleChoise : answerId|answerId
@@ -97,7 +101,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
         {
             case QuestionType.SingleChoice:
             case QuestionType.ReadingQuestionPassage:
-                if (!question.Answers.Any(x => x.Id.ToString() == answerRaw))
+                if (!question.AnswerClones.Any(x => x.Id.ToString() == answerRaw))
                     throw new NotFoundException(_t["Answer {0} Not Found.", answerRaw]);
 
                 return answerRaw;
@@ -105,7 +109,7 @@ public class SubmitAnswerRawRequestHandler : IRequestHandler<SubmitAnswerRawRequ
                 var answerList = answerRaw.SplitStringExtension("|");
                 foreach (string ans in answerList)
                 {
-                    if (!question.Answers.Any(x => x.Id.ToString() == ans))
+                    if (!question.AnswerClones.Any(x => x.Id.ToString() == ans))
                     {
                         throw new NotFoundException(_t["Answer {0} Not Found.", ans]);
                     }

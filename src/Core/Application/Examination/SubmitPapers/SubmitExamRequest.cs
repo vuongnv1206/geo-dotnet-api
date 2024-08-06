@@ -4,6 +4,7 @@ public class SubmitExamRequest : IRequest<Guid>
 {
     public required string SubmitPaperData { get; set; }
     public string? PublicIp { get; set; }
+    public bool IsEnd { get; set; }
 }
 
 public class SubmitExamRequestValidator : CustomValidator<SubmitExamRequest>

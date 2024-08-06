@@ -1,13 +1,14 @@
-﻿using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
-using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Domain.Examination;
 
-namespace FSH.WebApi.Application.Examination.SubmitPapers;
+namespace FSH.WebApi.Application.Examination.SubmitPapers.Specs;
 public class SubmitPaperByPaperId : Specification<SubmitPaper>
 {
-    public SubmitPaperByPaperId(Paper paper, Guid userId)
+    public SubmitPaperByPaperId(Paper paper, DefaultIdType userId)
     {
-        Query
+        _ = Query
           .Where(x => x.PaperId == paper.Id
-          && (x.CreatedBy == userId || paper.CreatedBy == userId));
+          && (x.CreatedBy == userId || paper.CreatedBy == userId))
+          .Include(sb => sb.SubmitPaperDetails)
+          .OrderByDescending(x => x.CreatedOn);
     }
 }

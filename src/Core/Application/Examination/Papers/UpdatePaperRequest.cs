@@ -28,6 +28,8 @@ public class UpdatePaperRequest : IRequest<Guid>
     public Guid? PaperLabelId { get; set; }
     public Guid? SubjectId { get; set; }
     public Guid? PaperFolderId { get; set; }
+    public string? PublicIpAllowed { get; set; }
+    public string? LocalIpAllowed { get; set; }
     public List<PaperAccessDto>? PaperAccesses { get; set; }
 
 }
@@ -109,7 +111,9 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             request.ShareType,
             request.PaperFolderId,
             request.PaperLabelId,
-            request.SubjectId
+            request.SubjectId,
+            request.PublicIpAllowed,
+            request.LocalIpAllowed
             );
         if (request.PaperAccesses is not null)
         {

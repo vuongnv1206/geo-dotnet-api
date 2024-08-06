@@ -80,7 +80,7 @@ public class Paper : AuditableEntity, IAggregateRoot
 
     public void AddQuestion(PaperQuestion question)
     {
-        PaperQuestions.Add(question);   
+        PaperQuestions.Add(question);
     }
 
     public void RemoveQuestion(Guid questionId)
@@ -130,7 +130,9 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperShareType shareType,
         Guid? paperFolderId,
         Guid? paperLabelId,
-        Guid? subjectId)
+        Guid? subjectId,
+        string? publicIpAllowed,
+        string? localIpAllowed)
     {
         ExamName = examName;
         Status = status;
@@ -150,6 +152,8 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperLabelId = paperLabelId;
         SubjectId = subjectId;
         PaperFolderId = paperFolderId;
+        PublicIpAllowed = publicIpAllowed;
+        LocalIpAllowed = localIpAllowed;
         return this;
     }
 
@@ -182,7 +186,7 @@ public class Paper : AuditableEntity, IAggregateRoot
             var existingPermission = PaperPermissions.FirstOrDefault(a => a.Id == permission.Id && a.Id != Guid.Empty);
             if (existingPermission != null)
             {
-                existingPermission.SetPermission(permission.CanView,permission.CanAdd,permission.CanUpdate,permission.CanDelete,permission.CanShare);
+                existingPermission.SetPermission(permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete, permission.CanShare);
             }
             else
             {

@@ -5,30 +5,35 @@ using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
+using FSH.WebApi.Application.Examination.SubmitPapers.Specs;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Questions;
+using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
-using FSH.WebApi.Host.Controllers.Examination;
 using FSH.WebApi.Infrastructure.Common.Utils;
 using Mapster;
 using Microsoft.Extensions.Localization;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace FSH.WebApi.Infrastructure.Examination;
 public class SubmmitPaperService : ISubmmitPaperService
 {
     private readonly IRepository<Paper> _paperRepository;
     private readonly IRepository<SubmitPaper> _submitPaperRepository;
+    private readonly IRepository<SubmitPaperLog> _submitPaperLogRepository;
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
     private readonly IStringLocalizer<SubmmitPaperService> _t;
     private readonly ISerializerService _serializerService;
 
-    public SubmmitPaperService(IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, ICurrentUser currentUser, IUserService userService, IStringLocalizer<SubmmitPaperService> t, ISerializerService serializerService)
+    public SubmmitPaperService(IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, IRepository<SubmitPaperLog> submitPaperLogRepository, ICurrentUser currentUser, IUserService userService, IStringLocalizer<SubmmitPaperService> t, ISerializerService serializerService)
     {
         _paperRepository = paperRepository;
         _submitPaperRepository = submitPaperRepository;
+        _submitPaperLogRepository = submitPaperLogRepository;
         _currentUser = currentUser;
         _userService = userService;
         _t = t;
@@ -106,14 +111,258 @@ public class SubmmitPaperService : ISubmmitPaperService
         return false;
     }
 
+    private void ShuffleQuestions(PaperForStudentDto paperDot)
+    {
+        // Shuffle questions passges and answers
+        foreach (var q in paperDot.Questions)
+        {
+            // Reading question
+            if (q.QuestionType == QuestionType.Reading)
+            {
+                Random random = new Random();
+                int n = q.QuestionPassages.Count;
+                while (n > 1)
+                {
+                    n--;
+                    int k = random.Next(n + 1);
+                    (q.QuestionPassages[n], q.QuestionPassages[k]) = (q.QuestionPassages[k], q.QuestionPassages[n]);
+                }
+
+                // Shuffle answers
+                foreach (var qp in q.QuestionPassages)
+                {
+                    n = qp.Answers.Count;
+                    while (n > 1)
+                    {
+                        n--;
+                        int k = random.Next(n + 1);
+                        (qp.Answers[n], qp.Answers[k]) = (qp.Answers[k], qp.Answers[n]);
+                    }
+                }
+            }
+
+            // SingleChoice - MultipleChoice
+            if (q.QuestionType is QuestionType.SingleChoice or QuestionType.MultipleChoice)
+            {
+                Random random = new Random();
+                int n = q.Answers.Count;
+                while (n > 1)
+                {
+                    n--;
+                    int k = random.Next(n + 1);
+                    (q.Answers[n], q.Answers[k]) = (q.Answers[k], q.Answers[n]);
+                }
+            }
+        }
+
+        // Shuffle questions
+        Random random1 = new Random();
+        int n1 = paperDot.Questions.Count;
+        while (n1 > 1)
+        {
+            n1--;
+            int k1 = random1.Next(n1 + 1);
+            (paperDot.Questions[n1], paperDot.Questions[k1]) = (paperDot.Questions[k1], paperDot.Questions[n1]);
+        }
+    }
+
+    private string FormatSingleChoiceAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    {
+        // SingleChoice : answerId
+        foreach (var a in question.AnswerClones)
+        {
+            foreach (var s in spq.Answers)
+            {
+                if (a.Id == Guid.Parse(s.Id!) && s.IsCorrect)
+                {
+                    return a.Id.ToString();
+                }
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private string FormatMultipleChoiceAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    {
+        // MultipleChoise : answerId|answerId
+        var answerIds = new List<string>();
+        foreach (var a in question.AnswerClones)
+        {
+            foreach (var s in spq.Answers)
+            {
+                if (a.Id == Guid.Parse(s.Id!) && s.IsCorrect)
+                {
+                    answerIds.Add(a.Id.ToString());
+                }
+            }
+        }
+
+        return string.Join('|', answerIds);
+    }
+
+    private string FormatFillBlankAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    {
+        List<Dictionary<string, string>> answers = new();
+        foreach (var a in question.AnswerClones)
+        {
+            int index = 1;
+            foreach (var s in spq.Answers)
+            {
+                if (a.Id == Guid.Parse(s.Id!))
+                {
+                    if (!string.IsNullOrEmpty(s.Content))
+                    {
+                        answers.Add(new Dictionary<string, string> { { index.ToString(), s.Content! } });
+                    }
+                }
+
+                index++;
+            }
+        }
+
+        // Serialize to json
+        return _serializerService.Serialize(answers);
+    }
+
+    private void FillPaperDetails(PaperForStudentDto paperDot, SubmitPaper? submitPaper1)
+    {
+        if (submitPaper1 == null)
+        {
+            return;
+        }
+
+        foreach (var pq in paperDot.Questions)
+        {
+            var spq = submitPaper1.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == pq.Id);
+            if (spq != null)
+            {
+                // AnswerRaw to AnswerForStudentDto
+                AnswerRawToAnswerForStudentDto(spq, pq);
+            }
+
+            if (pq.QuestionType == QuestionType.Reading)
+            {
+                foreach (var qp in pq.QuestionPassages)
+                {
+                    var spq1 = submitPaper1.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == qp.Id);
+                    if (spq1 != null)
+                    {
+                        // AnswerRaw to AnswerForStudentDto
+                        AnswerRawToAnswerForStudentDto(spq1, qp);
+                    }
+                }
+            }
+        }
+    }
+
+    private void AnswerRawToAnswerForStudentDto(SubmitPaperDetail spq1, QuestionPassagesForStudentDto qp)
+    {
+        // Deserialize AnswerRaw to AnswerForStudentDto
+        List<string> answerIds = new List<string>();
+        if (!string.IsNullOrEmpty(spq1.AnswerRaw))
+        {
+            // split answerIds
+            string[] answerIdStrs = spq1.AnswerRaw.Split('|');
+            foreach (string answerIdStr in answerIdStrs)
+            {
+                answerIds.Add(answerIdStr);
+            }
+
+            // AnswerForStudentDto
+            foreach (var a in qp.Answers)
+            {
+                if (answerIds.Contains(a.Id.ToString()))
+                {
+                    a.IsCorrect = true;
+                }
+            }
+        }
+    }
+
+    private void AnswerRawToAnswerForStudentDto(SubmitPaperDetail spq, QuestionForStudentDto pq)
+    {
+        // SingleChoice
+        if (pq.QuestionType == QuestionType.SingleChoice)
+        {
+            // AnswerRaw to AnswerForStudentDto
+            foreach (var a in pq.Answers)
+            {
+                // check if not null
+                if (string.IsNullOrEmpty(spq.AnswerRaw!))
+                {
+                    continue;
+                }
+
+                if (a.Id == Guid.Parse(spq.AnswerRaw!))
+                {
+                    a.IsCorrect = true;
+                }
+            }
+        }
+
+        // MultipleChoice
+        if (pq.QuestionType == QuestionType.MultipleChoice)
+        {
+            // AnswerRaw to AnswerForStudentDto
+            List<string> answerIds = new List<string>();
+            if (!string.IsNullOrEmpty(spq.AnswerRaw))
+            {
+                // split answerIds
+                string[] answerIdStrs = spq.AnswerRaw.Split('|');
+                foreach (string answerIdStr in answerIdStrs)
+                {
+                    answerIds.Add(answerIdStr);
+                }
+
+                // AnswerForStudentDto
+                foreach (var a in pq.Answers)
+                {
+                    if (answerIds.Contains(a.Id.ToString()!))
+                    {
+                        a.IsCorrect = true;
+                    }
+                }
+            }
+        }
+
+        // FillBlank
+        if (pq.QuestionType == QuestionType.FillBlank)
+        {
+            // AnswerRaw to AnswerForStudentDto
+            List<Dictionary<string, string>> answers = _serializerService.Deserialize<List<Dictionary<string, string>>>(spq.AnswerRaw);
+            for (int i = 0; i < answers.Count; i++)
+            {
+                pq.Answers[i].Content = answers[i].Values.First();
+            }
+        }
+
+        // Matching
+        if (pq.QuestionType == QuestionType.Matching)
+        {
+            if (pq.Answers.Count > 0)
+            {
+                pq.Answers[0].Content = spq.AnswerRaw;
+            }
+        }
+
+        // Writing
+        if (pq.QuestionType == QuestionType.Writing)
+        {
+            // AnswerRaw to AnswerForStudentDto
+            // Create AnswerForStudentDto
+            pq.Answers = new List<AnswerForStudentDto>
+            {
+                new()
+                {
+                    Content = spq.AnswerRaw
+                }
+            };
+        }
+    }
+
     public async Task<PaperForStudentDto> StartExamAsync(StartExamRequest request, CancellationToken cancellationToken)
     {
-        // check current user is allowed to start exam
-        // check paper is available
-        // check user has not submitted this paper
-        // create new submit paper
-        // return paper for student dto
-
         var spec = new PaperByIdWithAccessesSpec(request.PaperId);
         var paper = await _paperRepository.FirstOrDefaultAsync(spec, cancellationToken);
         if (paper == null)
@@ -122,6 +371,50 @@ public class SubmmitPaperService : ISubmmitPaperService
         }
 
         var userId = _currentUser.GetUserId();
+
+        var submitPaper1 = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
+
+        // Check time to do this exam
+        var timeNow = DateTime.Now;
+        if (paper.StartTime.HasValue && paper.StartTime > timeNow)
+        {
+            throw new ConflictException(_t["Exam has not started yet."]);
+        }
+
+        if (paper.EndTime.HasValue && paper.EndTime < timeNow)
+        {
+            throw new ConflictException(_t["Exam has ended."]);
+        }
+
+        // If resume, check user has permission to resume exam
+        if (request.IsResume)
+        {
+            // Get last submit paper
+            if (submitPaper1 == null)
+            {
+                throw new NotFoundException(_t["You do not have permission to resume this exam."]);
+            }
+
+            // check can resume
+            if (submitPaper1.Status != SubmitPaperStatus.Doing)
+            {
+                throw new ConflictException(_t["Exam is not in progress."]);
+            }
+
+            if (submitPaper1.canResume == false)
+            {
+                throw new ConflictException(_t["You do not have permission to resume this exam."]);
+            }
+        }
+        else
+        {
+            // check user has not submitted this paper
+            var submitPapers = await _submitPaperRepository.ListAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
+            if (submitPapers.Count >= paper.NumberAttempt)
+            {
+                throw new ConflictException(_t["Have used up all your attempts"]);
+            }
+        }
 
         //// check user has permission to start exam
         // bool hasPermission = false;
@@ -140,17 +433,10 @@ public class SubmmitPaperService : ISubmmitPaperService
         //    throw new ForbiddenException("You do not have permission to start this exam.");
         // }
 
-        // check user has not submitted this paper
-        var submitPapers = await _submitPaperRepository.ListAsync(new SubmitPaperByPaperId(paper, userId), cancellationToken);
-        if (submitPapers.Count >= paper.NumberAttempt)
-        {
-            throw new ConflictException("Have used up all your attempts");
-        }
-
         // check local ip
         if (!string.IsNullOrEmpty(paper.LocalIpAllowed) && !string.IsNullOrEmpty(request.LocalIp) && !IsLocalIpAllowed(request.LocalIp, paper.LocalIpAllowed))
         {
-            throw new ForbiddenException("Your local IP: " + request.LocalIp + " is not allowed to start this exam.");
+            throw new ForbiddenException(_t["Your local IP: {0} is not allowed to start this exam.", request.LocalIp]);
         }
 
         // check public ip
@@ -159,23 +445,60 @@ public class SubmmitPaperService : ISubmmitPaperService
         //    throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
         // }
 
-        var submitPaper = new SubmitPaper
+        if (request.IsResume)
         {
-            PaperId = paper.Id,
-            DeviceId = request.DeviceId,
-            DeviceName = request.DeviceName,
-            DeviceType = request.DeviceType,
-            PublicIp = request.PublicIp,
-            LocalIp = request.LocalIp
-        };
+            var paperDot = paper.Adapt<PaperForStudentDto>();
 
-        _ = await _submitPaperRepository.AddAsync(submitPaper, cancellationToken);
+            // Refill submit paper details
+            FillPaperDetails(paperDot, submitPaper1);
 
-        var paperDot = paper.Adapt<PaperForStudentDto>();
-        var user = await _userService.GetAsync(submitPaper.CreatedBy.ToString(), cancellationToken);
-        paperDot.SubmitPaperId = submitPaper.Id;
-        paperDot.UserDetails = user.Adapt<UserDetailsDto>();
-        return paperDot;
+            // Set Resume to false
+            submitPaper1.canResume = false;
+            submitPaper1.StartTime = timeNow;
+            await _submitPaperRepository.UpdateAsync(submitPaper1, cancellationToken);
+
+            var user = await _userService.GetAsync(submitPaper1.CreatedBy.ToString(), cancellationToken);
+            paperDot.SubmitPaperId = submitPaper1.Id;
+            paperDot.UserDetails = user.Adapt<UserDetailsDto>();
+
+            // Shuffle questions
+            if (paper.Shuffle)
+            {
+                ShuffleQuestions(paperDot);
+            }
+
+            return paperDot;
+        }
+        else
+        {
+            // Create new submit paper
+            var submitPaper = new SubmitPaper
+            {
+                PaperId = paper.Id,
+                Status = SubmitPaperStatus.Doing,
+                DeviceId = request.DeviceId,
+                DeviceName = request.DeviceName,
+                DeviceType = request.DeviceType,
+                PublicIp = request.PublicIp,
+                LocalIp = request.LocalIp
+            };
+
+            _ = await _submitPaperRepository.AddAsync(submitPaper, cancellationToken);
+
+            var paperDot = paper.Adapt<PaperForStudentDto>();
+            var user = await _userService.GetAsync(submitPaper.CreatedBy.ToString(), cancellationToken);
+            paperDot.SubmitPaperId = submitPaper.Id;
+            paperDot.UserDetails = user.Adapt<UserDetailsDto>();
+
+            // Shuffle questions
+            if (paper.Shuffle)
+            {
+                ShuffleQuestions(paperDot);
+            }
+
+            return paperDot;
+        }
+
     }
 
     public async Task<DefaultIdType> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
@@ -184,7 +507,7 @@ public class SubmmitPaperService : ISubmmitPaperService
         string submitPaperDataDecrypted = EncryptionUtils.SimpleDec(request.SubmitPaperData);
         if (string.IsNullOrEmpty(submitPaperDataDecrypted))
         {
-            throw new BadRequestException("Submit paper data is invalid.");
+            throw new BadRequestException(_t["Submit paper data is invalid."]);
         }
 
         // Json to object SubmitPaperData
@@ -192,6 +515,31 @@ public class SubmmitPaperService : ISubmmitPaperService
 
         // Get submit paper
         var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByIdSpec(Guid.Parse(sbp.SubmitPaperId!)), cancellationToken);
+
+        // Check current user has permission to submit this exam
+        if (submitPaper == null || submitPaper.CreatedBy != _currentUser.GetUserId())
+        {
+            throw new ForbiddenException(_t["You do not have permission to submit this exam."]);
+        }
+
+        // Check submit paper status
+        if (submitPaper.Status != SubmitPaperStatus.Doing)
+        {
+            throw new ConflictException(_t["Exam is not in progress."]);
+        }
+
+        // Check time to do this exam
+        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
+        var timeNow = DateTime.Now;
+        int duration = (int)(timeNow - submitPaper.StartTime).TotalMinutes;
+        if (paper.Duration.HasValue && duration > paper.Duration)
+        {
+            // Update submit paper status
+            submitPaper.Status = SubmitPaperStatus.End;
+            submitPaper.EndTime = timeNow;
+            await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
+            throw new ConflictException(_t["Over time to do this exam."]);
+        }
 
         // Update or Add submit paper details
         foreach (var q in sbp.Questions)
@@ -264,11 +612,25 @@ public class SubmmitPaperService : ISubmmitPaperService
             }
         }
 
+        // if isEnd
+        if (request.IsEnd)
+        {
+            // Update submit paper status
+            submitPaper.Status = SubmitPaperStatus.End;
+            submitPaper.EndTime = timeNow;
+
+            // Calculate score
+            submitPaper.TotalMark = await CalculateScoreSubmitPaper(submitPaper);
+
+            // Update submit paper
+            await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
+        }
+
         // Update submit paper
         await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
 
         return submitPaper == null
-            ? throw new NotFoundException("Submit Paper " + sbp.SubmitPaperId + " Not Found.")
+            ? throw new NotFoundException(_t["Submit paper {0} not found.", sbp.SubmitPaperId])
             : await Task.FromResult(submitPaper.Id);
     }
 
@@ -307,63 +669,261 @@ public class SubmmitPaperService : ISubmmitPaperService
         return question.QuestionType == QuestionType.Writing ? spq.Answers!.FirstOrDefault()?.Content ?? string.Empty : string.Empty;
     }
 
-    private string FormatSingleChoiceAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    public async Task<float> CalculateScoreSubmitPaper(DefaultIdType submitPaperId)
     {
-        // SingleChoice : answerId
-        foreach (var a in question.AnswerClones)
-        {
-            foreach (var s in spq.Answers)
-            {
-                if (a.Id == Guid.Parse(s.Id!) && s.IsCorrect)
-                {
-                    return a.Id.ToString();
-                }
-            }
-        }
-
-        return string.Empty;
+        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(new SubmitPaperByIdSpec(submitPaperId));
+        return submitPaper == null
+            ? throw new NotFoundException(_t["Submit paper {0} not found.", submitPaperId])
+            : await CalculateScoreSubmitPaper(submitPaper);
     }
 
-    private string FormatMultipleChoiceAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
+    private async Task<float> CalculateScoreSubmitPaper(SubmitPaper submitPaper)
     {
-        // MultipleChoise : answerId|answerId
-        var answerIds = new List<string>();
-        foreach (var a in question.AnswerClones)
+        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId));
+        if (paper == null)
         {
-            foreach (var s in spq.Answers)
-            {
-                if (a.Id == Guid.Parse(s.Id!) && s.IsCorrect)
-                {
-                    answerIds.Add(a.Id.ToString());
-                }
-            }
+            throw new NotFoundException(_t["Paper {0} not found.", submitPaper.PaperId]);
         }
 
-        return string.Join('|', answerIds);
-    }
-
-    private string FormatFillBlankAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
-    {
-        List<Dictionary<string, string>> answers = new();
-        foreach (var a in question.AnswerClones)
+        foreach (var question in paper.PaperQuestions)
         {
-            int index = 1;
-            foreach (var s in spq.Answers)
+            var detail = submitPaper.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == question.QuestionId);
+            if (detail != null)
             {
-                if (a.Id == Guid.Parse(s.Id!))
+                // if question is Reading
+                if (question.Question!.QuestionType == QuestionType.Reading)
                 {
-                    if (!string.IsNullOrEmpty(s.Content))
+                    // list of question passages detail
+                    List<SubmitPaperDetail> details = new();
+                    foreach (var qp in question.Question!.QuestionPassages)
                     {
-                        answers.Add(new Dictionary<string, string> { { index.ToString(), s.Content! } });
+                        var detail1 = submitPaper.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == qp.Id);
+                        if (detail1 != null)
+                        {
+                            details.Add(detail1);
+                        }
+                    }
+
+                    detail.Mark = CalculateScore(detail, question.Question!, question.Mark, details);
+                }
+                else
+                {
+                    detail.Mark = CalculateScore(detail, question.Question!, question.Mark);
+                }
+
+            }
+        }
+
+        float totalMark = 0;
+        foreach (var item in submitPaper.SubmitPaperDetails)
+        {
+            if (item.Mark.HasValue)
+            {
+                totalMark += item.Mark.Value;
+            }
+        }
+
+        return totalMark;
+    }
+
+    private float CalculateScore(SubmitPaperDetail detail, QuestionClone question, float mark, List<SubmitPaperDetail>? details = null)
+    {
+        return question.QuestionType switch
+        {
+            QuestionType.SingleChoice or QuestionType.ReadingQuestionPassage => CalculateSingleChoiceScore(detail, question, mark),
+            QuestionType.MultipleChoice => CalculateMultipleChoiceScore(detail, question, mark),
+            QuestionType.FillBlank => CalculateFillBlankScore(detail, question, mark),
+            QuestionType.Matching => CalculateMatchingScore(detail, question, mark),
+            QuestionType.Writing => CalculateWritingScore(detail),
+            QuestionType.Reading => CalculateReadingScore(question, mark, details),
+            _ => 0,
+        };
+    }
+
+    private float CalculateMultipleChoiceScore(SubmitPaperDetail detail, QuestionClone question, float mark)
+    {
+        // MultipleChoice
+        // Get answerIds from AnswerRaw
+        string[] answerIdStrs = detail.AnswerRaw!.Split('|');
+        bool isCorrect = true;
+        foreach (var a in question.AnswerClones)
+        {
+            if (a.IsCorrect && !answerIdStrs.Contains(a.Id.ToString()))
+            {
+                isCorrect = false;
+                break;
+            }
+        }
+
+        return isCorrect ? mark : 0;
+    }
+
+    private float CalculateSingleChoiceScore(SubmitPaperDetail detail, QuestionClone question, float mark)
+    {
+        // SingleChoice
+        foreach (var a in question.AnswerClones)
+        {
+            if (a.Id == Guid.Parse(detail.AnswerRaw!) && a.IsCorrect)
+            {
+                return mark;
+            }
+        }
+
+        return 0;
+    }
+
+    private float CalculateFillBlankScore(SubmitPaperDetail detail, QuestionClone question, float mark)
+    {
+        // FillBlank
+        List<Dictionary<string, string>> answers = _serializerService.Deserialize<List<Dictionary<string, string>>>(detail.AnswerRaw!);
+
+        // question.AnswerClones array = ["$_[1]Sahara", "$_[2]Africa"]
+        // Convert to dictionary
+        List<Dictionary<string, string>> correctAnswers = new();
+
+        // 1. Sahara 2. Africa
+        Regex regex = new Regex(@"\$_\[(\d+)\](.*)");
+        foreach (var a in question.AnswerClones)
+        {
+            Match match = regex.Match(a.Content!);
+            if (match.Success)
+            {
+                correctAnswers.Add(new Dictionary<string, string> { { match.Groups[1].Value, match.Groups[2].Value } });
+            }
+        }
+
+        int correctCount = 0;
+
+        // Check correct answers
+        foreach (var a in answers)
+        {
+            foreach (var ca in correctAnswers)
+            {
+                // Check key
+                if (a.Keys.First() == ca.Keys.First())
+                {
+                    // Check value
+                    string normalizedAnswer = a.Values.First().Trim().ToLower();
+                    string normalizedCorrectAnswer = ca.Values.First().Trim().ToLower();
+                    if (normalizedAnswer == normalizedCorrectAnswer)
+                    {
+                        correctCount++;
+                    }
+                }
+            }
+        }
+
+        return correctCount == 0 ? 0 : mark / correctAnswers.Count * correctCount;
+    }
+
+    private float CalculateMatchingScore(SubmitPaperDetail detail, QuestionClone question, float mark)
+    {
+        // if detail.AnswerRaw is empty
+        if (string.IsNullOrEmpty(detail.AnswerRaw))
+        {
+            return 0;
+        }
+
+        // Deserialize the AnswerRaw to get the user's answers
+        var userAnswers = detail.AnswerRaw.Split('|')
+                                          .Select(pair => pair.Split('_'))
+                                          .ToDictionary(parts => parts[0], parts => parts[1]);
+
+        // Initialize a counter for correct answers
+        int correctCount = 0;
+
+        // Iterate through each correct answer and check if the user's answer matches
+        var correctAnswers = question.AnswerClones.FirstOrDefault();
+        int numCorrectAnswers = 0;
+        if (correctAnswers != null)
+        {
+            Dictionary<string, string> correctAnswersDict = new();
+
+            // Deserialize the correct answers
+            foreach (string answer in correctAnswers.Content!.Split('|'))
+            {
+                string[] parts = answer.Split('_');
+                correctAnswersDict.Add(parts[0], parts[1]);
+            }
+
+            numCorrectAnswers = correctAnswersDict.Count;
+
+            // Check if the user's answer matches the correct answer
+            foreach (var userAnswer in userAnswers)
+            {
+                // ignore case, trim and compare
+                if (correctAnswersDict.TryGetValue(userAnswer.Key, out string? correctAnswer) &&
+                                       userAnswer.Value.Trim().Equals(correctAnswer.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    correctCount++;
+                }
+            }
+        }
+
+        // Calculate the score: total marks divided by the number of correct answers
+        return correctCount == 0 ? 0 : mark / numCorrectAnswers * correctCount;
+    }
+
+    private float CalculateReadingScore(QuestionClone question, float mark, List<SubmitPaperDetail>? details = null)
+    {
+        // Reading
+        float correctCount = 0;
+        foreach (var qp in question.QuestionPassages)
+        {
+            var detail1 = details!.FirstOrDefault(x => x.QuestionId == qp.Id);
+            if (detail1 != null)
+            {
+                bool isCorrect = true;
+                foreach (var a in qp.AnswerClones)
+                {
+                    if (a.IsCorrect && !detail1.AnswerRaw!.Split('|').Contains(a.Id.ToString()))
+                    {
+                        isCorrect = false;
+                        break;
                     }
                 }
 
-                index++;
+                if (isCorrect)
+                {
+                    correctCount += 1;
+                }
             }
         }
 
-        // Serialize to json
-        return _serializerService.Serialize(answers);
+        return correctCount == 0 ? 0 : mark / question.QuestionPassages.Count * correctCount;
     }
 
+    private float CalculateWritingScore(SubmitPaperDetail detail)
+    {
+        // if answer is empty
+        if (string.IsNullOrEmpty(detail.AnswerRaw))
+        {
+            return 0;
+        }
+
+        // if answer is nomal grade before
+        return detail.Mark.HasValue && detail.Mark > 0 ? detail.Mark ?? 0 : 0;
+    }
+
+    public Task<List<SubmitPaper>> CalculateScorePaperAsync(DefaultIdType paperId, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<DefaultIdType> SendLogAsync(SendLogRequest request, CancellationToken cancellationToken)
+    {
+        SubmitPaperLog spl = request.Adapt<SubmitPaperLog>();
+
+        // Add new submit paper log
+        _ = await _submitPaperLogRepository.AddAsync(spl, cancellationToken);
+
+        return spl.Id;
+    }
+
+    public bool IsCorrectAnswer(SubmitPaperDetail submitDetail, QuestionClone question)
+    {
+        float markFlag = 10f;
+        var x = CalculateScore(submitDetail, question, markFlag);
+        return x == markFlag;
+    }
 }

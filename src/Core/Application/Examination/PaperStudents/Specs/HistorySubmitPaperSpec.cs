@@ -1,14 +1,13 @@
-﻿using Ardalis.Specification;
-using FSH.WebApi.Application.Common.Specification;
+﻿using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Domain.Examination;
 
-namespace FSH.WebApi.Application.Examination.PaperStudents;
-public class HistorySubmitPaperSpec : EntitiesByPaginationFilterSpec<SubmitPaper>
+namespace FSH.WebApi.Application.Examination.PaperStudents.Specs;
+public class HistorySubmitPaperSpec : EntitiesByPaginationFilterSpec<SubmitPaper, StudentTestHistoryDto>
 {
-    public HistorySubmitPaperSpec(GetHistoryTestOfStudentRequest request, Guid userId)
+    public HistorySubmitPaperSpec(GetHistoryTestOfStudentRequest request, DefaultIdType userId)
         : base(request)
     {
-        Query
+        _ = Query
             .Where(sp => sp.CreatedBy == userId)
             .Include(sp => sp.Paper)
                 .ThenInclude(p => p.PaperLabel)

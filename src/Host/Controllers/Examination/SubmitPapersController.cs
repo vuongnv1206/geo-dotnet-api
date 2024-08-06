@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Examination.Papers.ByStudents;
+﻿using FSH.WebApi.Application.Examination.Monitor;
+using FSH.WebApi.Application.Examination.Papers.ByStudents;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
@@ -73,6 +74,21 @@ public class SubmitPapersController : VersionedApiController
     public async Task<ActionResult<Guid>> SubmitExam(SubmitExamRequest request)
     {
         request.PublicIp = GetIpAddress();
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("send-log")]
+    [OpenApiOperation("Send log")]
+    public async Task<ActionResult<Guid>> SendLog(SendLogRequest request)
+    {
+        request.PublicIp = GetIpAddress();
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("monitor")]
+    [OpenApiOperation("Monitor exam")]
+    public async Task<ActionResult<Guid>> MonitorExam(MonitorExamRequest request)
+    {
         return await Mediator.Send(request);
     }
 

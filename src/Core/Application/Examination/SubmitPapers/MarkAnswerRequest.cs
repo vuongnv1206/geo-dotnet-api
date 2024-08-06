@@ -15,9 +15,9 @@ public class MarkAnswerRequest : IRequest<Guid>
 public class MarkAnswerRequestValidator : CustomValidator<MarkAnswerRequest>
 {
     public MarkAnswerRequestValidator(
-               IRepository<SubmitPaper> submitPaperRepo,
-                      IRepository<Question> questionRepo,
-                             IStringLocalizer<MarkAnswerRequestValidator> T)
+        IRepository<SubmitPaper> submitPaperRepo,
+        IRepository<QuestionClone> questionRepo,
+        IStringLocalizer<MarkAnswerRequestValidator> T)
     {
         RuleFor(x => x.SubmitPaperId)
             .MustAsync(async (submitPaperId, ct) => await submitPaperRepo.GetByIdAsync(submitPaperId, ct) is not null)
@@ -32,18 +32,21 @@ public class MarkAnswerRequestHandler : IRequestHandler<MarkAnswerRequest, Guid>
 {
     private readonly IRepository<SubmitPaper> _submitPaperRepo;
     private readonly IRepository<Question> _questionRepo;
+    private readonly IRepository<QuestionClone> _questionCloneRepo;
     private readonly IStringLocalizer _t;
     private readonly ISerializerService _serializerService;
     public MarkAnswerRequestHandler(
-               IRepository<SubmitPaper> submitPaperRepo,
-                      IStringLocalizer<MarkAnswerRequestHandler> t,
-                             IRepository<Question> questionRepo,
-                                    ISerializerService serializerService)
+        IRepository<SubmitPaper> submitPaperRepo,
+        IStringLocalizer<MarkAnswerRequestHandler> t,
+        IRepository<Question> questionRepo,
+        ISerializerService serializerService,
+        IRepository<QuestionClone> questionCloneRepo)
     {
         _submitPaperRepo = submitPaperRepo;
         _t = t;
         _questionRepo = questionRepo;
         _serializerService = serializerService;
+        _questionCloneRepo = questionCloneRepo;
     }
 
     public async Task<DefaultIdType> Handle(MarkAnswerRequest request, CancellationToken cancellationToken)
@@ -52,7 +55,7 @@ public class MarkAnswerRequestHandler : IRequestHandler<MarkAnswerRequest, Guid>
         if (submitPaper is null)
             throw new NotFoundException(_t["Submit Paper {0} Not Found.", request.SubmitPaperId]);
 
-        var question = await _questionRepo.GetByIdAsync(request.QuestionId);
+        var question = await _questionCloneRepo.GetByIdAsync(request.QuestionId);
         if (question is null)
             throw new NotFoundException(_t["Question {0} Not Found.", request.QuestionId]);
         if (question.QuestionType != Domain.Question.Enums.QuestionType.Writing)

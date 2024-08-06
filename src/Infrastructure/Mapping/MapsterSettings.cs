@@ -8,7 +8,7 @@ using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
-using FSH.WebApi.Application.Examination.PaperStudents;
+using FSH.WebApi.Application.Examination.PaperStatistics;
 using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.Services.Models;
@@ -16,6 +16,7 @@ using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.Questions.QuestionLabel;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
@@ -23,6 +24,7 @@ using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
+using FSH.WebApi.Domain.Question.Enums;
 using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
@@ -126,7 +128,8 @@ public class MapsterSettings
            .Map(dest => dest.Answers, src => src.AnswerClones);
 
         _ = TypeAdapterConfig<AnswerClone, AnswerForStudentDto>.NewConfig()
-           .Map(dest => dest.IsCorrect, src => false);
+           .Map(dest => dest.IsCorrect, src => false)
+           .Map(dest => dest.Content, src => (src.QuestionClone.QuestionType == QuestionType.FillBlank || src.QuestionClone.QuestionType == QuestionType.Matching) ? string.Empty : src.Content);
 
         _ = TypeAdapterConfig<TeacherTeam, TeacherTeamDto>.NewConfig()
             .Map(dest => dest.TeacherPermissionInClassDto, src => src.TeacherPermissionInClasses);
@@ -176,7 +179,7 @@ public class MapsterSettings
             .Map(dest => dest.StartedTime, src => src.StartTime)
             .Map(dest => dest.SubmittedTime, src => src.EndTime)
             .Map(dest => dest.CompletionStatus, src => src.Status)
-            .Map(dest => dest.Score, src => src.TotalMark)
+            .Map(dest => dest.Score, src => src.getScore())
             .Map(dest => dest.ShowMarkResult, src => src.Paper.ShowMarkResult);
 
         _ = TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
@@ -187,6 +190,8 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<SubmitPaperDetail, SubmitPaperDetailDto>.NewConfig()
            .Map(dest => dest.IsCorrect, src => src.IsAnswerCorrect(src.Question, src.Question.AnswerClones.ToList()));
+
+        _ = TypeAdapterConfig<SubmitPaperLog, SendLogRequest>.NewConfig();
 
         _ = TypeAdapterConfig<PaperAccess, PaperAccessDto>.NewConfig();
 
@@ -220,11 +225,39 @@ public class MapsterSettings
         _ = TypeAdapterConfig<PaperPermission, PaperPermissionDto>.NewConfig();
         _ = TypeAdapterConfig<PaperFolderPermission, PaperFolderPermissionDto>.NewConfig();
 
-        //Examination.Services.Models
+        // Examination.Services.Models
         _ = TypeAdapterConfig<QuestionModel, QuestionDto>.NewConfig()
             .Map(dest => dest.Answers, src => src.Answers)
             .Map(dest => dest.QuestionPassages, src => src.QuestionPassages);
         _ = TypeAdapterConfig<QuestionPassageModel, QuestionPassagesDto>.NewConfig();
         _ = TypeAdapterConfig<AnswerModel, AnswerDto>.NewConfig();
+
+        // paper statistic
+        _ = TypeAdapterConfig<Paper, PaperInfoStatistic>.NewConfig()
+            .Map(dest => dest.TotalAttendee, src => src.SubmitPapers.GroupBy(x => x.CreatedBy).Count())
+            .Map(dest => dest.TotalRegister, src => src.SubmitPapers.GroupBy(x => x.CreatedBy).Count())
+            .Map(dest => dest.MarkPopular, src =>
+                src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End)
+                                .GroupBy(x => Math.Ceiling(x.TotalMark))
+                                .OrderByDescending(g => g.Count())
+                                .Select(g => g.Key)
+                                .FirstOrDefault())
+            .Map(dest => dest.TotalPopular, src =>
+                src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End)
+                                .GroupBy(x => Math.Ceiling(x.TotalMark))
+                                .OrderByDescending(g => g.Count())
+                                .Select(g => g.Count())
+                                .FirstOrDefault())
+            .Map(dest => dest.TotalDoing, src => src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.Doing).Count())
+            .Map(dest => dest.AverageMark, src => src.SubmitPapers.Sum(x => x.TotalMark)
+            / src.SubmitPapers.Where(sb => sb.Status == SubmitPaperStatus.End).Count());
+
+        _ = TypeAdapterConfig<QuestionClone, QuestionStatisticDto>.NewConfig()
+            .Map(dest => dest.Answers, src => src.AnswerClones);
+
+
+        //Question Label
+        _ = TypeAdapterConfig<QuestionLable, QuestionLabelDto>.NewConfig()
+        ;
     }
 }

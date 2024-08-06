@@ -1,4 +1,4 @@
-﻿
+﻿using FSH.WebApi.Application.Examination.Matrices;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 
@@ -101,7 +101,7 @@ public class PapersController : VersionedApiController
             : Ok(await Mediator.Send(request));
     }
 
-    //Write controller for DeleteQuestionInPaperRequest
+    // Write controller for DeleteQuestionInPaperRequest
     [HttpDelete("{id:guid}/questions/{questionId:guid}")]
     [OpenApiOperation("Delete a question in a paper")]
     [MustHavePermission(FSHAction.Delete, FSHResource.Papers)]
@@ -110,7 +110,7 @@ public class PapersController : VersionedApiController
         return Ok(await Mediator.Send(new DeleteQuestionInPaperRequest { PaperId = id, QuestionCloneId = questionId }));
     }
 
-    //fix controller for AddQuestionInPaperRequest
+    // fix controller for AddQuestionInPaperRequest
 
     [HttpPost("{id:guid}/questions")]
     [OpenApiOperation("Add questions in a paper")]
@@ -121,6 +121,7 @@ public class PapersController : VersionedApiController
         {
             return BadRequest("Paper Id in the request does not match the Id in the route.");
         }
+
         return Ok(await Mediator.Send(request));
     }
 
@@ -128,21 +129,30 @@ public class PapersController : VersionedApiController
     public async Task<IActionResult> GeneratePaperDocx(Guid paperId)
     {
         var request = new GeneratePaperDocxRequest(paperId);
-        var fileBytes = await Mediator.Send(request);
+        byte[] fileBytes = await Mediator.Send(request);
 
         // Trả về file DOCX dưới dạng response
-       // return File(fileBytes, "application/msword");
-        return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"ExamPaper-{paperId}.docx", true); //Download file
+        // return File(fileBytes, "application/msword");
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"ExamPaper-{paperId}.docx", true); // Download file
     }
 
-    [HttpGet("generate/pdf")]
-    public async Task<IActionResult> GeneratePaperPdf(Guid paperId)
-    {
-        var request = new GeneratePaperPdfRequest(paperId);
-        var fileBytes = await Mediator.Send(request);
+    // [HttpGet("generate/pdf")]
+    // public async Task<IActionResult> GeneratePaperPdf(Guid paperId)
+    // {
+    //    var request = new GeneratePaperPdfRequest(paperId);
+    //    var fileBytes = await Mediator.Send(request);
 
-        //return File(fileBytes, "application/pdf");  //Get file in pdf format
-        return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
+    // //return File(fileBytes, "application/pdf");  //Get file in pdf format
+    //    return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
+    // }
+
+    // Write controller for CreatePaperFromMatrixRequest
+    [HttpPost("create-from-matrix")]
+    [OpenApiOperation("Create a paper from a matrix.")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Papers)]
+    public async Task<ActionResult<Guid>> CreateFromMatrixAsync(CreatePaperFromMatrixRequest request)
+    {
+        return Ok(await Mediator.Send(request));
     }
 
 }

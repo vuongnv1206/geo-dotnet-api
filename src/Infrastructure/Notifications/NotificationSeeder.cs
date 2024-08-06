@@ -33,12 +33,12 @@ public class NotificationSeeder : ICustomSeeder
             foreach (var notification in notifications)
             {
                 notification.UserId = Guid.Parse(users.Id);
-                _db.Notifications.Add(notification);
+                _ = _db.Notifications.Add(notification);
             }
+
+            _ = await _db.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Seeded Notifications.");
         }
 
-        await _db.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("Seeded Notifications.");
     }
 }
