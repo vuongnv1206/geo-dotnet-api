@@ -104,5 +104,11 @@ public class QuestionController : VersionedApiController
         return await Mediator.Send(request);
     }
 
-
+    [HttpPost("question-random")]
+    [MustHavePermission(FSHAction.Search, FSHResource.Question)]
+    [OpenApiOperation("Get random question in folder", "")]
+    public async Task<List<QuestionDto>> GetQuestionRandom(GetQuestionRandomRequest request)
+    {
+        return await Mediator.Send(request);
+    }
 }

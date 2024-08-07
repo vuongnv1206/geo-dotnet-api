@@ -1,99 +1,116 @@
-﻿
-using FSH.WebApi.Application.Examination.Papers;
+﻿using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
-using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Question;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Examination.Matrices;
-public class CreatePaperFromMatrixRequest : IRequest<Guid>
+public class CreatePaperFromMatrixRequest : IRequest<List<QuestionGenarateToMatrix>>
 {
     public Guid MatrixId { get; set; }
-    public string ExamName { get; set; }
-    public PaperStatus Status { get; set; }
-    public string? Password { get; set; }
-    public PaperType Type { get; set; }
-    public string? Content { get; set; }
-    public string? Description { get; set; }
-    public Guid? PaperLabelId { get; set; }
-    public Guid? PaperFolderId { get; set; }
-    public Guid? SubjectId { get; set; }
 }
 
-public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFromMatrixRequest, Guid>
+public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFromMatrixRequest, List<QuestionGenarateToMatrix>>
 {
-    private readonly IRepositoryWithEvents<Paper> _paperRepo;
     private readonly IRepository<PaperMatrix> _matrixRepo;
     private readonly IStringLocalizer<CreatePaperFromMatrixRequestHandler> _t;
     private readonly IMediator _mediator;
-    private readonly IReadRepository<Domain.Question.Question> _questionRepo;
     private readonly IReadRepository<QuestionFolder> _questionFolderRepo;
+    private readonly ISerializerService _serializerService;
+
     public CreatePaperFromMatrixRequestHandler(
-        IRepositoryWithEvents<Paper> paperRepo,
         IRepository<PaperMatrix> matrixRepo,
         IStringLocalizer<CreatePaperFromMatrixRequestHandler> t,
         IMediator mediator,
-        IReadRepository<Domain.Question.Question> questionRepo,
-        IReadRepository<QuestionFolder> questionFolderRepo
-        )
+        IReadRepository<QuestionFolder> questionFolderRepo,
+        ISerializerService serializerService)
     {
-        _paperRepo = paperRepo;
         _matrixRepo = matrixRepo;
         _t = t;
         _mediator = mediator;
-        _questionRepo = questionRepo;
         _questionFolderRepo = questionFolderRepo;
+        _serializerService = serializerService;
     }
 
-    public async Task<Guid> Handle(CreatePaperFromMatrixRequest request, CancellationToken cancellationToken)
+    public async Task<List<QuestionGenarateToMatrix>> Handle(CreatePaperFromMatrixRequest request, CancellationToken cancellationToken)
     {
-        var matrix = await _matrixRepo.GetByIdAsync(request.MatrixId);
-        _ = matrix ?? throw new NotFoundException(_t["Matrix {0} Not Found.", request.MatrixId]);
+        var matrix = await _matrixRepo.GetByIdAsync(request.MatrixId)
+            ?? throw new NotFoundException(_t["Matrix {0} Not Found.", request.MatrixId]);
 
-        var matrixContent = JsonConvert.DeserializeObject<List<ContentMatrixDto>>(matrix.Content);
+        var matrixContent = _serializerService.Deserialize<List<ContentMatrixDto>>(matrix.Content);
 
-        var createPaperRequest = new CreatePaperRequest(request.ExamName, request.Status, request.Password, request.Type, request.Content, request.Description, request.PaperLabelId, request.PaperFolderId, request.SubjectId);
+        var response = new List<QuestionGenarateToMatrix>();
+        var rawIndexesPaper = new List<int>();
 
         foreach (var item in matrixContent)
         {
-            var rootQuestionFolder = await _questionFolderRepo.FirstOrDefaultAsync(new QuestionFolderByIdSpec(item.QuestionFolderId));
-            var folderIds = new List<Guid>();
-            folderIds.Add(item.QuestionFolderId);
-            rootQuestionFolder.ChildQuestionFolderIds(rootQuestionFolder.Children, folderIds);
+            var rootFolder = await _questionFolderRepo.FirstOrDefaultAsync(new QuestionFolderByIdSpec(item.QuestionFolderId));
+            var folderIds = new List<Guid> { item.QuestionFolderId };
+            rootFolder.ChildQuestionFolderIds(rootFolder.Children, folderIds);
 
-            int totalNumberOfQuestions = matrixContent.Sum(item => item.CriteriaQuestions.Sum(criteria => criteria.NumberOfQuestion));
-            float markPerQuestion = item.TotalPoint / totalNumberOfQuestions;
+            int totalQuestionsRequestInFolder = item.CriteriaQuestions.Sum(criteria => criteria.NumberOfQuestion);
+            float markPerQuestion = item.TotalPoint / totalQuestionsRequestInFolder;
 
-            foreach (var criteria in item.CriteriaQuestions)
+            foreach (var criteria in item.CriteriaQuestions.Where(x => x.NumberOfQuestion > 0))
             {
-                var spec = new QuestionFromMatrixSpec(folderIds, criteria.QuestionLabelId, criteria.QuestionType);
-                var questions = await _questionRepo.ListAsync(spec, cancellationToken);
+                var questionRequest = new GetQuestionRandomRequest(
+                    folderIds,
+                    criteria.QuestionType,
+                    criteria.QuestionLabelId,
+                    criteria.NumberOfQuestion);
 
-                if (questions.Count < criteria.NumberOfQuestion)
-                {
-                    throw new ValidationException($"Not enough questions found for {criteria.QuestionLabelId}.");
-                }
+                var selectedQuestions = await _mediator.Send(questionRequest);
 
-                var selectedQuestions = questions.OrderBy(x => Guid.NewGuid()).Take(criteria.NumberOfQuestion).ToList();
-                var rawIndexes = criteria.RawIndex.Split(',').Select(int.Parse).ToList();
-                for (int i = 0; i < selectedQuestions.Count; i++)
+                if (string.IsNullOrEmpty(criteria.RawIndex))
                 {
-                    createPaperRequest.Questions.Add(new CreateUpdateQuestionInPaperDto
+                    response.AddRange(selectedQuestions.Select(question => new QuestionGenarateToMatrix
                     {
-                        QuestionId = selectedQuestions[i].Id,
+                        Question = question,
                         Mark = markPerQuestion,
-                        RawIndex = rawIndexes.Count > i ? rawIndexes[i] : 0
-                    });
+                    }));
+                }
+                else
+                {
+                    var rawIndexes = criteria.RawIndex.Split(',')
+                    .Select(int.Parse)
+                    .ToList();
+
+                    // Check for duplicates
+                    if (rawIndexes.Any(x => rawIndexesPaper.Contains(x)))
+                    {
+                        throw new BadRequestException(_t["RawIndex contains duplicate values."]);
+                    }
+
+                    if (rawIndexes.Count < selectedQuestions.Count)
+                    {
+                        throw new BadRequestException(_t["Index question are missing compared to the total number of question"]);
+                    }
+
+                    rawIndexesPaper.AddRange(rawIndexes);
+
+                    response.AddRange(selectedQuestions.Select((question, i) => new QuestionGenarateToMatrix
+                    {
+                        Question = question,
+                        Mark = markPerQuestion,
+                        RawIndex = rawIndexes[i]
+                    }));
                 }
             }
         }
 
-        return await _mediator.Send(createPaperRequest);
+        // complete raw index missing
+        var allPossibleIndexes = new HashSet<int>(Enumerable.Range(1, response.Count));
+        allPossibleIndexes.ExceptWith(rawIndexesPaper);
+
+        var missingIndexes = new Queue<int>(allPossibleIndexes);
+
+        foreach (var item in response)
+        {
+            if (item.RawIndex == null && missingIndexes.Count > 0)
+            {
+                item.RawIndex = missingIndexes.Dequeue();
+            }
+        }
+
+        return response.OrderBy(x => x.RawIndex).ToList();
     }
 }
