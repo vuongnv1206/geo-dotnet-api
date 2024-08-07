@@ -148,9 +148,9 @@ public class PapersController : VersionedApiController
 
     // Write controller for CreatePaperFromMatrixRequest
     [HttpPost("get-questions-from-matrix")]
-    [OpenApiOperation("Get genarated questions from matrix")]
+    [OpenApiOperation("Get generated questions from matrix")]
     [MustHavePermission(FSHAction.Create, FSHResource.Papers)]
-    public async Task<ActionResult<List<QuestionGenarateToMatrix>>> CreateFromMatrixAsync(CreatePaperFromMatrixRequest request)
+    public async Task<ActionResult<List<QuestionGenerateToMatrix>>> CreateFromMatrixAsync(CreatePaperFromMatrixRequest request)
     {
         return Ok(await Mediator.Send(request));
     }

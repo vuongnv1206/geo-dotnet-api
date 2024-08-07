@@ -4,12 +4,12 @@ using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 
 namespace FSH.WebApi.Application.Examination.Matrices;
-public class CreatePaperFromMatrixRequest : IRequest<List<QuestionGenarateToMatrix>>
+public class CreatePaperFromMatrixRequest : IRequest<List<QuestionGenerateToMatrix>>
 {
     public Guid MatrixId { get; set; }
 }
 
-public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFromMatrixRequest, List<QuestionGenarateToMatrix>>
+public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFromMatrixRequest, List<QuestionGenerateToMatrix>>
 {
     private readonly IRepository<PaperMatrix> _matrixRepo;
     private readonly IStringLocalizer<CreatePaperFromMatrixRequestHandler> _t;
@@ -31,14 +31,14 @@ public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFr
         _serializerService = serializerService;
     }
 
-    public async Task<List<QuestionGenarateToMatrix>> Handle(CreatePaperFromMatrixRequest request, CancellationToken cancellationToken)
+    public async Task<List<QuestionGenerateToMatrix>> Handle(CreatePaperFromMatrixRequest request, CancellationToken cancellationToken)
     {
         var matrix = await _matrixRepo.GetByIdAsync(request.MatrixId)
             ?? throw new NotFoundException(_t["Matrix {0} Not Found.", request.MatrixId]);
 
         var matrixContent = _serializerService.Deserialize<List<ContentMatrixDto>>(matrix.Content);
 
-        var response = new List<QuestionGenarateToMatrix>();
+        var response = new List<QuestionGenerateToMatrix>();
         var rawIndexesPaper = new List<int>();
 
         foreach (var item in matrixContent)
@@ -62,7 +62,7 @@ public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFr
 
                 if (string.IsNullOrEmpty(criteria.RawIndex))
                 {
-                    response.AddRange(selectedQuestions.Select(question => new QuestionGenarateToMatrix
+                    response.AddRange(selectedQuestions.Select(question => new QuestionGenerateToMatrix
                     {
                         Question = question,
                         Mark = markPerQuestion,
@@ -87,7 +87,7 @@ public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFr
 
                     rawIndexesPaper.AddRange(rawIndexes);
 
-                    response.AddRange(selectedQuestions.Select((question, i) => new QuestionGenarateToMatrix
+                    response.AddRange(selectedQuestions.Select((question, i) => new QuestionGenerateToMatrix
                     {
                         Question = question,
                         Mark = markPerQuestion,
