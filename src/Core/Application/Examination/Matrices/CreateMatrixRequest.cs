@@ -54,25 +54,32 @@ public class CreateMatrixRequestHandler : IRequestHandler<CreateMatrixRequest, G
     public async Task<Guid> Handle(CreateMatrixRequest request, CancellationToken cancellationToken)
     {
         var contentItems = _serializerService.Deserialize<List<ContentMatrixDto>>(request.Content);
-        //foreach (var item in contentItems) and check question folderId, question labelId
+
         foreach (var contentMatrixDto in contentItems)
         {
             // Kiểm tra QuestionFolderId có hợp lệ hay không
-            var questionFolderExists = await _questionFolderRepo.FirstOrDefaultAsync(new QuestionFolderByIdSpec(contentMatrixDto.QuestionFolderId), cancellationToken);
-            _ = questionFolderExists ?? throw new NotFoundException($"Question Folder with ID {contentMatrixDto.QuestionFolderId} not found.");
+            var questionFolder = await _questionFolderRepo.FirstOrDefaultAsync(new QuestionFolderByIdSpec(contentMatrixDto.QuestionFolderId), cancellationToken);
+            _ = questionFolder ?? throw new NotFoundException($"Question Folder with ID {contentMatrixDto.QuestionFolderId} not found.");
+
+            var totalQuestionsInFolder = questionFolder.CountQuestionInFolder(); // Tổng số câu hỏi trong folder
 
             foreach (var criteria in contentMatrixDto.CriteriaQuestions)
             {
                 var questionLabelExists = await _repositoryQuestionLabel.FirstOrDefaultAsync(new QuestionLabelByIdSpec(criteria.QuestionLabelId), cancellationToken);
                 _ = questionLabelExists ?? throw new NotFoundException($"Question Label with ID {criteria.QuestionLabelId} not found.");
+
+                // Kiểm tra nếu NumberOfQuestion > tổng số câu hỏi có sẵn
+                if (criteria.NumberOfQuestion > totalQuestionsInFolder)
+                {
+                    throw new ValidationException($"NumberOfQuestion ({criteria.NumberOfQuestion}) for Label ID {criteria.QuestionLabelId} exceeds available questions ({totalQuestionsInFolder}) in the folder.");
+                }
             }
-
         }
-
 
         var matrix = new PaperMatrix(request.Name, request.Content, request.TotalPoint);
         await _repositoryMatrix.AddAsync(matrix);
-      
+
         return matrix.Id;
     }
+
 }
