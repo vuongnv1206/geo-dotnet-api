@@ -11,7 +11,7 @@ public interface IPaperTemplateService : ITransientService
         TranscriptPaginationResponse transcriptData,
         PaperInfoStatistic paperInfoData
     );
-    byte[] GeneratePdfFromHtml(string htmlContent, string title);
+    Task<byte[]> GeneratePdfFromHtml(string htmlContent, string title);
 
 
 }

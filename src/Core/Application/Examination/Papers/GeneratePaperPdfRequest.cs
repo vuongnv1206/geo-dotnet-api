@@ -43,7 +43,7 @@ public class GeneratePaperPdfRequestHandler : IRequestHandler<GeneratePaperPdfRe
 
         var htmlContent = _paperTemplateService.GeneratePaperTemplate("paper", paperTemplateModel);
 
-        var file = _paperTemplateService.GeneratePdfFromHtml(htmlContent, paperTemplateModel.ExamName);
+        var file = await _paperTemplateService.GeneratePdfFromHtml(htmlContent, paperTemplateModel.ExamName);
        
         return file;
 

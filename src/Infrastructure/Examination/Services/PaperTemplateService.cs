@@ -4,9 +4,9 @@ using FSH.WebApi.Application.Examination.PaperStatistics;
 using FSH.WebApi.Application.Examination.Services;
 using RazorEngineCore;
 using System.Text;
-using PdfSharp.Pdf;
-using PdfSharp;
-using PdfSharp.Drawing;
+using PuppeteerSharp.Media;
+using PuppeteerSharp;
+using Irony.Parsing;
 
 namespace FSH.WebApi.Infrastructure.Examination.Services;
 public class PaperTemplateService : IPaperTemplateService
@@ -180,7 +180,7 @@ public class PaperTemplateService : IPaperTemplateService
     }
 
 
- 
+
     private void AddTotalRow(IXLWorksheet worksheet, int row, List<float> intervals)
     {
         worksheet.Cell(row, 1).Value = "TỔNG";
@@ -193,8 +193,39 @@ public class PaperTemplateService : IPaperTemplateService
         }
     }
 
-    public byte[] GeneratePdfFromHtml(string htmlContent, string title)
+    public async Task<byte[]> GeneratePdfFromHtml(string htmlContent, string title)
     {
-        throw new Exception("Not implemented");
+        var pdfOptions = new PdfOptions {
+            DisplayHeaderFooter = true,
+            Landscape = true,
+            PrintBackground = true,
+            Format = PaperFormat.A4,
+            MarginOptions = new MarginOptions { Top = "1cm", Bottom = "1cm", Left = "1cm", Right = "1cm" },
+            Scale = 1
+        };
+
+        await new BrowserFetcher().DownloadAsync();
+
+        using (var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+        {
+            Headless = true
+        }))
+        {
+            using (var page = await browser.NewPageAsync())
+            {
+                await page.SetContentAsync(htmlContent);
+
+                using (var pdfStream = await page.PdfStreamAsync(pdfOptions))
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await pdfStream.CopyToAsync(memoryStream);
+                        return memoryStream.ToArray();
+                    }
+                }
+            }
+        }
     }
+
+
 }

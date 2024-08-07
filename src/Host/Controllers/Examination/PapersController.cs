@@ -136,15 +136,15 @@ public class PapersController : VersionedApiController
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"ExamPaper-{paperId}.docx", true); // Download file
     }
 
-    // [HttpGet("generate/pdf")]
-    // public async Task<IActionResult> GeneratePaperPdf(Guid paperId)
-    // {
-    //    var request = new GeneratePaperPdfRequest(paperId);
-    //    var fileBytes = await Mediator.Send(request);
+    [HttpGet("generate/pdf")]
+    public async Task<IActionResult> GeneratePaperPdf(Guid paperId)
+    {
+        var request = new GeneratePaperPdfRequest(paperId);
+        var fileBytes = await Mediator.Send(request);
 
-    // //return File(fileBytes, "application/pdf");  //Get file in pdf format
-    //    return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
-    // }
+        //return File(fileBytes, "application/pdf");  //Get file in pdf format
+        return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
+    }
 
     // Write controller for CreatePaperFromMatrixRequest
     [HttpPost("create-from-matrix")]
