@@ -80,7 +80,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
 
     public void SubmitAssignment(Guid studentId, string? answerRaw, string? attachmentPath)
     {
-        var assignmentStudent = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
+        var assignmentStudent = AssignmentStudents.Where(x => x.Student.StId == studentId).FirstOrDefault();
         if (assignmentStudent is not null)
         {
             assignmentStudent.AnswerRaw = answerRaw;
