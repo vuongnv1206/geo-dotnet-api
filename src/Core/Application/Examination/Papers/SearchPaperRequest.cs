@@ -30,24 +30,49 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
         var data = new List<Paper>();
         var parentIds = new List<Guid>();
         var count = 0;
-        if (request.PaperFolderId.HasValue)
+
+        //If search by name
+        if (!string.IsNullOrEmpty(request.Keyword))
         {
-            parentIds.Add(request.PaperFolderId.Value);
-            var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value));
-            if (parentFolder != null)
+            //If search by name in folder
+            if (request.PaperFolderId.HasValue)
             {
-                parentFolder.ChildPaperFolderIds(null, parentIds);
+                parentIds.Add(request.PaperFolderId.Value);
+                var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value));
+                if (parentFolder != null)
+                {
+                    parentFolder.ChildPaperFolderIds(null, parentIds);
+                }
+                var spec = new PaperBySearchSpec(parentIds, request);
+                count = await _repository.CountAsync(spec, cancellationToken);
+                data = await _repository.ListAsync(spec, cancellationToken);
             }
-            var spec = new PaperBySearchSpec(parentIds, request);
-            count = await _repository.CountAsync(spec, cancellationToken);
-            data = await _repository.ListAsync(spec, cancellationToken);
+            else  //If search by name in root
+            {
+                var spec = new PaperBySearchSpec(null, request);
+                count = await _repository.CountAsync(spec, cancellationToken);
+                data = await _repository.ListAsync(spec, cancellationToken);
+            }
         }
         else
         {
-            var spec = new PaperBySearchSpec(null, request);
-            count = await _repository.CountAsync(spec, cancellationToken);
-            data = await _repository.ListAsync(spec, cancellationToken);
+            //If specific folder
+            if (request.PaperFolderId.HasValue)
+            {
+                parentIds.Add(request.PaperFolderId.Value);
+                var spec = new PaperBySearchSpec(parentIds, request);
+                count = await _repository.CountAsync(spec, cancellationToken);
+                data = await _repository.ListAsync(spec, cancellationToken);
+            }//If root
+            else
+            {
+                var spec = new PaperBySearchSpec(null, request);
+                count = await _repository.CountAsync(spec, cancellationToken);
+                data = await _repository.ListAsync(spec, cancellationToken);
+            }
         }
+
+         
 
         var dtos = new List<PaperInListDto>();
         foreach (var paper in data)
