@@ -5,7 +5,7 @@ public class TeacherTeamByContactSpec : Specification<TeacherTeam>
 {
     public TeacherTeamByContactSpec(string contact, Guid userId)
     {
-        Query.Where(x => (x.Phone.Equals(contact) || x.Email.Equals(contact))
+        Query.Where(x => (x.Phone.Trim().ToLower().Equals(contact.Trim().ToLower()) || x.Email.Trim().ToLower().Equals(contact.Trim().ToLower()))
                         && x.CreatedBy == userId);
     }
 }
