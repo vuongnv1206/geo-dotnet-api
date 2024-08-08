@@ -46,6 +46,7 @@ public static class FSHResource
     public const string Notifications = nameof(Notifications);
     public const string AuditLogs = nameof(AuditLogs);
     public const string Orders = nameof(Orders);
+    public const string CommentPost = nameof(CommentPost);
 }
 
 public static class FSHPermissions
@@ -145,6 +146,11 @@ public static class FSHPermissions
         new("Create QuestionFolders", FSHAction.Create, FSHResource.QuestionFolders),
         new("Update QuestionFolders", FSHAction.Update, FSHResource.QuestionFolders),
         new("Delete QuestionFolders", FSHAction.Delete, FSHResource.QuestionFolders),
+
+        // COMMENT POST
+        new("Create Comment", FSHAction.Create, FSHResource.CommentPost, new[] { TEACHER, STUDENT }),
+        new("Update Comment", FSHAction.Update, FSHResource.CommentPost, new[] { TEACHER, STUDENT }),
+        new("Delete Comment", FSHAction.Delete, FSHResource.CommentPost, new[] { TEACHER, STUDENT }),
 
         // QUESTIONS
         new("View Question", FSHAction.View, FSHResource.Question),
