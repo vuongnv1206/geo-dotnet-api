@@ -7,7 +7,7 @@ namespace FSH.WebApi.Host.Controllers.Class;
 public class CommentController : VersionedApiController
 {
     [HttpPost]
-    [MustHavePermission(FSHAction.Create, FSHResource.News)]
+    [MustHavePermission(FSHAction.Create, FSHResource.CommentPost)]
     [OpenApiOperation("Create a comment.", "")]
     public Task<Guid> CreateCommentAsync(CreateCommentRequest request)
     {
@@ -15,7 +15,7 @@ public class CommentController : VersionedApiController
     }
 
     [HttpPut("{id:guid}")]
-    [MustHavePermission(FSHAction.Update, FSHResource.News)]
+    [MustHavePermission(FSHAction.Update, FSHResource.CommentPost)]
     [OpenApiOperation("Update a comment.", "")]
     public async Task<ActionResult<Guid>> UpdateCommentAsync(UpdateCommentRequest request, Guid id)
     {
@@ -25,7 +25,7 @@ public class CommentController : VersionedApiController
     }
 
     [HttpDelete("{id:guid}")]
-    [MustHavePermission(FSHAction.Delete, FSHResource.News)]
+    [MustHavePermission(FSHAction.Delete, FSHResource.CommentPost)]
     [OpenApiOperation("Delete a comment.", "")]
     public Task<Guid> DeleteCommentAsync(Guid id)
     {
