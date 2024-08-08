@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Class;
+﻿using FSH.WebApi.Application.Assignments.AssignmentClasses;
+using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.UserStudents;
 using FSH.WebApi.Application.Common.FileStorage;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
@@ -32,6 +33,7 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
     private readonly IRepository<GroupPermissionInClass> _groupPermissionRepo;
     private readonly IRepository<TeacherPermissionInClass> _teacherPermissionRepo;
     private readonly IStringLocalizer _t;
+    private readonly IMediator _mediator;
 
     public CreateAssignmentRequestHandler(
         IRepository<Assignment> repository,
@@ -40,7 +42,8 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
         ICurrentUser currentUser,
         IRepository<GroupPermissionInClass> groupPermissionRepo,
         IRepository<TeacherPermissionInClass> teacherPermissionRepo,
-        IStringLocalizer<CreateAssignmentRequestHandler> t)
+        IStringLocalizer<CreateAssignmentRequestHandler> t,
+        IMediator mediator)
     {
         _repository = repository;
         _file = file;
@@ -49,6 +52,7 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
         _groupPermissionRepo = groupPermissionRepo;
         _teacherPermissionRepo = teacherPermissionRepo;
         _t = t;
+        _mediator = mediator;
     }
 
     public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
@@ -79,16 +83,11 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
         //string attachmentPath = JsonSerializer.Serialize(request.Attachment);
 
         var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, request.Attachment, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
+        await _repository.AddAsync(assignment, cancellationToken);
+
         if (request.ClassIds != null)
         {
-
-            foreach (var classId in request.ClassIds)
-            {
-                var assignmentClass = new AssignmentClass(assignment.Id, classId);
-                assignment.AssignmentClasses.Add(assignmentClass);
-            }
-
-            await _repository.AddAsync(assignment, cancellationToken);
+            await _mediator.Send(new AssignAssignmentToClassRequest(assignment.Id, request.ClassIds));
         }
 
         return assignment.Id;
