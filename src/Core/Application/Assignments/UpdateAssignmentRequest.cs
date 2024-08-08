@@ -7,6 +7,7 @@ using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.Assignments;
+
 public class UpdateAssignmentRequest : IRequest<Guid>
 {
     public Guid Id { get; set; }
@@ -21,7 +22,6 @@ public class UpdateAssignmentRequest : IRequest<Guid>
     public string? Attachment { get; set; }
     public List<Guid>? ClassIds { get; set; }
     public List<Guid>? StudentIds { get; set; }
-
 }
 
 public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRequest, Guid>
@@ -61,15 +61,17 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             ?? throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
 
         var userId = _currentUser.GetUserId();
-        foreach (var classId in request.ClassIds)
+
+        // Kiểm tra quyền cập nhật Assignment
+        foreach (var class1 in assignment.AssignmentClasses)
         {
-            var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId, userId))
-                ?? throw new NotFoundException(_t["Class not found", classId]);
+            var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(class1.ClassesId, userId))
+                ?? throw new NotFoundException(_t["Class not found", class1.ClassesId]);
 
             if (classroom.CreatedBy != userId && assignment.CreatedBy != userId)
             {
-                var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, classId);
-                var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, classId);
+                var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, class1.ClassesId);
+                var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, class1.ClassesId);
 
                 var listPermission = new List<PermissionInClassDto>();
 
@@ -79,10 +81,11 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
                                                 .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
 
                 if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment))
-                    throw new NotFoundException(_t["Classes {0} Not Found.", classId]);
+                    throw new NotFoundException(_t["Classes {0} Not Found.", class1.ClassesId]);
             }
         }
 
+        // Cập nhật thông tin Assignment
         var updatedAssignment = assignment.Update(
             request.Name,
             request.StartTime,
@@ -93,25 +96,19 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             request.RequireLoginToSubmit,
             request.SubjectId);
 
+        // Cập nhật các lớp học liên quan
         if (request.ClassIds != null)
         {
-            // Lấy danh sách các lớp hiện tại được giao bài tập
             var currentClassIds = updatedAssignment.AssignmentClasses.Select(ac => ac.ClassesId).ToList();
-
-            // Lấy danh sách các lớp cần thêm mới
             var newClassIds = request.ClassIds.Except(currentClassIds).ToList();
-
-            // Lấy danh sách các lớp cần xóa
             var removedClassIds = currentClassIds.Except(request.ClassIds).ToList();
 
-            // Thêm các lớp mới vào AssignmentClasses
             if (newClassIds.Any())
             {
                 var assignRequest = new AssignAssignmentToClassRequest(request.Id, newClassIds);
                 await _mediator.Send(assignRequest, cancellationToken);
             }
 
-            // Xóa các lớp không còn trong danh sách
             if (removedClassIds.Any())
             {
                 foreach (var classId in removedClassIds)
@@ -120,31 +117,15 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
                     await _mediator.Send(removeRequest, cancellationToken);
                 }
             }
-
-        }
-        else
-        {
-            // Nếu ClassIds là null, xóa tất cả các lớp hiện tại
-            var currentClassIds = updatedAssignment.AssignmentClasses.Select(ac => ac.ClassesId).ToList();
-            foreach (var classId in currentClassIds)
-            {
-                var removeRequest = new RemoveAssignmentFromClassRequest(request.Id, classId);
-                await _mediator.Send(removeRequest, cancellationToken);
-            }
         }
 
+        // Cập nhật các học sinh liên quan
         if (request.StudentIds != null)
         {
-            // Lấy danh sách các học sinh hiện tại được giao bài tập
             var currentStudentIds = updatedAssignment.AssignmentStudents.Select(a => a.StudentId).ToList();
-
-            // Lấy danh sách các học sinh cần thêm mới
             var newStudentIds = request.StudentIds.Except(currentStudentIds).ToList();
-
-            // Lấy danh sách các học sinh cần xóa
             var removedStudentIds = currentStudentIds.Except(request.StudentIds).ToList();
 
-            // Thêm các học sinh mới vào AssignmentStudents
             if (newStudentIds.Any())
             {
                 var assignRequest = new AssignAssignmentToStudentsRequest
@@ -155,7 +136,6 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
                 await _mediator.Send(assignRequest, cancellationToken);
             }
 
-            // Xóa các học sinh không còn trong danh sách
             if (removedStudentIds.Any())
             {
                 foreach (var studentId in removedStudentIds)
@@ -167,20 +147,6 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
                     };
                     await _mediator.Send(removeRequest, cancellationToken);
                 }
-            }
-        }
-        else
-        {
-            // Nếu StudentIds là null, xóa tất cả các học sinh hiện tại
-            var currentStudentIds = updatedAssignment.AssignmentStudents.Select(a => a.StudentId).ToList();
-            foreach (var studentId in currentStudentIds)
-            {
-                var removeRequest = new RemoveAssignmentOfStudentRequest
-                {
-                    AssignmentId = request.Id,
-                    StudentId = studentId
-                };
-                await _mediator.Send(removeRequest, cancellationToken);
             }
         }
 
