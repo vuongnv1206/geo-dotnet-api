@@ -163,7 +163,7 @@ internal partial class UserService : IUserService
     {
         var user = await _userManager.Users
            .AsNoTracking()
-           .Where(u => u.Email == email && u.IsActive)
+           .Where(u => u.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && u.IsActive)
            .FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
@@ -177,7 +177,7 @@ internal partial class UserService : IUserService
     {
         var user = await _userManager.Users
            .AsNoTracking()
-           .Where(u => u.PhoneNumber == phoneNumber && u.IsActive)
+           .Where(u => u.PhoneNumber.Trim().ToLower().Equals(phoneNumber.Trim().ToLower()) && u.IsActive)
            .FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
