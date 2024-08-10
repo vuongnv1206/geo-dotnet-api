@@ -6,7 +6,7 @@ public class GroupTeacher : AuditableEntity, IAggregateRoot
     public string? QrCode { get; set; }
     public virtual List<TeacherInGroup> TeacherInGroups { get; set; } = new();
     public virtual List<GroupPermissionInClass> GroupPermissionInClasses { get; set; } = new();
-    public virtual List<JoinGroupTeacherRequest>? JoinGroupRequest { get; set; }
+    public virtual List<JoinGroupTeacherRequest> JoinGroupRequests { get; set; } = new();
 
     public GroupTeacher(string name)
     {
@@ -54,6 +54,14 @@ public class GroupTeacher : AuditableEntity, IAggregateRoot
         if (permission is not null)
         {
             GroupPermissionInClasses.Remove(permission);
+        }
+    }
+
+    public void AddRequestJoinGroup(JoinGroupTeacherRequest request)
+    {
+        if (request is not null)
+        {
+            JoinGroupRequests.Add(request);
         }
     }
 }

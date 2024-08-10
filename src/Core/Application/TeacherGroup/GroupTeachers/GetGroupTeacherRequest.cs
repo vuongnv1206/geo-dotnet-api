@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
@@ -16,15 +17,18 @@ public class GetGroupTeacherRequestHandler : IRequestHandler<GetGroupTeacherRequ
     private readonly IRepository<GroupTeacher> _repository;
     private readonly IStringLocalizer _t;
     private readonly ICurrentUser _currentUser;
+    private readonly IUserService _userService;
 
     public GetGroupTeacherRequestHandler(
         IRepository<GroupTeacher> repository,
         IStringLocalizer<GetGroupTeacherRequestHandler> t,
-        ICurrentUser currentUser)
+        ICurrentUser currentUser,
+        IUserService userService)
     {
         _repository = repository;
         _t = t;
         _currentUser = currentUser;
+        _userService = userService;
     }
 
     public async Task<GroupTeacherDto> Handle(GetGroupTeacherRequest request, CancellationToken cancellationToken)
@@ -36,7 +40,8 @@ public class GetGroupTeacherRequestHandler : IRequestHandler<GetGroupTeacherRequ
 
         var response = groupTeacher.Adapt<GroupTeacherDto>();
 
-        response.AdminGroup = _currentUser.GetUserEmail() ?? "";
+        var adminGroup = await _userService.GetAsync(groupTeacher.CreatedBy.ToString(), cancellationToken);
+        response.AdminGroup = adminGroup.Email ?? "";
 
         return response;
     }
