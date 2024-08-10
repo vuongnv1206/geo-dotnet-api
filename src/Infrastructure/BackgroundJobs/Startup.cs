@@ -34,8 +34,8 @@ internal static class Startup
 
         services.AddHangfire((provider, hangfireConfig) => hangfireConfig
             .UseDatabase(storageSettings.StorageProvider, storageSettings.ConnectionString, config)
-            //.UseFilter(new FSHJobFilter(provider))
-            //.UseFilter(new LogJobFilter())
+            .UseFilter(new FSHJobFilter(provider))
+            .UseFilter(new LogJobFilter())
             .UseConsole());
 
         return services;
