@@ -65,3 +65,12 @@ public class GroupPermissionInClassConfig : IEntityTypeConfiguration<GroupPermis
         builder.ToTable("GroupPermissionInClasses", SchemaNames.GroupTeacher);
     }
 }
+
+public class JoinGroupTeacherRequestConfig : IEntityTypeConfiguration<JoinGroupTeacherRequest>
+{
+    public void Configure(EntityTypeBuilder<JoinGroupTeacherRequest> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("JoinGroupTeacherRequest", SchemaNames.GroupTeacher);
+    }
+}

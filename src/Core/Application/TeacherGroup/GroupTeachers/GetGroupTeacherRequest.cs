@@ -15,8 +15,17 @@ public class GetGroupTeacherRequestHandler : IRequestHandler<GetGroupTeacherRequ
 {
     private readonly IRepository<GroupTeacher> _repository;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
 
-    public GetGroupTeacherRequestHandler(IRepository<GroupTeacher> repository, IStringLocalizer<GetGroupTeacherRequestHandler> localizer) => (_repository, _t) = (repository, localizer);
+    public GetGroupTeacherRequestHandler(
+        IRepository<GroupTeacher> repository,
+        IStringLocalizer<GetGroupTeacherRequestHandler> t,
+        ICurrentUser currentUser)
+    {
+        _repository = repository;
+        _t = t;
+        _currentUser = currentUser;
+    }
 
     public async Task<GroupTeacherDto> Handle(GetGroupTeacherRequest request, CancellationToken cancellationToken)
     {
@@ -25,6 +34,10 @@ public class GetGroupTeacherRequestHandler : IRequestHandler<GetGroupTeacherRequ
         if (groupTeacher == null)
             throw new NotFoundException(_t["GroupTeacher{0} Not Found.", request.Id]);
 
-        return groupTeacher.Adapt<GroupTeacherDto>();
+        var response = groupTeacher.Adapt<GroupTeacherDto>();
+
+        response.AdminGroup = _currentUser.GetUserEmail() ?? "";
+
+        return response;
     }
 }
