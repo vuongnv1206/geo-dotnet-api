@@ -116,9 +116,10 @@ public class Assignment : AuditableEntity, IAggregateRoot
         }
     }
 
-    public void RemoveAssignmentFromClass(Guid classId)
+    public void RemoveSubmissionFromClass(List<Guid> studentIds)
     {
-        AssignmentStudents.RemoveAll(x => AssignmentClasses.Any(ac => ac.ClassesId == classId && ac.AssignmentId == x.AssignmentId));
+      //
+      AssignmentStudents.RemoveAll(x => studentIds.Contains(x.StudentId));
     }
 
     public void RemoveAssignmentOfStudent(Guid studentId)

@@ -73,15 +73,16 @@ public class PapersController : VersionedApiController
     [HttpPut("{id:guid}/questions")]
     [OpenApiOperation("Update questions in a paper")]
     [MustHavePermission(FSHAction.Update, FSHResource.Papers)]
-    public async Task<IActionResult> UpdateQuestionsInPaperAsync(Guid id, [FromBody] AddQuestionsInPaperRequest request)
+    public async Task<ActionResult> UpdateQuestionsInPaperAsync(Guid id, UpdateQuestionsInPaperRequest request)
     {
         if (id != request.PaperId)
         {
-            return BadRequest("Paper ID in the request does not match the ID in the route.");
+            return BadRequest("Paper Id in the request does not match the Id in the route.");
         }
 
         return Ok(await Mediator.Send(request));
     }
+
 
     [HttpPost("Shared")]
     [MustHavePermission(FSHAction.View, FSHResource.Papers)]

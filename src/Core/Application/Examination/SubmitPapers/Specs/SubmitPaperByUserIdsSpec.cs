@@ -9,7 +9,7 @@ public class SubmitPaperByUserIdsSpec : Specification<SubmitPaper>
     {
         Query
             .Where(x => x.PaperId == paperId)
-            .OrderByDescending(x => x.CreatedOn);
+            .OrderBy(x => x.CreatedOn);
 
         if (accessibleIds.Any())
         {
