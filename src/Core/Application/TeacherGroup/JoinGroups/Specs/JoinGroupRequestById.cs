@@ -5,6 +5,7 @@ public class JoinGroupRequestById : Specification<JoinGroupTeacherRequest>, ISin
 {
     public JoinGroupRequestById(Guid id)
     {
-        Query.Where(x => x.Id == id);
+        Query.Where(x => x.Id == id)
+            .Include(x => x.GroupTeacher);
     }
 }

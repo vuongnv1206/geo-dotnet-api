@@ -1,6 +1,8 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Notifications;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.TeacherGroup;
+using FSH.WebApi.Shared.Notifications;
 
 namespace FSH.WebApi.Application.TeacherGroup.JoinGroups;
 public class SendRequestJoinGroupRequest : IRequest<Guid>
@@ -16,19 +18,22 @@ public class SendRequestJoinGroupRequestHandler : IRequestHandler<SendRequestJoi
     private readonly IStringLocalizer _t;
     private readonly IRepository<TeacherTeam> _teacherTeamRepo;
     private readonly IUserService _userService;
+    private readonly INotificationService _notificationService;
 
     public SendRequestJoinGroupRequestHandler(
         ICurrentUser currentUser,
         IRepository<GroupTeacher> teacherGroupRepo,
         IStringLocalizer<SendRequestJoinGroupRequestHandler> t,
         IRepository<TeacherTeam> teacherTeamRepo,
-        IUserService userService)
+        IUserService userService,
+        INotificationService notificationService)
     {
         _currentUser = currentUser;
         _teacherGroupRepo = teacherGroupRepo;
         _t = t;
         _teacherTeamRepo = teacherTeamRepo;
         _userService = userService;
+        _notificationService = notificationService;
     }
 
     public async Task<DefaultIdType> Handle(SendRequestJoinGroupRequest request, CancellationToken cancellationToken)
@@ -50,7 +55,7 @@ public class SendRequestJoinGroupRequestHandler : IRequestHandler<SendRequestJoi
             throw new BadRequestException(_t["You are already in the group."]);
         }
 
-        if (group.JoinGroupRequests.Any(x => x.TeacherId == userId
+        if (group.JoinGroupRequests.Any(x => x.CreatedBy == userId
                 && x.Status == JoinTeacherGroupStatus.Pending))
         {
             throw new BadRequestException(_t["You are already send request."]);
@@ -59,6 +64,17 @@ public class SendRequestJoinGroupRequestHandler : IRequestHandler<SendRequestJoi
         group.AddRequestJoinGroup(new JoinGroupTeacherRequest(request.GroupId, existTeacherTeam.Id, group.CreatedBy, request.Content));
 
         await _teacherGroupRepo.UpdateAsync(group);
+
+        string userEmail = _currentUser.GetUserEmail();
+        var noti = new BasicNotification
+        {
+            Message = $"{userEmail} want to join to {group.Name} group.",
+            Label = BasicNotification.LabelType.Information,
+            Title = "Join group",
+            Url = "/teacher-group/join-request"
+        };
+
+        await _notificationService.SendNotificationToUser(group.CreatedBy.ToString(), noti, null, cancellationToken);
 
         return default(DefaultIdType);
     }
