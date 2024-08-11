@@ -56,7 +56,7 @@ public class SendRequestJoinGroupRequestHandler : IRequestHandler<SendRequestJoi
             throw new BadRequestException(_t["You are already send request."]);
         }
 
-        group.AddRequestJoinGroup(new JoinGroupTeacherRequest(request.GroupId, userId, request.Content));
+        group.AddRequestJoinGroup(new JoinGroupTeacherRequest(request.GroupId, existTeacherTeam.Id, group.CreatedBy, request.Content));
 
         await _teacherGroupRepo.UpdateAsync(group);
 

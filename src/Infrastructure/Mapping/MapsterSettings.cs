@@ -18,6 +18,7 @@ using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.Questions.QuestionLabel;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+using FSH.WebApi.Application.TeacherGroup.JoinGroups;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.Assignment;
@@ -283,5 +284,10 @@ public class MapsterSettings
         _ = TypeAdapterConfig<QuestionLable, QuestionLabelDto>.NewConfig();
 
         _ = TypeAdapterConfig<Paper, PaperInListDto>.NewConfig();
+
+        _ = TypeAdapterConfig<JoinGroupTeacherRequest, JoinGroupTeacherRequestDto>.NewConfig()
+            .Map(dest => dest.GroupName, src => src.GroupTeacher.Name)
+            .Map(dest => dest.Email, src => src.TeacherTeam.Email)
+            .Map(dest => dest.Phone, src => src.TeacherTeam.Phone);
     }
 }
