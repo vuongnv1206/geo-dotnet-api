@@ -37,7 +37,7 @@ public class AddQuestionsInPaperRequestHandler : IRequestHandler<AddQuestionsInP
             .ToHashSet();
         foreach (var question in request.Questions)
         {
-            var existingQuestion = await _repositoryQuestion.FirstOrDefaultAsync(new Questions.Specs.QuestionByIdSpec(question.QuestionId.Value));
+            var existingQuestion = await _repositoryQuestion.FirstOrDefaultAsync(new Questions.Specs.QuestionByIdSpec(question.QuestionId));
             if (existingQuestion == null)
                 throw new NotFoundException(_t["Question {0} Not Found.", question.QuestionId]);
 
@@ -49,7 +49,7 @@ public class AddQuestionsInPaperRequestHandler : IRequestHandler<AddQuestionsInP
 
             var createdQuestionCloneId = _mediator.Send(new CreateQuestionCloneRequest
             {
-                OriginalQuestionId = question.QuestionId.Value,
+                OriginalQuestionId = question.QuestionId,
             }).Result;
 
             var paperQuestion = new PaperQuestion
