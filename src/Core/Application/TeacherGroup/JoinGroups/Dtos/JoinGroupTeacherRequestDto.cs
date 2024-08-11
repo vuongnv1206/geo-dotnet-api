@@ -13,4 +13,6 @@ public class JoinGroupTeacherRequestDto : IDto
     public string? ReceiverEmail { get; set; }
     public JoinTeacherGroupStatus Status { get; set; }
     public string? Content { get; set; }
+    public DateTime? CreateOn { get; set; }
+    public DateTime? LastModifiedOn { get; set; }
 }

@@ -288,6 +288,8 @@ public class MapsterSettings
         _ = TypeAdapterConfig<JoinGroupTeacherRequest, JoinGroupTeacherRequestDto>.NewConfig()
             .Map(dest => dest.GroupName, src => src.GroupTeacher.Name)
             .Map(dest => dest.Email, src => src.TeacherTeam.Email)
-            .Map(dest => dest.Phone, src => src.TeacherTeam.Phone);
+            .Map(dest => dest.Phone, src => src.TeacherTeam.Phone)
+            .Map(dest => dest.CreateOn, src => src.CreatedOn)
+            .Map(dest => dest.LastModifiedOn, src => src.LastModifiedOn);
     }
 }
