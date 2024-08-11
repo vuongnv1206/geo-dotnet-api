@@ -112,7 +112,7 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
             var frequencyMarks = new List<FrequencyMarkDto>();
 
             // Loop through each point from 0 to 9
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 9; i++)
             {
                 var fromMark = i; // Từ điểm hiện tại
                 var toMark = i + 1; // Đến điểm tiếp theo
@@ -128,11 +128,11 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
                 });
             }
 
-            // Xử lý riêng cho điểm 10
-            var countMax = classSubmissions.Count(s => s.TotalMark == 10);
+            // Xử lý riêng cho điểm từ 9 đến 10
+            var countMax = classSubmissions.Count(s => s.TotalMark >= 9 && s.TotalMark <= 10);
             frequencyMarks.Add(new FrequencyMarkDto
             {
-                FromMark = 10,
+                FromMark = 9,
                 ToMark = 10,
                 Total = countMax,
                 Rate = totalAttendee > 0 ? (float)countMax / totalAttendee * 100 : 0,

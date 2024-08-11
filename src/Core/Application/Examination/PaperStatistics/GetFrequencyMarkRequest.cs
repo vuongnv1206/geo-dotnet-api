@@ -8,7 +8,7 @@ namespace FSH.WebApi.Application.Examination.PaperStatistics;
 public class GetFrequencyMarkRequest : IRequest<ClassroomFrequencyMarkDto>
 {
     public Guid PaperId { get; set; }
-    public Guid? classroomId { get; set; }
+    public Guid? ClassroomId { get; set; }
 }
 
 public class GetFrequencyMarkRequestHandler : IRequestHandler<GetFrequencyMarkRequest, ClassroomFrequencyMarkDto>
@@ -46,10 +46,10 @@ public class GetFrequencyMarkRequestHandler : IRequestHandler<GetFrequencyMarkRe
 
         var accessibleStudentIds = new List<Guid>();
 
-        if (request.classroomId.HasValue)
+        if (request.ClassroomId.HasValue)
         {
-            classroom = await _repoClass.FirstOrDefaultAsync(new ClassByIdSpec(request.classroomId.Value,currentUserId))
-                ?? throw new NotFoundException(_t["Classroom {0} Not Found.", request.classroomId]);
+            classroom = await _repoClass.FirstOrDefaultAsync(new ClassByIdSpec(request.ClassroomId.Value,currentUserId))
+                ?? throw new NotFoundException(_t["Classroom {0} Not Found.", request.ClassroomId]);
 
             submissions.AddRange(paper.SubmitPapers.Where(sp => classroom.UserClasses.Any(uc => uc.Student.StId == sp.CreatedBy)));
 
@@ -64,8 +64,8 @@ public class GetFrequencyMarkRequestHandler : IRequestHandler<GetFrequencyMarkRe
         var totalAttendee = submissions.Count(s => s.Status == SubmitPaperStatus.End);
         var frequencyMarks = new List<FrequencyMarkDto>();
 
-        // Loop through each point from 0 to 9
-        for (int i = 0; i < 10; i++)
+        // Xử lý các mốc điểm từ 0 đến 9
+        for (int i = 0; i < 9; i++)
         {
             var fromMark = i; // Từ điểm hiện tại
             var toMark = i + 1; // Đến điểm tiếp theo
@@ -81,11 +81,11 @@ public class GetFrequencyMarkRequestHandler : IRequestHandler<GetFrequencyMarkRe
             });
         }
 
-        // Xử lý riêng cho điểm 10
-        var countMax = submissions.Count(s => s.TotalMark == 10);
+        // Xử lý riêng cho điểm từ 9 đến 10
+        var countMax = submissions.Count(s => s.TotalMark >= 9 && s.TotalMark <= 10);
         frequencyMarks.Add(new FrequencyMarkDto
         {
-            FromMark = 10,
+            FromMark = 9,
             ToMark = 10,
             Total = countMax,
             Rate = totalAttendee > 0 ? (float)countMax / totalAttendee * 100 : 0,
