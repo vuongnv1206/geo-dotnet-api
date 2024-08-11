@@ -1,4 +1,6 @@
-﻿using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Application.TeacherGroup.QRCode;
+using FSH.WebApi.Domain.TeacherGroup;
+using System.Data.Common;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 public class CreateGroupTeacherRequest : IRequest<Guid>
@@ -20,16 +22,31 @@ public class CreateGroupTeacherRequestValidator : CustomValidator<CreateGroupTea
 public class CreateGroupTeacherRequestHandler : IRequestHandler<CreateGroupTeacherRequest, Guid>
 {
     private readonly IRepositoryWithEvents<GroupTeacher> _repository;
+    private readonly IQrCode _qrCodeRepository;
 
-    public CreateGroupTeacherRequestHandler(IRepositoryWithEvents<GroupTeacher> repository)
+    public CreateGroupTeacherRequestHandler(
+        IRepositoryWithEvents<GroupTeacher> repository,
+        IQrCode qrCodeRepository)
     {
         _repository = repository;
+        _qrCodeRepository = qrCodeRepository;
     }
 
     public async Task<DefaultIdType> Handle(CreateGroupTeacherRequest request, CancellationToken cancellationToken)
     {
         var groupTeacher = new GroupTeacher(request.Name);
         await _repository.AddAsync(groupTeacher, cancellationToken);
+
+        Dictionary<string, string> data = new Dictionary<string, string>
+        {
+            { "id", groupTeacher.Id.ToString() }
+        };
+
+        string qr = _qrCodeRepository.CreateQrCode(data, "http://localhost:5173/join-group/");
+
+        groupTeacher.UpdateJoinGroup($"http://localhost:5173/join-group/{groupTeacher.Id}", qr);
+
+        await _repository.UpdateAsync(groupTeacher, cancellationToken);
 
         return groupTeacher.Id;
     }

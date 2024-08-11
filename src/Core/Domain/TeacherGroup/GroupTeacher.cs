@@ -2,12 +2,22 @@
 public class GroupTeacher : AuditableEntity, IAggregateRoot
 {
     public string Name { get; set; } = null!;
+    public string? JoinLink { get; set; }
+    public string? QrCode { get; set; }
     public virtual List<TeacherInGroup> TeacherInGroups { get; set; } = new();
     public virtual List<GroupPermissionInClass> GroupPermissionInClasses { get; set; } = new();
+    public virtual List<JoinGroupTeacherRequest> JoinGroupRequests { get; set; } = new();
 
     public GroupTeacher(string name)
     {
         Name = name;
+    }
+
+    public GroupTeacher UpdateJoinGroup(string joinLink, string qrCode)
+    {
+        JoinLink = joinLink;
+        QrCode = qrCode;
+        return this;
     }
 
     public GroupTeacher Update(string? name)
@@ -44,6 +54,14 @@ public class GroupTeacher : AuditableEntity, IAggregateRoot
         if (permission is not null)
         {
             GroupPermissionInClasses.Remove(permission);
+        }
+    }
+
+    public void AddRequestJoinGroup(JoinGroupTeacherRequest request)
+    {
+        if (request is not null)
+        {
+            JoinGroupRequests.Add(request);
         }
     }
 }

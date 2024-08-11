@@ -59,6 +59,7 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<Subscription> Subscriptions { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<JoinGroupTeacherRequest> JoinGroupTeacherRequests { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
