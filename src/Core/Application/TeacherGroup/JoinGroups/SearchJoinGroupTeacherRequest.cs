@@ -61,9 +61,9 @@ public class SearchJoinGroupTeacherRequestHandler : IRequestHandler<SearchJoinGr
         return new PaginationResponse<JoinGroupTeacherRequestDto>
         (
             response,
-            request.PageSize,
+            totalItem,
             request.PageNumber,
-            totalItem
+            request.PageSize
         );
     }
 }

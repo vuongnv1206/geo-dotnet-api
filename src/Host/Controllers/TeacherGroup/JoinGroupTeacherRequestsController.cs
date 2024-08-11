@@ -11,4 +11,28 @@ public class JoinGroupTeacherRequestsController : VersionedApiController
     {
         return Mediator.Send(request);
     }
+
+    [HttpPost("accept-request")]
+    [MustHavePermission(FSHAction.Create, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Accept request join to group.", "")]
+    public Task AcceptRequest(AcceptRequestJoinGroupRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("reject-request")]
+    [MustHavePermission(FSHAction.Create, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Reject request join to group.", "")]
+    public Task RejectRequest(RejectRequestJoinGroupRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("cancel-request")]
+    [MustHavePermission(FSHAction.Create, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Cancel request join to group.", "")]
+    public Task CancelRequest(CancelRequestJoinGroupRequest request)
+    {
+        return Mediator.Send(request);
+    }
 }

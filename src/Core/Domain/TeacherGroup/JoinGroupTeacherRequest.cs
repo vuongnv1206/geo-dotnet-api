@@ -21,4 +21,19 @@ public class JoinGroupTeacherRequest : AuditableEntity, IAggregateRoot
         Status = JoinTeacherGroupStatus.Pending;
         Content = content;
     }
+
+    public void AcceptRequest()
+    {
+        Status = JoinTeacherGroupStatus.Accepted;
+    }
+
+    public void RejectRequest()
+    {
+        Status = JoinTeacherGroupStatus.Rejected;
+    }
+
+    public void CancelRequest()
+    {
+        Status = JoinTeacherGroupStatus.Cancel;
+    }
 }

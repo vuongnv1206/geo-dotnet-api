@@ -3,6 +3,7 @@
 namespace FSH.WebApi.Application.TeacherGroup.JoinGroups;
 public class JoinGroupTeacherRequestDto : IDto
 {
+    public Guid Id { get; set; }
     public Guid GroupId { get; set; }
     public string? GroupName { get; set; }
     public Guid TeacherId { get; set; }
