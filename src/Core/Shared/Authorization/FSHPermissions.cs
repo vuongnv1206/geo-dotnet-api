@@ -82,13 +82,6 @@ public static class FSHPermissions
         new("View RoleClaims", FSHAction.View, FSHResource.RoleClaims),
         new("Update RoleClaims", FSHAction.Update, FSHResource.RoleClaims),
 
-        // TEACHERS
-        new("View GroupTeachers", FSHAction.View, FSHResource.GroupTeachers),
-        new("Search GroupTeachers", FSHAction.Search, FSHResource.GroupTeachers),
-        new("Create GroupTeachers", FSHAction.Create, FSHResource.GroupTeachers),
-        new("Update GroupTeachers", FSHAction.Update, FSHResource.GroupTeachers),
-        new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
-
         new("View Tenants", FSHAction.View, FSHResource.Tenants, new[] { ROOT }),
         new("Create Tenants", FSHAction.Create, FSHResource.Tenants, new[] { ROOT }),
         new("Update Tenants", FSHAction.Update, FSHResource.Tenants, new[] { ROOT }),
@@ -192,6 +185,7 @@ public static class FSHPermissions
 
         // GROUP TEACHERS
         new("View GroupTeachers", FSHAction.View, FSHResource.GroupTeachers),
+        new("Search GroupTeachers", FSHAction.Search, FSHResource.GroupTeachers),
         new("Create GroupTeachers", FSHAction.Create, FSHResource.GroupTeachers),
         new("Update GroupTeachers", FSHAction.Update, FSHResource.GroupTeachers),
         new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
