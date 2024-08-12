@@ -48,11 +48,11 @@ public class SendRequestJoinTeamRequestHandler : IRequestHandler<SendRequestJoin
             throw new BadRequestException(_t["You are ready in this team."]);
         }
 
-        var existJoinTeamRequest = await _joinTeacherTeamRepo.FirstOrDefaultAsync(
+        var existJoinTeamRequest = await _joinTeacherTeamRepo.ListAsync(
             new ExistJoinRequestTeacherTeamSpec(useId, request.AdminTeamId), cancellationToken);
 
         if (existJoinTeamRequest != null
-            && existJoinTeamRequest.Status == JoinTeacherGroupStatus.Pending)
+            && existJoinTeamRequest.Any(x => x.Status == JoinTeacherGroupStatus.Pending))
         {
             throw new BadRequestException(_t["You have already sent the request before."]);
         }

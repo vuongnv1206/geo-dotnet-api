@@ -60,7 +60,8 @@ public class ApplicationDbContext : BaseDbContext
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<JoinGroupTeacherRequest> JoinGroupTeacherRequests { get; set; }
-    public DbSet<JoinTeacherTeamRequest> joinTeacherTeamRequests { get; set; }
+    public DbSet<JoinTeacherTeamRequest> JoinTeacherTeamRequests { get; set; }
+    public DbSet<InviteJoinTeacherTeam> InviteJoinTeacherTeams { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

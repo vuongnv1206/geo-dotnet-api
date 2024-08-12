@@ -83,3 +83,12 @@ public class JoinTeacherTeacherRequestConfig : IEntityTypeConfiguration<JoinTeac
     }
 }
 
+public class InviteJoinTeacherTeamConfig : IEntityTypeConfiguration<InviteJoinTeacherTeam>
+{
+    public void Configure(EntityTypeBuilder<InviteJoinTeacherTeam> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("InviteJoinTeacherTeam", SchemaNames.GroupTeacher);
+    }
+}
+
