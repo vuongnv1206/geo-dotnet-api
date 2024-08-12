@@ -7,5 +7,6 @@ public class QuestionFolderByIdSpec : Specification<QuestionFolder>, ISingleResu
         Query
         .Include(b => b.Permissions)
         .Include(b => b.Children)
+        .Include(x => x.Questions).ThenInclude(x => x.QuestionLable)
         .Where(b => b.Id == id);
 }

@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Question.Enums;
 
 namespace FSH.WebApi.Domain.Question;
 
@@ -112,15 +113,24 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
         }
     }
 
-    //write funtion to count number of question in folder and all subfolder
-    public int CountQuestionInFolder()
+    public int CountQuestionWithLabelInFolder(Guid labelId)
     {
-        var count = Questions.Count;
+        int count = 0;
+        foreach (var question in Questions)
+        {
+            if (question.QuestionLableId == labelId)
+            {
+                count++;
+            }
+        }
+
         foreach (var child in Children)
         {
-            count += child.CountQuestionInFolder();
+            count += child.CountQuestionWithLabelInFolder(labelId);
         }
+
         return count;
     }
+
 
 }
