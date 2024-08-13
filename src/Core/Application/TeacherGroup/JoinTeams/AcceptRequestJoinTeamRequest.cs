@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.TeacherGroup.JoinGroups;
+﻿using FSH.WebApi.Application.Notifications;
+using FSH.WebApi.Application.TeacherGroup.JoinGroups;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.TeacherGroup;
 
@@ -14,17 +15,20 @@ public class AcceptRequestJoinTeamRequestHandler : IRequestHandler<AcceptRequest
     private readonly IRepository<JoinTeacherTeamRequest> _joinTeacherTeamRepo;
     private readonly IStringLocalizer _t;
     private readonly IMediator _mediator;
+    private readonly INotificationService _notificationService;
 
     public AcceptRequestJoinTeamRequestHandler(
         ICurrentUser currentUser,
         IRepository<JoinTeacherTeamRequest> joinTeacherTeamRepo,
         IStringLocalizer<AcceptRequestJoinTeamRequestHandler> t,
-        IMediator mediator)
+        IMediator mediator,
+        INotificationService notificationService)
     {
         _currentUser = currentUser;
         _joinTeacherTeamRepo = joinTeacherTeamRepo;
         _t = t;
         _mediator = mediator;
+        _notificationService = notificationService;
     }
 
     public async Task<DefaultIdType> Handle(AcceptRequestJoinTeamRequest request, CancellationToken cancellationToken)
@@ -50,6 +54,16 @@ public class AcceptRequestJoinTeamRequestHandler : IRequestHandler<AcceptRequest
         joinRequest.AcceptRequest();
 
         await _joinTeacherTeamRepo.UpdateAsync(joinRequest);
+
+        var noti = new BasicNotification
+        {
+            Message = $"{_currentUser.GetUserEmail()} accepted request. Now you can join \"{_currentUser.GetUserEmail()}\" team",
+            Label = BasicNotification.LabelType.Success,
+            Title = "Join group",
+        };
+
+        await _notificationService.SendNotificationToUser(joinRequest.CreatedBy.ToString(), noti, null, cancellationToken);
+
 
         return joinRequest.Id;
     }

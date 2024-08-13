@@ -73,7 +73,7 @@ public class SendRequestJoinGroupRequestHandler : IRequestHandler<SendRequestJoi
         string userEmail = _currentUser.GetUserEmail();
         var noti = new BasicNotification
         {
-            Message = $"{userEmail} want to join to {group.Name} group.",
+            Message = $"{userEmail} want to join to \"{group.Name}\" group.",
             Label = BasicNotification.LabelType.Information,
             Title = "Join group",
             Url = "/teacher-group/join-request"

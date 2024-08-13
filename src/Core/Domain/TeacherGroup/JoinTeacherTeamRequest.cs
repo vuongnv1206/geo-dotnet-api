@@ -5,13 +5,15 @@ public class JoinTeacherTeamRequest : AuditableEntity, IAggregateRoot
     public JoinTeacherGroupStatus Status { get; set; }
     public string? Content { get; set; }
     public string SenderEmail { get; set; }
+    public Guid? InvitationId { get; set; }
 
-    public JoinTeacherTeamRequest(Guid adminTeamId, string? content, string senderEmail)
+    public JoinTeacherTeamRequest(Guid adminTeamId, string? content, string senderEmail, Guid? invitationId)
     {
         AdminTeamId = adminTeamId;
         Content = content;
         Status = JoinTeacherGroupStatus.Pending;
         SenderEmail = senderEmail;
+        InvitationId = invitationId;
     }
 
     public void AcceptRequest()

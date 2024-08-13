@@ -297,5 +297,8 @@ public class MapsterSettings
             .Map(dest => dest.CreateBy, src => src.CreatedBy)
             .Map(dest => dest.CreateOn, src => src.CreatedOn)
             .Map(dest => dest.LastModifiedOn, src => src.LastModifiedOn);
+
+        _ = TypeAdapterConfig<InviteJoinTeacherTeam, InviteJoinTeacherTeamDto>.NewConfig()
+            .Map(dest => dest.CreateOn, src => src.CreatedOn);
     }
 }

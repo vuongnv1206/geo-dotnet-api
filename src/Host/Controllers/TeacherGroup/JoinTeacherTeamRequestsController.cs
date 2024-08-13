@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.TeacherGroup.JoinGroups;
 using FSH.WebApi.Application.TeacherGroup.JoinTeams;
+using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Host.Controllers.TeacherGroup;
 
@@ -49,6 +50,14 @@ public class JoinTeacherTeamRequestsController : VersionedApiController
     [MustHavePermission(FSHAction.Create, FSHResource.GroupTeachers)]
     [OpenApiOperation("Cancel request join to team.", "")]
     public Task InviteTeacherJoinTeam(InviteTeacherJoinRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("get-invitations")]
+    [MustHavePermission(FSHAction.Search, FSHResource.GroupTeachers)]
+    [OpenApiOperation("retrieve invitations sent to teacher who have not joined.", "")]
+    public Task<List<InviteJoinTeacherTeamDto>> SearchAsync(SearchInviteJoinTeacherTeamRequest request)
     {
         return Mediator.Send(request);
     }

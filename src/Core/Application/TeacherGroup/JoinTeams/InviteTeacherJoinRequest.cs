@@ -1,5 +1,4 @@
 ﻿using FSH.WebApi.Application.Common.Mailing;
-using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -7,7 +6,7 @@ using FSH.WebApi.Domain.TeacherGroup;
 namespace FSH.WebApi.Application.TeacherGroup.JoinTeams;
 public class InviteTeacherJoinRequest : IRequest<Guid>
 {
-    public string Contact { get; set; }
+    public string Contact { get; set; } = default!;
 }
 
 public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoinRequest, Guid>
@@ -57,16 +56,13 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
             throw new ConflictException(_t["Teacher's contact exist in team"]);
         }
 
-        var recipient = await _userService.GetUserDetailByEmailAsync(request.Contact, cancellationToken);
-        inviteJoin.IsRegistered = recipient != null;
-
         await _inviteJoinRepo.AddAsync(inviteJoin);
 
         var eMailModel = new InviteJoinTeamEmailModel
         {
             RecipientEmail = request.Contact,
             SenderEmail = _currentUser.GetUserEmail(),
-            Url = $"http://localhost:5173/invite-join-team/{userId}"
+            Url = $"http://localhost:5173/invite-join-team/{userId}/{inviteJoin.Id}"
         };
 
         var mailRequest = new MailRequest(
