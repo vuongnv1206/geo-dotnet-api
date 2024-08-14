@@ -22,14 +22,11 @@ public class CreateGroupTeacherRequestValidator : CustomValidator<CreateGroupTea
 public class CreateGroupTeacherRequestHandler : IRequestHandler<CreateGroupTeacherRequest, Guid>
 {
     private readonly IRepositoryWithEvents<GroupTeacher> _repository;
-    private readonly IQrCode _qrCodeRepository;
 
     public CreateGroupTeacherRequestHandler(
-        IRepositoryWithEvents<GroupTeacher> repository,
-        IQrCode qrCodeRepository)
+        IRepositoryWithEvents<GroupTeacher> repository)
     {
         _repository = repository;
-        _qrCodeRepository = qrCodeRepository;
     }
 
     public async Task<DefaultIdType> Handle(CreateGroupTeacherRequest request, CancellationToken cancellationToken)
@@ -42,9 +39,7 @@ public class CreateGroupTeacherRequestHandler : IRequestHandler<CreateGroupTeach
             { "id", groupTeacher.Id.ToString() }
         };
 
-        string qr = _qrCodeRepository.CreateQrCode(data, "http://localhost:5173/join-group/");
-
-        groupTeacher.UpdateJoinGroup($"http://localhost:5173/join-group/{groupTeacher.Id}", qr);
+        groupTeacher.UpdateJoinGroup($"join-group/{groupTeacher.Id}");
 
         await _repository.UpdateAsync(groupTeacher, cancellationToken);
 
