@@ -14,7 +14,7 @@ public class UpdatePaperRequest : IRequest<Guid>
     public PaperStatus Status { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public int? Duration { get; set; }
+    public float? Duration { get; set; }
     public bool Shuffle { get; set; }
     public ShowResult ShowMarkResult { get; set; }
     public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
