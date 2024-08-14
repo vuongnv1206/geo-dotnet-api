@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class payment : Migration
+    public partial class addme4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -90,6 +90,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    JoinLink = table.Column<string>(type: "text", nullable: true),
                     TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -101,6 +102,51 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GroupTeachers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InviteJoinTeacherTeam",
+                schema: "GroupTeacher",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RecipientEmail = table.Column<string>(type: "text", nullable: false),
+                    SenderEmail = table.Column<string>(type: "text", nullable: false),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InviteJoinTeacherTeam", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JoinTeacherTeamRequest",
+                schema: "GroupTeacher",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AdminTeamId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    SenderEmail = table.Column<string>(type: "text", nullable: false),
+                    InvitationId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinTeacherTeamRequest", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -686,6 +732,44 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         principalTable: "Subscriptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JoinGroupTeacherRequest",
+                schema: "GroupTeacher",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TeacherId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReceiverId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    TenantId = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinGroupTeacherRequest", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JoinGroupTeacherRequest_GroupTeachers_GroupId",
+                        column: x => x.GroupId,
+                        principalSchema: "GroupTeacher",
+                        principalTable: "GroupTeachers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JoinGroupTeacherRequest_TeacherTeams_TeacherId",
+                        column: x => x.TeacherId,
+                        principalSchema: "GroupTeacher",
+                        principalTable: "TeacherTeams",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1507,6 +1591,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
                 column: "GroupTeacherId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JoinGroupTeacherRequest_GroupId",
+                schema: "GroupTeacher",
+                table: "JoinGroupTeacherRequest",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinGroupTeacherRequest_TeacherId",
+                schema: "GroupTeacher",
+                table: "JoinGroupTeacherRequest",
+                column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_SubscriptionId",
                 schema: "Payment",
                 table: "Orders",
@@ -1773,6 +1869,18 @@ namespace Migrators.PostgreSQL.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "GroupPermissionInClasses",
+                schema: "GroupTeacher");
+
+            migrationBuilder.DropTable(
+                name: "InviteJoinTeacherTeam",
+                schema: "GroupTeacher");
+
+            migrationBuilder.DropTable(
+                name: "JoinGroupTeacherRequest",
+                schema: "GroupTeacher");
+
+            migrationBuilder.DropTable(
+                name: "JoinTeacherTeamRequest",
                 schema: "GroupTeacher");
 
             migrationBuilder.DropTable(
