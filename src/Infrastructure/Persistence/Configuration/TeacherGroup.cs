@@ -74,3 +74,21 @@ public class JoinGroupTeacherRequestConfig : IEntityTypeConfiguration<JoinGroupT
         builder.ToTable("JoinGroupTeacherRequest", SchemaNames.GroupTeacher);
     }
 }
+public class JoinTeacherTeacherRequestConfig : IEntityTypeConfiguration<JoinTeacherTeamRequest>
+{
+    public void Configure(EntityTypeBuilder<JoinTeacherTeamRequest> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("JoinTeacherTeamRequest", SchemaNames.GroupTeacher);
+    }
+}
+
+public class InviteJoinTeacherTeamConfig : IEntityTypeConfiguration<InviteJoinTeacherTeam>
+{
+    public void Configure(EntityTypeBuilder<InviteJoinTeacherTeam> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("InviteJoinTeacherTeam", SchemaNames.GroupTeacher);
+    }
+}
+

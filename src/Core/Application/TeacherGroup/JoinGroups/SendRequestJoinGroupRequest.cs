@@ -44,6 +44,11 @@ public class SendRequestJoinGroupRequestHandler : IRequestHandler<SendRequestJoi
 
         var userId = _currentUser.GetUserId();
 
+        if (userId == group.CreatedBy)
+        {
+            throw new BadRequestException(_t["You cannot join your own group."]);
+        }
+
         var fullNameAdminGroup = _userService.GetFullName(group.CreatedBy);
         // kiểm tra giáo viên có trong team của chủ group
         var existTeacherTeam = await _teacherTeamRepo
@@ -68,7 +73,7 @@ public class SendRequestJoinGroupRequestHandler : IRequestHandler<SendRequestJoi
         string userEmail = _currentUser.GetUserEmail();
         var noti = new BasicNotification
         {
-            Message = $"{userEmail} want to join to {group.Name} group.",
+            Message = $"{userEmail} want to join to \"{group.Name}\" group.",
             Label = BasicNotification.LabelType.Information,
             Title = "Join group",
             Url = "/teacher-group/join-request"
