@@ -1,34 +1,35 @@
-﻿using FSH.WebApi.Application.Common.Models;
-using FSH.WebApi.Application.Common.Persistence;
+﻿
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class SearchPaperFolderRequest : PaginationFilter, IRequest<PaginationResponse<PaperFolderDto>>
+public class SearchPaperFolderRequest : IRequest<PaperFolderTreeDto>
 {
     public Guid? ParentId { get; set; }
+    public string? Name { get; set; }
 }
 
-public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolderRequest, PaginationResponse<PaperFolderDto>>
+public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolderRequest, PaperFolderTreeDto>
 {
     public readonly IReadRepository<PaperFolder> _paperFolderRepo;
     public readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
-
-    public SearchPaperFolderRequestHandler(IReadRepository<PaperFolder> paperFolderRepo, ICurrentUser currentUser, IUserService userService)
+    private readonly IStringLocalizer _t;
+    public SearchPaperFolderRequestHandler(IReadRepository<PaperFolder> paperFolderRepo, ICurrentUser currentUser, IUserService userService, IStringLocalizer<SearchPaperFolderRequestHandler> t)
     {
         _paperFolderRepo = paperFolderRepo;
         _currentUser = currentUser;
         _userService = userService;
+        _t = t;
     }
 
-    public async Task<PaginationResponse<PaperFolderDto>> Handle(SearchPaperFolderRequest request, CancellationToken cancellationToken)
+    public async Task<PaperFolderTreeDto> Handle(SearchPaperFolderRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
         var data = new List<PaperFolder>();
         var count = 0;
-        if (!string.IsNullOrEmpty(request.Keyword))
+        if (!string.IsNullOrEmpty(request.Name))
         {
             // Find all parent IDs
             var parentIds = new List<Guid>();
@@ -43,16 +44,12 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
                 }
             }
             var spec = new PaperFolderBySearchSpec(parentIds, request, currentUserId);
-            count = await _paperFolderRepo.CountAsync(spec, cancellationToken);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
         }
         else
         {
             var spec = new PaperFolderTreeBySearchSpec(currentUserId,request);
-            count = await _paperFolderRepo.CountAsync(spec, cancellationToken);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
-
-
         }
 
         var dtos = new List<PaperFolderDto>();
@@ -78,7 +75,27 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
             }
             dtos.Add(dto);
         }
-        return new PaginationResponse<PaperFolderDto>(dtos, count, request.PageNumber, request.PageSize);
+
+        if (request.ParentId.HasValue)
+        {
+            var paperFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value), cancellationToken);
+            _ = paperFolder ?? throw new NotFoundException(_t["PaperFolder {0} Not Found.", request.ParentId.Value]);
+
+            return new PaperFolderTreeDto
+            {
+                Id = request.ParentId.Value,
+                PaperFolderPermissions = paperFolder.PaperFolderPermissions.Adapt<List<PaperFolderPermissionDto>>(),
+                PaperFolderChildrens = dtos,
+                TotalPapers = paperFolder.CountPapers()
+            };
+        }
+        else
+        {
+            return new PaperFolderTreeDto
+            {
+                PaperFolderChildrens = dtos
+            };
+        }
     }
 }
 

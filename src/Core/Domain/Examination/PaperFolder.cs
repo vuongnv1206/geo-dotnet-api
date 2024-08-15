@@ -170,4 +170,19 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
             AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true,true));
         }
     }
+
+    public int CountPapers()
+    {
+        int count = Papers.Count;
+        foreach (var child in PaperFolderChildrens)
+        {
+            count += child.CountPapers();
+        }
+        return count;
+    }
+
+    
+
+
+
 }
