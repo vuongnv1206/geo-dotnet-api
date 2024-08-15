@@ -195,6 +195,12 @@ public class Paper : AuditableEntity, IAggregateRoot
         }
     }
 
+    public bool HasPermission(Guid userId)
+    {
+        // Kiểm tra xem có bất kỳ quyền nào được gán cho người dùng này không
+        return PaperPermissions.Any(permission => permission.UserId == userId);
+    }
+
     public void AddPermission(PaperPermission permission)
     {
         PaperPermissions.Add(permission);

@@ -105,7 +105,11 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
             ChildPaperFolderIds(paperFolder.PaperFolderChildrens, ids);
         }
     }
-
+    public bool HasPermission(Guid userId)
+    {
+        // Kiểm tra xem có bất kỳ quyền nào được gán cho người dùng này không
+        return PaperFolderPermissions.Any(permission => permission.UserId == userId);
+    }
     public void AddPermission(PaperFolderPermission permission)
     {
         PaperFolderPermissions.Add(permission);

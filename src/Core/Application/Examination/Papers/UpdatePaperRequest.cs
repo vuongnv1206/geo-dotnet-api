@@ -78,9 +78,11 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         _ = paper
             ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.Id]);
 
+
+
         var userId = _currentUser.GetUserId();
         if (!paper.CanUpdate(userId))
-            throw new ForbiddenException(_t["You can not Update paper."]);
+            throw new ForbiddenException(_t["You do not have permission to edit this paper."]);
 
         if (request.PaperFolderId.HasValue
             && !await _folderRepo.AnyAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value), cancellationToken))
