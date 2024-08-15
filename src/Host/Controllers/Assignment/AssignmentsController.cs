@@ -48,7 +48,6 @@ public class AssignmentsController : VersionedApiController
         return Mediator.Send(new DeleteAssignmentRequest(id));
     }
 
-   
     [HttpPost("mark")]
     [MustHavePermission(FSHAction.Update, FSHResource.Assignments)]
     [OpenApiOperation("Mark assignment.", "")]
@@ -57,24 +56,20 @@ public class AssignmentsController : VersionedApiController
         return Mediator.Send(request);
     }
 
-  
     [HttpPost("submit")]
-    [MustHavePermission(FSHAction.Update, FSHResource.Assignments)]
+    [MustHavePermission(FSHAction.Update, FSHResource.SubmitAssignment)]
     [OpenApiOperation("Submit assignment.", "")]
     public Task SubmitAsync(SubmitAssignmentRequest request)
     {
         return Mediator.Send(request);
     }
 
-    [HttpGet("submission/{id:guid}")]
+    [HttpPost("submission")]
     [MustHavePermission(FSHAction.View, FSHResource.Assignments)]
     [OpenApiOperation("Get submission assignment details.", "")]
-    public Task<List<SubmissionAssignmentDto>> GetSubmissionAsync(Guid id)
+    public Task<List<SubmissionAssignmentDto>> GetSubmissionAsync(GetSubmissionAssignmentRequest request)
     {
-        return Mediator.Send(new GetSubmissionAssignmentRequest(id));
+        return Mediator.Send(request);
     }
 
-
-
 }
-

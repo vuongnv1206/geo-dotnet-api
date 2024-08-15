@@ -32,6 +32,7 @@ public static class FSHResource
     public const string QuestionLabel = nameof(QuestionLabel);
     public const string GroupTeachers = nameof(GroupTeachers);
     public const string Assignments = nameof(Assignments);
+    public const string SubmitAssignment = nameof(SubmitAssignment);
     public const string Subjects = nameof(Subjects);
     public const string Classes = nameof(Classes);
     public const string GroupClasses = nameof(GroupClasses);
@@ -46,6 +47,7 @@ public static class FSHResource
     public const string Notifications = nameof(Notifications);
     public const string AuditLogs = nameof(AuditLogs);
     public const string Orders = nameof(Orders);
+    public const string CommentPost = nameof(CommentPost);
 }
 
 public static class FSHPermissions
@@ -80,13 +82,6 @@ public static class FSHPermissions
         new("View RoleClaims", FSHAction.View, FSHResource.RoleClaims),
         new("Update RoleClaims", FSHAction.Update, FSHResource.RoleClaims),
 
-        // TEACHERS
-        new("View GroupTeachers", FSHAction.View, FSHResource.GroupTeachers),
-        new("Search GroupTeachers", FSHAction.Search, FSHResource.GroupTeachers),
-        new("Create GroupTeachers", FSHAction.Create, FSHResource.GroupTeachers),
-        new("Update GroupTeachers", FSHAction.Update, FSHResource.GroupTeachers),
-        new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
-
         new("View Tenants", FSHAction.View, FSHResource.Tenants, new[] { ROOT }),
         new("Create Tenants", FSHAction.Create, FSHResource.Tenants, new[] { ROOT }),
         new("Update Tenants", FSHAction.Update, FSHResource.Tenants, new[] { ROOT }),
@@ -100,6 +95,7 @@ public static class FSHPermissions
         new("Update Assignments", FSHAction.Update, FSHResource.Assignments),
         new("Delete Assignments", FSHAction.Delete, FSHResource.Assignments),
         new("Export Assignments", FSHAction.Export, FSHResource.Assignments),
+        new("Submit Assignments", FSHAction.Update, FSHResource.SubmitAssignment, new[] { STUDENT }),
 
         // SUBJECTS
         new("View Subjects", FSHAction.View, FSHResource.Subjects),
@@ -128,7 +124,6 @@ public static class FSHPermissions
         new("Update News", FSHAction.Update, FSHResource.News),
         new("Delete News", FSHAction.Delete, FSHResource.News),
 
-
         // QUESTION LABELS
         new("View QuestionLabels", FSHAction.View, FSHResource.QuestionLabel, new[] { STUDENT }),
         new("Search QuestionLabels", FSHAction.Search, FSHResource.QuestionLabel, new[] { STUDENT }),
@@ -136,7 +131,7 @@ public static class FSHPermissions
         new("Update QuestionLabels", FSHAction.Update, FSHResource.QuestionLabel),
         new("Delete QuestionLabels", FSHAction.Delete, FSHResource.QuestionLabel),
 
-        //NEWS REACTIONS
+        // NEWS REACTIONS
         new("View NewsReaction", FSHAction.View, FSHResource.NewsReaction, new[] { STUDENT }),
         new("Search NewsReaction", FSHAction.Search, FSHResource.NewsReaction, new[] { STUDENT }),
         new("Create NewsReaction", FSHAction.Create, FSHResource.NewsReaction),
@@ -145,6 +140,11 @@ public static class FSHPermissions
         new("Create QuestionFolders", FSHAction.Create, FSHResource.QuestionFolders),
         new("Update QuestionFolders", FSHAction.Update, FSHResource.QuestionFolders),
         new("Delete QuestionFolders", FSHAction.Delete, FSHResource.QuestionFolders),
+
+        // COMMENT POST
+        new("Create Comment", FSHAction.Create, FSHResource.CommentPost, new[] { TEACHER, STUDENT }),
+        new("Update Comment", FSHAction.Update, FSHResource.CommentPost, new[] { TEACHER, STUDENT }),
+        new("Delete Comment", FSHAction.Delete, FSHResource.CommentPost, new[] { TEACHER, STUDENT }),
 
         // QUESTIONS
         new("View Question", FSHAction.View, FSHResource.Question),
@@ -171,7 +171,7 @@ public static class FSHPermissions
         new("Update Papers", FSHAction.Update, FSHResource.Papers),
         new("Delete Papers", FSHAction.Delete, FSHResource.Papers),
 
-        //PAPER LABELS
+        // PAPER LABELS
         new("View PaperLabels", FSHAction.View, FSHResource.PaperLabels),
         new("Create PaperLabels", FSHAction.Create, FSHResource.PaperLabels),
         new("Update PaperLabels", FSHAction.Update, FSHResource.PaperLabels),
@@ -183,14 +183,15 @@ public static class FSHPermissions
         new("Update TeacherTeams", FSHAction.Update, FSHResource.TeacherTeams),
         new("Delete TeacherTeams", FSHAction.Delete, FSHResource.TeacherTeams),
 
-        //GROUP TEACHERS
+        // GROUP TEACHERS
         new("View GroupTeachers", FSHAction.View, FSHResource.GroupTeachers),
+        new("Search GroupTeachers", FSHAction.Search, FSHResource.GroupTeachers),
         new("Create GroupTeachers", FSHAction.Create, FSHResource.GroupTeachers),
         new("Update GroupTeachers", FSHAction.Update, FSHResource.GroupTeachers),
         new("Delete GroupTeachers", FSHAction.Delete, FSHResource.GroupTeachers),
 
         // FILES
-        new("Upload files", FSHAction.Upload, FSHResource.Files, new[] { ROOT }),
+        new("Upload files", FSHAction.Upload, FSHResource.Files, new[] { ROOT, TEACHER, STUDENT }),
 
         // NOTIFICATIONS
         new("Send Notifications", FSHAction.Create, FSHResource.Notifications,  new[] { ROOT }),

@@ -25,9 +25,17 @@ public class UpdateGroupTeacherRequestHandler : IRequestHandler<UpdateGroupTeach
     // Add Domain Events automatically by using IRepositoryWithEvents
     private readonly IRepositoryWithEvents<GroupTeacher> _repository;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
 
-    public UpdateGroupTeacherRequestHandler(IRepositoryWithEvents<GroupTeacher> repository, IStringLocalizer<UpdateGroupTeacherRequestHandler> localizer) =>
-        (_repository, _t) = (repository, localizer);
+    public UpdateGroupTeacherRequestHandler(
+        IRepositoryWithEvents<GroupTeacher> repository,
+        IStringLocalizer<UpdateGroupTeacherRequestHandler> t,
+        ICurrentUser currentUser)
+    {
+        _repository = repository;
+        _t = t;
+        _currentUser = currentUser;
+    }
 
     public async Task<Guid> Handle(UpdateGroupTeacherRequest request, CancellationToken cancellationToken)
     {
@@ -35,6 +43,11 @@ public class UpdateGroupTeacherRequestHandler : IRequestHandler<UpdateGroupTeach
 
         _ = group
         ?? throw new NotFoundException(_t["GroupTeacher {0} Not Found.", request.Id]);
+
+        if (group.CreatedBy != _currentUser.GetUserId())
+        {
+            throw new ForbiddenException(_t["You have not authorization"]);
+        }
 
         group.Update(request.Name);
 

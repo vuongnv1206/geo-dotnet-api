@@ -108,39 +108,36 @@ public class GetClassroomFrequencyMarkRequestHandler : IRequestHandler<GetClassr
 
             var totalRegister = classSubmissions.Count;
             var totalAttendee = classSubmissions.Count(s => s.Status == SubmitPaperStatus.End);
-            var maxPointInPaper = paper.PaperQuestions.Sum(x => x.Mark);
-            var interval = maxPointInPaper / 10.0;
+
             var frequencyMarks = new List<FrequencyMarkDto>();
 
-            // Chia thang điểm thành 10 phần và tính tần số điểm cho từng khoảng
-            for (int i = 0; i < 10; i++)
+            // Loop through each point from 0 to 9
+            for (int i = 0; i < 9; i++)
             {
-                var fromMark = i * interval;
-                var toMark = (i + 1) * interval;
+                var fromMark = i; // Từ điểm hiện tại
+                var toMark = i + 1; // Đến điểm tiếp theo
                 var count = classSubmissions.Count(s => s.TotalMark >= fromMark && s.TotalMark < toMark);
                 var rate = totalAttendee > 0 ? (float)count / totalAttendee * 100 : 0;
 
-                if (toMark == maxPointInPaper)
-                {
-                    var countMax = classSubmissions.Count(s => s.TotalMark >= fromMark && s.TotalMark <= toMark);
-                    frequencyMarks.Add(new FrequencyMarkDto
-                    {
-                        FromMark = (float)fromMark,
-                        ToMark = (float)toMark,
-                        Total = countMax,
-                        Rate = totalAttendee > 0 ? (float)countMax / totalAttendee * 100 : 0,
-                    });
-                    break;
-                }
-
                 frequencyMarks.Add(new FrequencyMarkDto
                 {
-                    FromMark = (float)fromMark,
-                    ToMark = (float)toMark,
+                    FromMark = fromMark,
+                    ToMark = toMark,
                     Total = count,
                     Rate = rate
                 });
             }
+
+            // Xử lý riêng cho điểm từ 9 đến 10
+            var countMax = classSubmissions.Count(s => s.TotalMark >= 9 && s.TotalMark <= 10);
+            frequencyMarks.Add(new FrequencyMarkDto
+            {
+                FromMark = 9,
+                ToMark = 10,
+                Total = countMax,
+                Rate = totalAttendee > 0 ? (float)countMax / totalAttendee * 100 : 0,
+            });
+
 
             // Thêm thông tin tần số điểm vào danh sách kết quả
             classFrequencyMarks.Add(new ClassroomFrequencyMarkDto

@@ -44,6 +44,7 @@ public class GetOrdersRequestHandler : IRequestHandler<GetOrdersRequest, Paginat
 
 public class OrderDto : IDto
 {
+    public Guid Id { get; set; }
     public string OrderNo { get; set; }
     public decimal Total { get; set; }
     public DateOnly? StartDate { get; set; }

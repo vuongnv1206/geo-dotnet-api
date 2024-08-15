@@ -86,8 +86,8 @@ public static class Startup
     public static void InitializeJob(this IServiceProvider services, IConfiguration config)
     {
         var settings = config.GetSection(nameof(PaymentSettings)).Get<PaymentSettings>();
-        RecurringJob.AddOrUpdate("CheckTransactionJob", () => TransactionsUtils.CallAPIChecking($"{settings.SyncJobURL}/api/v1/payment/check-new-transactions"), settings.CheckTransCron);
-        RecurringJob.AddOrUpdate("DeactiveExpiredUser", () => TransactionsUtils.CallAPIChecking($"{settings.SyncJobURL}/api/v1/payment/deactive-expired-user"), settings.DisableSubCron);
+        RecurringJob.AddOrUpdate("root-CheckTransactionJob", () => TransactionsUtils.CallAPIChecking($"{settings.SyncJobURL}/api/v1/payment/check-new-transactions"), settings.CheckTransCron);
+        RecurringJob.AddOrUpdate("root-DeactiveExpiredUser", () => TransactionsUtils.CallAPIChecking($"{settings.SyncJobURL}/api/v1/payment/deactive-expired-user"), settings.DisableSubCron);
     }
 
     public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder, IConfiguration config) =>

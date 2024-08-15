@@ -1,7 +1,8 @@
+using FSH.WebApi.Application.Assignments.AssignmentClasses;
 using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.UserStudents.Dto;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Class;
-using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
@@ -20,19 +21,22 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
     private readonly ICurrentUser _currentUser;
     private readonly IRepository<GroupPermissionInClass> _groupPermissionRepo;
     private readonly IRepository<TeacherPermissionInClass> _teacherPermissionRepo;
+    private readonly IMediator _mediator;
 
     public GetClassRequestHandler(
         IRepository<Classes> repository,
         IStringLocalizer<GetClassRequestHandler> t,
         ICurrentUser currentUser,
         IRepository<TeacherPermissionInClass> teacherPermissionRepo,
-        IRepository<GroupPermissionInClass> groupPermissionRepo)
+        IRepository<GroupPermissionInClass> groupPermissionRepo,
+        IMediator mediator)
     {
         _repository = repository;
         _t = t;
         _currentUser = currentUser;
         _teacherPermissionRepo = teacherPermissionRepo;
         _groupPermissionRepo = groupPermissionRepo;
+        _mediator = mediator;
     }
 
     public async Task<ClassDto> Handle(GetClassesRequest request, CancellationToken cancellationToken)
@@ -64,24 +68,31 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
 
                 if (!listPermission.Any(x => x.PermissionType == PermissionType.ManageStudentList))
                 {
-                    classdto.Students = null;
+                    classdto.Students = classroom.UserClasses?.Select(x => x.Student).Adapt<List<UserStudentDto>>();
                 }
 
                 if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment
                                             && x.PermissionType == PermissionType.Marking))
                 {
-                    classdto.Assignments = null;
-                    classdto.Papers = null;
+                    classdto.Assignments = await _mediator.Send(new GetAssignmentInClassRequest(request.Id));
+                    classdto.Papers = await _mediator.Send(new GetPapersInClassRequest(request.Id));
                 }
 
                 classdto.Permissions = listPermission;
             }
             else
             {
-                //classdto.Assignments = null;
-                //classdto.Papers = null;
-                classdto.Students = null;
+                classdto.Assignments = await _mediator.Send(new GetAssignmentInClassRequest(request.Id));
+                classdto.Papers = await _mediator.Send(new GetPapersInClassRequest(request.Id));
+                classdto.Students = classroom.UserClasses?.Select(x => x.Student).Adapt<List<UserStudentDto>>();
+
             }
+        }
+        else
+        {
+            classdto.Assignments = await _mediator.Send(new GetAssignmentInClassRequest(request.Id));
+            classdto.Papers = await _mediator.Send(new GetPapersInClassRequest(request.Id));
+            classdto.Students = classroom.UserClasses?.Select(x => x.Student).Adapt<List<UserStudentDto>>();
         }
 
         return classdto;

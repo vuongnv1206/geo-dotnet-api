@@ -50,7 +50,7 @@ public class GetPaperInfoRequestHandler : IRequestHandler<GetPaperInfoRequest, P
 
         var response = paper.Adapt<PaperInfoStatistic>();
 
-        if (paper.ShareType != PaperShareType.All && paper.PaperAccesses.Any())
+        if (paper.PaperAccesses.Any())
         {
             response.TotalRegister = 0;
             var studentsInclass = new List<UserClass>();

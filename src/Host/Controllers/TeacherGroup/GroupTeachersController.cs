@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+using FSH.WebApi.Application.TeacherGroup.JoinGroups;
 using FSH.WebApi.Application.TeacherGroup.TeacherInGroups;
 
 namespace FSH.WebApi.Host.Controllers.TeacherGroup;
@@ -59,6 +60,14 @@ public class GroupTeachersController : VersionedApiController
     [MustHavePermission(FSHAction.Delete, FSHResource.GroupTeachers)]
     [OpenApiOperation("Remove a teacher in group")]
     public Task RemoveTeacherInGroup(RemoveTeacherInGroupRequest request)
+    {
+        return Mediator.Send(request);
+    }
+
+    [HttpPost("request-join-group")]
+    [MustHavePermission(FSHAction.Create, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Send request join a group")]
+    public Task SendRequestJoinGroup(SendRequestJoinGroupRequest request)
     {
         return Mediator.Send(request);
     }

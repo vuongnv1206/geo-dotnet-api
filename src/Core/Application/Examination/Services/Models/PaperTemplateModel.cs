@@ -16,7 +16,7 @@ public class PaperTemplateModel
     public string ExamCode { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public int? Duration { get; set; }
+    public string? Duration { get; set; }
     public int TotalQuestion { get; set; }
     public List<QuestionModel> Questions { get; set; }
 

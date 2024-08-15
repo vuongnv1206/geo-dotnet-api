@@ -18,6 +18,8 @@ using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Application.Questions.QuestionLabel;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
+using FSH.WebApi.Application.TeacherGroup.JoinGroups;
+using FSH.WebApi.Application.TeacherGroup.JoinTeams;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.Assignment;
@@ -248,9 +250,32 @@ public class MapsterSettings
                                 .OrderByDescending(g => g.Count())
                                 .Select(g => g.Count())
                                 .FirstOrDefault())
+            .Map(dest => dest.HighestMark, src =>
+                src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End)
+                                .Select(x => x.TotalMark)
+                                .DefaultIfEmpty(0) // Default to 0 if no submissions
+                                .Max())
+            .Map(dest => dest.TotalHighestMark, src =>
+                src.SubmitPapers
+                    .Where(x => x.Status == SubmitPaperStatus.End && x.TotalMark
+                    == src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End).Max(x => x.TotalMark))
+                    .Count())
+            .Map(dest => dest.LowestMark, src =>
+                src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End)
+                                .Select(x => x.TotalMark)
+                                .DefaultIfEmpty(0) // Default to 0 if no submissions
+                                .Min())
+            .Map(dest => dest.TotalLowestMark, src =>
+                src.SubmitPapers
+                    .Where(x => x.Status == SubmitPaperStatus.End && x.TotalMark
+                    == src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End).Min(x => x.TotalMark))
+                    .Count())
             .Map(dest => dest.TotalDoing, src => src.SubmitPapers.Where(x => x.Status == SubmitPaperStatus.Doing).Count())
-            .Map(dest => dest.AverageMark, src => src.SubmitPapers.Sum(x => x.TotalMark)
-            / src.SubmitPapers.Where(sb => sb.Status == SubmitPaperStatus.End).Count());
+            .Map(dest => dest.AverageMark, src =>
+                src.SubmitPapers.Where(sb => sb.Status == SubmitPaperStatus.End).Any()
+                ? src.SubmitPapers.Sum(x => x.TotalMark) / src.SubmitPapers.Where(sb => sb.Status == SubmitPaperStatus.End).Count()
+                : 0);
+
 
         _ = TypeAdapterConfig<QuestionClone, QuestionStatisticDto>.NewConfig()
             .Map(dest => dest.Answers, src => src.AnswerClones);
@@ -260,5 +285,20 @@ public class MapsterSettings
         _ = TypeAdapterConfig<QuestionLable, QuestionLabelDto>.NewConfig();
 
         _ = TypeAdapterConfig<Paper, PaperInListDto>.NewConfig();
+
+        _ = TypeAdapterConfig<JoinGroupTeacherRequest, JoinGroupTeacherRequestDto>.NewConfig()
+            .Map(dest => dest.GroupName, src => src.GroupTeacher.Name)
+            .Map(dest => dest.Email, src => src.TeacherTeam.Email)
+            .Map(dest => dest.Phone, src => src.TeacherTeam.Phone)
+            .Map(dest => dest.CreateOn, src => src.CreatedOn)
+            .Map(dest => dest.LastModifiedOn, src => src.LastModifiedOn);
+
+        _ = TypeAdapterConfig<JoinTeacherTeamRequest, JoinTeacherTeamRequestDto>.NewConfig()
+            .Map(dest => dest.CreateBy, src => src.CreatedBy)
+            .Map(dest => dest.CreateOn, src => src.CreatedOn)
+            .Map(dest => dest.LastModifiedOn, src => src.LastModifiedOn);
+
+        _ = TypeAdapterConfig<InviteJoinTeacherTeam, InviteJoinTeacherTeamDto>.NewConfig()
+            .Map(dest => dest.CreateOn, src => src.CreatedOn);
     }
 }

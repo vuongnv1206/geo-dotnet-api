@@ -9,6 +9,6 @@ public class SubmitPaperByPaperId : Specification<SubmitPaper>
           .Where(x => x.PaperId == paper.Id
           && (x.CreatedBy == userId || paper.CreatedBy == userId))
           .Include(sb => sb.SubmitPaperDetails)
-          .OrderByDescending(x => x.CreatedOn);
+          .OrderBy(x => x.CreatedOn);
     }
 }
