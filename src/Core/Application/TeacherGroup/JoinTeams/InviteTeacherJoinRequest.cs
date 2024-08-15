@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Notifications;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.TeacherGroup;
 
@@ -19,6 +20,7 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
     private readonly IMailService _mailService;
     private readonly IEmailTemplateService _templateService;
     private readonly IJobService _jobService;
+    private readonly INotificationService _notificationService;
 
     public InviteTeacherJoinRequestHandler(
         IStringLocalizer<InviteTeacherJoinRequestHandler> t,
@@ -28,7 +30,8 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
         IRepository<TeacherTeam> teacherTeamRepo,
         IMailService mailService,
         IEmailTemplateService templateService,
-        IJobService jobService)
+        IJobService jobService,
+        INotificationService notificationService)
     {
         _t = t;
         _userService = userService;
@@ -38,6 +41,7 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
         _mailService = mailService;
         _templateService = templateService;
         _jobService = jobService;
+        _notificationService = notificationService;
     }
 
     public async Task<DefaultIdType> Handle(InviteTeacherJoinRequest request, CancellationToken cancellationToken)
@@ -71,6 +75,21 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
             _templateService.GenerateEmailTemplate("join-my-team", eMailModel));
 
         _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
+
+
+        var recipient = await _userService.GetUserDetailByEmailAsync(request.Contact, cancellationToken);
+        if (recipient.Email != null && recipient.EmailConfirmed)
+        {
+            var noti = new BasicNotification
+            {
+                Message = $"{_currentUser.GetUserEmail()} invites you join their team.",
+                Label = BasicNotification.LabelType.Information,
+                Title = "Join my team",
+                Url = $"/invite-join-team/{userId}/{inviteJoin.Id}"
+            };
+
+            await _notificationService.SendNotificationToUser(recipient.Id.ToString(), noti, null, cancellationToken);
+        }
 
         return inviteJoin.Id;
     }

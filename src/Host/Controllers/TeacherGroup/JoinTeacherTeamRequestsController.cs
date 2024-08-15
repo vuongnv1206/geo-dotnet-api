@@ -48,7 +48,7 @@ public class JoinTeacherTeamRequestsController : VersionedApiController
 
     [HttpPost("invite-teacher")]
     [MustHavePermission(FSHAction.Create, FSHResource.GroupTeachers)]
-    [OpenApiOperation("Cancel request join to team.", "")]
+    [OpenApiOperation("Invite teacher join to team.", "")]
     public Task InviteTeacherJoinTeam(InviteTeacherJoinRequest request)
     {
         return Mediator.Send(request);
