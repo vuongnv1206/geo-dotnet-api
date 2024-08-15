@@ -8,7 +8,7 @@ public class PapersController : VersionedApiController
     [HttpPost("Search")]
     [OpenApiOperation("Search paper using available filter", "")]
     [MustHavePermission(FSHAction.View, FSHResource.Papers)]
-    public Task<PaginationResponse<PaperInListDto>> SearchPaper(SearchPaperRequest request)
+    public Task<List<PaperInListDto>> SearchPaper(SearchPaperRequest request)
     {
         return Mediator.Send(request);
     }
