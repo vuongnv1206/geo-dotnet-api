@@ -95,7 +95,7 @@ public class SubmitPapersController : VersionedApiController
 
     [HttpPost("monitor-detail")]
     [OpenApiOperation("Monitor detail of user in exam")]
-    public async Task<ActionResult<Guid>> MonitorDetailExam(MonitorDetailExamRequest request)
+    public async Task<ActionResult<MonitorDetailExamDto>> MonitorDetailExam(MonitorDetailExamRequest request)
     {
         return await Mediator.Send(request);
     }
