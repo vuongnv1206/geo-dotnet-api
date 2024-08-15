@@ -1,15 +1,23 @@
-﻿namespace FSH.WebApi.Application.Examination.Monitor;
+﻿using FSH.WebApi.Application.Examination.Monitor.Dtos;
 
-public class MonitorExamRequest : IRequest<DefaultIdType>
+namespace FSH.WebApi.Application.Examination.Monitor;
+
+public class MonitorExamRequest : IRequest<MonitorExamDto>
 {
     public DefaultIdType PaperId { get; set; }
 }
 
-public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, DefaultIdType>
+public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, MonitorExamDto>
 {
-    public Task<DefaultIdType> Handle(MonitorExamRequest request, CancellationToken cancellationToken)
+    private readonly IMonitorService _monitorService;
+
+    public MonitorExamRequestHandler(IMonitorService monitorService)
     {
-        // not implemented
-        return Task.FromResult(new DefaultIdType());
+        _monitorService = monitorService;
+    }
+
+    public Task<MonitorExamDto> Handle(MonitorExamRequest request, CancellationToken cancellationToken)
+    {
+        return _monitorService.MonitorExam(request.PaperId);
     }
 }
