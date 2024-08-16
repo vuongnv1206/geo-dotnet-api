@@ -74,9 +74,9 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
 
         if (classOfStudent.UserClasses != null)
         {
-            if (classOfStudent.UserClasses.Any(x => x.Student.Email.Trim() == request.Email.Trim()))
+            if (classOfStudent.UserClasses.Any(x => x.Student.Email.Trim() == request.Email.Trim() && x.Student.Id != request.Id))
                 throw new BadRequestException(_t["Email is existed in class"]);
-            else if (classOfStudent.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim()))
+            else if (classOfStudent.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim() && x.Student.Id != request.Id))
                 throw new BadRequestException(_t["Phone number is existed in class"]);
         }
 
