@@ -1,5 +1,6 @@
 ﻿
 
+using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Examination;
@@ -8,30 +9,31 @@ using Mapster;
 using System.Linq;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class SearchSharedPaperFolderRequest : IRequest<List<PaperFolderDto>>
+public class SearchSharedPaperFolderRequest : IRequest<PaperFolderTreeDto>
 {
     public Guid? ParentId { get; set; }
     public string? Name { get; set; }
 }
 
-public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchSharedPaperFolderRequest, List<PaperFolderDto>>
+public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchSharedPaperFolderRequest, PaperFolderTreeDto>
 {
     private readonly IReadRepository<PaperFolder> _paperFolderRepo;
     private readonly IReadRepository<GroupTeacher> _groupTeacherRepo;
     private readonly IReadRepository<PaperFolderPermission> _paperFolderPermissionRepo;
     private readonly ICurrentUser _currentUser;
     private readonly IUserService _userService;
-
-    public SearchSharedPaperFolderRequestHandler(IReadRepository<PaperFolder> paperFolderRepo, IReadRepository<GroupTeacher> groupTeacherRepo, IReadRepository<PaperFolderPermission> paperFolderPermissionRepo, ICurrentUser currentUser, IUserService userService)
+    private readonly IStringLocalizer _t;
+    public SearchSharedPaperFolderRequestHandler(IReadRepository<PaperFolder> paperFolderRepo, IReadRepository<GroupTeacher> groupTeacherRepo, IReadRepository<PaperFolderPermission> paperFolderPermissionRepo, ICurrentUser currentUser, IUserService userService, IStringLocalizer<SearchSharedPaperFolderRequestHandler> t)
     {
         _paperFolderRepo = paperFolderRepo;
         _groupTeacherRepo = groupTeacherRepo;
         _paperFolderPermissionRepo = paperFolderPermissionRepo;
         _currentUser = currentUser;
         _userService = userService;
+        _t = t;
     }
 
-    public async Task<List<PaperFolderDto>> Handle(SearchSharedPaperFolderRequest request, CancellationToken cancellationToken)
+    public async Task<PaperFolderTreeDto> Handle(SearchSharedPaperFolderRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
 
@@ -40,7 +42,7 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
         var groupIds = accessibleGroups.Select(g => g.Id).ToList();
 
 
-        var accessibleFolders = await _paperFolderPermissionRepo.ListAsync(new PaperFolderPermissionByUserOrGroupSpec(currentUserId,groupIds), cancellationToken);
+        var accessibleFolders = await _paperFolderPermissionRepo.ListAsync(new PaperFolderPermissionByUserOrGroupSpec(currentUserId, groupIds), cancellationToken);
         var accessibleFolderIds = accessibleFolders.Select(p => p.FolderId).Distinct();
 
         var data = new List<PaperFolder>();
@@ -72,7 +74,29 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
             dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
             dtos.Add(dto);
         }
-        return dtos;
+
+        if (request.ParentId.HasValue)
+        {
+            var paperFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value), cancellationToken);
+            _ = paperFolder ?? throw new NotFoundException(_t["PaperFolder {0} Not Found.", request.ParentId.Value]);
+
+            return new PaperFolderTreeDto
+            {
+                Id = request.ParentId.Value,
+                PaperFolderPermissions = paperFolder.PaperFolderPermissions.Adapt<List<PaperFolderPermissionDto>>(),
+                PaperFolderChildrens = dtos,
+                TotalPapers = paperFolder.CountPapers()
+            };
+        }
+        else
+        {
+            return new PaperFolderTreeDto
+            {
+                PaperFolderChildrens = dtos
+            };
+        }
+
+
     }
 }
-  
+

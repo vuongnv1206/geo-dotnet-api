@@ -36,7 +36,7 @@ public class GeneratePaperPdfRequestHandler : IRequestHandler<GeneratePaperPdfRe
             ExamName = paperDto.ExamName,
             StartTime = paperDto.StartTime,
             EndTime = paperDto.EndTime,
-            Duration = paperDto.Duration.ToString(),
+            Duration = paperDto.Duration,
             SubjectName = paperDto.Subject?.Name,
             Questions = paperDto.Questions.Adapt<List<QuestionModel>>(),
         };

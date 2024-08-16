@@ -105,7 +105,11 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
             ChildPaperFolderIds(paperFolder.PaperFolderChildrens, ids);
         }
     }
-
+    public bool HasPermission(Guid userId)
+    {
+        // Kiểm tra xem có bất kỳ quyền nào được gán cho người dùng này không
+        return PaperFolderPermissions.Any(permission => permission.UserId == userId);
+    }
     public void AddPermission(PaperFolderPermission permission)
     {
         PaperFolderPermissions.Add(permission);
@@ -166,4 +170,19 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
             AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true,true));
         }
     }
+
+    public int CountPapers()
+    {
+        int count = Papers.Count;
+        foreach (var child in PaperFolderChildrens)
+        {
+            count += child.CountPapers();
+        }
+        return count;
+    }
+
+    
+
+
+
 }
