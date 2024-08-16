@@ -3,7 +3,7 @@
     "DBProvider": "postgresql",
     //"ConnectionString": "Host=localhost;Port=5432;Database=geo-db-test;Username=postgres;Password=123;Include Error Detail=true"
 
-    "ConnectionString": "Host=localhost;Port=5432;Database=geo-db-test;Username=postgres;Password=123;Include Error Detail=true"
+    "ConnectionString": "Host=localhost;Port=5432;Database=geo-db-test;Username=postgres;Password=12345;Include Error Detail=true"
 
 
 
