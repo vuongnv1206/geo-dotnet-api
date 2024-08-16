@@ -65,7 +65,7 @@ public class AssignmentsController : VersionedApiController
     }
 
     [HttpPost("submission")]
-    [MustHavePermission(FSHAction.View, FSHResource.Assignments)]
+    [MustHavePermission(FSHAction.View, FSHResource.SubmitAssignment)]
     [OpenApiOperation("Get submission assignment details.", "")]
     public Task<List<SubmissionAssignmentDto>> GetSubmissionAsync(GetSubmissionAssignmentRequest request)
     {
