@@ -9,7 +9,7 @@ public class AssignmentsController : VersionedApiController
     [HttpPost("search")]
     [MustHavePermission(FSHAction.Search, FSHResource.Assignments)]
     [OpenApiOperation("Search assignments using available filters.", "")]
-    public Task<PaginationResponse<AssignmentDto>> SearchAsync(SearchAssignmentsRequest request)
+    public Task<PaginationResponse<AssignmentDto>> SearchAsync(SearchMyAssignmentsRequest request)
     {
         return Mediator.Send(request);
     }
