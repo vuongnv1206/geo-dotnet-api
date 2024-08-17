@@ -47,10 +47,17 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
     public async Task<DefaultIdType> Handle(InviteTeacherJoinRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
+        string senderEmail = _currentUser.GetUserEmail();
+
+        if(senderEmail == request.Contact)
+        {
+            throw new BadRequestException(_t["You cannot join your own group."]);
+        }
+
         var inviteJoin = new InviteJoinTeacherTeam
         {
             RecipientEmail = request.Contact,
-            SenderEmail = _currentUser.GetUserEmail()
+            SenderEmail = senderEmail
         };
 
         var existDuplicateContact = await _teacherTeamRepo.AnyAsync(
