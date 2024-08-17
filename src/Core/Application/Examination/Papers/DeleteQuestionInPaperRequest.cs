@@ -12,8 +12,7 @@ namespace FSH.WebApi.Application.Examination.Papers;
 public class DeleteQuestionInPaperRequest : IRequest
 {
     public Guid PaperId { get; set; }
-    [Description("QuestionCloneId")]
-    public Guid QuestionCloneId { get; set; }
+    public Guid OriginalQuestionId { get; set; }
 }
 
 public class DeleteQuestionInPaperRequestHandler : IRequestHandler<DeleteQuestionInPaperRequest>
@@ -37,13 +36,13 @@ public class DeleteQuestionInPaperRequestHandler : IRequestHandler<DeleteQuestio
         _ = paper
             ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.PaperId]);
 
-
-        paper.RemoveQuestion(request.QuestionCloneId);
+        var questionCloneToRemove = paper.PaperQuestions.FirstOrDefault(q => q.Question.OriginalQuestionId == request.OriginalQuestionId);
+        paper.RemoveQuestion(questionCloneToRemove.QuestionId);
         await _repository.UpdateAsync(paper, cancellationToken);
 
-        var questionClone = await _repositoryQuestionClone.FirstOrDefaultAsync(new QuestionCloneByIdSpec(request.QuestionCloneId));
+        var questionClone = await _repositoryQuestionClone.FirstOrDefaultAsync(new QuestionCloneByIdSpec(questionCloneToRemove.QuestionId));
         if (questionClone == null)
-            throw new NotFoundException(_t["Question {0} Not Found.", request.QuestionCloneId]);
+            throw new NotFoundException(_t["Question {0} Not Found.", questionCloneToRemove.QuestionId]);
 
         await DeleteAllQuestionPassages(questionClone, cancellationToken);
         await _repositoryQuestionClone.DeleteAsync(questionClone);
