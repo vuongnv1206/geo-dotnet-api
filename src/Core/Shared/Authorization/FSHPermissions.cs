@@ -95,7 +95,9 @@ public static class FSHPermissions
         new("Update Assignments", FSHAction.Update, FSHResource.Assignments),
         new("Delete Assignments", FSHAction.Delete, FSHResource.Assignments),
         new("Export Assignments", FSHAction.Export, FSHResource.Assignments),
+        new("Mark Assignments", FSHAction.Update, FSHResource.Assignments),
         new("Submit Assignments", FSHAction.Update, FSHResource.SubmitAssignment, new[] { STUDENT }),
+        new("Submission Assignments", FSHAction.View, FSHResource.SubmitAssignment, new[] { STUDENT }),
 
         // SUBJECTS
         new("View Subjects", FSHAction.View, FSHResource.Subjects),
