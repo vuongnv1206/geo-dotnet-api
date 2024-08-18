@@ -44,7 +44,7 @@ public class GeneratePaperDocxRequestHandler : IRequestHandler<GeneratePaperDocx
             ExamName = paperDto.ExamName,
             StartTime = paperDto.StartTime,
             EndTime = paperDto.EndTime,
-            Duration = paperDto.Duration.ToString(),
+            Duration = paperDto.Duration,
             SubjectName = paperDto.Subject.Name,
             TotalQuestion = paperDto.Questions.Count,
             Questions = paperDto.Questions.Adapt<List<QuestionModel>>(),
@@ -75,7 +75,7 @@ public class GeneratePaperDocxRequestHandler : IRequestHandler<GeneratePaperDocx
                 paragraph
                     .InsertTabStopPosition(Alignment.center, 200f, TabStopPositionLeader.dot)
                     .InsertTabStopPosition(Alignment.right, 125f, TabStopPositionLeader.dot)
-                    .Append($"Subject: {paperTemplateModel.SubjectName ?? "\t"} - Duration: {(string.IsNullOrEmpty(paperTemplateModel.Duration) ? "\t" : paperTemplateModel.Duration)} minute(s)")
+                    .Append($"Subject: {paperTemplateModel.SubjectName ?? "\t"} - Duration: {(paperTemplateModel.Duration.HasValue ? "\t" : paperTemplateModel.Duration)} minute(s)")
                     .FontSize(10)
                     .Italic()
                     .AppendLine();

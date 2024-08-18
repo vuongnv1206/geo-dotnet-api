@@ -11,4 +11,5 @@ public class SubmissionAssignmentDto
     public float? Score { get; set; }
     public string? Comment { get; set; }
     public required StudentDto Student { get; set; }
+    public Guid CreatedBy { get; set; }
 }

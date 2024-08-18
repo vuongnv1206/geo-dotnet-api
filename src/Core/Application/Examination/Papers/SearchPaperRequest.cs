@@ -4,12 +4,13 @@ using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.Papers;
-public class SearchPaperRequest : PaginationFilter,IRequest<PaginationResponse<PaperInListDto>>
+public class SearchPaperRequest : IRequest<List<PaperInListDto>>
 {
     public Guid? PaperFolderId { get; set; }
+    public string? Name { get; set; }
 }
 
-public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, PaginationResponse<PaperInListDto>>
+public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, List<PaperInListDto>>
 {
     private readonly IReadRepository<Paper> _repository;
     public readonly IReadRepository<PaperFolder> _paperFolderRepo;
@@ -23,7 +24,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
         _userService = userService;
     }
 
-    public async Task<PaginationResponse<PaperInListDto>> Handle(SearchPaperRequest request, CancellationToken cancellationToken)
+    public async Task<List<PaperInListDto>> Handle(SearchPaperRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
 
@@ -32,7 +33,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
         var count = 0;
 
         //If search by name
-        if (!string.IsNullOrEmpty(request.Keyword))
+        if (!string.IsNullOrEmpty(request.Name))
         {
             //If search by name in folder
             if (request.PaperFolderId.HasValue)
@@ -61,13 +62,11 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
             {
                 parentIds.Add(request.PaperFolderId.Value);
                 var spec = new PaperBySearchSpec(parentIds, request);
-                count = await _repository.CountAsync(spec, cancellationToken);
                 data = await _repository.ListAsync(spec, cancellationToken);
             }//If root
             else
             {
                 var spec = new PaperBySearchSpec(null, request);
-                count = await _repository.CountAsync(spec, cancellationToken);
                 data = await _repository.ListAsync(spec, cancellationToken);
             }
         }
@@ -86,7 +85,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
             dto.CreatorName = await _userService.GetFullName(paper.CreatedBy);
             dtos.Add(dto);
         }
-        return new PaginationResponse<PaperInListDto>(dtos, count, request.PageNumber, request.PageSize);
+        return dtos;
 
     }
 }

@@ -1,6 +1,7 @@
 using FSH.WebApi.Application.Assignments.AssignmentClasses;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.UserStudents.Dto;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -22,6 +23,7 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
     private readonly IRepository<GroupPermissionInClass> _groupPermissionRepo;
     private readonly IRepository<TeacherPermissionInClass> _teacherPermissionRepo;
     private readonly IMediator _mediator;
+    private readonly IUserService _userService;
 
     public GetClassRequestHandler(
         IRepository<Classes> repository,
@@ -29,7 +31,8 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
         ICurrentUser currentUser,
         IRepository<TeacherPermissionInClass> teacherPermissionRepo,
         IRepository<GroupPermissionInClass> groupPermissionRepo,
-        IMediator mediator)
+        IMediator mediator,
+        IUserService userService)
     {
         _repository = repository;
         _t = t;
@@ -37,6 +40,7 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
         _teacherPermissionRepo = teacherPermissionRepo;
         _groupPermissionRepo = groupPermissionRepo;
         _mediator = mediator;
+        _userService = userService;
     }
 
     public async Task<ClassDto> Handle(GetClassesRequest request, CancellationToken cancellationToken)
@@ -93,6 +97,12 @@ public class GetClassRequestHandler : IRequestHandler<GetClassesRequest, ClassDt
             classdto.Assignments = await _mediator.Send(new GetAssignmentInClassRequest(request.Id));
             classdto.Papers = await _mediator.Send(new GetPapersInClassRequest(request.Id));
             classdto.Students = classroom.UserClasses?.Select(x => x.Student).Adapt<List<UserStudentDto>>();
+        }
+
+        var user = await _userService.GetAsync(classdto.OwnerId.ToString(), cancellationToken);
+        if (user != null)
+        {
+            classdto.Owner = user;
         }
 
         return classdto;

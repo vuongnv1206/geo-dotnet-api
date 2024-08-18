@@ -64,7 +64,7 @@ public class UpdateQuestionsInPaperRequestHandler : IRequestHandler<UpdateQuesti
                 var deleteRequest = new DeleteQuestionInPaperRequest
                 {
                     PaperId = request.PaperId,
-                    QuestionCloneId = questionId.Value
+                    OriginalQuestionId = questionId.Value
                 };
                 await _mediator.Send(deleteRequest, cancellationToken);
             }

@@ -8,7 +8,7 @@ public class PapersController : VersionedApiController
     [HttpPost("Search")]
     [OpenApiOperation("Search paper using available filter", "")]
     [MustHavePermission(FSHAction.View, FSHResource.Papers)]
-    public Task<PaginationResponse<PaperInListDto>> SearchPaper(SearchPaperRequest request)
+    public Task<List<PaperInListDto>> SearchPaper(SearchPaperRequest request)
     {
         return Mediator.Send(request);
     }
@@ -108,7 +108,7 @@ public class PapersController : VersionedApiController
     [MustHavePermission(FSHAction.Delete, FSHResource.Papers)]
     public async Task<ActionResult> DeleteQuestionInPaperAsync(Guid id, Guid questionId)
     {
-        return Ok(await Mediator.Send(new DeleteQuestionInPaperRequest { PaperId = id, QuestionCloneId = questionId }));
+        return Ok(await Mediator.Send(new DeleteQuestionInPaperRequest { PaperId = id, OriginalQuestionId = questionId }));
     }
 
     // fix controller for AddQuestionInPaperRequest

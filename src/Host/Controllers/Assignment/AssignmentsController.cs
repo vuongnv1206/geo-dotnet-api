@@ -9,7 +9,7 @@ public class AssignmentsController : VersionedApiController
     [HttpPost("search")]
     [MustHavePermission(FSHAction.Search, FSHResource.Assignments)]
     [OpenApiOperation("Search assignments using available filters.", "")]
-    public Task<PaginationResponse<AssignmentDto>> SearchAsync(SearchAssignmentsRequest request)
+    public Task<PaginationResponse<AssignmentDto>> SearchAsync(SearchMyAssignmentsRequest request)
     {
         return Mediator.Send(request);
     }
@@ -65,7 +65,7 @@ public class AssignmentsController : VersionedApiController
     }
 
     [HttpPost("submission")]
-    [MustHavePermission(FSHAction.View, FSHResource.Assignments)]
+    [MustHavePermission(FSHAction.View, FSHResource.SubmitAssignment)]
     [OpenApiOperation("Get submission assignment details.", "")]
     public Task<List<SubmissionAssignmentDto>> GetSubmissionAsync(GetSubmissionAssignmentRequest request)
     {

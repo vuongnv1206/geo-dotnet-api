@@ -9,7 +9,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public string ExamName { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public int? Duration { get; set; }
+    public float? Duration { get; set; }
     public PaperType Type { get; set; }
     public bool IsPublish { get; set; }
     public string? Content { get; set; }
@@ -117,7 +117,7 @@ public class Paper : AuditableEntity, IAggregateRoot
         PaperStatus status,
         DateTime? startTime,
         DateTime? endTime,
-        int? duration,
+        float? duration,
         bool shuffle,
         ShowResult showMarkResult,
         ShowQuestionAnswer showQuestionAnswer,
@@ -193,6 +193,12 @@ public class Paper : AuditableEntity, IAggregateRoot
                 AddPermission(permission);
             }
         }
+    }
+
+    public bool HasPermission(Guid userId)
+    {
+        // Kiểm tra xem có bất kỳ quyền nào được gán cho người dùng này không
+        return PaperPermissions.Any(permission => permission.UserId == userId);
     }
 
     public void AddPermission(PaperPermission permission)
