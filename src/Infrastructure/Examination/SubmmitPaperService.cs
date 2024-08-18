@@ -619,15 +619,19 @@ public class SubmmitPaperService : ISubmmitPaperService
             submitPaper.Status = SubmitPaperStatus.End;
             submitPaper.EndTime = timeNow;
 
+            // Update submit paper
+            await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
+
             // Calculate score
             submitPaper.TotalMark = await CalculateScoreSubmitPaper(submitPaper);
 
             // Update submit paper
             await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
         }
-
-        // Update submit paper
-        await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
+        else
+        {
+            await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
+        }
 
         return submitPaper == null
             ? throw new NotFoundException(_t["Submit paper {0} not found.", sbp.SubmitPaperId])
@@ -763,9 +767,16 @@ public class SubmmitPaperService : ISubmmitPaperService
         // SingleChoice
         foreach (var a in question.AnswerClones)
         {
-            if (a.Id == Guid.Parse(detail.AnswerRaw!) && a.IsCorrect)
+            try
             {
-                return mark;
+                if (a.Id == Guid.Parse(detail.AnswerRaw!) && a.IsCorrect)
+                {
+                    return mark;
+                }
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
 
@@ -923,7 +934,7 @@ public class SubmmitPaperService : ISubmmitPaperService
     public bool IsCorrectAnswer(SubmitPaperDetail submitDetail, QuestionClone question)
     {
         float markFlag = 10f;
-        var x = CalculateScore(submitDetail, question, markFlag);
+        float x = CalculateScore(submitDetail, question, markFlag);
         return x == markFlag;
     }
 }

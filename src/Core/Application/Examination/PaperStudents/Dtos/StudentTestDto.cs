@@ -12,5 +12,6 @@ public class StudentTestDto : IDto
     public string? PaperLabelName { get; set; }
     public DefaultIdType? SubjectId { get; set; }
     public string? SubjectName { get; set; }
+    public string? Password { get; set; }
     public CompletionStatusEnum CompletionStatus { get; set; }
 }
