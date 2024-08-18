@@ -4,5 +4,6 @@ public class GroupPermissionInClassDto
     public Guid Id { get; set; }
     public Guid GroupTeacherId { get; set; }
     public Guid ClassId { get; set; }
+    public string? ClassName { get; set; }
     public required string PermissionType { get; set; }
 }
