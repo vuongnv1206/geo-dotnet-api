@@ -71,4 +71,12 @@ public class GroupTeachersController : VersionedApiController
     {
         return Mediator.Send(request);
     }
+
+    [HttpPost("shared-group")]
+    [MustHavePermission(FSHAction.View, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Get joined teacher groups.", "")]
+    public Task<PaginationResponse<GroupTeacherDto>> SearchAsync(SearchSharedGroupTeachersRequest request)
+    {
+        return Mediator.Send(request);
+    }
 }

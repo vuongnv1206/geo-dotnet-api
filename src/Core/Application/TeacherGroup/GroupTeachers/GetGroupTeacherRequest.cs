@@ -33,12 +33,18 @@ public class GetGroupTeacherRequestHandler : IRequestHandler<GetGroupTeacherRequ
 
     public async Task<GroupTeacherDto> Handle(GetGroupTeacherRequest request, CancellationToken cancellationToken)
     {
-        var groupTeacher = await _repository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(request.Id), cancellationToken);
+        var userId = _currentUser.GetUserId();
+        var groupTeacher = await _repository.FirstOrDefaultAsync(new GroupTeacherByIdWithPermissionSpec(request.Id, userId), cancellationToken);
 
         if (groupTeacher == null)
             throw new NotFoundException(_t["GroupTeacher{0} Not Found.", request.Id]);
 
         var response = groupTeacher.Adapt<GroupTeacherDto>();
+
+        foreach(var classroom in response.GroupPermissionInClasses)
+        {
+            classroom.ClassName = groupTeacher.GroupPermissionInClasses.FirstOrDefault(x => x.ClassId == classroom.ClassId).Classroom.Name;
+        }
 
         var adminGroup = await _userService.GetAsync(groupTeacher.CreatedBy.ToString(), cancellationToken);
         response.AdminGroup = adminGroup.Email ?? "";
