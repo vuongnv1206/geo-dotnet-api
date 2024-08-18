@@ -1,5 +1,7 @@
 ﻿using ClosedXML.Excel;
+using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.UserStudents;
+using Microsoft.AspNetCore.Http;
 
 namespace FSH.WebApi.Infrastructure.Class.UserClasses
 {
@@ -69,6 +71,43 @@ namespace FSH.WebApi.Infrastructure.Class.UserClasses
                 workbook.SaveAs(stream);
                 return stream.ToArray();
             }
+        }
+
+        public async Task<List<CreateStudentDto>> GetImportStudents(IFormFile file, Guid classId)
+        {
+            var students = new List<CreateStudentDto>();
+            if (file == null || file.Length == 0)
+            {
+                return students;
+            }
+
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                using (var workbook = new XLWorkbook(stream))
+                {
+                    var worksheet = workbook.Worksheet(1);
+
+                    for (int row = 2; row <= worksheet.LastRowUsed().RowNumber(); row++)
+                    {
+                        var student = new CreateStudentDto
+                        {
+                            FirstName = worksheet.Cell(row, 1).GetValue<string>(),
+                            LastName = worksheet.Cell(row, 2).GetValue<string>(),
+                            Gender = worksheet.Cell(row, 3).GetValue<string>() == "Male",
+                            DateOfBirth = worksheet.Cell(row, 4).GetDateTime(),
+                            Email = worksheet.Cell(row, 5).GetValue<string>(),
+                            PhoneNumber = worksheet.Cell(row, 6).GetValue<string>(),
+                            StudentCode = worksheet.Cell(row, 7).GetValue<string>(),
+                            ClassesId = classId
+                        };
+                        students.Add(student);
+                    }
+
+                }
+            }
+
+            return students;
         }
     }
 }

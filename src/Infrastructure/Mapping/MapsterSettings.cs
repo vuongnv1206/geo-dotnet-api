@@ -5,6 +5,7 @@ using FSH.WebApi.Application.Class.Comments.Dto;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.New.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
+using FSH.WebApi.Application.Class.UserStudents;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
@@ -300,5 +301,8 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<InviteJoinTeacherTeam, InviteJoinTeacherTeamDto>.NewConfig()
             .Map(dest => dest.CreateOn, src => src.CreatedOn);
+
+        _ = TypeAdapterConfig<CreateStudentRequest, CreateStudentDto>.NewConfig();
+
     }
 }

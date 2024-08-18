@@ -64,9 +64,21 @@ public class StudentController : VersionedApiController
     }
 
     [HttpGet("format-import-student-excel")]
-    public async Task<IActionResult> ExportAddStudentExcel()
+    [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
+    [OpenApiOperation("get template import student", "")]
+    public async Task<IActionResult> GetTemplateAddStudentExcel()
     {
         var fileBytes = await Mediator.Send(new FormatAddStudentExcelRequest());
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ImportStudent.xlsx");
     }
+
+    [HttpPost("import-student-excel")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
+    [OpenApiOperation("Import student to class using excel", "")]
+    public async Task<IActionResult> ImportTemplateStudentExcel(IFormFile formFile, Guid classId)
+    {
+        var request = new ImportStudentExcelRequest(classId, formFile);
+        return Ok(await Mediator.Send(request));
+    }
+
 }
