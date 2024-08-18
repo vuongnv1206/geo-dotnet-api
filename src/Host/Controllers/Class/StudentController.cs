@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using FSH.WebApi.Application.Class.UserStudents.Dto;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Examination.PaperStatistics;
 
 namespace FSH.WebApi.Host.Controllers.Class;
 public class StudentController : VersionedApiController
@@ -60,5 +61,12 @@ public class StudentController : VersionedApiController
         return id != request.Id
             ? BadRequest()
             : Ok(await Mediator.Send(request));
+    }
+
+    [HttpGet("format-import-student-excel")]
+    public async Task<IActionResult> ExportAddStudentExcel()
+    {
+        var fileBytes = await Mediator.Send(new FormatAddStudentExcelRequest());
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ImportStudent.xlsx");
     }
 }

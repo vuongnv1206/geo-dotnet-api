@@ -46,7 +46,7 @@ public class GetSubmissionAssignmentRequestHandler : IRequestHandler<GetSubmissi
                 var studentIds = classroom.UserClasses?.Select(x => x.StudentId).ToList();
 
                 submissionAssignmentDto = submissionAssignmentDto
-                .Where(submission => studentIds.Contains(submission.StudentId) && submission.CreatedBy == currenrUserId)
+                .Where(submission => studentIds.Contains(submission.StudentId) && submission.StudentId == currenrUserId)
                 .ToList();
             }
         }

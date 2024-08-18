@@ -60,7 +60,7 @@ public class GetPaperInfoRequestHandler : IRequestHandler<GetPaperInfoRequest, P
                 if (paperAccess.ClassId.HasValue)
                 {
                     var classRoom = await _classRepo.FirstOrDefaultAsync(new ClassByIdSpec(paperAccess.ClassId.Value, userId));
-                    if (classRoom.UserClasses.Any())
+                    if (classRoom.UserClasses != null)
                     {
                         studentsInclass.AddRange(classRoom.UserClasses);
                     }
