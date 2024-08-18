@@ -43,7 +43,7 @@ public class QuestionSeeder : ICustomSeeder
                 }
             }
 
-            await _db.SaveChangesAsync(cancellationToken);
+            _ = await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Seeded Questions.");
         }
     }
@@ -57,13 +57,26 @@ public class QuestionSeeder : ICustomSeeder
             if (questionFolder == null)
             {
                 questionFolder = new QuestionFolder(question.QuestionFolder.Name, null);
-                await _db.QuestionFolders.AddAsync(questionFolder, cancellationToken);
-                await _db.SaveChangesAsync(cancellationToken);
+                _ = await _db.QuestionFolders.AddAsync(questionFolder, cancellationToken);
+                _ = await _db.SaveChangesAsync(cancellationToken);
                 question.QuestionFolder = questionFolder;
             }
             else
             {
                 question.QuestionFolder = questionFolder;
+            }
+
+            var questionLabel = await _db.QuestionLables.FirstOrDefaultAsync(x => x.Id == question.QuestionLableId || x.Name == question.QuestionLable.Name, cancellationToken);
+            if (questionLabel == null)
+            {
+                questionLabel = new QuestionLable(question.QuestionLable.Name, question.QuestionLable.Color);
+                _ = await _db.QuestionLables.AddAsync(questionLabel, cancellationToken);
+                _ = await _db.SaveChangesAsync(cancellationToken);
+                question.QuestionLable = questionLabel;
+            }
+            else
+            {
+                question.QuestionLable = questionLabel;
             }
 
             // add creator for all folders
@@ -73,7 +86,7 @@ public class QuestionSeeder : ICustomSeeder
                 folder.CreatedBy = _adminGuid;
             }
 
-            await _db.SaveChangesAsync(cancellationToken);
+            _ = await _db.SaveChangesAsync(cancellationToken);
 
             // seed question folder permissions
             foreach (var folder in folders)
@@ -84,18 +97,18 @@ public class QuestionSeeder : ICustomSeeder
                 var existingPermission = await _db.QuestionFolderPermissions.FirstOrDefaultAsync(x => x.UserId == _adminGuid && x.QuestionFolderId == folder.Id, cancellationToken);
                 if (existingPermission == null)
                 {
-                    await _db.QuestionFolderPermissions.AddAsync(permission, cancellationToken);
+                    _ = await _db.QuestionFolderPermissions.AddAsync(permission, cancellationToken);
                 }
             }
 
-            await _db.SaveChangesAsync(cancellationToken);
+            _ = await _db.SaveChangesAsync(cancellationToken);
 
         }
 
         question.CreatedBy = _adminGuid;
-        await _db.Questions.AddAsync(question, cancellationToken);
+        _ = await _db.Questions.AddAsync(question, cancellationToken);
 
-        await _db.SaveChangesAsync(cancellationToken);
+        _ = await _db.SaveChangesAsync(cancellationToken);
     }
 }
 

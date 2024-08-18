@@ -1,7 +1,4 @@
-﻿using FSH.WebApi.Domain.Examination;
-using System.Xml.Linq;
-
-namespace FSH.WebApi.Domain.Question;
+﻿namespace FSH.WebApi.Domain.Question;
 public class QuestionLable : AuditableEntity, IAggregateRoot
 {
     public string Name { get; set; } = null!;
@@ -9,7 +6,7 @@ public class QuestionLable : AuditableEntity, IAggregateRoot
 
     public QuestionLable()
     {
-        
+
     }
 
     public QuestionLable(string name, string color)
