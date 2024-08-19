@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Class.UserStudents;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
@@ -19,14 +20,16 @@ public class GetSubmissionAssignmentRequestHandler : IRequestHandler<GetSubmissi
     private readonly IUserService _userService;
     private readonly IRepository<Classes> _classesRepository;
     private readonly ICurrentUser _currentUser;
+    private readonly IReadRepository<Student> _repositoryStudent;
 
-    public GetSubmissionAssignmentRequestHandler(IRepository<Assignment> repositoryAssignment, IStringLocalizer<GetSubmissionAssignmentRequestHandler> t, IUserService userService, IRepository<Classes> classesRepository, ICurrentUser currentUser)
+    public GetSubmissionAssignmentRequestHandler(IRepository<Assignment> repositoryAssignment, IStringLocalizer<GetSubmissionAssignmentRequestHandler> t, IUserService userService, IRepository<Classes> classesRepository, ICurrentUser currentUser, IReadRepository<Student> repositoryStudent)
     {
         _repositoryAssignment = repositoryAssignment;
         _t = t;
         _userService = userService;
         _classesRepository = classesRepository;
         _currentUser = currentUser;
+        _repositoryStudent = repositoryStudent;
     }
 
     public async Task<List<SubmissionAssignmentDto>> Handle(GetSubmissionAssignmentRequest request, CancellationToken cancellationToken)
@@ -36,6 +39,10 @@ public class GetSubmissionAssignmentRequestHandler : IRequestHandler<GetSubmissi
 
         var submissionAssignmentDto = assignment.AssignmentStudents.Adapt<List<SubmissionAssignmentDto>>();
         var currenrUserId = _currentUser.GetUserId();
+
+       
+
+
         if (_currentUser.IsInRole(FSHRoles.Student))
         {
             if (request.ClassId.HasValue)
@@ -43,10 +50,13 @@ public class GetSubmissionAssignmentRequestHandler : IRequestHandler<GetSubmissi
                 var classroom = await _classesRepository.FirstOrDefaultAsync(new ClassesByIdSpec(request.ClassId.Value));
                 _ = classroom ?? throw new NotFoundException(_t["Class {0} Not Found.", request.ClassId]);
 
+                var studentList = classroom.UserClasses?.Select(x => x.Student).ToList();
                 var studentIds = classroom.UserClasses?.Select(x => x.StudentId).ToList();
 
+                var currentStudent = studentList.FirstOrDefault(x => x.StId == currenrUserId);
+
                 submissionAssignmentDto = submissionAssignmentDto
-                .Where(submission => studentIds.Contains(submission.StudentId) && submission.StudentId == currenrUserId)
+                .Where(submission => studentIds.Contains(submission.StudentId) && submission.StudentId == currentStudent.Id)
                 .ToList();
             }
         }
