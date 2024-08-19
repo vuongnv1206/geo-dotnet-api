@@ -10,7 +10,7 @@ public class PaperFolderTreeBySearchSpec : Specification<PaperFolder>
         Query
         .Include(x => x.PaperFolderParent)
         .Include(x => x.PaperFolderChildrens)
-        .Where(x => x.ParentId == request.ParentId)
+        //.Where(x => x.ParentId == request.ParentId)         //Không where vì để included hết ,sẽ query bên ngoài , gọi là spit query       
         .Where(x => (x.CreatedBy == currentUserId))
         .OrderBy(x => x.CreatedOn);
     }

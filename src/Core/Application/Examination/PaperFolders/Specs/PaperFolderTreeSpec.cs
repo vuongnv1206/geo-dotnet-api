@@ -9,7 +9,7 @@ public class PaperFolderTreeSpec : Specification<PaperFolder>
        Query
       .Include(x => x.PaperFolderParent)
       .Include(x => x.PaperFolderChildrens)
-      .Include(x => x.PaperFolderPermissions)
+      .Include(x => x.Papers).ThenInclude(x => x.PaperPermissions)
       .ThenInclude(x => x.GroupTeacher)
       .OrderBy(x => x.CreatedOn);
     }   
