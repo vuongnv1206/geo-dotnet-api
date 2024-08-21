@@ -2,6 +2,7 @@
 using FSH.WebApi.Application.Examination.Monitor.Dtos;
 using FSH.WebApi.Application.Examination.Papers.ByStudents;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
+using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
@@ -88,7 +89,7 @@ public class SubmitPapersController : VersionedApiController
 
     [HttpPost("monitor")]
     [OpenApiOperation("Monitor exam")]
-    public async Task<ActionResult<MonitorExamDto>> MonitorExam(MonitorExamRequest request)
+    public async Task<ActionResult<PaginationResponse<StudentMoni>>> MonitorExam(MonitorExamRequest request)
     {
         return await Mediator.Send(request);
     }

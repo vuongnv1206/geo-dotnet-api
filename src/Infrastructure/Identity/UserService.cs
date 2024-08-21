@@ -154,7 +154,7 @@ internal partial class UserService : IUserService
 
         user.IsActive = request.ActivateUser;
 
-        await _userManager.UpdateAsync(user);
+        _ = await _userManager.UpdateAsync(user);
 
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
     }
@@ -165,12 +165,7 @@ internal partial class UserService : IUserService
            .AsNoTracking()
            .Where(u => u.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && u.IsActive)
            .FirstOrDefaultAsync(cancellationToken);
-        if (user is null)
-        {
-            return new UserDetailsDto();
-        }
-
-        return user.Adapt<UserDetailsDto>();
+        return user is null ? new UserDetailsDto() : user.Adapt<UserDetailsDto>();
     }
 
     public async Task<UserDetailsDto> GetUserDetailByPhoneAsync(string phoneNumber, CancellationToken cancellationToken)
@@ -179,12 +174,7 @@ internal partial class UserService : IUserService
            .AsNoTracking()
            .Where(u => u.PhoneNumber.Trim().ToLower().Equals(phoneNumber.Trim().ToLower()) && u.IsActive)
            .FirstOrDefaultAsync(cancellationToken);
-        if (user is null)
-        {
-            return new UserDetailsDto();
-        }
-
-        return user.Adapt<UserDetailsDto>();
+        return user is null ? new UserDetailsDto() : user.Adapt<UserDetailsDto>();
     }
 
     public async Task GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
@@ -201,5 +191,10 @@ internal partial class UserService : IUserService
     {
         var user = await GetAsync(userId.ToString(), CancellationToken.None);
         return string.Join(" ", user.FirstName, user.LastName);
+    }
+
+    public Task GetUserByIdAsync(DefaultIdType? userId, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }
