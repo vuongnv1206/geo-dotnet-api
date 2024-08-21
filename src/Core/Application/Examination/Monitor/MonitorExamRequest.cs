@@ -86,10 +86,20 @@ public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, Pag
                     {
                         foreach (var studentId in studentIdsInclass)
                         {
+                            UserDetailsDto s = new UserDetailsDto();
+                            try
+                            {
+                                s = await _userService.GetAsync(studentId.ToString(), cancellationToken);
+                            }
+                            catch (Exception)
+                            {
+                                continue;
+                            }
+
                             StudentMoni student = new()
                             {
                                 StudentId = (DefaultIdType)studentId,
-                                Student = await _userService.GetAsync(studentId.ToString(), cancellationToken),
+                                Student = s,
                                 ClassId = classpp.Id.ToString(),
                                 Class = classpp.Adapt<ClassMoniDto>()
                             };
