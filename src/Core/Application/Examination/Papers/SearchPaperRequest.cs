@@ -35,24 +35,29 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Lis
         //If search by name
         if (!string.IsNullOrEmpty(request.Name))
         {
+            var treeFolder = await _paperFolderRepo.ListAsync(new PaperFolderTreeSpec());
+
             //If search by name in folder
             if (request.PaperFolderId.HasValue)
             {
                 parentIds.Add(request.PaperFolderId.Value);
-                var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value));
+                var parentFolder = treeFolder.FirstOrDefault(x => x.Id == request.PaperFolderId.Value);
                 if (parentFolder != null)
                 {
                     parentFolder.ChildPaperFolderIds(null, parentIds);
                 }
                 var spec = new PaperBySearchSpec(parentIds, request);
-                count = await _repository.CountAsync(spec, cancellationToken);
                 data = await _repository.ListAsync(spec, cancellationToken);
             }
             else  //If search by name in root
             {
                 var spec = new PaperBySearchSpec(null, request);
-                count = await _repository.CountAsync(spec, cancellationToken);
                 data = await _repository.ListAsync(spec, cancellationToken);
+                foreach (var paper in data)
+                {
+                    paper.PaperFolder = treeFolder.FirstOrDefault(folder => folder.Id == paper.PaperFolderId);
+                }
+
             }
         }
         else

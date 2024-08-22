@@ -10,6 +10,11 @@ public static class GetResultAnswerExtensions
 {
     public static bool IsAnswerCorrect(this SubmitPaperDetail submitDetail, QuestionClone question, List<AnswerClone> correctAnswers)
     {
+        if (string.IsNullOrEmpty(submitDetail.AnswerRaw))
+        {
+            return false;
+        }
+
         switch (question.QuestionType)
         {
             case QuestionType.SingleChoice:

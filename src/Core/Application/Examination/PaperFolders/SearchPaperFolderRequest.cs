@@ -29,27 +29,39 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
         var currentUserId = _currentUser.GetUserId();
         var data = new List<PaperFolder>();
         var count = 0;
-        if (!string.IsNullOrEmpty(request.Name))
+
+        if (!string.IsNullOrEmpty(request.Name))  // Search by name
         {
             // Find all parent IDs
             var parentIds = new List<Guid>();
-            if (request.ParentId.HasValue)
+            var treeFolder = await _paperFolderRepo.ListAsync(new PaperFolderTreeSpec());
+            if (request.ParentId.HasValue)       //Search in folder
             {
                 parentIds.Add(request.ParentId.Value);
-                var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.ParentId.Value));
-
+               
+                var parentFolder = treeFolder.FirstOrDefault(x => x.Id == request.ParentId.Value);
                 if (parentFolder != null)
                 {
                     parentFolder.ChildPaperFolderIds(null, parentIds);
                 }
+                var spec = new PaperFolderBySearchSpec(request, currentUserId);
+                data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
+                if (parentIds.Any())
+                {
+                    var nullableParentIds = parentIds.Select(id => (Guid?)id).ToList();
+                    data = data.Where(x => nullableParentIds.Contains(x.ParentId) || nullableParentIds.Contains(x.Id)).ToList();
+                }
+            }       
+            else        //Search in root folder
+            {   
+                data = treeFolder.Where(folder => string.IsNullOrEmpty(request.Name) ||folder.Name.Contains(request.Name, StringComparison.OrdinalIgnoreCase)).ToList();
             }
-            var spec = new PaperFolderBySearchSpec(parentIds, request, currentUserId);
-            data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
         }
-        else
+        else    
         {
             var spec = new PaperFolderTreeBySearchSpec(currentUserId,request);
             data = await _paperFolderRepo.ListAsync(spec, cancellationToken);
+            data = data.Where(x => x.ParentId == request.ParentId).ToList();
         }
 
         var dtos = new List<PaperFolderDto>();

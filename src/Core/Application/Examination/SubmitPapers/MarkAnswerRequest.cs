@@ -55,6 +55,10 @@ public class MarkAnswerRequestHandler : IRequestHandler<MarkAnswerRequest, Guid>
         if (submitPaper is null)
             throw new NotFoundException(_t["Submit Paper {0} Not Found.", request.SubmitPaperId]);
 
+        // Kiểm tra trạng thái của SubmitPaper
+        if (submitPaper.Status != SubmitPaperStatus.End)
+            throw new ConflictException(_t["Cannot mark this submit paper. This test is not over yet.", request.SubmitPaperId]);
+
         var question = await _questionCloneRepo.GetByIdAsync(request.QuestionId);
         if (question is null)
             throw new NotFoundException(_t["Question {0} Not Found.", request.QuestionId]);
