@@ -1,8 +1,10 @@
-﻿using FSH.WebApi.Application.Common.Exceptions;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
+using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 using FSH.WebApi.Application.Examination.SubmitPapers.Specs;
@@ -18,6 +20,7 @@ using Mapster;
 using Microsoft.Extensions.Localization;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace FSH.WebApi.Infrastructure.Examination;
 public class SubmmitPaperService : ISubmmitPaperService
@@ -937,5 +940,77 @@ public class SubmmitPaperService : ISubmmitPaperService
         float markFlag = 10f;
         float x = CalculateScore(submitDetail, question, markFlag);
         return x == markFlag;
+    }
+
+    public async Task<LastResultExamDto> GetLastResultExamAsync(Guid paperId, Guid userId, Guid submitPaperId,CancellationToken cancellationToken)
+    {
+        var spec = new ExamResultSpec(submitPaperId, paperId, userId);
+        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(spec,cancellationToken)
+            ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
+
+        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId),cancellationToken);
+
+        var student = await _userService.GetAsync(userId.ToString(), cancellationToken);
+
+
+        float totalMark = 0;
+        var submitPaperDetailsDtos = new List<SubmitPaperDetailDto>();
+        foreach (var submit in submitPaper.SubmitPaperDetails)
+        {
+            float questionMark = paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId)?.Mark ?? 0;
+            // if question is Reading
+            if (submit.Question.QuestionType == QuestionType.Reading)
+            {
+                // list of question passages detail
+                List<SubmitPaperDetail> details = new();
+                foreach (var qp in submit.Question!.QuestionPassages)
+                {
+                    var detail1 = submitPaper.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == qp.Id);
+                    if (detail1 != null)
+                    {
+                        details.Add(detail1);
+                    }
+                }
+
+                totalMark += CalculateScore(submit, submit.Question!, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark, details);
+            }
+            else
+            {
+                totalMark += CalculateScore(submit, submit.Question!, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+            }
+            // Fill SubmitPaperDetailDto
+            var submitPaperDetailDto = new SubmitPaperDetailDto
+            {
+                SubmitPaperId = submit.SubmitPaperId,
+                QuestionId = submit.QuestionId,
+                AnswerRaw = submit.AnswerRaw,
+                Mark = submit.Mark,
+                IsCorrect = IsCorrectAnswer(submit,submit.Question),
+                CreatedBy = submit.CreatedBy,
+                CreatedOn = submit.CreatedOn,
+                LastModifiedBy = submit.LastModifiedBy,
+                LastModifiedOn = submit.LastModifiedOn,
+                Question = submit.Question.Adapt<QuestionDto>() // Assuming you have a mapping for QuestionDto
+            };
+
+            submitPaperDetailsDtos.Add(submitPaperDetailDto);
+        }
+
+        // Fill LastResultExamDto
+        var examResultDto = new LastResultExamDto
+        {
+            Id = submitPaper.Id,
+            PaperId = submitPaper.PaperId,
+            Status = submitPaper.Status,
+            StartTime = submitPaper.StartTime,
+            EndTime = submitPaper.EndTime,
+            TotalMark = totalMark,
+            TotalQuestion = submitPaper.SubmitPaperDetails.Count,
+            Paper = paper.Adapt<PaperDto>(), // Assuming you have a mapping for PaperDto
+            SubmitPaperDetails = submitPaperDetailsDtos,
+            Student = student
+        };
+
+        return examResultDto;
     }
 }

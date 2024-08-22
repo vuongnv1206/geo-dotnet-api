@@ -21,8 +21,9 @@ public class GetSubmissionAssignmentRequestHandler : IRequestHandler<GetSubmissi
     private readonly IRepository<Classes> _classesRepository;
     private readonly ICurrentUser _currentUser;
     private readonly IReadRepository<Student> _repositoryStudent;
+    private readonly IMediator _mediator;
 
-    public GetSubmissionAssignmentRequestHandler(IRepository<Assignment> repositoryAssignment, IStringLocalizer<GetSubmissionAssignmentRequestHandler> t, IUserService userService, IRepository<Classes> classesRepository, ICurrentUser currentUser, IReadRepository<Student> repositoryStudent)
+    public GetSubmissionAssignmentRequestHandler(IRepository<Assignment> repositoryAssignment, IStringLocalizer<GetSubmissionAssignmentRequestHandler> t, IUserService userService, IRepository<Classes> classesRepository, ICurrentUser currentUser, IReadRepository<Student> repositoryStudent, IMediator mediator)
     {
         _repositoryAssignment = repositoryAssignment;
         _t = t;
@@ -30,6 +31,7 @@ public class GetSubmissionAssignmentRequestHandler : IRequestHandler<GetSubmissi
         _classesRepository = classesRepository;
         _currentUser = currentUser;
         _repositoryStudent = repositoryStudent;
+        _mediator = mediator;
     }
 
     public async Task<List<SubmissionAssignmentDto>> Handle(GetSubmissionAssignmentRequest request, CancellationToken cancellationToken)
@@ -75,6 +77,15 @@ public class GetSubmissionAssignmentRequestHandler : IRequestHandler<GetSubmissi
             }
         }
 
+        //check if now > assignment.EndTime ,mediator send to UpdateStatusSubmitAssignmentRequest
+        if (DateTime.UtcNow > assignment.EndTime)
+        {
+            await _mediator.Send(new UpdateStatusSubmitAssignmentRequest
+            {
+                AssignmentId = request.AssignmentId,
+                Status = SubmitAssignmentStatus.NotSubmitted,
+            });
+        }
        
 
         return submissionAssignmentDto;
