@@ -22,6 +22,14 @@ public class GroupTeachersController : VersionedApiController
         return Mediator.Send(new GetGroupTeacherRequest(id));
     }
 
+    [HttpGet("guest/{id:guid}")]
+    [MustHavePermission(FSHAction.View, FSHResource.GroupTeachers)]
+    [OpenApiOperation("Get groupTeacher details.", "")]
+    public Task<GroupTeacherGuestDto> GetGroupAsync(Guid id)
+    {
+        return Mediator.Send(new GetGroupTeacherGuestRequest(id));
+    }
+
     [HttpPost]
     [MustHavePermission(FSHAction.Create, FSHResource.GroupTeachers)]
     [OpenApiOperation("Create a new groupTeacher.", "")]
