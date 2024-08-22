@@ -40,7 +40,7 @@ public class SubmitPapersController : VersionedApiController
     }
 
     [HttpPost("paper/{paperId:guid}/students-submitted")]
-    [OpenApiOperation("get student have submitted a paper yet")]
+    [OpenApiOperation("get student have submitted a paper")]
     public async Task<ActionResult<List<SubmitPaperDto>>> GetSubmittedPaper(Guid paperId, GetSubmittedPaperRequest request)
     {
         return paperId == request.PaperId

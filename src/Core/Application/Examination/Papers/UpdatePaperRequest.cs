@@ -1,6 +1,9 @@
-﻿using FSH.WebApi.Application.Examination.PaperFolders;
+﻿using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.PaperLabels;
+using FSH.WebApi.Application.Notifications;
 using FSH.WebApi.Application.Subjects;
+using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Subjects;
@@ -55,6 +58,8 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
     private readonly IReadRepository<PaperLabel> _labelRepo;
     private readonly IReadRepository<Subject> _subjectRepo;
     private readonly ICurrentUser _currentUser;
+    private readonly INotificationService _notificationService;
+    private readonly IRepository<Classes> _repoClass;
 
     public UpdatePaperRequestHandler(
         IRepositoryWithEvents<Paper> paperRepo,
@@ -62,7 +67,9 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         IReadRepository<PaperFolder> folderRepo,
         IReadRepository<PaperLabel> labelRepo,
         IReadRepository<Subject> subjectRepo,
-        ICurrentUser currentUser)
+        ICurrentUser currentUser,
+        INotificationService notificationService,
+        IRepository<Classes> repositoryClass)
     {
         _paperRepo = paperRepo;
         _t = t;
@@ -70,6 +77,8 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         _labelRepo = labelRepo;
         _subjectRepo = subjectRepo;
         _currentUser = currentUser;
+        _notificationService = notificationService;
+        _repoClass = repositoryClass;
     }
 
     public async Task<DefaultIdType> Handle(UpdatePaperRequest request, CancellationToken cancellationToken)
@@ -78,7 +87,32 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         _ = paper
             ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.Id]);
 
+        // Kiểm tra nếu Paper đã được Publish
+        if (paper.IsPublish)
+        {
+            throw new ConflictException(_t["Cannot update setting of exam as it has already been published."]);
+        }
 
+        // Kiểm tra nếu đang trong giai đoạn 30 phút trước khi thi, đang thi hoặc đã thi xong
+        var timeNow = DateTime.UtcNow;
+
+        // Kiểm tra nếu đang trong giai đoạn 30 phút trước khi thi, đang thi hoặc đã thi xong
+        if (paper.StartTime.HasValue)
+        {
+            var startTime = paper.StartTime.Value;
+
+            // Nếu đã vượt quá EndTime, không cho phép cập nhật
+            if (paper.EndTime.HasValue && timeNow > paper.EndTime.Value)
+            {
+                throw new ConflictException(_t["Cannot update setting after the exam has ended."]);
+            }
+
+            // Nếu đang trong khoảng 30 phút trước StartTime hoặc trong thời gian thi, không cho phép cập nhật
+            if (timeNow > startTime.AddMinutes(-30) && timeNow < paper.EndTime)
+            {
+                throw new ConflictException(_t["Cannot update the paper within 30 minutes before the start time or during the exam."]);
+            }
+        }
 
         var userId = _currentUser.GetUserId();
         if (!paper.CanUpdate(userId))
@@ -119,7 +153,45 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             );
         if (request.PaperAccesses is not null)
         {
-            paper.UpdatePaperAccesses(request.ShareType,request.PaperAccesses.Adapt<List<PaperAccess>>());
+            paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
+        }
+
+        // Kiểm tra nếu đã Publish và gửi thông báo đến các học sinh
+        if (request.IsPublish)
+        {
+            var studentIds = new List<Guid>();
+            var notification = new BasicNotification
+            {
+                Title = "Exam Published",
+                Message = $"The exam '{paper.ExamName}' has been published. Please prepare yourself.",
+                Label = BasicNotification.LabelType.Information,
+            };
+
+            // Lặp qua tất cả các PaperAccessDto để lấy học sinh từ ClassId và UserId
+            foreach (var access in paper.PaperAccesses)
+            {
+                if (access.ClassId.HasValue)
+                {
+                    var classroom = await _repoClass.FirstOrDefaultAsync(new ClassesByIdSpec(access.ClassId.Value), cancellationToken);
+                    if (classroom != null)
+                    {
+                        var studentIdsInClass = classroom.GetStudentIds();
+                        studentIds.AddRange(studentIdsInClass.Select(x => x.Value));
+                    }
+
+
+                }
+                if (access.UserId.HasValue)
+                {
+
+                    studentIds.Add(access.UserId.Value);
+                }
+
+                await _notificationService.SendNotificationToUsers(studentIds.Adapt<List<string>>(), notification, null, cancellationToken);
+            }
+
+
+          
         }
 
         await _paperRepo.UpdateAsync(paper, cancellationToken);
