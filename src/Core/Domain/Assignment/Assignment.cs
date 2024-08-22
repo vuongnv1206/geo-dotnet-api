@@ -75,6 +75,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
         {
             submission.Score = score;
             submission.Comment = comment;
+            submission.Status = SubmitAssignmentStatus.Marked;
         }
     }
 
@@ -85,7 +86,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
         {
             assignmentStudent.AnswerRaw = answerRaw;
             assignmentStudent.AttachmentPath = attachmentPath;
-            assignmentStudent.Status = SubmitAssignmentStatus.Submmitted;
+            assignmentStudent.Status = SubmitAssignmentStatus.Submitted;
         }
     }
 
@@ -118,8 +119,7 @@ public class Assignment : AuditableEntity, IAggregateRoot
 
     public void RemoveSubmissionFromClass(List<Guid> studentIds)
     {
-      //
-      AssignmentStudents.RemoveAll(x => studentIds.Contains(x.StudentId));
+        AssignmentStudents.RemoveAll(x => studentIds.Contains(x.StudentId));
     }
 
     public void RemoveAssignmentOfStudent(Guid studentId)
