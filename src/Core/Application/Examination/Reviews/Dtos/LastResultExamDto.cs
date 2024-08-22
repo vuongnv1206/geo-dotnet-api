@@ -3,7 +3,7 @@ using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Questions.Dtos;
-using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 
 namespace FSH.WebApi.Application.Examination.Reviews;
 public class LastResultExamDto

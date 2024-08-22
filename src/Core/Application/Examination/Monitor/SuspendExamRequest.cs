@@ -1,11 +1,10 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
-using FSH.WebApi.Domain.Examination.Enums;
 
 namespace FSH.WebApi.Application.Examination.Monitor;
 
-public class ReassignExamRequest : IRequest<DefaultIdType>
+public class SuspendExamRequest : IRequest<DefaultIdType>
 {
     public DefaultIdType PaperId { get; set; }
     public DefaultIdType? UserId { get; set; }
@@ -13,27 +12,14 @@ public class ReassignExamRequest : IRequest<DefaultIdType>
     public string? Reason { get; set; }
 }
 
-public class SubmitPaperByStudentIdSpec : Specification<SubmitPaper>, ISingleResultSpecification
-{
-    public SubmitPaperByStudentIdSpec(DefaultIdType paperId, DefaultIdType studentId)
-    {
-        _ = Query.Where(p => p.PaperId == paperId && p.CreatedBy == studentId);
-    }
-
-    public SubmitPaperByStudentIdSpec(DefaultIdType paperId, DefaultIdType? userId)
-    {
-        _ = Query.Where(p => p.PaperId == paperId && p.CreatedBy == userId);
-    }
-}
-
-public class ReassignExamRequestHandler : IRequestHandler<ReassignExamRequest, DefaultIdType>
+public class SuspendExamRequestHandler : IRequestHandler<SuspendExamRequest, DefaultIdType>
 {
     private readonly IRepository<Paper> _paperRepository;
     private readonly IRepository<SubmitPaper> _submitPaperRepository;
     private readonly IRepository<SubmitPaperLog> _submitPaperLogRepository;
     private readonly IUserService _userService;
 
-    public ReassignExamRequestHandler(IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, IRepository<SubmitPaperLog> submitPaperLogRepository, IUserService userService)
+    public SuspendExamRequestHandler(IRepository<Paper> paperRepository, IRepository<SubmitPaper> submitPaperRepository, IRepository<SubmitPaperLog> submitPaperLogRepository, IUserService userService)
     {
         _paperRepository = paperRepository;
         _submitPaperRepository = submitPaperRepository;
@@ -41,7 +27,7 @@ public class ReassignExamRequestHandler : IRequestHandler<ReassignExamRequest, D
         _userService = userService;
     }
 
-    public async Task<DefaultIdType> Handle(ReassignExamRequest request, CancellationToken cancellationToken)
+    public async Task<DefaultIdType> Handle(SuspendExamRequest request, CancellationToken cancellationToken)
     {
         var spec = new PaperByIdSpec(request.PaperId);
         var paper = await _paperRepository.FirstOrDefaultAsync(spec, cancellationToken);
@@ -63,33 +49,29 @@ public class ReassignExamRequestHandler : IRequestHandler<ReassignExamRequest, D
 
         if (sb == null)
         {
-            throw new NotFoundException($"Submit Paper {request.PaperId} Not Found.");
+            throw new NotFoundException($"Submit Paper Not Found.");
         }
-
-        if (sb.Status != SubmitPaperStatus.Doing)
-        {
-            throw new BadRequestException($"Cannot reassign exam. The exam is not in progress.");
-        }
-
-        // reassign exam
-        sb.canResume = true;
 
         try
         {
-            await _submitPaperRepository.UpdateAsync(sb, cancellationToken);
-
             var log = new SubmitPaperLog
             {
                 SubmitPaperId = sb.Id,
-                ReassignLog = request.Reason,
+                IsSuspicious = true,
+                SuspiciousReason = request.Reason,
             };
 
             _ = await _submitPaperLogRepository.AddAsync(log, cancellationToken);
 
-            return sb.Id;
+            sb.Status = Domain.Examination.Enums.SubmitPaperStatus.Suspended;
+
+            await _submitPaperRepository.UpdateAsync(sb, cancellationToken);
         }
-        catch (Exception ex) { throw new BadRequestException($"Failed to reassign exam. {ex.Message}"); }
+        catch (Exception ex)
+        {
+            throw new BadRequestException(ex.Message);
+        }
 
+        return sb.Id;
     }
-
 }

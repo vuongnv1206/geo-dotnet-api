@@ -12,6 +12,7 @@ using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
 using FSH.WebApi.Infrastructure.Common.Utils;

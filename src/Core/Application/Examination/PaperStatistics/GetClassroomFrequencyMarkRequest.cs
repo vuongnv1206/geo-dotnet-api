@@ -4,6 +4,7 @@ using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 using System.Reflection.Metadata;
 
 namespace FSH.WebApi.Application.Examination.PaperStatistics;
