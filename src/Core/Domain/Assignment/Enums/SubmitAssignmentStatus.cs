@@ -2,6 +2,7 @@
 public enum SubmitAssignmentStatus
 {
     Doing = 0,
-    Submmitted = 1,
-    NotSubmitted = 2
+    Submitted = 1,
+    NotSubmitted = 2,
+    Marked = 3
 }
