@@ -20,3 +20,9 @@ public class ClassDto : IDto
     public List<PermissionInClassDto>? Permissions { get; set; }
     public UserDetailsDto? Owner { get; set; }
 }
+
+public class ClassMoniDto : IDto
+{
+    public DefaultIdType Id { get; set; }
+    public required string Name { get; set; }
+}
