@@ -166,6 +166,9 @@ public class MapsterSettings
           .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
           .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
 
+        _ = TypeAdapterConfig<Paper, PaperMoniDto>.NewConfig()
+            .Map(dest => dest.MaxPoint, src => src.PaperQuestions.Sum(x => x.Mark));
+
         _ = TypeAdapterConfig<Paper, PaperStudentDto>.NewConfig()
           .Map(dest => dest.TotalAttended, src => src.SubmitPapers.Count())
           .Map(dest => dest.NumberOfQuestion, src => src.PaperQuestions.Count());
@@ -279,12 +282,10 @@ public class MapsterSettings
                 ? src.SubmitPapers.Sum(x => x.TotalMark) / src.SubmitPapers.Where(sb => sb.Status == SubmitPaperStatus.End).Count()
                 : 0);
 
-
         _ = TypeAdapterConfig<QuestionClone, QuestionStatisticDto>.NewConfig()
             .Map(dest => dest.Answers, src => src.AnswerClones);
 
-
-        //Question Label
+        // Question Label
         _ = TypeAdapterConfig<QuestionLable, QuestionLabelDto>.NewConfig();
 
         _ = TypeAdapterConfig<Paper, PaperInListDto>.NewConfig();

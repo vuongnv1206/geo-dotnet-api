@@ -1,5 +1,5 @@
 ﻿using FSH.WebApi.Application.Class.Dto;
-using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
@@ -10,7 +10,7 @@ public class StudentMoni : IDto
     public DefaultIdType StudentId { get; set; }
     public UserDetailsDto? Student { get; set; }
     public DefaultIdType PaperId { get; set; }
-    public PaperDto? Paper { get; set; }
+    public PaperMoniDto? Paper { get; set; }
     public DefaultIdType? SubmitPaperId { get; set; }
     public SubmitPaperDto? SubmitPaper { get; set; }
     public CompletionStatusEnum CompletionStatus { get; set; }

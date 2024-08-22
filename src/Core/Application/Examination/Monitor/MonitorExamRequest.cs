@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 using FSH.WebApi.Application.Identity.Users;
@@ -86,7 +87,8 @@ public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, Pag
                 StudentMoni student = new()
                 {
                     StudentId = (DefaultIdType)item.UserId,
-                    Student = await _userService.GetAsync(item.UserId.ToString(), cancellationToken)
+                    Student = await _userService.GetAsync(item.UserId.ToString(), cancellationToken),
+                    Paper = paper.Adapt<PaperMoniDto>()
                 };
 
                 // Get submit paper by student id
@@ -136,7 +138,8 @@ public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, Pag
                                 StudentId = (DefaultIdType)studentId,
                                 Student = s,
                                 ClassId = classpp.Id.ToString(),
-                                Class = classpp.Adapt<ClassMoniDto>()
+                                Class = classpp.Adapt<ClassMoniDto>(),
+                                Paper = paper.Adapt<PaperMoniDto>()
                             };
 
                             // Get submit paper by student id

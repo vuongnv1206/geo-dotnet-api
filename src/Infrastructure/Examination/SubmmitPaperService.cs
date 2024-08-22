@@ -533,14 +533,6 @@ public class SubmmitPaperService : ISubmmitPaperService
         var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
         var timeNow = DateTime.Now;
         int duration = (int)(timeNow - submitPaper.StartTime).TotalMinutes;
-        if (paper.Duration.HasValue && duration > paper.Duration)
-        {
-            // Update submit paper status
-            submitPaper.Status = SubmitPaperStatus.End;
-            submitPaper.EndTime = timeNow;
-            await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
-            throw new ConflictException(_t["Over time to do this exam."]);
-        }
 
         // Update or Add submit paper details
         foreach (var q in sbp.Questions)
