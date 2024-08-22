@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.Matrices;
+using FSH.WebApi.Application.Examination.PaperAccesses;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 
@@ -156,4 +157,11 @@ public class PapersController : VersionedApiController
         return Ok(await Mediator.Send(request));
     }
 
+    [HttpPost("get-access-paper")]
+    [OpenApiOperation("get group class and student who assigned to paper")]
+    [MustHavePermission(FSHAction.View, FSHResource.Papers)]
+    public async Task<PaginationResponse<GroupClassAccessPaper>> GetGroupClassesAccessPaper(GetGroupClassesAccessPaperRequest request)
+    {
+        return await Mediator.Send(request);
+    }
 }
