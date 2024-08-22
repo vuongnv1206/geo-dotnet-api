@@ -8,6 +8,7 @@ using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Subjects;
 using Mapster;
+using MediatR;
 
 namespace FSH.WebApi.Application.Examination.Papers;
 public class UpdatePaperRequest : IRequest<Guid>
@@ -92,63 +93,6 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         if (!paper.CanUpdate(userId))
             throw new ForbiddenException(_t["You do not have permission to edit this paper."]);
 
-        var timeNow = DateTime.UtcNow;
-
-        // Kiểm tra nếu đang trong giai đoạn 30 phút trước khi thi, đang thi hoặc đã thi xong
-        if (paper.StartTime.HasValue)
-        {
-            var startTime = paper.StartTime.Value;
-
-            // Nếu đã vượt quá EndTime, không cho phép cập nhật
-            if (paper.EndTime.HasValue && timeNow > paper.EndTime.Value)
-            {
-                throw new ConflictException(_t["Cannot update setting after the exam has ended."]);
-            }
-
-            // Nếu đang trong khoảng 30 phút trước StartTime hoặc trong thời gian thi, không cho phép cập nhật
-            if (timeNow > startTime.AddMinutes(-30) && timeNow < paper.EndTime)
-            {
-                throw new ConflictException(_t["Cannot update the paper within 30 minutes before the start time or during the exam."]);
-            }
-        }
-
-        // Kiểm tra nếu Paper đã được Publish
-        if (paper.IsPublish)
-        {
-
-            if (request.StartTime.HasValue && request.EndTime.HasValue)
-            {
-                bool isStartTimeChanged = paper.StartTime != request.StartTime.Value;
-                bool isEndTimeChanged = paper.EndTime != request.EndTime.Value;
-
-                // Gửi thông báo khi thời gian thi được cập nhật
-                if (isStartTimeChanged || isEndTimeChanged) //nếu changes
-                {
-
-                    // Cập nhật StartTime và EndTime
-                    paper.UpdateTime(request.StartTime, request.EndTime, request.Duration);
-                    await _paperRepo.UpdateAsync(paper, cancellationToken);
-                    var studentIds = await GetStudentIdsAsync(request.PaperAccesses, cancellationToken);
-                    if (studentIds.Count > 0)
-                    {
-                        var notification = new BasicNotification
-                        {
-                            Title = "Exam Schedule Updated",
-                            Message = $"The exam '{paper.ExamName}' has had its schedule updated. Please check the new start and end times.",
-                            Label = BasicNotification.LabelType.Information,
-                        };
-
-                        await _notificationService.SendNotificationToUsers(studentIds, notification, null, cancellationToken);
-                    }
-                }
-            }
-        }
-        else
-        {
-            throw new ConflictException(_t["Cannot update setting of exam as it has already been published."]);
-
-        }
-
 
         if (request.PaperFolderId.HasValue
             && !await _folderRepo.AnyAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value), cancellationToken))
@@ -161,63 +105,163 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         if (request.SubjectId.HasValue && !await _subjectRepo.AnyAsync(new SubjectByIdSpec(request.SubjectId.Value), cancellationToken))
             throw new NotFoundException(_t["Subject {0} Not Found.", request.SubjectId]);
 
-      
-
-        if (request.IsPublish) //Publish Exam
+        //Nếu muốn publish
+        if (request.Status == PaperStatus.Publish)
         {
-            if (request.PaperAccesses is not null)
+            // Kiểm tra nếu Paper đã được Publish
+            if (paper.Status == PaperStatus.Publish)
             {
-                paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
-                // Kiểm tra nếu đã Publish và gửi thông báo đến các học sinh
-                var studentIds = await GetStudentIdsAsync(request.PaperAccesses, cancellationToken);
-                var notification = new BasicNotification
+                var timeNow = DateTime.UtcNow;
+                // Kiểm tra nếu đang trong giai đoạn 30 phút trước khi thi, đang thi hoặc đã thi xong
+                if (paper.StartTime.HasValue)
                 {
-                    Title = "Exam Published",
-                    Message = $"The exam '{paper.ExamName}' has been published. Please prepare yourself.",
-                    Label = BasicNotification.LabelType.Information,
-                };
+                    var startTime = paper.StartTime.Value;
 
-                await _notificationService.SendNotificationToUsers(studentIds, notification, null, cancellationToken);
+                    // Nếu đã vượt quá EndTime, không cho phép cập nhật
+                    if (paper.EndTime.HasValue && timeNow > paper.EndTime.Value)
+                    {
+                        throw new ConflictException(_t["Cannot update setting after the exam has ended."]);
+                    }
+
+                    // Nếu đang trong khoảng 30 phút trước StartTime hoặc trong thời gian thi, không cho phép cập nhật
+                    if (timeNow > startTime.AddMinutes(-30) && timeNow < paper.EndTime)
+                    {
+                        throw new ConflictException(_t["Cannot update the paper within 30 minutes before the start time or during the exam."]);
+                    }
+                }
+
+
+                //Chỉ cho phép sửa Time và send notification
+                if (request.StartTime.HasValue && request.EndTime.HasValue)
+                {
+                    bool isStartTimeChanged = paper.StartTime != request.StartTime.Value;
+                    bool isEndTimeChanged = paper.EndTime != request.EndTime.Value;
+
+                    // Gửi thông báo khi thời gian thi được cập nhật
+                    if (isStartTimeChanged || isEndTimeChanged) //nếu changes
+                    {
+
+                        // Cập nhật StartTime và EndTime
+                        paper.UpdateTime(request.StartTime, request.EndTime, request.Duration);
+                        await _paperRepo.UpdateAsync(paper, cancellationToken);
+                        if (request.PaperAccesses is not null && request.PaperAccesses.Any())
+                        {
+                            var studentIds = await GetStudentIdsAsync(request.PaperAccesses, cancellationToken);
+                            if (studentIds.Count > 0)
+                            {
+                                var notification = new BasicNotification
+                                {
+                                    Title = "Exam Schedule Updated",
+                                    Message = $"The exam '{paper.ExamName}' has had its schedule updated. Please check the new schedule",
+                                    Label = BasicNotification.LabelType.Information,
+                                };
+
+                                await _notificationService.SendNotificationToUsers(studentIds, notification, null, cancellationToken);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new ConflictException(_t["When publishing, StartTime and EndTime are required."]);
+                }
+            }
+            else  //  Paper đã đc Save as draft
+            {
+                if (request.StartTime.HasValue && request.EndTime.HasValue)
+                {
+                    throw new ConflictException(_t["When publishing, StartTime and EndTime are required."]);
+                }
+                //Gửi noti đến những ai thi
+                if (request.PaperAccesses is not null && request.PaperAccesses.Any())
+                {
+
+                    paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
+                    paper.Update(
+                   request.ExamName,
+                   request.Status,
+                   request.StartTime,
+                   request.EndTime,
+                   request.Duration,
+                   request.Shuffle,
+                   request.ShowMarkResult,
+                   request.ShowQuestionAnswer,
+                   request.Type,
+                   request.IsPublish,
+                   request.Content,
+                   request.Description,
+                   request.Password,
+                   request.NumberAttempt,
+                   request.ShareType,
+                   request.PaperFolderId,
+                   request.PaperLabelId,
+                   request.SubjectId,
+                   request.PublicIpAllowed,
+                   request.LocalIpAllowed
+                   );
+                    await _paperRepo.UpdateAsync(paper, cancellationToken);
+                    var studentIds = await GetStudentIdsAsync(request.PaperAccesses, cancellationToken);
+                    if (studentIds.Count > 0)
+                    {
+                        var notification = new BasicNotification
+                        {
+                            Title = "Exam Schedule Updated",
+                            Message = $"The exam '{paper.ExamName}'  has been published. Please check the schedule and prepare yourself",
+                            Label = BasicNotification.LabelType.Information,
+                        };
+
+                        await _notificationService.SendNotificationToUsers(studentIds, notification, null, cancellationToken);
+                    }
+                }
+                else
+                {
+                    throw new ConflictException(_t["Cannot publish the exam because there are no students or classes assigned to it. Please assign at least one student or class before publishing."]);
+                }
+            }
+        }
+        else  //Save as draft
+        {
+            // Kiểm tra nếu Paper đã được Publish
+            if (paper.Status == PaperStatus.Publish)
+            {
+                throw new ConflictException(_t["Cannot update setting of exam as it has already been published."]);
             }
             else
             {
-                throw new ConflictException(_t["Cannot publish the exam because there are no students or classes assigned to it. Please assign at least one student or class before publishing."]);
+                paper.Update(
+              request.ExamName,
+              request.Status,
+              request.StartTime,
+              request.EndTime,
+              request.Duration,
+              request.Shuffle,
+              request.ShowMarkResult,
+              request.ShowQuestionAnswer,
+              request.Type,
+              request.IsPublish,
+              request.Content,
+              request.Description,
+              request.Password,
+              request.NumberAttempt,
+              request.ShareType,
+              request.PaperFolderId,
+              request.PaperLabelId,
+              request.SubjectId,
+              request.PublicIpAllowed,
+              request.LocalIpAllowed
+              );
+
+                if (request.PaperAccesses is not null)
+                {
+                    paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
+                }
+
+                await _paperRepo.UpdateAsync(paper, cancellationToken);
             }
 
         }
-        else  //Save as Draft
-        {
-            if (request.PaperAccesses is not null)
-            {
-                paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
-            }
-        }
-
-        paper.Update(
-          request.ExamName,
-          request.Status,
-          request.StartTime,
-          request.EndTime,
-          request.Duration,
-          request.Shuffle,
-          request.ShowMarkResult,
-          request.ShowQuestionAnswer,
-          request.Type,
-          request.IsPublish,
-          request.Content,
-          request.Description,
-          request.Password,
-          request.NumberAttempt,
-          request.ShareType,
-          request.PaperFolderId,
-          request.PaperLabelId,
-          request.SubjectId,
-          request.PublicIpAllowed,
-          request.LocalIpAllowed
-          );
 
 
-        await _paperRepo.UpdateAsync(paper, cancellationToken);
 
         return paper.Id;
     }
