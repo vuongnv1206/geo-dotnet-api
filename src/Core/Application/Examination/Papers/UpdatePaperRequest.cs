@@ -168,7 +168,7 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             }
             else  //  Paper đã đc Save as draft
             {
-                if (request.StartTime.HasValue && request.EndTime.HasValue)
+                if (!request.StartTime.HasValue && !request.EndTime.HasValue)
                 {
                     throw new ConflictException(_t["When publishing, StartTime and EndTime are required."]);
                 }
