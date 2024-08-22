@@ -87,13 +87,11 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         _ = paper
             ?? throw new NotFoundException(_t["Paper {0} Not Found.", request.Id]);
 
-        // Kiểm tra nếu Paper đã được Publish
-        if (paper.IsPublish)
-        {
-            throw new ConflictException(_t["Cannot update setting of exam as it has already been published."]);
-        }
 
-        // Kiểm tra nếu đang trong giai đoạn 30 phút trước khi thi, đang thi hoặc đã thi xong
+        var userId = _currentUser.GetUserId();
+        if (!paper.CanUpdate(userId))
+            throw new ForbiddenException(_t["You do not have permission to edit this paper."]);
+
         var timeNow = DateTime.UtcNow;
 
         // Kiểm tra nếu đang trong giai đoạn 30 phút trước khi thi, đang thi hoặc đã thi xong
@@ -114,9 +112,43 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             }
         }
 
-        var userId = _currentUser.GetUserId();
-        if (!paper.CanUpdate(userId))
-            throw new ForbiddenException(_t["You do not have permission to edit this paper."]);
+        // Kiểm tra nếu Paper đã được Publish
+        if (paper.IsPublish)
+        {
+
+            if (request.StartTime.HasValue && request.EndTime.HasValue)
+            {
+                bool isStartTimeChanged = paper.StartTime != request.StartTime.Value;
+                bool isEndTimeChanged = paper.EndTime != request.EndTime.Value;
+
+                // Gửi thông báo khi thời gian thi được cập nhật
+                if (isStartTimeChanged || isEndTimeChanged) //nếu changes
+                {
+
+                    // Cập nhật StartTime và EndTime
+                    paper.UpdateTime(request.StartTime, request.EndTime, request.Duration);
+                    await _paperRepo.UpdateAsync(paper, cancellationToken);
+                    var studentIds = await GetStudentIdsAsync(request.PaperAccesses, cancellationToken);
+                    if (studentIds.Count > 0)
+                    {
+                        var notification = new BasicNotification
+                        {
+                            Title = "Exam Schedule Updated",
+                            Message = $"The exam '{paper.ExamName}' has had its schedule updated. Please check the new start and end times.",
+                            Label = BasicNotification.LabelType.Information,
+                        };
+
+                        await _notificationService.SendNotificationToUsers(studentIds, notification, null, cancellationToken);
+                    }
+                }
+            }
+        }
+        else
+        {
+            throw new ConflictException(_t["Cannot update setting of exam as it has already been published."]);
+
+        }
+
 
         if (request.PaperFolderId.HasValue
             && !await _folderRepo.AnyAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value), cancellationToken))
@@ -129,73 +161,87 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         if (request.SubjectId.HasValue && !await _subjectRepo.AnyAsync(new SubjectByIdSpec(request.SubjectId.Value), cancellationToken))
             throw new NotFoundException(_t["Subject {0} Not Found.", request.SubjectId]);
 
-        paper.Update(
-            request.ExamName,
-            request.Status,
-            request.StartTime,
-            request.EndTime,
-            request.Duration,
-            request.Shuffle,
-            request.ShowMarkResult,
-            request.ShowQuestionAnswer,
-            request.Type,
-            request.IsPublish,
-            request.Content,
-            request.Description,
-            request.Password,
-            request.NumberAttempt,
-            request.ShareType,
-            request.PaperFolderId,
-            request.PaperLabelId,
-            request.SubjectId,
-            request.PublicIpAllowed,
-            request.LocalIpAllowed
-            );
-        if (request.PaperAccesses is not null)
+      
+
+        if (request.IsPublish) //Publish Exam
         {
-            paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
-        }
-
-        // Kiểm tra nếu đã Publish và gửi thông báo đến các học sinh
-        if (request.IsPublish)
-        {
-            var studentIds = new List<Guid>();
-            var notification = new BasicNotification
+            if (request.PaperAccesses is not null)
             {
-                Title = "Exam Published",
-                Message = $"The exam '{paper.ExamName}' has been published. Please prepare yourself.",
-                Label = BasicNotification.LabelType.Information,
-            };
+                paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
+                // Kiểm tra nếu đã Publish và gửi thông báo đến các học sinh
+                var studentIds = await GetStudentIdsAsync(request.PaperAccesses, cancellationToken);
+                var notification = new BasicNotification
+                {
+                    Title = "Exam Published",
+                    Message = $"The exam '{paper.ExamName}' has been published. Please prepare yourself.",
+                    Label = BasicNotification.LabelType.Information,
+                };
 
-            // Lặp qua tất cả các PaperAccessDto để lấy học sinh từ ClassId và UserId
-            foreach (var access in paper.PaperAccesses)
+                await _notificationService.SendNotificationToUsers(studentIds, notification, null, cancellationToken);
+            }
+            else
             {
-                if (access.ClassId.HasValue)
-                {
-                    var classroom = await _repoClass.FirstOrDefaultAsync(new ClassesByIdSpec(access.ClassId.Value), cancellationToken);
-                    if (classroom != null)
-                    {
-                        var studentIdsInClass = classroom.GetStudentIds();
-                        studentIds.AddRange(studentIdsInClass.Select(x => x.Value));
-                    }
-
-
-                }
-                if (access.UserId.HasValue)
-                {
-
-                    studentIds.Add(access.UserId.Value);
-                }
-
-                await _notificationService.SendNotificationToUsers(studentIds.Adapt<List<string>>(), notification, null, cancellationToken);
+                throw new ConflictException(_t["Cannot publish the exam because there are no students or classes assigned to it. Please assign at least one student or class before publishing."]);
             }
 
-
-          
         }
+        else  //Save as Draft
+        {
+            if (request.PaperAccesses is not null)
+            {
+                paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
+            }
+        }
+
+        paper.Update(
+          request.ExamName,
+          request.Status,
+          request.StartTime,
+          request.EndTime,
+          request.Duration,
+          request.Shuffle,
+          request.ShowMarkResult,
+          request.ShowQuestionAnswer,
+          request.Type,
+          request.IsPublish,
+          request.Content,
+          request.Description,
+          request.Password,
+          request.NumberAttempt,
+          request.ShareType,
+          request.PaperFolderId,
+          request.PaperLabelId,
+          request.SubjectId,
+          request.PublicIpAllowed,
+          request.LocalIpAllowed
+          );
+
 
         await _paperRepo.UpdateAsync(paper, cancellationToken);
 
         return paper.Id;
+    }
+    private async Task<List<string>> GetStudentIdsAsync(List<PaperAccessDto> paperAccess, CancellationToken cancellationToken)
+    {
+        var studentIds = new List<string>();
+
+        foreach (var access in paperAccess)
+        {
+            if (access.ClassId.HasValue)
+            {
+                var classroom = await _repoClass.FirstOrDefaultAsync(new ClassesByIdSpec(access.ClassId.Value), cancellationToken);
+                if (classroom != null)
+                {
+                    studentIds.AddRange(classroom.GetStudentIds().Where(id => id.HasValue).Select(id => id.Value.ToString()));
+                }
+            }
+
+            if (access.UserId.HasValue)
+            {
+                studentIds.Add(access.UserId.Value.ToString());
+            }
+        }
+
+        return studentIds.Distinct().ToList();
     }
 }

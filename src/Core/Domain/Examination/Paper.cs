@@ -60,6 +60,12 @@ public class Paper : AuditableEntity, IAggregateRoot
         Password = password;
         ExamCode = examName;
     }
+    public void UpdateTime(DateTime? startTime, DateTime? endTime, float? duration)
+    {
+        StartTime = startTime;
+        EndTime = endTime;
+        Duration = duration;
+    }
 
     public void AddQuestions(List<PaperQuestion> questions)
     {
