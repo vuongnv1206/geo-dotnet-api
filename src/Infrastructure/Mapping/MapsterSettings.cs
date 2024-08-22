@@ -6,6 +6,7 @@ using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class.New.Dto;
 using FSH.WebApi.Application.Class.UserClasses.Dto;
 using FSH.WebApi.Application.Class.UserStudents;
+using FSH.WebApi.Application.Examination.PaperAccesses;
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
@@ -303,6 +304,9 @@ public class MapsterSettings
             .Map(dest => dest.CreateOn, src => src.CreatedOn);
 
         _ = TypeAdapterConfig<CreateStudentRequest, CreateStudentDto>.NewConfig();
+
+        _ = TypeAdapterConfig<Classes, ClassAccessPaper>.NewConfig();
+        _ = TypeAdapterConfig<Student, StudentAccessPaper>.NewConfig();
 
     }
 }
