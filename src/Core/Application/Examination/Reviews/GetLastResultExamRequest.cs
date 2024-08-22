@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
@@ -68,6 +69,8 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
         }
 
         var examResultDto = submitPaper.Adapt<LastResultExamDto>();
+
+
         examResultDto.TotalMark = totalMark;
         examResultDto.Student = student;
 
