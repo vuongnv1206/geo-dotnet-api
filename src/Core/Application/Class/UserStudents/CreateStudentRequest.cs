@@ -78,6 +78,8 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
                 throw new BadRequestException(_t["Email is existed in class"]);
             else if (classroom.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim()))
                 throw new BadRequestException(_t["Phone number is existed in class"]);
+            else if (classroom.UserClasses.Any(x => x.Student.StudentCode.Trim() == request.StudentCode.Trim()))
+                throw new BadRequestException(_t["Code student is existed in class"]);
         }
 
         var userStudent = new Student
@@ -87,12 +89,8 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
             AvatarUrl = request.AvatarUrl,
             DateOfBirth = request.DateOfBirth,
             Gender = request.Gender,
+            StudentCode = request.StudentCode,
         };
-
-        string existDuplicate = await _userStudentRepository
-            .AnyAsync(new StudentByStudentCodeSpec(request.StudentCode))
-            ? throw new ConflictException(_t["The student code '{0}' is already in use.", request.StudentCode])
-            : userStudent.StudentCode = request.StudentCode;
 
         var userEmail = await _userService.GetUserDetailByEmailAsync(request.Email, cancellationToken);
 
