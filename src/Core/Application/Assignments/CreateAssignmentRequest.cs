@@ -1,14 +1,9 @@
 ﻿using FSH.WebApi.Application.Assignments.AssignmentClasses;
 using FSH.WebApi.Application.Class;
-using FSH.WebApi.Application.Class.UserStudents;
-using FSH.WebApi.Application.Common.FileStorage;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
-using FSH.WebApi.Domain.Common.Events;
 using FSH.WebApi.Domain.TeacherGroup;
-using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 
 namespace FSH.WebApi.Application.Assignments;
 public class CreateAssignmentRequest : IRequest<Guid>
@@ -21,7 +16,7 @@ public class CreateAssignmentRequest : IRequest<Guid>
     public bool RequireLoginToSubmit { get; set; }
     public Guid SubjectId { get; set; }
     public string? Attachment { get; set; }
-    public List<Guid>? ClassIds { get; set; }
+    public List<Guid>? classesId { get; set; }
 }
 
 public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRequest, Guid>
@@ -58,7 +53,7 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
     public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
-        foreach (var classId in request.ClassIds)
+        foreach (var classId in request.classesId)
         {
             var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId, userId))
                 ?? throw new NotFoundException(_t["Class not found", classId]);
@@ -80,14 +75,14 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
             }
         }
 
-        //string attachmentPath = JsonSerializer.Serialize(request.Attachment);
+        // string attachmentPath = JsonSerializer.Serialize(request.Attachment);
 
         var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, request.Attachment, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
         await _repository.AddAsync(assignment, cancellationToken);
 
-        if (request.ClassIds != null)
+        if (request.classesId != null)
         {
-            await _mediator.Send(new AssignAssignmentToClassRequest(assignment.Id, request.ClassIds));
+            await _mediator.Send(new AssignAssignmentToClassRequest(assignment.Id, request.classesId));
         }
 
         return assignment.Id;
