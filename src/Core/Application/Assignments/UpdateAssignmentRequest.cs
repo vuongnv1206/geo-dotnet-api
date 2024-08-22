@@ -20,7 +20,7 @@ public class UpdateAssignmentRequest : IRequest<Guid>
     public DefaultIdType? SubjectId { get; set; }
     public bool DeleteCurrentAttachment { get; set; } = false;
     public string? Attachment { get; set; }
-    public List<Guid>? ClassIds { get; set; }
+    public List<Guid>? classesId { get; set; }
     public List<Guid>? StudentIds { get; set; }
 }
 
@@ -97,11 +97,11 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             request.SubjectId);
 
         // Cập nhật các lớp học liên quan
-        if (request.ClassIds != null)
+        if (request.classesId != null)
         {
             var currentClassIds = updatedAssignment.AssignmentClasses.Select(ac => ac.ClassesId).ToList();
-            var newClassIds = request.ClassIds.Except(currentClassIds).ToList();
-            var removedClassIds = currentClassIds.Except(request.ClassIds).ToList();
+            var newClassIds = request.classesId.Except(currentClassIds).ToList();
+            var removedClassIds = currentClassIds.Except(request.classesId).ToList();
 
             if (newClassIds.Any())
             {
