@@ -108,6 +108,13 @@ public class SubmitPapersController : VersionedApiController
         return await Mediator.Send(request);
     }
 
+    [HttpPost("suspend")]
+    [OpenApiOperation("Suspend exam")]
+    public async Task<ActionResult<Guid>> SuspendExam(SuspendExamRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
     public string? GetIpAddress() =>
     Request.Headers.ContainsKey("X-Forwarded-For")
         ? Request.Headers["X-Forwarded-For"]

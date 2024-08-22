@@ -2,6 +2,7 @@
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 
 namespace FSH.WebApi.Application.Examination.SubmitPapers;
 public class UpdateSubmitPaperRequest : IRequest<Guid>

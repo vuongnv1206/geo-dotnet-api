@@ -26,6 +26,7 @@ using FSH.WebApi.Application.TeacherGroup.TeacherTeams;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
 using FSH.WebApi.Domain.TeacherGroup;

@@ -12,7 +12,7 @@ public class SendLogRequest : IRequest<DefaultIdType>
     public string? MouseLog { get; set; }
     public string? KeyboardLog { get; set; }
     public string? NetworkLog { get; set; }
-    public bool? IsSuspicious { get; set; }
+    public bool? IsSuspicious { get; set; } = false;
 }
 
 public class SendLogRequestHandler : IRequestHandler<SendLogRequest, DefaultIdType>

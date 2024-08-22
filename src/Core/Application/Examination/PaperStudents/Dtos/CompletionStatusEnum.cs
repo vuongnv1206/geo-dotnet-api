@@ -3,5 +3,6 @@ public enum CompletionStatusEnum
 {
     NotStarted = 0,
     InProgress = 1,
-    Completed = 2
+    Completed = 2,
+    Supended = 3
 }

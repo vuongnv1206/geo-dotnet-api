@@ -3,6 +3,7 @@ using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
 using System.Text.RegularExpressions;

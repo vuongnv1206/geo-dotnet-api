@@ -20,6 +20,7 @@ public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, Pag
     private readonly IRepository<Classes> _classRepo;
     private readonly IRepository<Paper> _paperRepository;
     private readonly IRepository<SubmitPaper> _submitPaperRepo;
+    private readonly IRepository<SubmitPaperLog> _submitPaperLogRepository;
 
     private readonly IUserService _userService;
     public MonitorExamRequestHandler(
@@ -27,13 +28,47 @@ public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, Pag
         IRepository<Classes> classRepo,
         IRepository<Paper> paperRepo,
         IUserService userService,
-        IRepository<SubmitPaper> submitPaperRepo)
+        IRepository<SubmitPaper> submitPaperRepo,
+        IRepository<SubmitPaperLog> submitPaperLogRepository)
     {
         _currentUser = currentUser;
         _classRepo = classRepo;
         _paperRepository = paperRepo;
         _userService = userService;
         _submitPaperRepo = submitPaperRepo;
+        _submitPaperLogRepository = submitPaperLogRepository;
+    }
+
+    public static bool IsSuspicious(SubmitPaperLog log)
+    {
+        // check is suspicious
+        if (log.IsSuspicious == true)
+        {
+            return true;
+        }
+
+        // checl process log
+        if (log.ProcessLog != null)
+        {
+            // TeamViewer, AnyDesk, Chrome Remote Desktop, UltraViewer, AnyDesk, Supremo, AeroAdmin, Ammyy Admin, Remote Utilities, Zoho Assist, Splashtop, LogMeIn, GoToMyPC, Join.me, WebEx, Zoom, Microsoft Teams, Skype, Slack, Discord
+            // Zalo PC, Skype, Viber, Zalo, Facebook, Messenger, WhatsApp, Telegram, Skype, Viber
+            List<string> suspiciousProcess = new()
+            {
+                "TeamViewer", "AnyDesk", "Chrome Remote Desktop", "UltraViewer", "AnyDesk", "Supremo", "AeroAdmin", "Ammyy Admin", "Remote Utilities", "Zoho Assist", "Splashtop", "LogMeIn", "GoToMyPC", "Join.me", "WebEx", "Zoom", "Microsoft Teams", "Skype", "Slack", "Discord",
+                "Zalo PC", "Skype", "Viber", "Zalo", "Facebook", "Messenger", "WhatsApp", "Telegram", "Skype", "Viber"
+            };
+
+            foreach (string item in suspiciousProcess)
+            {
+                // ignore case
+                if (log.ProcessLog.ToLower().Contains(item.ToLower()))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public async Task<PaginationResponse<StudentMoni>> Handle(MonitorExamRequest request, CancellationToken cancellationToken)
@@ -127,10 +162,45 @@ public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, Pag
                     }
                 }
             }
+        }
 
+        // Get submit paper logs
+        foreach (var student in students)
+        {
+            try
+            {
+                var spec3 = new SubmitPaperLogBySubmitPaperIdSpec(student.SubmitPaperId);
+                var logs = await _submitPaperLogRepository.ListAsync(spec3, cancellationToken);
+                foreach (var log in logs)
+                {
+                    if (log.IsSuspicious == true)
+                    {
+                        student.IsSuspicious = true;
+                        break;
+                    }
+
+                    if (IsSuspicious(log))
+                    {
+                        student.IsSuspicious = true;
+                        break;
+                    }
+
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
         var res = new PaginationResponse<StudentMoni>(students, students.Count, request.PageNumber, request.PageSize);
         return res;
+    }
+}
+
+public class SubmitPaperLogBySubmitPaperIdSpec : Specification<SubmitPaperLog>, ISingleResultSpecification
+{
+    public SubmitPaperLogBySubmitPaperIdSpec(DefaultIdType? submitPaperId)
+    {
+        _ = Query.Where(p => p.SubmitPaperId == submitPaperId);
     }
 }

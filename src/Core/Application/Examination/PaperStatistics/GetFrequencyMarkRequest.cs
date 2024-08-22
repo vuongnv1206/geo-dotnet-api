@@ -3,6 +3,7 @@ using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 
 namespace FSH.WebApi.Application.Examination.PaperStatistics;
 public class GetFrequencyMarkRequest : IRequest<ClassroomFrequencyMarkDto>
