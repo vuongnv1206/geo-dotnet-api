@@ -32,6 +32,7 @@ public class GetPaperByIdRequestHandler : IRequestHandler<GetPaperByIdRequest, P
 
         var paperDto = paper.Adapt<PaperDto>();
         paperDto.CreatorName = await _userService.GetFullName(paper.CreatedBy);
+        paperDto.TotalAttended = paper.GetTotalSubmissions();
 
         return paperDto;
 

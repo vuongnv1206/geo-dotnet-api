@@ -34,6 +34,12 @@ public class UpdateQuestionsInPaperRequestHandler : IRequestHandler<UpdateQuesti
             throw new NotFoundException($"Paper with Id {request.PaperId} not found.");
         }
 
+        // Kiểm tra nếu DateTime.Now > StartTime
+        if (DateTime.UtcNow > paper.StartTime)
+        {
+            throw new ConflictException(_t["Cannot update questions in the paper. The exam has already started."]);
+        }
+
         var existingQuestionIds = paper.PaperQuestions.Select(q => q.Question.OriginalQuestionId).ToList();
 
         var questionsToAdd = new List<CreateUpdateQuestionInPaperDto>();

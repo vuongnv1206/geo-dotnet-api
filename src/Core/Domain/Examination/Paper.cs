@@ -60,6 +60,12 @@ public class Paper : AuditableEntity, IAggregateRoot
         Password = password;
         ExamCode = examName;
     }
+    public void UpdateTime(DateTime? startTime, DateTime? endTime, float? duration)
+    {
+        StartTime = startTime;
+        EndTime = endTime;
+        Duration = duration;
+    }
 
     public void AddQuestions(List<PaperQuestion> questions)
     {
@@ -112,6 +118,7 @@ public class Paper : AuditableEntity, IAggregateRoot
         }
     }
 
+    #region update constructor
     public Paper Update(
         string examName,
         PaperStatus status,
@@ -156,6 +163,7 @@ public class Paper : AuditableEntity, IAggregateRoot
         LocalIpAllowed = localIpAllowed;
         return this;
     }
+    #endregion
 
     public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
     {
@@ -238,5 +246,9 @@ public class Paper : AuditableEntity, IAggregateRoot
         return PaperPermissions.Any(x => x.UserId == userId && x.CanShare);
     }
 
-
+    // lấy ra số người đã hoàn thành bài làm
+    public int GetTotalSubmissions()
+    => SubmitPapers.Any()
+        ? SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End).Count()
+        : 0;
 }
