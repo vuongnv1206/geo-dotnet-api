@@ -10,9 +10,9 @@ public class PaperByIdsAndPublishSpec : EntitiesByPaginationFilterSpec<Paper>
         : base(request)
     {
         // get paper: exist in papepIds, published, student hasn't started yet.
-        _ = Query
+        Query
             .Include(p => p.PaperAccesses)
-            .Where(p => p.IsPublish
+            .Where(p => p.Status == Domain.Examination.Enums.PaperStatus.Publish
                     && p.PaperAccesses.Any(pa => (pa.UserId.HasValue && studentIdsInClass.Contains(pa.UserId.Value))
                     || (pa.ClassId.HasValue && joinedClassIds.Contains(pa.ClassId.Value))))
             .Include(p => p.PaperLabel)
@@ -21,15 +21,15 @@ public class PaperByIdsAndPublishSpec : EntitiesByPaginationFilterSpec<Paper>
 
         if (request.CompletionStatus == CompletionStatusEnum.NotStarted)
         {
-            _ = Query.Where(p => !p.SubmitPapers.Any(x => x.CreatedBy == userId));
+            Query.Where(p => !p.SubmitPapers.Any(x => x.CreatedBy == userId));
         }
         else if (request.CompletionStatus == CompletionStatusEnum.InProgress)
         {
-            _ = Query.Where(p => p.SubmitPapers.Any(x => x.CreatedBy == userId && !x.EndTime.HasValue));
+            Query.Where(p => p.SubmitPapers.Any(x => x.CreatedBy == userId && !x.EndTime.HasValue));
         }
         else if (request.CompletionStatus == CompletionStatusEnum.Completed)
         {
-            _ = Query.Where(p => p.SubmitPapers.Any(x => x.CreatedBy == userId && x.EndTime.HasValue));
+            Query.Where(p => p.SubmitPapers.Any(x => x.CreatedBy == userId && x.EndTime.HasValue));
         }
     }
 }
