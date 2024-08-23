@@ -73,7 +73,7 @@ public class SubmitPapersController : VersionedApiController
 
     [HttpPost("submit")]
     [OpenApiOperation("Submit exam")]
-    public async Task<ActionResult<Guid>> SubmitExam(SubmitExamRequest request)
+    public async Task<ActionResult<string>> SubmitExam(SubmitExamRequest request)
     {
         request.PublicIp = GetIpAddress();
         return await Mediator.Send(request);

@@ -504,7 +504,7 @@ public class SubmmitPaperService : ISubmmitPaperService
 
     }
 
-    public async Task<DefaultIdType> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
+    public async Task<string> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
     {
         // Decrypt and validate submit paper data
         string submitPaperDataDecrypted = EncryptionUtils.SimpleDec(request.SubmitPaperData);
@@ -628,9 +628,15 @@ public class SubmmitPaperService : ISubmmitPaperService
             await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
         }
 
-        return submitPaper == null
-            ? throw new NotFoundException(_t["Submit paper {0} not found.", sbp.SubmitPaperId])
-            : await Task.FromResult(submitPaper.Id);
+        if (paper.ShowMarkResult == ShowResult.No)
+        {
+            return _t["Submit exam successfully."];
+        }
+        else
+        {
+            float? mark = submitPaper.TotalMark / paper.Adapt<PaperDto>().MaxPoint * 10;
+            return mark.HasValue ? mark.Value.ToString() : "0";
+        }
     }
 
     public string FormatAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
