@@ -53,7 +53,7 @@ public class GetGroupClassesAccessPaperRequestHandler : IRequestHandler<GetGroup
             }
         }
 
-        var spec = new GroupClassAccessPaperByClassId(accessClassIds, accessStudentIds, request);
+        var spec = new GroupClassAccessPaperByClassId(accessClassIds, accessStudentIds, request, paper.CreatedBy);
 
         var groups = await _groupRepo.ListAsync(spec, cancellationToken);
 
