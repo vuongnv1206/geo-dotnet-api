@@ -75,17 +75,18 @@ public class Assignment : AuditableEntity, IAggregateRoot
         {
             submission.Score = score;
             submission.Comment = comment;
+            submission.Status = SubmitAssignmentStatus.Marked;
         }
     }
 
     public void SubmitAssignment(Guid studentId, string? answerRaw, string? attachmentPath)
     {
-        var assignmentStudent = AssignmentStudents.FirstOrDefault(x => x.StudentId == studentId);
+        var assignmentStudent = AssignmentStudents.Where(x => x.Student.StId == studentId).FirstOrDefault();
         if (assignmentStudent is not null)
         {
             assignmentStudent.AnswerRaw = answerRaw;
             assignmentStudent.AttachmentPath = attachmentPath;
-            assignmentStudent.Status = SubmitAssignmentStatus.Submmitted;
+            assignmentStudent.Status = SubmitAssignmentStatus.Submitted;
         }
     }
 
@@ -116,9 +117,9 @@ public class Assignment : AuditableEntity, IAggregateRoot
         }
     }
 
-    public void RemoveAssignmentFromClass(Guid classId)
+    public void RemoveSubmissionFromClass(List<Guid> studentIds)
     {
-        AssignmentStudents.RemoveAll(x => AssignmentClasses.Any(ac => ac.ClassesId == classId && ac.AssignmentId == x.AssignmentId));
+        AssignmentStudents.RemoveAll(x => studentIds.Contains(x.StudentId));
     }
 
     public void RemoveAssignmentOfStudent(Guid studentId)

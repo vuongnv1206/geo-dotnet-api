@@ -1,9 +1,11 @@
 ﻿using FSH.WebApi.Application.Examination.Monitor;
 using FSH.WebApi.Application.Examination.Papers.ByStudents;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
+using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
+using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class SubmitPapersController : VersionedApiController
@@ -39,7 +41,7 @@ public class SubmitPapersController : VersionedApiController
     }
 
     [HttpPost("paper/{paperId:guid}/students-submitted")]
-    [OpenApiOperation("get student have submitted a paper yet")]
+    [OpenApiOperation("get student have submitted a paper")]
     public async Task<ActionResult<List<SubmitPaperDto>>> GetSubmittedPaper(Guid paperId, GetSubmittedPaperRequest request)
     {
         return paperId == request.PaperId
@@ -71,7 +73,7 @@ public class SubmitPapersController : VersionedApiController
 
     [HttpPost("submit")]
     [OpenApiOperation("Submit exam")]
-    public async Task<ActionResult<Guid>> SubmitExam(SubmitExamRequest request)
+    public async Task<ActionResult<string>> SubmitExam(SubmitExamRequest request)
     {
         request.PublicIp = GetIpAddress();
         return await Mediator.Send(request);
@@ -87,7 +89,28 @@ public class SubmitPapersController : VersionedApiController
 
     [HttpPost("monitor")]
     [OpenApiOperation("Monitor exam")]
-    public async Task<ActionResult<Guid>> MonitorExam(MonitorExamRequest request)
+    public async Task<ActionResult<PaginationResponse<StudentMoni>>> MonitorExam(MonitorExamRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("monitor-detail")]
+    [OpenApiOperation("Monitor detail of user in exam")]
+    public async Task<ActionResult<PaginationResponse<SubmitPaperLog>>> MonitorDetailExam(MonitorDetailExamRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("reassign")]
+    [OpenApiOperation("Reassign exam")]
+    public async Task<ActionResult<Guid>> ReassignExam(ReassignExamRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("suspend")]
+    [OpenApiOperation("Suspend exam")]
+    public async Task<ActionResult<Guid>> SuspendExam(SuspendExamRequest request)
     {
         return await Mediator.Send(request);
     }

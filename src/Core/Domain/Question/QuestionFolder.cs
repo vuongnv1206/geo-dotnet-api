@@ -1,4 +1,5 @@
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Question.Enums;
 
 namespace FSH.WebApi.Domain.Question;
 
@@ -11,6 +12,7 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
     public virtual ICollection<QuestionFolder> Children { get; private set; } = new List<QuestionFolder>();
 
     public virtual ICollection<QuestionFolderPermission> Permissions { get; private set; } = new List<QuestionFolderPermission>();
+    public virtual List<Question> Questions { get; set; } = new();
 
     public QuestionFolder(string name, Guid? parentId)
     {
@@ -110,4 +112,25 @@ public class QuestionFolder : AuditableEntity, IAggregateRoot
             ChildQuestionFolderIds(questionFolder.Children, ids);
         }
     }
+
+    public int CountQuestionWithLabelInFolder(Guid labelId)
+    {
+        int count = 0;
+        foreach (var question in Questions)
+        {
+            if (question.QuestionLableId == labelId)
+            {
+                count++;
+            }
+        }
+
+        foreach (var child in Children)
+        {
+            count += child.CountQuestionWithLabelInFolder(labelId);
+        }
+
+        return count;
+    }
+
+
 }

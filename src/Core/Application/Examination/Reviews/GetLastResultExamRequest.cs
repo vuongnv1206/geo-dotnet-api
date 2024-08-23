@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
@@ -19,58 +20,25 @@ public class GetLastResultExamRequestHandler : IRequestHandler<GetLastResultExam
     private readonly IUserService _userService;
     private readonly IReadRepository<Paper> _repositoryPaper;
     private readonly IStringLocalizer _t;
+    private readonly ISubmmitPaperService _submmitPaperService;
 
     public GetLastResultExamRequestHandler(
         IReadRepository<SubmitPaper> repositorySubmitPaper,
         IUserService userService,
         IReadRepository<Paper> repositoryPaper,
-        IStringLocalizer<GetLastResultExamRequestHandler> t)
+        IStringLocalizer<GetLastResultExamRequestHandler> t,
+        ISubmmitPaperService submmitPaperService)
     {
         _repositorySubmitPaper = repositorySubmitPaper;
         _userService = userService;
         _repositoryPaper = repositoryPaper;
         _t = t;
+       _submmitPaperService = submmitPaperService;
     }
 
     public async Task<LastResultExamDto> Handle(GetLastResultExamRequest request, CancellationToken cancellationToken)
     {
-        var spec = new ExamResultSpec(request.SubmitPaperId, request.PaperId, request.UserId);
-        var submitPaper = await _repositorySubmitPaper.FirstOrDefaultAsync(spec, cancellationToken)
-            ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
-
-        var paper = await _repositoryPaper.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
-
-        var student = await _userService.GetAsync(request.UserId.ToString(), cancellationToken);
-
-
-        float totalMark = 0;
-
-        foreach (var submit in submitPaper.SubmitPaperDetails)
-        {
-            float achieveMark = 0;
-            if (submit.Question.QuestionParentId is null
-                || submit.Question.QuestionParentId == Guid.Empty)
-            {
-                achieveMark = submit.GetPointQuestion(submit.Question, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
-                totalMark += achieveMark;
-            }
-            else
-            {
-                var paperQuestionParent = paper.PaperQuestions
-                .FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
-
-                float avgMark = paperQuestionParent.Mark / paperQuestionParent.Question.QuestionPassages.Count;
-                achieveMark = submit.GetPointQuestion(submit.Question, avgMark);
-                totalMark += achieveMark;
-            }
-
-            submit.Mark = achieveMark;
-        }
-
-        var examResultDto = submitPaper.Adapt<LastResultExamDto>();
-        examResultDto.TotalMark = totalMark;
-        examResultDto.Student = student;
-
+        var examResultDto = await _submmitPaperService.GetLastResultExamAsync(request.PaperId, request.UserId, request.SubmitPaperId, cancellationToken);
         return examResultDto;
     }
 }

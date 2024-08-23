@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Domain.TeacherGroup;
 using Mapster;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
@@ -15,16 +16,39 @@ public class GetGroupTeacherRequestHandler : IRequestHandler<GetGroupTeacherRequ
 {
     private readonly IRepository<GroupTeacher> _repository;
     private readonly IStringLocalizer _t;
+    private readonly ICurrentUser _currentUser;
+    private readonly IUserService _userService;
 
-    public GetGroupTeacherRequestHandler(IRepository<GroupTeacher> repository, IStringLocalizer<GetGroupTeacherRequestHandler> localizer) => (_repository, _t) = (repository, localizer);
+    public GetGroupTeacherRequestHandler(
+        IRepository<GroupTeacher> repository,
+        IStringLocalizer<GetGroupTeacherRequestHandler> t,
+        ICurrentUser currentUser,
+        IUserService userService)
+    {
+        _repository = repository;
+        _t = t;
+        _currentUser = currentUser;
+        _userService = userService;
+    }
 
     public async Task<GroupTeacherDto> Handle(GetGroupTeacherRequest request, CancellationToken cancellationToken)
     {
-        var groupTeacher = await _repository.FirstOrDefaultAsync(new GroupTeacherByIdSpec(request.Id), cancellationToken);
+        var userId = _currentUser.GetUserId();
+        var groupTeacher = await _repository.FirstOrDefaultAsync(new GroupTeacherByIdWithPermissionSpec(request.Id, userId), cancellationToken);
 
         if (groupTeacher == null)
             throw new NotFoundException(_t["GroupTeacher{0} Not Found.", request.Id]);
 
-        return groupTeacher.Adapt<GroupTeacherDto>();
+        var response = groupTeacher.Adapt<GroupTeacherDto>();
+
+        foreach(var classroom in response.GroupPermissionInClasses)
+        {
+            classroom.ClassName = groupTeacher.GroupPermissionInClasses.FirstOrDefault(x => x.ClassId == classroom.ClassId).Classroom.Name;
+        }
+
+        var adminGroup = await _userService.GetAsync(groupTeacher.CreatedBy.ToString(), cancellationToken);
+        response.AdminGroup = adminGroup.Email ?? "";
+
+        return response;
     }
 }

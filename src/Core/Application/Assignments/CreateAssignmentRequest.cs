@@ -1,13 +1,9 @@
-﻿using FSH.WebApi.Application.Class;
-using FSH.WebApi.Application.Class.UserStudents;
-using FSH.WebApi.Application.Common.FileStorage;
+﻿using FSH.WebApi.Application.Assignments.AssignmentClasses;
+using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
-using FSH.WebApi.Domain.Common.Events;
 using FSH.WebApi.Domain.TeacherGroup;
-using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 
 namespace FSH.WebApi.Application.Assignments;
 public class CreateAssignmentRequest : IRequest<Guid>
@@ -20,7 +16,7 @@ public class CreateAssignmentRequest : IRequest<Guid>
     public bool RequireLoginToSubmit { get; set; }
     public Guid SubjectId { get; set; }
     public string? Attachment { get; set; }
-    public List<Guid>? ClassIds { get; set; }
+    public List<Guid>? classesId { get; set; }
 }
 
 public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRequest, Guid>
@@ -32,6 +28,7 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
     private readonly IRepository<GroupPermissionInClass> _groupPermissionRepo;
     private readonly IRepository<TeacherPermissionInClass> _teacherPermissionRepo;
     private readonly IStringLocalizer _t;
+    private readonly IMediator _mediator;
 
     public CreateAssignmentRequestHandler(
         IRepository<Assignment> repository,
@@ -40,7 +37,8 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
         ICurrentUser currentUser,
         IRepository<GroupPermissionInClass> groupPermissionRepo,
         IRepository<TeacherPermissionInClass> teacherPermissionRepo,
-        IStringLocalizer<CreateAssignmentRequestHandler> t)
+        IStringLocalizer<CreateAssignmentRequestHandler> t,
+        IMediator mediator)
     {
         _repository = repository;
         _file = file;
@@ -49,12 +47,13 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
         _groupPermissionRepo = groupPermissionRepo;
         _teacherPermissionRepo = teacherPermissionRepo;
         _t = t;
+        _mediator = mediator;
     }
 
     public async Task<Guid> Handle(CreateAssignmentRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
-        foreach (var classId in request.ClassIds)
+        foreach (var classId in request.classesId)
         {
             var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(classId, userId))
                 ?? throw new NotFoundException(_t["Class not found", classId]);
@@ -76,19 +75,14 @@ public class CreateAssignmentRequestHandler : IRequestHandler<CreateAssignmentRe
             }
         }
 
-        //string attachmentPath = JsonSerializer.Serialize(request.Attachment);
+        // string attachmentPath = JsonSerializer.Serialize(request.Attachment);
 
         var assignment = new Assignment(request.Name.Trim(), request.StartTime, request.EndTime, request.Attachment, request.Content, request.CanViewResult, request.RequireLoginToSubmit, request.SubjectId);
-        if (request.ClassIds != null)
+        await _repository.AddAsync(assignment, cancellationToken);
+
+        if (request.classesId != null)
         {
-
-            foreach (var classId in request.ClassIds)
-            {
-                var assignmentClass = new AssignmentClass(assignment.Id, classId);
-                assignment.AssignmentClasses.Add(assignmentClass);
-            }
-
-            await _repository.AddAsync(assignment, cancellationToken);
+            await _mediator.Send(new AssignAssignmentToClassRequest(assignment.Id, request.classesId));
         }
 
         return assignment.Id;

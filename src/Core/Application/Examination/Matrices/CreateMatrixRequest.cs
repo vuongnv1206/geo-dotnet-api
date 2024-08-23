@@ -53,26 +53,81 @@ public class CreateMatrixRequestHandler : IRequestHandler<CreateMatrixRequest, G
 
     public async Task<Guid> Handle(CreateMatrixRequest request, CancellationToken cancellationToken)
     {
+        // Deserialize content từ JSON string thành List<ContentMatrixDto>
         var contentItems = _serializerService.Deserialize<List<ContentMatrixDto>>(request.Content);
-        //foreach (var item in contentItems) and check question folderId, question labelId
-        foreach (var contentMatrixDto in contentItems)
+
+        // Khởi tạo tập hợp để lưu các RawIndex đã tồn tại
+        var allRawIndexes = new HashSet<int>();
+
+        // Duyệt qua từng ContentMatrixDto trong danh sách
+        foreach (var item in contentItems)
         {
             // Kiểm tra QuestionFolderId có hợp lệ hay không
-            var questionFolderExists = await _questionFolderRepo.FirstOrDefaultAsync(new QuestionFolderByIdSpec(contentMatrixDto.QuestionFolderId), cancellationToken);
-            _ = questionFolderExists ?? throw new NotFoundException($"Question Folder with ID {contentMatrixDto.QuestionFolderId} not found.");
+            var questionFolderTree = await _questionFolderRepo.ListAsync(
+                new QuestionFolderTreeSpec(), cancellationToken);
+            var questionFolder = questionFolderTree.Where(x => x.Id == item.QuestionFolderId).FirstOrDefault();
 
-            foreach (var criteria in contentMatrixDto.CriteriaQuestions)
+            
+            _ = questionFolder ?? throw new NotFoundException(
+                $"Question Folder with ID {item.QuestionFolderId} not found.");
+
+            // Remove CriteriaQuestion where NumberOfQuestion is 0
+            item.CriteriaQuestions = item.CriteriaQuestions.Where(c => c.NumberOfQuestion > 0).ToList();
+
+
+
+            // Duyệt qua từng tiêu chí (criteria) trong CriteriaQuestions của ContentMatrixDto
+            foreach (var criteria in item.CriteriaQuestions)
             {
-                var questionLabelExists = await _repositoryQuestionLabel.FirstOrDefaultAsync(new QuestionLabelByIdSpec(criteria.QuestionLabelId), cancellationToken);
-                _ = questionLabelExists ?? throw new NotFoundException($"Question Label with ID {criteria.QuestionLabelId} not found.");
+                // Kiểm tra xem QuestionLabelId có tồn tại hay không
+                var questionLabelExists = await _repositoryQuestionLabel.FirstOrDefaultAsync(
+                    new QuestionLabelByIdSpec(criteria.QuestionLabelId), cancellationToken);
+                _ = questionLabelExists ?? throw new NotFoundException(
+                    $"Question Label with ID {criteria.QuestionLabelId} not found.");
+
+                // Lấy tổng số câu hỏi trong folder with label
+                var totalQuestionsAlreadyExisted = questionFolder.CountQuestionWithLabelInFolder(criteria.QuestionLabelId);
+
+
+                // Kiểm tra nếu NumberOfQuestion lớn hơn tổng số câu hỏi có sẵn trong folder
+                if (criteria.NumberOfQuestion > totalQuestionsAlreadyExisted)
+                {
+                    throw new ConflictException(
+                        $" Number of question {criteria.NumberOfQuestion} for {questionLabelExists.Name} exceeds available {totalQuestionsAlreadyExisted} in the folder.");
+                }
+
+                // Nếu RawIndex trống, tính toán và gán giá trị mới cho RawIndex
+                if (string.IsNullOrWhiteSpace(criteria.RawIndex))
+                {
+                    var maxIndex = allRawIndexes.Any() ? allRawIndexes.Max() : 0;
+                    var missingIndexes = Enumerable.Range(1, maxIndex).Except(allRawIndexes).ToList();
+                    var newIndexes = missingIndexes.Take(criteria.NumberOfQuestion).ToList();
+                    if (newIndexes.Count < criteria.NumberOfQuestion)
+                    {
+                        newIndexes.AddRange(
+                            Enumerable.Range(maxIndex + 1, criteria.NumberOfQuestion - newIndexes.Count));
+                    }
+                    criteria.RawIndex = string.Join(",", newIndexes);
+                }
+
+                // Chuyển đổi RawIndex từ string thành danh sách các số nguyên
+                var indexes = criteria.RawIndex.Split(',').Select(int.Parse).ToList();
+
+                // Kiểm tra và thêm từng RawIndex vào tập hợp allRawIndexes, nếu bị trùng sẽ ném ngoại lệ
+                foreach (var index in indexes)
+                {
+                    if (!allRawIndexes.Add(index))
+                    {
+                        throw new ConflictException($"RawIndex '{index}' is duplicated across CriteriaQuestions.");
+                    }
+                }
             }
-
         }
-
 
         var matrix = new PaperMatrix(request.Name, request.Content, request.TotalPoint);
         await _repositoryMatrix.AddAsync(matrix);
-      
+
         return matrix.Id;
     }
+
 }

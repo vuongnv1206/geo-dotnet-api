@@ -1,4 +1,6 @@
-﻿using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Questions.Specs;
+using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.In.Examination.Matrices.Helpers;
 using Newtonsoft.Json;
@@ -25,30 +27,103 @@ public class UpdateMatrixRequestHandler : IRequestHandler<UpdateMatrixRequest, G
     private readonly IStringLocalizer<UpdateMatrixRequestHandler> _t;
     private readonly IReadRepository<QuestionFolder> _questionFolderRepo;
     private readonly IMediator _mediator;
+    private readonly ISerializerService _serializerService;
+    private readonly IRepository<QuestionLable> _repositoryQuestionLabel;
 
     public UpdateMatrixRequestHandler(
         IRepository<PaperMatrix> repositoryMatrix,
         IStringLocalizer<UpdateMatrixRequestHandler> t,
         IReadRepository<QuestionFolder> questionFolderRepo,
-        IMediator mediator)
+        IMediator mediator,
+        ISerializerService serializerService,
+        IRepository<QuestionLable> repositoryQuestionLabel)
     {
         _repositoryMatrix = repositoryMatrix;
         _t = t;
         _questionFolderRepo = questionFolderRepo;
         _mediator = mediator;
+        _serializerService = serializerService;
+        _repositoryQuestionLabel = repositoryQuestionLabel;
     }
 
     public async Task<Guid> Handle(UpdateMatrixRequest request, CancellationToken cancellationToken)
     {
+        // Lấy ma trận hiện tại từ cơ sở dữ liệu
         var matrix = await _repositoryMatrix.GetByIdAsync(request.Id, cancellationToken);
         if (matrix == null)
         {
             throw new NotFoundException(_t["Matrix {0} Not Found.", request.Id]);
         }
 
+        // Deserialize content từ JSON string thành List<ContentMatrixDto>
+        var contentItems = _serializerService.Deserialize<List<ContentMatrixDto>>(request.Content);
+
+        // Khởi tạo tập hợp để lưu các RawIndex đã tồn tại
+        var allRawIndexes = new HashSet<int>();
+
+        // Duyệt qua từng ContentMatrixDto trong danh sách
+        foreach (var item in contentItems)
+        {
+            // Kiểm tra QuestionFolderId có hợp lệ hay không
+            var questionFolder = await _questionFolderRepo.FirstOrDefaultAsync(
+                new QuestionFolderByIdSpec(item.QuestionFolderId), cancellationToken);
+            _ = questionFolder ?? throw new NotFoundException(
+                $"Question Folder with ID {item.QuestionFolderId} not found.");
+
+            // Loại bỏ các CriteriaQuestion có NumberOfQuestion bằng 0
+            item.CriteriaQuestions = item.CriteriaQuestions.Where(c => c.NumberOfQuestion > 0).ToList();
+
+            // Duyệt qua từng tiêu chí (criteria) trong CriteriaQuestions của ContentMatrixDto
+            foreach (var criteria in item.CriteriaQuestions)
+            {
+                // Kiểm tra xem QuestionLabelId có tồn tại hay không
+                var questionLabelExists = await _repositoryQuestionLabel.FirstOrDefaultAsync(
+                    new QuestionLabelByIdSpec(criteria.QuestionLabelId), cancellationToken);
+                _ = questionLabelExists ?? throw new NotFoundException(
+                    $"Question Label with ID {criteria.QuestionLabelId} not found.");
+
+                // Lấy tổng số câu hỏi trong folder with label
+                var totalQuestionsAlreadyExisted = questionFolder.CountQuestionWithLabelInFolder(criteria.QuestionLabelId);
+
+                // Kiểm tra nếu NumberOfQuestion lớn hơn tổng số câu hỏi có sẵn trong folder
+                if (criteria.NumberOfQuestion > totalQuestionsAlreadyExisted)
+                {
+                    throw new ConflictException(
+                        $"NumberOfQuestion ({criteria.NumberOfQuestion}) for Label ID {criteria.QuestionLabelId} exceeds available questions ({totalQuestionsAlreadyExisted}) in the folder.");
+                }
+
+                // Nếu RawIndex trống, tính toán và gán giá trị mới cho RawIndex
+                if (string.IsNullOrWhiteSpace(criteria.RawIndex))
+                {
+                    var maxIndex = allRawIndexes.Any() ? allRawIndexes.Max() : 0;
+                    var missingIndexes = Enumerable.Range(1, maxIndex).Except(allRawIndexes).ToList();
+                    var newIndexes = missingIndexes.Take(criteria.NumberOfQuestion).ToList();
+                    if (newIndexes.Count < criteria.NumberOfQuestion)
+                    {
+                        newIndexes.AddRange(
+                            Enumerable.Range(maxIndex + 1, criteria.NumberOfQuestion - newIndexes.Count));
+                    }
+                    criteria.RawIndex = string.Join(",", newIndexes);
+                }
+
+                // Chuyển đổi RawIndex từ string thành danh sách các số nguyên
+                var indexes = criteria.RawIndex.Split(',').Select(int.Parse).ToList();
+
+                // Kiểm tra và thêm từng RawIndex vào tập hợp allRawIndexes, nếu bị trùng sẽ ném ngoại lệ
+                foreach (var index in indexes)
+                {
+                    if (!allRawIndexes.Add(index))
+                    {
+                        throw new ConflictException($"RawIndex '{index}' is duplicated across CriteriaQuestions.");
+                    }
+                }
+            }
+        }
+
         // Cập nhật thông tin ma trận
         matrix.Update(request.Name, request.Content, request.TotalPoint);
 
+        // Lưu thay đổi vào cơ sở dữ liệu
         await _repositoryMatrix.UpdateAsync(matrix, cancellationToken);
 
         return matrix.Id;

@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Identity.Users;
+﻿using FSH.WebApi.Application.Examination.Papers.Dtos;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 using Mapster;
 
@@ -32,6 +33,7 @@ public class GetPaperByIdRequestHandler : IRequestHandler<GetPaperByIdRequest, P
 
         var paperDto = paper.Adapt<PaperDto>();
         paperDto.CreatorName = await _userService.GetFullName(paper.CreatedBy);
+        paperDto.TotalAttended = paper.GetTotalSubmissions();
 
         return paperDto;
 

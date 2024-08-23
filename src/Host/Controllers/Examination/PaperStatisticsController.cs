@@ -7,8 +7,14 @@ public class PaperStatisticsController : VersionedApiController
 {
 
     // write controller for GetClassroomFrequencyMarkRequest
-    [HttpGet("classroom-frequency-mark")]
-    public async Task<ActionResult<List<ClassroomFrequencyMarkDto>>> GetClassroomFrequencyMark([FromQuery] GetClassroomFrequencyMarkRequest request)
+    [HttpPost("classroom-frequency-mark")]
+    public async Task<ActionResult<List<ClassroomFrequencyMarkDto>>> GetClassroomFrequencyMark(GetClassroomFrequencyMarkRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+    //write controller for GetFrequencyMarkRequest
+    [HttpPost("frequency-mark")]
+    public async Task<ActionResult<ClassroomFrequencyMarkDto>> GetFrequencyMark(GetFrequencyMarkRequest request)
     {
         return await Mediator.Send(request);
     }
@@ -36,11 +42,11 @@ public class PaperStatisticsController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    // [HttpGet("generate-excel")]
-    // public async Task<IActionResult> GenerateExcel([FromQuery] GeneratePaperStatisticExcelRequest request)
-    // {
-    //    var fileBytes = await Mediator.Send(request);
-    //    return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PaperStatistics.xlsx");
-    // }
+    [HttpGet("generate-excel")]
+    public async Task<IActionResult> GenerateExcel([FromQuery] GeneratePaperStatisticExcelRequest request)
+    {
+        var fileBytes = await Mediator.Send(request);
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PaperStatistics.xlsx");
+    }
 
 }

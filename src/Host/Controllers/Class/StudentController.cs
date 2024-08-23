@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using FSH.WebApi.Application.Class.UserStudents.Dto;
 using FSH.WebApi.Application.Class.Dto;
 using FSH.WebApi.Application.Class;
+using FSH.WebApi.Application.Examination.PaperStatistics;
 
 namespace FSH.WebApi.Host.Controllers.Class;
 public class StudentController : VersionedApiController
@@ -61,4 +62,32 @@ public class StudentController : VersionedApiController
             ? BadRequest()
             : Ok(await Mediator.Send(request));
     }
+
+    [HttpGet("format-import-student-excel")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
+    [OpenApiOperation("get template import student", "")]
+    public async Task<IActionResult> GetTemplateAddStudentExcel()
+    {
+        var fileBytes = await Mediator.Send(new FormatAddStudentExcelRequest());
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ImportStudent.xlsx");
+    }
+
+    [HttpPost("import-student-excel")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
+    [OpenApiOperation("Import student to class using excel", "")]
+    public async Task<List<FailedStudentRequest>> ImportTemplateStudentExcel(IFormFile formFile, Guid classId)
+    {
+        var request = new ImportStudentExcelRequest(classId, formFile);
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("failed-import-student-excel")]
+    [MustHavePermission(FSHAction.Create, FSHResource.Classes)]
+    [OpenApiOperation("get fail import student", "")]
+    public async Task<IActionResult> GetFailedAddStudentExcel(FailedStudentExcelRequest request)
+    {
+        var fileBytes = await Mediator.Send(request);
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "FailedStudent.xlsx");
+    }
+
 }

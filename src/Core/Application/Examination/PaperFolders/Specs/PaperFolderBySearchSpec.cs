@@ -4,10 +4,9 @@ using FSH.WebApi.Domain.Examination;
 using MediatR;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
-public class PaperFolderBySearchSpec : EntitiesByPaginationFilterSpec<PaperFolder>
+public class PaperFolderBySearchSpec : Specification<PaperFolder>
 {
-    public PaperFolderBySearchSpec(IEnumerable<Guid> parentIds, SearchPaperFolderRequest request, DefaultIdType currentUserId)
-        : base(request)
+    public PaperFolderBySearchSpec(SearchPaperFolderRequest request, Guid currentUserId)
     {
             Query
             .Include(x => x.PaperFolderParent)
@@ -15,15 +14,9 @@ public class PaperFolderBySearchSpec : EntitiesByPaginationFilterSpec<PaperFolde
             .Include(x => x.PaperFolderPermissions)
             .ThenInclude(x => x.GroupTeacher)
             .Where(x => (x.CreatedBy == currentUserId || x.PaperFolderPermissions.Any(x => x.CanView))
-                  && (string.IsNullOrEmpty(request.Keyword) || x.Name.ToLower().Contains(request.Keyword.ToLower())));
-
-            if (parentIds.Any())
-            {
-                var nullableParentIds = parentIds.Select(id => (Guid?)id).ToList();
-                Query.Where(x => nullableParentIds.Contains(x.ParentId) || nullableParentIds.Contains(x.Id));
-            }
-
-            Query.OrderBy(x => x.CreatedOn, !request.HasOrderBy());
+                  && (string.IsNullOrEmpty(request.Name) || x.Name.ToLower().Contains(request.Name.ToLower())));
+            
+            Query.OrderBy(x => x.CreatedOn);
         
     }
 }

@@ -4,12 +4,13 @@ using FSH.WebApi.Domain.Examination;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.Papers;
-public class SearchPaperRequest : PaginationFilter,IRequest<PaginationResponse<PaperInListDto>>
+public class SearchPaperRequest : IRequest<List<PaperInListDto>>
 {
     public Guid? PaperFolderId { get; set; }
+    public string? Name { get; set; }
 }
 
-public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, PaginationResponse<PaperInListDto>>
+public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, List<PaperInListDto>>
 {
     private readonly IReadRepository<Paper> _repository;
     public readonly IReadRepository<PaperFolder> _paperFolderRepo;
@@ -23,31 +24,59 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
         _userService = userService;
     }
 
-    public async Task<PaginationResponse<PaperInListDto>> Handle(SearchPaperRequest request, CancellationToken cancellationToken)
+    public async Task<List<PaperInListDto>> Handle(SearchPaperRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
 
         var data = new List<Paper>();
         var parentIds = new List<Guid>();
         var count = 0;
-        if (request.PaperFolderId.HasValue)
+
+        //If search by name
+        if (!string.IsNullOrEmpty(request.Name))
         {
-            parentIds.Add(request.PaperFolderId.Value);
-            var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value));
-            if (parentFolder != null)
+            var treeFolder = await _paperFolderRepo.ListAsync(new PaperFolderTreeSpec());
+
+            //If search by name in folder
+            if (request.PaperFolderId.HasValue)
             {
-                parentFolder.ChildPaperFolderIds(null, parentIds);
+                parentIds.Add(request.PaperFolderId.Value);
+                var parentFolder = treeFolder.FirstOrDefault(x => x.Id == request.PaperFolderId.Value);
+                if (parentFolder != null)
+                {
+                    parentFolder.ChildPaperFolderIds(null, parentIds);
+                }
+                var spec = new PaperBySearchSpec(parentIds, request);
+                data = await _repository.ListAsync(spec, cancellationToken);
             }
-            var spec = new PaperBySearchSpec(parentIds, request);
-            count = await _repository.CountAsync(spec, cancellationToken);
-            data = await _repository.ListAsync(spec, cancellationToken);
+            else  //If search by name in root
+            {
+                var spec = new PaperBySearchSpec(null, request);
+                data = await _repository.ListAsync(spec, cancellationToken);
+                foreach (var paper in data)
+                {
+                    paper.PaperFolder = treeFolder.FirstOrDefault(folder => folder.Id == paper.PaperFolderId);
+                }
+
+            }
         }
         else
         {
-            var spec = new PaperBySearchSpec(null, request);
-            count = await _repository.CountAsync(spec, cancellationToken);
-            data = await _repository.ListAsync(spec, cancellationToken);
+            //If specific folder
+            if (request.PaperFolderId.HasValue)
+            {
+                parentIds.Add(request.PaperFolderId.Value);
+                var spec = new PaperBySearchSpec(parentIds, request);
+                data = await _repository.ListAsync(spec, cancellationToken);
+            }//If root
+            else
+            {
+                var spec = new PaperBySearchSpec(null, request);
+                data = await _repository.ListAsync(spec, cancellationToken);
+            }
         }
+
+         
 
         var dtos = new List<PaperInListDto>();
         foreach (var paper in data)
@@ -61,7 +90,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Pag
             dto.CreatorName = await _userService.GetFullName(paper.CreatedBy);
             dtos.Add(dto);
         }
-        return new PaginationResponse<PaperInListDto>(dtos, count, request.PageNumber, request.PageSize);
+        return dtos;
 
     }
 }

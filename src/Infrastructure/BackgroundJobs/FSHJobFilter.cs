@@ -23,16 +23,26 @@ public class FSHJobFilter : IClientFilter
 
         Logger.InfoFormat("Set TenantId and UserId parameters to job {0}.{1}...", context.Job.Method.ReflectedType?.FullName, context.Job.Method.Name);
 
-        using var scope = _services.CreateScope();
+        string recurringJobId = context.GetJobParameter<string>("RecurringJobId");
 
-        var httpContext = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>()?.HttpContext;
-        _ = httpContext ?? throw new InvalidOperationException("Can't create a TenantJob without HttpContext.");
+        if (!string.IsNullOrEmpty(recurringJobId))
+        {
+            string tenantIdName = recurringJobId.Split('-')[0];
+            context.SetJobParameter(MultitenancyConstants.TenantIdName, tenantIdName);
+        }
+        else
+        {
+            using var scope = _services.CreateScope();
 
-        var tenantInfo = scope.ServiceProvider.GetRequiredService<ITenantInfo>();
-        context.SetJobParameter(MultitenancyConstants.TenantIdName, tenantInfo);
+            var httpContext = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>()?.HttpContext;
+            _ = httpContext ?? throw new InvalidOperationException("Can't create a TenantJob without HttpContext.");
 
-        string? userId = httpContext.User.GetUserId();
-        context.SetJobParameter(QueryStringKeys.UserId, userId);
+            var tenantInfo = scope.ServiceProvider.GetRequiredService<ITenantInfo>();
+            context.SetJobParameter(MultitenancyConstants.TenantIdName, tenantInfo.Identifier);
+
+            string? userId = httpContext.User.GetUserId();
+            context.SetJobParameter(QueryStringKeys.UserId, userId);
+        }
     }
 
     public void OnCreated(CreatedContext context) =>

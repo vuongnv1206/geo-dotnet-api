@@ -54,14 +54,12 @@ public class AddTeacherIntoTeacherTeamRequestHandler : IRequestHandler<AddTeache
             case ValidationType.EmailAddress:
                 teacherTeam.Email = request.Contact;
                 var teacher = await _userService.GetUserDetailByEmailAsync(request.Contact, cancellationToken);
-                if (teacher is not null)
-                    teacherTeam.TeacherId = teacher.Id;
+                teacherTeam.TeacherId = teacher?.Id ?? (Guid?)null;
                 break;
             case ValidationType.PhoneNumber:
                 teacherTeam.Phone = request.Contact;
                 teacher = await _userService.GetUserDetailByPhoneAsync(request.Contact, cancellationToken);
-                if (teacher is not null)
-                    teacherTeam.TeacherId = teacher.Id;
+                teacherTeam.TeacherId = teacher?.Id ?? (Guid?)null;
                 break;
             default:
                 throw new ConflictException(_t["This Contact is invalid!"]);

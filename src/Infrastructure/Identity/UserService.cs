@@ -8,10 +8,12 @@ using FSH.WebApi.Application.Common.FileStorage;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.Models;
+using FSH.WebApi.Application.Common.Persistence;
 using FSH.WebApi.Application.Common.ReCaptchaV3;
 using FSH.WebApi.Application.Common.Specification;
 using FSH.WebApi.Application.Common.SpeedSMS;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Infrastructure.Auth;
 using FSH.WebApi.Infrastructure.Persistence.Context;
@@ -42,6 +44,7 @@ internal partial class UserService : IUserService
     private readonly ITenantInfo _currentTenant;
     private readonly IReCAPTCHAv3Service _reCAPTCHAv3Service;
     private readonly ISpeedSMSService _speedSMSService;
+    private readonly IRepository<Student> _studentRepo;
 
     public UserService(
         SignInManager<ApplicationUser> signInManager,
@@ -59,7 +62,8 @@ internal partial class UserService : IUserService
         ITenantInfo currentTenant,
         IReCAPTCHAv3Service reCAPTCHAv3Service,
         IOptions<SecuritySettings> securitySettings,
-        ISpeedSMSService speedSMSService)
+        ISpeedSMSService speedSMSService,
+        IRepository<Student> studentRepo)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -77,6 +81,7 @@ internal partial class UserService : IUserService
         _reCAPTCHAv3Service = reCAPTCHAv3Service;
         _securitySettings = securitySettings.Value;
         _speedSMSService = speedSMSService;
+        _studentRepo = studentRepo;
     }
 
     public async Task<PaginationResponse<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
@@ -154,7 +159,7 @@ internal partial class UserService : IUserService
 
         user.IsActive = request.ActivateUser;
 
-        await _userManager.UpdateAsync(user);
+        _ = await _userManager.UpdateAsync(user);
 
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id));
     }
@@ -163,28 +168,18 @@ internal partial class UserService : IUserService
     {
         var user = await _userManager.Users
            .AsNoTracking()
-           .Where(u => u.Email == email && u.IsActive)
+           .Where(u => u.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && u.IsActive)
            .FirstOrDefaultAsync(cancellationToken);
-        if (user is null)
-        {
-            return new UserDetailsDto();
-        }
-
-        return user.Adapt<UserDetailsDto>();
+        return user is null ? new UserDetailsDto() : user.Adapt<UserDetailsDto>();
     }
 
     public async Task<UserDetailsDto> GetUserDetailByPhoneAsync(string phoneNumber, CancellationToken cancellationToken)
     {
         var user = await _userManager.Users
            .AsNoTracking()
-           .Where(u => u.PhoneNumber == phoneNumber && u.IsActive)
+           .Where(u => u.PhoneNumber.Trim().ToLower().Equals(phoneNumber.Trim().ToLower()) && u.IsActive)
            .FirstOrDefaultAsync(cancellationToken);
-        if (user is null)
-        {
-            return new UserDetailsDto();
-        }
-
-        return user.Adapt<UserDetailsDto>();
+        return user is null ? new UserDetailsDto() : user.Adapt<UserDetailsDto>();
     }
 
     public async Task GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
@@ -201,5 +196,10 @@ internal partial class UserService : IUserService
     {
         var user = await GetAsync(userId.ToString(), CancellationToken.None);
         return string.Join(" ", user.FirstName, user.LastName);
+    }
+
+    public Task GetUserByIdAsync(DefaultIdType? userId, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

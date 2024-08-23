@@ -165,6 +165,11 @@ public class PaymentService : IPaymentService
 
     public async Task<string> CreateOrder(Guid userId, Guid subscriptionId)
     {
+        if (await _context.Orders.AnyAsync(o => o.UserId == userId && o.Status == OrderStatus.PENDING))
+        {
+            throw new BadRequestException("You have pending order. Please complete or cancel it first.");
+        }
+
         Subscription subscription = await _context.Subscriptions.FirstOrDefaultAsync(s => s.Id == subscriptionId) ?? throw new NotFoundException("Subscription not found.");
 
         string orderNo = GenerateUniqueOrderNo();

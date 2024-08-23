@@ -23,18 +23,8 @@ public class DeleteGroupClassRequestHandler : IRequestHandler<DeleteGroupClassRe
     public async Task<Guid> Handle(DeleteGroupClassRequest request, CancellationToken cancellationToken)
     {
 
-        var classes = await _classRepo.ListAsync(new ClassByGroupClassSpec(request.Id), cancellationToken);
-        if (classes != null)
-        {
-            foreach (var c in classes)
-            {
-                c.UpdateGroupClassId(null);
-                await _classEventRepo.UpdateAsync(c, cancellationToken);
-            }
-        }
 
-        var groupClass = await _groupClassRepo.GetByIdAsync(request.Id, cancellationToken);
-
+        var groupClass = await _groupClassRepo.FirstOrDefaultAsync(new GroupClassByIdSpec(request.Id), cancellationToken);
         _ = groupClass ?? throw new NotFoundException(_t["GroupClass {0} Not Found."]);
 
         await _groupClassRepo.DeleteAsync(groupClass, cancellationToken);

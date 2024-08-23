@@ -73,7 +73,7 @@ public class GetListTranscriptRequestHandler : IRequestHandler<GetListTranscript
 
             results.Add(new TranscriptResultDto
             {
-                Attendee = student.Adapt<StudentDto>(),
+                Attendee = student != null ? student.Adapt<StudentDto>() : null,
                 Mark = submission.TotalMark,
                 Classrooms = paper.PaperAccesses
                                     .Where(x => x.Class.UserClasses
