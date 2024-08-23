@@ -1,7 +1,7 @@
 {
   "SecuritySettings": {
     "Provider": "Jwt",
-    "RequireConfirmedAccount":false,
+    "RequireConfirmedAccount":true,
     "JwtSettings": {
       "key": "LVYj7.o.wrkRUsQ*~#->",
       "tokenExpirationInMinutes": 10080,
