@@ -36,7 +36,7 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Lis
         if (!string.IsNullOrEmpty(request.Name))
         {
             var treeFolder = await _paperFolderRepo.ListAsync(new PaperFolderTreeSpec());
-
+            var myTreeFolder = treeFolder.Where(x => x.CreatedBy == currentUserId).ToList();
             //If search by name in folder
             if (request.PaperFolderId.HasValue)
             {
@@ -46,12 +46,12 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Lis
                 {
                     parentFolder.ChildPaperFolderIds(null, parentIds);
                 }
-                var spec = new PaperBySearchSpec(parentIds, request);
+                var spec = new PaperBySearchSpec(parentIds, request,currentUserId);
                 data = await _repository.ListAsync(spec, cancellationToken);
             }
             else  //If search by name in root
             {
-                var spec = new PaperBySearchSpec(null, request);
+                var spec = new PaperBySearchSpec(null, request,currentUserId);
                 data = await _repository.ListAsync(spec, cancellationToken);
                 foreach (var paper in data)
                 {
@@ -66,12 +66,12 @@ public class SearchPaperRequestHandler : IRequestHandler<SearchPaperRequest, Lis
             if (request.PaperFolderId.HasValue)
             {
                 parentIds.Add(request.PaperFolderId.Value);
-                var spec = new PaperBySearchSpec(parentIds, request);
+                var spec = new PaperBySearchSpec(parentIds, request, currentUserId);
                 data = await _repository.ListAsync(spec, cancellationToken);
             }//If root
             else
             {
-                var spec = new PaperBySearchSpec(null, request);
+                var spec = new PaperBySearchSpec(null, request,currentUserId);
                 data = await _repository.ListAsync(spec, cancellationToken);
             }
         }
