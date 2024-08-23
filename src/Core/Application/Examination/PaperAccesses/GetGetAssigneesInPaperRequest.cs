@@ -56,6 +56,11 @@ public class GetGetAssigneesInPaperRequestHandler : IRequestHandler<GetGetAssign
 
         var classrooms = await _classRepo.ListAsync(spec, cancellationToken);
 
+        foreach(var classroom in classrooms)
+        {
+            classroom.UserClasses = classroom.UserClasses.Where(x => accessStudentIds.Contains(x.StudentId)).ToList();
+        }
+
         var classMap = classrooms.Adapt<List<ClassAccessPaper>>();
 
         return new PaginationResponse<ClassAccessPaper>(classMap, classrooms.Count, request.PageNumber, request.PageSize);
