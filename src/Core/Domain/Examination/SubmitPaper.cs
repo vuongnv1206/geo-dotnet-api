@@ -63,7 +63,9 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         }
         else
         {
+            TotalMark -= answer.Mark ?? 0;
             answer.Mark = mark;
+            TotalMark += mark;
         }
     }
 

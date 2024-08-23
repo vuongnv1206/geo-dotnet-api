@@ -59,7 +59,7 @@ public class AcceptRequestJoinTeamRequestHandler : IRequestHandler<AcceptRequest
         {
             Message = $"{_currentUser.GetUserEmail()} accepted request. Now you can join \"{_currentUser.GetUserEmail()}\" team",
             Label = BasicNotification.LabelType.Success,
-            Title = "Join group",
+            Title = "Join team",
         };
 
         await _notificationService.SendNotificationToUser(joinRequest.CreatedBy.ToString(), noti, null, cancellationToken);
