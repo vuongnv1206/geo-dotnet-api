@@ -63,8 +63,11 @@ public class CreateMatrixRequestHandler : IRequestHandler<CreateMatrixRequest, G
         foreach (var item in contentItems)
         {
             // Kiểm tra QuestionFolderId có hợp lệ hay không
-            var questionFolder = await _questionFolderRepo.FirstOrDefaultAsync(
-                new QuestionFolderByIdSpec(item.QuestionFolderId), cancellationToken);
+            var questionFolderTree = await _questionFolderRepo.ListAsync(
+                new QuestionFolderTreeSpec(), cancellationToken);
+            var questionFolder = questionFolderTree.Where(x => x.Id == item.QuestionFolderId).FirstOrDefault();
+
+            
             _ = questionFolder ?? throw new NotFoundException(
                 $"Question Folder with ID {item.QuestionFolderId} not found.");
 
@@ -90,7 +93,7 @@ public class CreateMatrixRequestHandler : IRequestHandler<CreateMatrixRequest, G
                 if (criteria.NumberOfQuestion > totalQuestionsAlreadyExisted)
                 {
                     throw new ConflictException(
-                        $" Number of question ({criteria.NumberOfQuestion}) for Label {questionLabelExists.Name} exceeds available questions ({totalQuestionsAlreadyExisted}) in the folder.");
+                        $" Number of question {criteria.NumberOfQuestion} for {questionLabelExists.Name} exceeds available {totalQuestionsAlreadyExisted} in the folder.");
                 }
 
                 // Nếu RawIndex trống, tính toán và gán giá trị mới cho RawIndex
