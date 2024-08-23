@@ -97,9 +97,14 @@ namespace FSH.WebApi.Infrastructure.Class.UserClasses
             worksheet.Column(5).Width = 20; // Email
             worksheet.Column(6).Width = 10; // Phone Number
             worksheet.Column(7).Width = 15; // Student Code
+            worksheet.Column(7).Width = 30; // error
 
             var headerRange = worksheet.Range(1, 1, 1, 7);
             headerRange.Style.Fill.BackgroundColor = XLColor.BabyBlue;
+
+            // Đặt màu nền của ô thứ 8 trên dòng đầu tiên thành màu đỏ
+            var cell8 = worksheet.Cell(1, 8);
+            cell8.Style.Fill.BackgroundColor = XLColor.Red;
 
             // Place the dropdown values in cells
             worksheet.Cell("Z1").Value = "Male";
@@ -136,39 +141,61 @@ namespace FSH.WebApi.Infrastructure.Class.UserClasses
 
         public async Task<List<CreateStudentDto>> GetImportStudents(IFormFile file, Guid classId)
         {
-            var students = new List<CreateStudentDto>();
             if (file == null || file.Length == 0)
             {
-                return students;
+                return new List<CreateStudentDto>();
             }
 
-            using (var stream = new MemoryStream())
-            {
-                await file.CopyToAsync(stream);
-                using (var workbook = new XLWorkbook(stream))
-                {
-                    var worksheet = workbook.Worksheet(1);
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            using var workbook = new XLWorkbook(stream);
+            var worksheet = workbook.Worksheet(1);
 
-                    for (int row = 2; row <= worksheet.LastRowUsed().RowNumber(); row++)
-                    {
-                        var student = new CreateStudentDto
-                        {
-                            FirstName = worksheet.Cell(row, 1).GetValue<string>(),
-                            LastName = worksheet.Cell(row, 2).GetValue<string>(),
-                            Gender = worksheet.Cell(row, 3).GetValue<string>() == "Male",
-                            DateOfBirth = worksheet.Cell(row, 4).GetDateTime(),
-                            Email = worksheet.Cell(row, 5).GetValue<string>(),
-                            PhoneNumber = worksheet.Cell(row, 6).GetValue<string>(),
-                            StudentCode = worksheet.Cell(row, 7).GetValue<string>(),
-                            ClassesId = classId
-                        };
-                        students.Add(student);
-                    }
-
-                }
-            }
-
-            return students;
+            return worksheet.RowsUsed().Skip(1) // Bỏ qua hàng tiêu đề
+                .Select(row => ParseStudent(row, classId))
+                .Where(student => student != null)
+                .ToList();
         }
+
+        private CreateStudentDto ParseStudent(IXLRow row, Guid classId)
+        {
+            if (IsRowEmpty(row))
+            {
+                return null;
+            }
+
+            return new CreateStudentDto
+            {
+                FirstName = row.Cell(1).GetValue<string>(),
+                LastName = row.Cell(2).GetValue<string>(),
+                Gender = ParseGender(row.Cell(3).GetValue<string>()),
+                DateOfBirth = ParseDateOfBirth(row.Cell(4).GetValue<string>()),
+                Email = row.Cell(5).GetValue<string>(),
+                PhoneNumber = row.Cell(6).GetValue<string>(),
+                StudentCode = row.Cell(7).GetValue<string>(),
+                ClassesId = classId
+            };
+        }
+
+        private bool IsRowEmpty(IXLRow row)
+        {
+            return row.CellsUsed().All(cell => string.IsNullOrWhiteSpace(cell.GetValue<string>()));
+        }
+
+        private bool ParseGender(string gender)
+        {
+            return string.Equals(gender, "Male", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private DateTime? ParseDateOfBirth(string dateOfBirth)
+        {
+            if (DateTime.TryParse(dateOfBirth, out var dob))
+            {
+                return dob;
+            }
+            return null;
+        }
+
     }
+
 }

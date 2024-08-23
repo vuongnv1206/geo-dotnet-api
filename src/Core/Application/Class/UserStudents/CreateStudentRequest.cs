@@ -4,6 +4,7 @@ using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.TeacherGroup;
+using System.Text.RegularExpressions;
 
 namespace FSH.WebApi.Application.Class.UserStudents;
 public class CreateStudentRequest : IRequest<Guid>
@@ -72,6 +73,17 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
                 throw new NotFoundException(_t["Classes {0} Not Found.", request.ClassesId]);
         }
 
+        if (string.IsNullOrEmpty(request.Email) && string.IsNullOrEmpty(request.PhoneNumber))
+        {
+            throw new BadRequestException(_t["An email address or phone number is required"]);
+        }
+
+        if (string.IsNullOrEmpty(request.StudentCode))
+        {
+            throw new BadRequestException(_t["a studetn code is required"]);
+        }
+
+
         if (classroom.UserClasses != null)
         {
             if (classroom.UserClasses.Any(x => x.Student.Email.Trim() == request.Email.Trim()))
@@ -80,6 +92,23 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
                 throw new BadRequestException(_t["Phone number is existed in class"]);
             else if (classroom.UserClasses.Any(x => x.Student.StudentCode.Trim() == request.StudentCode.Trim()))
                 throw new BadRequestException(_t["Code student is existed in class"]);
+        }
+
+        if (request.DateOfBirth.HasValue)
+        {
+            var today = DateTime.Today;
+
+            int age = today.Year - request.DateOfBirth.Value.Year;
+
+            if (age < 12)
+            {
+                throw new BadRequestException(_t["The student is not yet 12 years old"]);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(request.Email) && !IsValidEmail(request.Email))
+        {
+            throw new BadRequestException(_t["Invalid format email address"]);
         }
 
         var userStudent = new Student
@@ -142,5 +171,22 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
             });
         }
         return userStudent.Id;
+    }
+
+    private bool IsValidEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        try
+        {
+            // Sử dụng biểu thức chính quy để kiểm tra định dạng email
+            var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase);
+            return emailRegex.IsMatch(email);
+        }
+        catch (RegexMatchTimeoutException)
+        {
+            return false;
+        }
     }
 }
