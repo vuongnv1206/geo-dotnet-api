@@ -73,6 +73,67 @@ namespace FSH.WebApi.Infrastructure.Class.UserClasses
             }
         }
 
+        public byte[] GenerateImportStudentFailed(List<FailedStudentRequest> listFail)
+        {
+            var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Import student");
+
+            worksheet.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+            worksheet.Cell(1, 1).Value = "First name";
+            worksheet.Cell(1, 2).Value = "Last name";
+            worksheet.Cell(1, 3).Value = "Gender";
+            worksheet.Cell(1, 4).Value = "Date of Birth";
+            worksheet.Cell(1, 5).Value = "Email";
+            worksheet.Cell(1, 6).Value = "Phone Number";
+            worksheet.Cell(1, 7).Value = "Student Code";
+            worksheet.Cell(1, 8).Value = "Error";
+
+            // Set column widths
+            worksheet.Column(1).Width = 30; // First name
+            worksheet.Column(2).Width = 30; // Last name
+            worksheet.Column(3).Width = 10; // Gender
+            worksheet.Column(4).Width = 20; // Date of Birth
+            worksheet.Column(5).Width = 20; // Email
+            worksheet.Column(6).Width = 10; // Phone Number
+            worksheet.Column(7).Width = 15; // Student Code
+
+            var headerRange = worksheet.Range(1, 1, 1, 7);
+            headerRange.Style.Fill.BackgroundColor = XLColor.BabyBlue;
+
+            // Place the dropdown values in cells
+            worksheet.Cell("Z1").Value = "Male";
+            worksheet.Cell("Z2").Value = "Female";
+
+            // Add data validation for Gender column (dropdown)
+            var genderRange = worksheet.Range("C2:C100"); // Apply dropdown from row 2 to row 100 in column C
+            var dataValidation = genderRange.CreateDataValidation();
+            dataValidation.List(worksheet.Range("Z1:Z2"));
+
+            var dateRange = worksheet.Range("D2:D100");
+            dateRange.Style.DateFormat.Format = "dd/mm/yyyy";
+
+            // Add sample data to worksheet using a loop
+            for (int i = 0; i < listFail.Count; i++)
+            {
+                worksheet.Cell(i + 2, 1).Value = listFail[i].StudentRequest.FirstName;
+                worksheet.Cell(i + 2, 2).Value = listFail[i].StudentRequest.LastName;
+                worksheet.Cell(i + 2, 3).Value = listFail[i].StudentRequest.Gender.Value ? "Male" : "Female";
+                worksheet.Cell(i + 2, 4).Value = listFail[i].StudentRequest.DateOfBirth;
+                worksheet.Cell(i + 2, 5).Value = listFail[i].StudentRequest.Email;
+                worksheet.Cell(i + 2, 6).Value = listFail[i].StudentRequest.PhoneNumber;
+                worksheet.Cell(i + 2, 7).Value = listFail[i].StudentRequest.StudentCode;
+                worksheet.Cell(i + 2, 8).Value = listFail[i].ErrorMessage;
+            }
+
+
+            using (var stream = new MemoryStream())
+            {
+                workbook.SaveAs(stream);
+                return stream.ToArray();
+            }
+        }
+
         public async Task<List<CreateStudentDto>> GetImportStudents(IFormFile file, Guid classId)
         {
             var students = new List<CreateStudentDto>();
