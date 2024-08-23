@@ -1,11 +1,11 @@
 ﻿using FSH.WebApi.Application.Examination.Monitor;
-using FSH.WebApi.Application.Examination.Monitor.Dtos;
 using FSH.WebApi.Application.Examination.Papers.ByStudents;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
+using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Host.Controllers.Examination;
 public class SubmitPapersController : VersionedApiController
@@ -96,7 +96,7 @@ public class SubmitPapersController : VersionedApiController
 
     [HttpPost("monitor-detail")]
     [OpenApiOperation("Monitor detail of user in exam")]
-    public async Task<ActionResult<MonitorDetailExamDto>> MonitorDetailExam(MonitorDetailExamRequest request)
+    public async Task<ActionResult<PaginationResponse<SubmitPaperLog>>> MonitorDetailExam(MonitorDetailExamRequest request)
     {
         return await Mediator.Send(request);
     }

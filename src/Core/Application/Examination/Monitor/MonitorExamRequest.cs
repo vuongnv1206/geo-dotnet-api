@@ -204,6 +204,12 @@ public class SubmitPaperLogBySubmitPaperIdSpec : Specification<SubmitPaperLog>, 
 {
     public SubmitPaperLogBySubmitPaperIdSpec(DefaultIdType? submitPaperId)
     {
-        _ = Query.Where(p => p.SubmitPaperId == submitPaperId);
+        _ = Query.Where(p => p.SubmitPaperId == submitPaperId).OrderByDescending(x => x.CreatedOn);
+    }
+
+    public SubmitPaperLogBySubmitPaperIdSpec(DefaultIdType? submitPaperId, int pageNumber, int pageSize)
+        : this(submitPaperId)
+    {
+        _ = Query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
     }
 }

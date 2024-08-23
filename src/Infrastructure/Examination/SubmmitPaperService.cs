@@ -1,7 +1,7 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using FSH.WebApi.Application.Common.Exceptions;
+﻿using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Application.Examination.Monitor;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
@@ -20,7 +20,6 @@ using Mapster;
 using Microsoft.Extensions.Localization;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace FSH.WebApi.Infrastructure.Examination;
 public class SubmmitPaperService : ISubmmitPaperService
@@ -921,8 +920,36 @@ public class SubmmitPaperService : ISubmmitPaperService
     {
         SubmitPaperLog spl = request.Adapt<SubmitPaperLog>();
 
-        // Add new submit paper log
-        _ = await _submitPaperLogRepository.AddAsync(spl, cancellationToken);
+        // get last submit paper log
+        var lastLog = await _submitPaperLogRepository.FirstOrDefaultAsync(new SubmitPaperLogBySubmitPaperIdSpec(spl.SubmitPaperId), cancellationToken);
+
+        // compare last log and current log
+        bool flag = false;
+        if (lastLog != null)
+        {
+            flag = lastLog.DeviceId != spl.DeviceId ||
+                        lastLog.DeviceName != spl.DeviceName ||
+                        lastLog.DeviceType != spl.DeviceType ||
+                        lastLog.PublicIp != spl.PublicIp ||
+                        lastLog.LocalIp != spl.LocalIp ||
+                        lastLog.ProcessLog != spl.ProcessLog ||
+                        lastLog.MouseLog != spl.MouseLog ||
+                        lastLog.KeyboardLog != spl.KeyboardLog ||
+                        lastLog.NetworkLog != spl.NetworkLog ||
+                        lastLog.IsSuspicious != spl.IsSuspicious;
+        }
+
+        if (!flag && lastLog != null)
+        {
+            // Update last submit paper log lasmodified
+            lastLog.LastModifiedOn = DateTime.Now;
+            await _submitPaperLogRepository.UpdateAsync(lastLog, cancellationToken);
+        }
+        else
+        {
+            // Add new submit paper log
+            _ = await _submitPaperLogRepository.AddAsync(spl, cancellationToken);
+        }
 
         return spl.Id;
     }
@@ -934,22 +961,22 @@ public class SubmmitPaperService : ISubmmitPaperService
         return x == markFlag;
     }
 
-    public async Task<LastResultExamDto> GetLastResultExamAsync(Guid paperId, Guid userId, Guid submitPaperId,CancellationToken cancellationToken)
+    public async Task<LastResultExamDto> GetLastResultExamAsync(Guid paperId, Guid userId, Guid submitPaperId, CancellationToken cancellationToken)
     {
         var spec = new ExamResultSpec(submitPaperId, paperId, userId);
-        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(spec,cancellationToken)
+        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(spec, cancellationToken)
             ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
 
-        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId),cancellationToken);
+        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
 
         var student = await _userService.GetAsync(userId.ToString(), cancellationToken);
-
 
         float totalMark = 0;
         var submitPaperDetailsDtos = new List<SubmitPaperDetailDto>();
         foreach (var submit in submitPaper.SubmitPaperDetails)
         {
             float questionMark = paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId)?.Mark ?? 0;
+
             // if question is Reading
             if (submit.Question.QuestionType == QuestionType.Reading)
             {
@@ -970,6 +997,7 @@ public class SubmmitPaperService : ISubmmitPaperService
             {
                 totalMark += CalculateScore(submit, submit.Question!, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
             }
+
             // Fill SubmitPaperDetailDto
             var submitPaperDetailDto = new SubmitPaperDetailDto
             {
@@ -977,7 +1005,7 @@ public class SubmmitPaperService : ISubmmitPaperService
                 QuestionId = submit.QuestionId,
                 AnswerRaw = submit.AnswerRaw,
                 Mark = submit.Mark,
-                IsCorrect = IsCorrectAnswer(submit,submit.Question),
+                IsCorrect = IsCorrectAnswer(submit, submit.Question),
                 CreatedBy = submit.CreatedBy,
                 CreatedOn = submit.CreatedOn,
                 LastModifiedBy = submit.LastModifiedBy,
