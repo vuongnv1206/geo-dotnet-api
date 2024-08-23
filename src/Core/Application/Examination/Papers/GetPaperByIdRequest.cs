@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Examination.Papers.Dtos;
+﻿using FSH.WebApi.Application.Common.Interfaces;
+using FSH.WebApi.Application.Examination.Papers.Dtos;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Domain.Examination;
 using Mapster;
@@ -34,6 +35,22 @@ public class GetPaperByIdRequestHandler : IRequestHandler<GetPaperByIdRequest, P
         var paperDto = paper.Adapt<PaperDto>();
         paperDto.CreatorName = await _userService.GetFullName(paper.CreatedBy);
         paperDto.TotalAttended = paper.GetTotalSubmissions();
+
+        if (paperDto.PaperPermissions.Any())
+        {
+            foreach (var per in paperDto.PaperPermissions)
+            {
+                if (per.UserId.HasValue)
+                {
+                    var user_permission = await _userService.GetAsync(per.UserId.ToString(), cancellationToken);
+                    if (user_permission != null)
+                    {
+                        per.User = user_permission;
+                    }
+                }
+            }
+        }
+
 
         return paperDto;
 

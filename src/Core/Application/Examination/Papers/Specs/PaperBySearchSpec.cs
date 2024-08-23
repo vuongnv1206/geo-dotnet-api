@@ -10,6 +10,7 @@ public class PaperBySearchSpec : Specification<Paper>
             .Include(x => x.PaperPermissions)
             .Include(x => x.PaperLabel)
             .Include(x => x.PaperFolder).ThenInclude(x => x.PaperFolderParent)
+            .Include(x => x.PaperFolder).ThenInclude(x => x.PaperFolderPermissions)
             .Where(x => (x.CreatedBy == currentUserId))
             .OrderBy(x => x.CreatedOn);
            
