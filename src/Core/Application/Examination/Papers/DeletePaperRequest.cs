@@ -1,12 +1,6 @@
-﻿using FSH.WebApi.Application.Common.Interfaces;
-using FSH.WebApi.Application.Common.Persistence;
-using FSH.WebApi.Application.Examination.PaperFolders;
+﻿
 using FSH.WebApi.Domain.Examination;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace FSH.WebApi.Application.Examination.Papers;
 public class DeletePaperRequest : IRequest<Guid>
@@ -44,6 +38,19 @@ public class DeletePaperRequestHandler : IRequestHandler<DeletePaperRequest, Gui
         if (!paper.CanDelete(_currentUser.GetUserId()))
         {
             throw new ForbiddenException(_t["You do not have permission to delete this paper."]);
+        }
+
+        // Kiểm tra nếu có bài thi nào đã được nộp
+        if (paper.SubmitPapers.Any())
+        {
+            throw new ConflictException(_t["Cannot delete this paper because there are submitted exams associated with it."]);
+        }
+
+        // Kiểm tra nếu đang trong quá trình thi
+        var timeNow = DateTime.UtcNow;
+        if (paper.StartTime.HasValue && paper.EndTime.HasValue && timeNow >= paper.StartTime.Value && timeNow <= paper.EndTime.Value)
+        {
+            throw new ConflictException(_t["Cannot delete this paper because the exam is currently in progress."]);
         }
 
         await _repo.DeleteAsync(paper);
