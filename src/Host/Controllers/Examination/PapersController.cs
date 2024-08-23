@@ -164,4 +164,12 @@ public class PapersController : VersionedApiController
     {
         return await Mediator.Send(request);
     }
+
+    [HttpPost("get-assignees-paper")]
+    [OpenApiOperation("get student who assigned to paper")]
+    [MustHavePermission(FSHAction.View, FSHResource.Papers)]
+    public async Task<PaginationResponse<ClassAccessPaper>> GetAssigneesInPaper(GetGetAssigneesInPaperRequest request)
+    {
+        return await Mediator.Send(request);
+    }
 }

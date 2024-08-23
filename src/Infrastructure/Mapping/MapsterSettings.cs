@@ -305,7 +305,8 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<CreateStudentRequest, CreateStudentDto>.NewConfig();
 
-        _ = TypeAdapterConfig<Classes, ClassAccessPaper>.NewConfig();
+        _ = TypeAdapterConfig<Classes, ClassAccessPaper>.NewConfig()
+            .Map(dest => dest.GroupClassName, src => src.GroupClass.Name);
         _ = TypeAdapterConfig<Student, StudentAccessPaper>.NewConfig();
 
     }
