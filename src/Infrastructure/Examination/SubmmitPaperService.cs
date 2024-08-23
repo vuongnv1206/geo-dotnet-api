@@ -960,10 +960,10 @@ public class SubmmitPaperService : ISubmmitPaperService
         return spl.Id;
     }
 
-    public bool IsCorrectAnswer(SubmitPaperDetail submitDetail, QuestionClone question)
+    public bool IsCorrectAnswer(SubmitPaperDetail submitDetail, QuestionClone question, List<SubmitPaperDetail>? details = null)
     {
         float markFlag = 10f;
-        float x = CalculateScore(submitDetail, question, markFlag);
+        float x = CalculateScore(submitDetail, question, markFlag, details);
         return x == markFlag;
     }
 
@@ -983,11 +983,12 @@ public class SubmmitPaperService : ISubmmitPaperService
         {
             float questionMark = paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId)?.Mark ?? 0;
 
+            bool isCorrect = false;
             // if question is Reading
             if (submit.Question.QuestionType == QuestionType.Reading)
             {
                 // list of question passages detail
-                List<SubmitPaperDetail> details = new();
+                List<SubmitPaperDetail> details = new List<SubmitPaperDetail>();
                 foreach (var qp in submit.Question!.QuestionPassages)
                 {
                     var detail1 = submitPaper.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == qp.Id);
@@ -998,10 +999,18 @@ public class SubmmitPaperService : ISubmmitPaperService
                 }
 
                 totalMark += CalculateScore(submit, submit.Question!, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark, details);
+                isCorrect = IsCorrectAnswer(submit, submit.Question, details);
+            }
+            else if (submit.Question.QuestionType == QuestionType.ReadingQuestionPassage)
+            {
+                var parentQuestion = paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.Question.QuestionParentId);
+                totalMark += CalculateScore(submit, submit.Question!, parentQuestion.Mark / parentQuestion.Question.QuestionPassages.Count);
+                isCorrect = IsCorrectAnswer(submit, submit.Question);
             }
             else
             {
                 totalMark += CalculateScore(submit, submit.Question!, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+                isCorrect = IsCorrectAnswer(submit, submit.Question);
             }
 
             // Fill SubmitPaperDetailDto
@@ -1011,7 +1020,7 @@ public class SubmmitPaperService : ISubmmitPaperService
                 QuestionId = submit.QuestionId,
                 AnswerRaw = submit.AnswerRaw,
                 Mark = submit.Mark,
-                IsCorrect = IsCorrectAnswer(submit, submit.Question),
+                IsCorrect = isCorrect,
                 CreatedBy = submit.CreatedBy,
                 CreatedOn = submit.CreatedOn,
                 LastModifiedBy = submit.LastModifiedBy,

@@ -72,7 +72,7 @@ public class SearchInviteJoinTeacherTeamRequestHandler : IRequestHandler<SearchI
             };
 
             var recipient = await _userService.GetUserDetailByEmailAsync(item.RecipientEmail, cancellationToken);
-            item.IsRegistered = recipient.Email != null && recipient.EmailConfirmed;
+            item.IsRegistered = recipient.Email != null;
         }
 
         return datas.OrderByDescending(x => x.CreateOn).ToList();

@@ -85,7 +85,7 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
         _ = _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
 
         var recipient = await _userService.GetUserDetailByEmailAsync(request.Contact, cancellationToken);
-        if (recipient.Email != null && recipient.EmailConfirmed)
+        if (recipient.Email != null)
         {
             var noti = new BasicNotification
             {
