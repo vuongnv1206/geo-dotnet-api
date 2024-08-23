@@ -8,6 +8,7 @@ public sealed class AccessibleFoldersWithChildrenSpec : Specification<PaperFolde
         Query
             .Where(folder => searchFolderIds.Contains(folder.Id))
             .Include(x => x.PaperFolderParent)
+            .Include(x => x.PaperFolderPermissions)
             .Include(folder => folder.PaperFolderChildrens);
 
         if (!string.IsNullOrEmpty(request.Name))

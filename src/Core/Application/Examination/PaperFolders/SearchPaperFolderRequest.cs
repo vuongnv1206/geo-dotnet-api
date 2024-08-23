@@ -35,6 +35,7 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
             // Find all parent IDs
             var parentIds = new List<Guid>();
             var treeFolder = await _paperFolderRepo.ListAsync(new PaperFolderTreeSpec());
+            var myTreeFolder = treeFolder.Where(x => x.CreatedBy == currentUserId).ToList();
             if (request.ParentId.HasValue)       //Search in folder
             {
                 parentIds.Add(request.ParentId.Value);
@@ -54,7 +55,7 @@ public class SearchPaperFolderRequestHandler : IRequestHandler<SearchPaperFolder
             }       
             else        //Search in root folder
             {   
-                data = treeFolder.Where(folder => string.IsNullOrEmpty(request.Name) ||folder.Name.Contains(request.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+                data = myTreeFolder.Where(folder => string.IsNullOrEmpty(request.Name) ||folder.Name.Contains(request.Name, StringComparison.OrdinalIgnoreCase)).ToList();
             }
         }
         else    

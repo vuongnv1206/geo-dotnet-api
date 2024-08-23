@@ -123,10 +123,10 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
                         throw new ConflictException(_t["Cannot update setting after the exam has ended."]);
                     }
 
-                    // Nếu đang trong khoảng 30 phút trước StartTime hoặc trong thời gian thi, không cho phép cập nhật
-                    if (timeNow > startTime.AddMinutes(-30) && timeNow < paper.EndTime)
+                    // Nếu đang trong qua trinh thi StartTime hoặc trong thời gian thi, không cho phép cập nhật
+                    if (timeNow > startTime && timeNow < paper.EndTime)
                     {
-                        throw new ConflictException(_t["Cannot update the paper within 30 minutes before the start time or during the exam."]);
+                        throw new ConflictException(_t["Cannot update setting ,exam in progress"]);
                     }
                 }
 

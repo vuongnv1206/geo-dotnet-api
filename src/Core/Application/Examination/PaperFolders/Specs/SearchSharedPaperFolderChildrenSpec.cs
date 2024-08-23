@@ -9,6 +9,7 @@ public class SearchSharedPaperFolderChildrenSpec : Specification<PaperFolder>
         Query
             .Include(x => x.PaperFolderParent)
             .Include(folder => folder.PaperFolderChildrens)
+               .Include(x => x.PaperFolderPermissions)
             .Where(folder => accessibleFolderIds.Contains(folder.Id) && folder.ParentId.HasValue && !accessibleFolderIds.Contains(folder.ParentId.Value))
             .OrderBy(x => x.CreatedOn);
     }

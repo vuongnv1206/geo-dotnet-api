@@ -14,6 +14,7 @@ public class AccessiblePaperInSearchSpec : Specification<Paper>
               .Include(x => x.PaperPermissions)
               .Include(x => x.PaperLabel)
               .Include(x => x.PaperFolder).ThenInclude(x => x.PaperFolderParent)
+              .Include(x => x.PaperFolder).ThenInclude(x => x.PaperFolderPermissions)
               .Where(x => accessiblePaperIds.Contains(x.Id)); // Filter by accessible paper IDs
 
         if (searchableFolderIds != null && searchableFolderIds.Any())
