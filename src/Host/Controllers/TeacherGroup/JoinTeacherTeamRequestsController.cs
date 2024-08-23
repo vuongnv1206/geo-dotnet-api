@@ -1,6 +1,4 @@
-﻿using FSH.WebApi.Application.TeacherGroup.JoinGroups;
-using FSH.WebApi.Application.TeacherGroup.JoinTeams;
-using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Application.TeacherGroup.JoinTeams;
 
 namespace FSH.WebApi.Host.Controllers.TeacherGroup;
 
@@ -51,6 +49,7 @@ public class JoinTeacherTeamRequestsController : VersionedApiController
     [OpenApiOperation("Invite teacher join to team.", "")]
     public Task InviteTeacherJoinTeam(InviteTeacherJoinRequest request)
     {
+        request.Origin = GetOriginFromRequest();
         return Mediator.Send(request);
     }
 
@@ -60,5 +59,12 @@ public class JoinTeacherTeamRequestsController : VersionedApiController
     public Task<List<InviteJoinTeacherTeamDto>> SearchAsync(SearchInviteJoinTeacherTeamRequest request)
     {
         return Mediator.Send(request);
+    }
+
+    private string GetOriginFromRequest()
+    {
+        return Request.Headers.TryGetValue("x-from-host", out var values)
+            ? $"{Request.Scheme}://{values.First()}"
+            : $"{Request.Scheme}://{Request.Host.Value}{Request.PathBase.Value}";
     }
 }

@@ -8,6 +8,7 @@ namespace FSH.WebApi.Application.TeacherGroup.JoinTeams;
 public class InviteTeacherJoinRequest : IRequest<Guid>
 {
     public string Contact { get; set; } = default!;
+    public string? Origin { get; set; }
 }
 
 public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoinRequest, Guid>
@@ -49,7 +50,7 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
         var userId = _currentUser.GetUserId();
         string senderEmail = _currentUser.GetUserEmail();
 
-        if(senderEmail == request.Contact)
+        if (senderEmail == request.Contact)
         {
             throw new BadRequestException(_t["You cannot join your own group."]);
         }
@@ -60,20 +61,20 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
             SenderEmail = senderEmail
         };
 
-        var existDuplicateContact = await _teacherTeamRepo.AnyAsync(
+        bool existDuplicateContact = await _teacherTeamRepo.AnyAsync(
             new TeacherTeamByContactSpec(request.Contact, userId), cancellationToken);
         if (existDuplicateContact)
         {
             throw new ConflictException(_t["Teacher's contact exist in team"]);
         }
 
-        await _inviteJoinRepo.AddAsync(inviteJoin);
-
+        _ = await _inviteJoinRepo.AddAsync(inviteJoin);
+        var enpointUrl = new Uri($"{request.Origin}/invite-join-team/{userId}/{inviteJoin.Id}");
         var eMailModel = new InviteJoinTeamEmailModel
         {
             RecipientEmail = request.Contact,
             SenderEmail = _currentUser.GetUserEmail(),
-            Url = $"http://localhost:5173/invite-join-team/{userId}/{inviteJoin.Id}"
+            Url = enpointUrl.ToString()
         };
 
         var mailRequest = new MailRequest(
@@ -81,8 +82,7 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
             _t["Join My Team"],
             _templateService.GenerateEmailTemplate("join-my-team", eMailModel));
 
-        _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
-
+        _ = _jobService.Enqueue(() => _mailService.SendAsync(mailRequest, CancellationToken.None));
 
         var recipient = await _userService.GetUserDetailByEmailAsync(request.Contact, cancellationToken);
         if (recipient.Email != null && recipient.EmailConfirmed)
