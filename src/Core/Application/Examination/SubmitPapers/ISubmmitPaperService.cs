@@ -14,6 +14,6 @@ public interface ISubmmitPaperService : ITransientService
     Task<float> CalculateScoreSubmitPaper(Guid submitPaperId);
     Task<List<SubmitPaper>> CalculateScorePaperAsync(Guid paperId, CancellationToken cancellationToken);
     Task<DefaultIdType> SendLogAsync(SendLogRequest request, CancellationToken cancellationToken);
-    bool IsCorrectAnswer(SubmitPaperDetail submitDetail, QuestionClone question);
+    bool IsCorrectAnswer(SubmitPaperDetail submitDetail, QuestionClone question, List<SubmitPaperDetail>? details = null);
     Task<LastResultExamDto> GetLastResultExamAsync(Guid paperId, Guid userId, Guid submitPaperId, CancellationToken cancellationToken);
 }

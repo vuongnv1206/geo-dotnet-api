@@ -1,12 +1,14 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperAccesses;
 public class GetGroupClassesAccessPaperRequest : PaginationFilter, IRequest<PaginationResponse<GroupClassAccessPaper>>
 {
     public Guid PaperId { get; set; }
+    public PaperShareType Status { get; set; }
 
     public GetGroupClassesAccessPaperRequest(DefaultIdType paperId)
     {
@@ -53,7 +55,18 @@ public class GetGroupClassesAccessPaperRequestHandler : IRequestHandler<GetGroup
             }
         }
 
-        var spec = new GroupClassAccessPaperByClassId(accessClassIds, accessStudentIds, request, paper.CreatedBy);
+        GroupClassAccessPaperSpec spec;
+            
+        if (request.Status == PaperShareType.AssignToStudent)
+        {
+            spec = new GroupClassAccessPaperSpec(accessStudentIds, request, paper.CreatedBy, request.Status);
+        }else if (request.Status == PaperShareType.AssignToClass)
+        {
+            spec = new GroupClassAccessPaperSpec(accessClassIds, request, paper.CreatedBy, request.Status);
+        }else
+        {
+            spec = new GroupClassAccessPaperSpec(accessClassIds, accessStudentIds, request, paper.CreatedBy);
+        }
 
         var groups = await _groupRepo.ListAsync(spec, cancellationToken);
 

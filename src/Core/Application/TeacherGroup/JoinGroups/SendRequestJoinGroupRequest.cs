@@ -49,11 +49,11 @@ public class SendRequestJoinGroupRequestHandler : IRequestHandler<SendRequestJoi
             throw new BadRequestException(_t["You cannot join your own group."]);
         }
 
-        var fullNameAdminGroup = _userService.GetFullName(group.CreatedBy);
+        var fullNameAdminGroup = await _userService.GetFullName(group.CreatedBy);
         // kiểm tra giáo viên có trong team của chủ group
         var existTeacherTeam = await _teacherTeamRepo
             .FirstOrDefaultAsync(new ExistTeacherMemberInTeamSpec(group.CreatedBy, userId))
-            ?? throw new BadRequestException(_t["You can not in {0} team.", fullNameAdminGroup.Result]);
+            ?? throw new BadRequestException(_t["You can not in {0} team.", fullNameAdminGroup]);
 
         if (group.TeacherInGroups.Any(x => x.TeacherTeamId == existTeacherTeam.Id))
         {

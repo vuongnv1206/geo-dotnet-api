@@ -85,7 +85,7 @@ public class InviteTeacherJoinRequestHandler : IRequestHandler<InviteTeacherJoin
 
 
         var recipient = await _userService.GetUserDetailByEmailAsync(request.Contact, cancellationToken);
-        if (recipient.Email != null && recipient.EmailConfirmed)
+        if (recipient.Email != null)
         {
             var noti = new BasicNotification
             {
