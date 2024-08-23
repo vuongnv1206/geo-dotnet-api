@@ -8,36 +8,41 @@ using System.Text.RegularExpressions;
 namespace FSH.WebApi.Application.Extensions;
 public static class GetResultAnswerExtensions
 {
-    public static bool IsAnswerCorrect(this SubmitPaperDetail submitDetail, QuestionClone question, List<AnswerClone> correctAnswers)
-    {
-        switch (question.QuestionType)
-        {
-            case QuestionType.SingleChoice:
-                return correctAnswers.Any(a => a.Id == Guid.Parse(submitDetail.AnswerRaw) && a.IsCorrect);
+    //public static bool IsAnswerCorrect(this SubmitPaperDetail submitDetail, QuestionClone question, List<AnswerClone> correctAnswers)
+    //{
+    //    if (string.IsNullOrEmpty(submitDetail.AnswerRaw))
+    //    {
+    //        return false;
+    //    }
 
-            case QuestionType.MultipleChoice:
-                var answerIds = submitDetail.AnswerRaw.Split('|').Select(Guid.Parse).ToList();
-                var correctAnswerIds = correctAnswers.Where(a => a.IsCorrect).Select(a => a.Id).ToList();
-                return !correctAnswerIds.Except(answerIds).Any() && !answerIds.Except(correctAnswerIds).Any();
+    //    switch (question.QuestionType)
+    //    {
+    //        case QuestionType.SingleChoice:
+    //            return correctAnswers.Any(a => a.Id == Guid.Parse(submitDetail.AnswerRaw) && a.IsCorrect);
 
-            case QuestionType.FillBlank:
-                return false;
+    //        case QuestionType.MultipleChoice:
+    //            var answerIds = submitDetail.AnswerRaw.Split('|').Select(Guid.Parse).ToList();
+    //            var correctAnswerIds = correctAnswers.Where(a => a.IsCorrect).Select(a => a.Id).ToList();
+    //            return !correctAnswerIds.Except(answerIds).Any() && !answerIds.Except(correctAnswerIds).Any();
 
-            case QuestionType.Matching:
-                var matchingAnswers = submitDetail.AnswerRaw.Split('|').Select(ma => ma.Split('_')).ToDictionary(ma => ma[0], ma => ma[1]);
-                var correctMatchings = correctAnswers.ToDictionary(a => a.Id.ToString(), a => a.Content);
-                return matchingAnswers.All(ma => correctMatchings.ContainsKey(ma.Key) && correctMatchings[ma.Key] == ma.Value);
+    //        case QuestionType.FillBlank:
+    //            return false;
 
-            case QuestionType.ReadingQuestionPassage:
-            case QuestionType.Writing:
-            case QuestionType.Reading:
-            case QuestionType.Other:
-                return false;
+    //        case QuestionType.Matching:
+    //            var matchingAnswers = submitDetail.AnswerRaw.Split('|').Select(ma => ma.Split('_')).ToDictionary(ma => ma[0], ma => ma[1]);
+    //            var correctMatchings = correctAnswers.ToDictionary(a => a.Id.ToString(), a => a.Content);
+    //            return matchingAnswers.All(ma => correctMatchings.ContainsKey(ma.Key) && correctMatchings[ma.Key] == ma.Value);
 
-            default:
-                throw new NotImplementedException($"Question type {question.QuestionType} is not supported.");
-        }
-    }
+    //        case QuestionType.ReadingQuestionPassage:
+    //        case QuestionType.Writing:
+    //        case QuestionType.Reading:
+    //        case QuestionType.Other:
+    //            return false;
+
+    //        default:
+    //            throw new NotImplementedException($"Question type {question.QuestionType} is not supported.");
+    //    }
+    //}
 
     public static float GetPointQuestion(this SubmitPaperDetail submitDetail, QuestionClone question, float mark)
     {

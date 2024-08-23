@@ -40,8 +40,8 @@
     },
     "QuestionType": 1,
     "QuestionLable": {
-      "Name": "Medium",
-      "Color": "#FFFF00"
+      "Name": "Easy",
+      "Color": "#FF0000"
     },
     "Answers": [
       {
@@ -102,7 +102,8 @@
     },
     "QuestionType": 1,
     "QuestionLable": {
-      "Name": "River"
+      "Name": "Hard",
+      "Color": "#00FF00"
     },
     "Answers": [
       {
@@ -132,7 +133,8 @@
     },
     "QuestionType": 1,
     "QuestionLable": {
-      "Name": "Country Nickname"
+      "Name": "Hard",
+      "Color": "#00FF00"
     },
     "Answers": [
       {
@@ -163,7 +165,8 @@
     },
     "QuestionType": 2,
     "QuestionLable": {
-      "Name": "Scientist"
+      "Name": "Hard",
+      "Color": "#00FF00"
     },
     "Answers": [
       {
@@ -193,7 +196,8 @@
     },
     "QuestionType": 2,
     "QuestionLable": {
-      "Name": "Author"
+      "Name": "Hard",
+      "Color": "#00FF00"
     },
     "Answers": [
       {
@@ -223,7 +227,8 @@
     },
     "QuestionType": 2,
     "QuestionLable": {
-      "Name": "Author"
+      "Name": "Hard",
+      "Color": "#00FF00"
     },
     "Answers": [
       {
@@ -253,7 +258,8 @@
     },
     "QuestionType": 2,
     "QuestionLable": {
-      "Name": "Scientist"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "Answers": [
       {
@@ -283,7 +289,8 @@
     },
     "QuestionType": 2,
     "QuestionLable": {
-      "Name": "Author"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "Answers": [
       {
@@ -314,7 +321,8 @@
     },
     "QuestionType": 4,
     "QuestionLable": {
-      "Name": "Geography Facts"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "Answers": [
       {
@@ -336,7 +344,8 @@
     },
     "QuestionType": 4,
     "QuestionLable": {
-      "Name": "Animal"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "Answers": [
       {
@@ -354,7 +363,8 @@
     },
     "QuestionType": 4,
     "QuestionLable": {
-      "Name": "Desert"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "Answers": [
       {
@@ -376,7 +386,8 @@
     },
     "QuestionType": 4,
     "QuestionLable": {
-      "Name": "Planet"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "Answers": [
       {
@@ -395,7 +406,8 @@
     "Image": null,
     "Audio": null,
     "QuestionFolder": {
-      "Name": "Geography"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "QuestionType": 5,
     "QuestionLable": {
@@ -417,7 +429,8 @@
     },
     "QuestionType": 5,
     "QuestionLable": {
-      "Name": "Scientist-Discovery Matching"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     },
     "Answers": [
       {
@@ -436,7 +449,7 @@
     },
     "QuestionType": 6,
     "QuestionLable": {
-      "Name": "Reading Comprehension",
+      "Name": "Easy",
       "Color": "#FF0000"
     },
     "QuestionPassages": [
@@ -496,7 +509,8 @@
     },
     "QuestionType": 8,
     "QuestionLable": {
-      "Name": "Essay"
+      "Name": "Medium",
+      "Color": "#FFFF00"
     }
   }
 ]

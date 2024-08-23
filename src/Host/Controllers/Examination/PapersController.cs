@@ -1,4 +1,5 @@
 ﻿using FSH.WebApi.Application.Examination.Matrices;
+using FSH.WebApi.Application.Examination.PaperAccesses;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
 
@@ -8,7 +9,7 @@ public class PapersController : VersionedApiController
     [HttpPost("Search")]
     [OpenApiOperation("Search paper using available filter", "")]
     [MustHavePermission(FSHAction.View, FSHResource.Papers)]
-    public Task<PaginationResponse<PaperInListDto>> SearchPaper(SearchPaperRequest request)
+    public Task<List<PaperInListDto>> SearchPaper(SearchPaperRequest request)
     {
         return Mediator.Send(request);
     }
@@ -73,15 +74,16 @@ public class PapersController : VersionedApiController
     [HttpPut("{id:guid}/questions")]
     [OpenApiOperation("Update questions in a paper")]
     [MustHavePermission(FSHAction.Update, FSHResource.Papers)]
-    public async Task<IActionResult> UpdateQuestionsInPaperAsync(Guid id, [FromBody] AddQuestionsInPaperRequest request)
+    public async Task<ActionResult> UpdateQuestionsInPaperAsync(Guid id, UpdateQuestionsInPaperRequest request)
     {
         if (id != request.PaperId)
         {
-            return BadRequest("Paper ID in the request does not match the ID in the route.");
+            return BadRequest("Paper Id in the request does not match the Id in the route.");
         }
 
         return Ok(await Mediator.Send(request));
     }
+
 
     [HttpPost("Shared")]
     [MustHavePermission(FSHAction.View, FSHResource.Papers)]
@@ -107,7 +109,7 @@ public class PapersController : VersionedApiController
     [MustHavePermission(FSHAction.Delete, FSHResource.Papers)]
     public async Task<ActionResult> DeleteQuestionInPaperAsync(Guid id, Guid questionId)
     {
-        return Ok(await Mediator.Send(new DeleteQuestionInPaperRequest { PaperId = id, QuestionCloneId = questionId }));
+        return Ok(await Mediator.Send(new DeleteQuestionInPaperRequest { PaperId = id, OriginalQuestionId = questionId }));
     }
 
     // fix controller for AddQuestionInPaperRequest
@@ -136,23 +138,38 @@ public class PapersController : VersionedApiController
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", $"ExamPaper-{paperId}.docx", true); // Download file
     }
 
-    // [HttpGet("generate/pdf")]
-    // public async Task<IActionResult> GeneratePaperPdf(Guid paperId)
-    // {
-    //    var request = new GeneratePaperPdfRequest(paperId);
-    //    var fileBytes = await Mediator.Send(request);
+    [HttpGet("generate/pdf")]
+    public async Task<IActionResult> GeneratePaperPdf(Guid paperId)
+    {
+        var request = new GeneratePaperPdfRequest(paperId);
+        var fileBytes = await Mediator.Send(request);
 
-    // //return File(fileBytes, "application/pdf");  //Get file in pdf format
-    //    return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
-    // }
+        //return File(fileBytes, "application/pdf");  //Get file in pdf format
+        return File(fileBytes, "application/pdf", $"ExamPaper-{paperId}.pdf", true); //Download file
+    }
 
     // Write controller for CreatePaperFromMatrixRequest
-    [HttpPost("create-from-matrix")]
-    [OpenApiOperation("Create a paper from a matrix.")]
+    [HttpPost("get-questions-from-matrix")]
+    [OpenApiOperation("Get generated questions from matrix")]
     [MustHavePermission(FSHAction.Create, FSHResource.Papers)]
-    public async Task<ActionResult<Guid>> CreateFromMatrixAsync(CreatePaperFromMatrixRequest request)
+    public async Task<ActionResult<List<QuestionGenerateToMatrix>>> CreateFromMatrixAsync(CreatePaperFromMatrixRequest request)
     {
         return Ok(await Mediator.Send(request));
     }
 
+    [HttpPost("get-access-paper")]
+    [OpenApiOperation("get group class and student who assigned to paper")]
+    [MustHavePermission(FSHAction.View, FSHResource.Papers)]
+    public async Task<PaginationResponse<GroupClassAccessPaper>> GetGroupClassesAccessPaper(GetGroupClassesAccessPaperRequest request)
+    {
+        return await Mediator.Send(request);
+    }
+
+    [HttpPost("get-assignees-paper")]
+    [OpenApiOperation("get student who assigned to paper")]
+    [MustHavePermission(FSHAction.View, FSHResource.Papers)]
+    public async Task<PaginationResponse<ClassAccessPaper>> GetAssigneesInPaper(GetGetAssigneesInPaperRequest request)
+    {
+        return await Mediator.Send(request);
+    }
 }

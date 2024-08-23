@@ -11,7 +11,7 @@ public class PaperInListDto : IDto
     public string ExamName { get; set; }
    
     public int NumberOfQuestion { get; set; }
-    public int? Duration { get; set; }
+    public float? Duration { get; set; }
     public ShowResult ShowMarkResult { get; set; }
     public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
     public string? Password { get; set; }

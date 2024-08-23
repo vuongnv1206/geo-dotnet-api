@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Application.Class.UserStudents.Spec;
+﻿using FSH.WebApi.Application.Assignments.AssignmentStudent;
+using FSH.WebApi.Application.Class.UserStudents.Spec;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 using FSH.WebApi.Domain.Class;
@@ -27,6 +28,7 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
     private readonly ICurrentUser _currentUser;
     private readonly IRepository<GroupPermissionInClass> _groupPermissionRepo;
     private readonly IRepository<TeacherPermissionInClass> _teacherPermissionRepo;
+    private readonly IMediator _mediator;
 
     public CreateUserStudentRequestHandler(
         IUserService userService,
@@ -35,7 +37,8 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
         IRepository<Classes> classRepository,
         ICurrentUser currentUser,
         IRepository<GroupPermissionInClass> groupPermissionRepo,
-        IRepository<TeacherPermissionInClass> teacherPermissionRepo)
+        IRepository<TeacherPermissionInClass> teacherPermissionRepo,
+        IMediator mediator)
     {
         _userService = userService;
         _t = t;
@@ -44,6 +47,7 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
         _currentUser = currentUser;
         _groupPermissionRepo = groupPermissionRepo;
         _teacherPermissionRepo = teacherPermissionRepo;
+        _mediator = mediator;
     }
 
     public async Task<DefaultIdType> Handle(CreateStudentRequest request, CancellationToken cancellationToken)
@@ -74,6 +78,8 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
                 throw new BadRequestException(_t["Email is existed in class"]);
             else if (classroom.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim()))
                 throw new BadRequestException(_t["Phone number is existed in class"]);
+            else if (classroom.UserClasses.Any(x => x.Student.StudentCode.Trim() == request.StudentCode.Trim()))
+                throw new BadRequestException(_t["Code student is existed in class"]);
         }
 
         var userStudent = new Student
@@ -83,12 +89,8 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
             AvatarUrl = request.AvatarUrl,
             DateOfBirth = request.DateOfBirth,
             Gender = request.Gender,
+            StudentCode = request.StudentCode,
         };
-
-        string existDuplicate = await _userStudentRepository
-            .AnyAsync(new StudentByStudentCodeSpec(request.StudentCode))
-            ? throw new ConflictException(_t["The student code '{0}' is already in use.", request.StudentCode])
-            : userStudent.StudentCode = request.StudentCode;
 
         var userEmail = await _userService.GetUserDetailByEmailAsync(request.Email, cancellationToken);
 
@@ -125,6 +127,20 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
         classroom.AddUserInClass(userClass);
         await _classRepository.UpdateAsync(classroom);
 
+
+        // Gán các assignment của lớp học cho học sinh mới
+        var classroomToAssign = await _classRepository.FirstOrDefaultAsync(new ClassesByIdSpec(request.ClassesId))
+            ?? throw new NotFoundException(_t["Class not found", request.ClassesId]);
+        var listAssignmentIds = classroomToAssign.AssignmentClasses.Select(x => x.AssignmentId).ToList();
+
+        foreach (var assignmentId in listAssignmentIds)
+        {
+            await _mediator.Send(new AssignAssignmentToStudentsRequest
+            {
+                AssignmentId = assignmentId,
+                StudentIds = new List<Guid> { userStudent.Id }
+            });
+        }
         return userStudent.Id;
     }
 }

@@ -1,12 +1,11 @@
-﻿using FSH.WebApi.Application.Common.Exceptions;
+﻿using FSH.WebApi.Application.Class.UserStudents;
+using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Mailing;
 using FSH.WebApi.Application.Common.SpeedSMS;
 using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Identity.Users.Profile;
-using FSH.WebApi.Domain.Common;
 using FSH.WebApi.Domain.Identity;
 using FSH.WebApi.Shared.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -129,6 +128,17 @@ internal partial class UserService
         else if (request.Role.Equals(FSHRoles.Student))
         {
             await _userManager.AddToRoleAsync(user, FSHRoles.Student);
+            var studentList = await _studentRepo.ListAsync(new StudentByEmailSpec(user.Email));
+
+            if (studentList.Any())
+            {
+                foreach(var student in studentList)
+                {
+                    student.StId = Guid.Parse(user.Id);
+                    await _studentRepo.UpdateAsync(student);
+                }
+            }
+
         }
 
         var messages = new List<string> { string.Format(_t["User {0} Registered."], user.UserName) };

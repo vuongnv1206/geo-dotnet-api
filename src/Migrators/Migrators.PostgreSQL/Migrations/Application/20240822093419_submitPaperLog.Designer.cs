@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Migrators.PostgreSQL.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240805154037_payment")]
-    partial class payment
+    [Migration("20240822093419_submitPaperLog")]
+    partial class submitPaperLog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -507,8 +507,8 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int?>("Duration")
-                        .HasColumnType("integer");
+                    b.Property<float?>("Duration")
+                        .HasColumnType("real");
 
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("timestamp with time zone");
@@ -1038,6 +1038,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CommonLog")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
@@ -1084,6 +1087,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                         .HasColumnType("text");
 
                     b.Property<string>("PublicIp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReassignLog")
                         .HasColumnType("text");
 
                     b.Property<Guid>("SubmitPaperId")
@@ -1821,6 +1827,9 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("JoinLink")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("LastModifiedBy")
                         .HasColumnType("uuid");
 
@@ -1840,6 +1849,157 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.HasKey("Id");
 
                     b.ToTable("GroupTeachers", "GroupTeacher");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.InviteJoinTeacherTeam", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RecipientEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InviteJoinTeacherTeam", "GroupTeacher");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.JoinGroupTeacherRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ReceiverId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("JoinGroupTeacherRequest", "GroupTeacher");
+
+                    b.HasAnnotation("Finbuckle:MultiTenant", true);
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.JoinTeacherTeamRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AdminTeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("InvitationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("LastModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JoinTeacherTeamRequest", "GroupTeacher");
 
                     b.HasAnnotation("Finbuckle:MultiTenant", true);
                 });
@@ -2605,7 +2765,7 @@ namespace Migrators.PostgreSQL.Migrations.Application
             modelBuilder.Entity("FSH.WebApi.Domain.Question.Question", b =>
                 {
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionFolder", "QuestionFolder")
-                        .WithMany()
+                        .WithMany("Questions")
                         .HasForeignKey("QuestionFolderId");
 
                     b.HasOne("FSH.WebApi.Domain.Question.QuestionLable", "QuestionLable")
@@ -2688,6 +2848,25 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Classroom");
 
                     b.Navigation("GroupTeacher");
+                });
+
+            modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.JoinGroupTeacherRequest", b =>
+                {
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", "GroupTeacher")
+                        .WithMany("JoinGroupRequests")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FSH.WebApi.Domain.TeacherGroup.TeacherTeam", "TeacherTeam")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroupTeacher");
+
+                    b.Navigation("TeacherTeam");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.TeacherInGroup", b =>
@@ -2866,11 +3045,15 @@ namespace Migrators.PostgreSQL.Migrations.Application
                     b.Navigation("Children");
 
                     b.Navigation("Permissions");
+
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("FSH.WebApi.Domain.TeacherGroup.GroupTeacher", b =>
                 {
                     b.Navigation("GroupPermissionInClasses");
+
+                    b.Navigation("JoinGroupRequests");
 
                     b.Navigation("TeacherInGroups");
                 });

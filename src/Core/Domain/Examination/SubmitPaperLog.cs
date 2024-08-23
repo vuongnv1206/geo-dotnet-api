@@ -12,7 +12,10 @@ public class SubmitPaperLog : AuditableEntity, IAggregateRoot
     public string? MouseLog { get; set; }
     public string? KeyboardLog { get; set; }
     public string? NetworkLog { get; set; }
+    public string? ReassignLog { get; set; }
+    public string? CommonLog { get; set; }
     public bool? IsSuspicious { get; set; }
+    public string? SuspiciousReason { get; set; }
 
     public SubmitPaperLog()
     {

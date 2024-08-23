@@ -41,18 +41,15 @@ public class RemoveTeacherInGroupRequestHandler : IRequestHandler<RemoveTeacherI
         if (!group.CanUpdate(_currentUser.GetUserId()))
             throw new ForbiddenException(_t["You cannot have permissio update with {0}", request.GroupId]);
 
-        if (group.TeacherInGroups.Any())
-        {
-            var teacherInGroup = group.TeacherInGroups?
-                .FirstOrDefault(x => x.TeacherTeamId == request.TeacherId);
+        var teacherInGroup = group.TeacherInGroups?
+            .FirstOrDefault(x => x.TeacherTeamId == request.TeacherId);
 
-            if (teacherInGroup is null)
-                throw new NotFoundException(_t["Teacher {0} Not Found.", request.TeacherId]);
+        if (teacherInGroup is null)
+            throw new NotFoundException(_t["Teacher {0} Not Found In Group.", request.TeacherId]);
 
-            group.RemoveTeacherInGroup(teacherInGroup);
+        group.RemoveTeacherInGroup(teacherInGroup);
 
-            await _groupTeacherRepository.UpdateAsync(group);
-        }
+        await _groupTeacherRepository.UpdateAsync(group);
 
         return default(DefaultIdType);
     }

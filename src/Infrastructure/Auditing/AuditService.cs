@@ -10,12 +10,18 @@ public class AuditService : IAuditService
 {
     private readonly ApplicationDbContext _context;
 
-    public AuditService(ApplicationDbContext context) => _context = context;
+    public AuditService(ApplicationDbContext context)
+    {
+        _context = context;
+    }
 
-    public Task<List<string>> GetResourceName()
+    public Task<List<string?>> GetResourceName()
     {
         return _context.AuditTrails
             .Select(a => a.TableName)
+
+            // filter TableName not Have "Clone" string
+            .Where(a => !a.Contains("Clone"))
             .Distinct()
             .OrderBy(a => a)
             .ToListAsync();
@@ -25,8 +31,11 @@ public class AuditService : IAuditService
     {
         var query = _context.AuditTrails
             .Where(a => a.UserId.Equals(request.UserId))
-            .Where(a => !string.IsNullOrEmpty(request.Action) ? a.Type.ToLower() == request.Action.ToLower() : true)
-            .Where(a => !string.IsNullOrEmpty(request.Resource) ? a.TableName.ToLower() == request.Resource.ToLower() : true)
+            .Where(a => string.IsNullOrEmpty(request.Action) || a.Type.ToLower() == request.Action.ToLower())
+            .Where(a => string.IsNullOrEmpty(request.Resource) || a.TableName.ToLower() == request.Resource.ToLower())
+
+            // filter TableName not Have "Clone" string
+            .Where(a => !a.TableName.Contains("Clone"))
             .Join(
                 _context.Users,
                 a => a.UserId.ToString(),
@@ -35,7 +44,7 @@ public class AuditService : IAuditService
             .OrderByDescending(a => a.AuditTrail.DateTime)
             .AsQueryable();
 
-        var totalRecords = await query.CountAsync();
+        int totalRecords = await query.CountAsync();
 
         var trails = await query
             .Skip((request.PageNumber - 1) * request.PageSize)

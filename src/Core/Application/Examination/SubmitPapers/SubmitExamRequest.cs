@@ -1,6 +1,6 @@
 ﻿namespace FSH.WebApi.Application.Examination.SubmitPapers;
 
-public class SubmitExamRequest : IRequest<Guid>
+public class SubmitExamRequest : IRequest<string>
 {
     public required string SubmitPaperData { get; set; }
     public string? PublicIp { get; set; }
@@ -16,7 +16,7 @@ public class SubmitExamRequestValidator : CustomValidator<SubmitExamRequest>
     }
 }
 
-public class SubmitExamRequestHandler : IRequestHandler<SubmitExamRequest, Guid>
+public class SubmitExamRequestHandler : IRequestHandler<SubmitExamRequest, string>
 {
     private readonly ISubmmitPaperService _submmitPaperService;
 
@@ -25,7 +25,7 @@ public class SubmitExamRequestHandler : IRequestHandler<SubmitExamRequest, Guid>
         _submmitPaperService = submmitPaperService;
     }
 
-    public Task<Guid> Handle(SubmitExamRequest request, CancellationToken cancellationToken)
+    public Task<string> Handle(SubmitExamRequest request, CancellationToken cancellationToken)
     {
         return _submmitPaperService.SubmitExamAsync(request, cancellationToken);
     }

@@ -29,17 +29,6 @@ public class UpdateStatusSubmitAssignmentRequestHandler : IRequestHandler<Update
         var assignment = await _assignmentRepo.FirstOrDefaultAsync(new AssignmentByIdSpec(request.AssignmentId));
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not  Found.", request.AssignmentId]);
 
-        if (assignment.EndTime < DateTime.Now)
-        {
-            throw new ForbiddenException(_t["Can't update this submit."]);
-        }
-
-        var currentUserId = _currentUser.GetUserId();
-        if (assignment.CreatedBy != currentUserId)
-        {
-            throw new ForbiddenException(_t["Can't update this submit."]);
-        }
-
         assignment.UpdateStatusSubmitAssignment(request.Status);
         await _assignmentRepo.UpdateAsync(assignment);
         return assignment.Id;

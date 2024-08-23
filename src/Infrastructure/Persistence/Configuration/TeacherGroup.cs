@@ -65,3 +65,30 @@ public class GroupPermissionInClassConfig : IEntityTypeConfiguration<GroupPermis
         builder.ToTable("GroupPermissionInClasses", SchemaNames.GroupTeacher);
     }
 }
+
+public class JoinGroupTeacherRequestConfig : IEntityTypeConfiguration<JoinGroupTeacherRequest>
+{
+    public void Configure(EntityTypeBuilder<JoinGroupTeacherRequest> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("JoinGroupTeacherRequest", SchemaNames.GroupTeacher);
+    }
+}
+public class JoinTeacherTeacherRequestConfig : IEntityTypeConfiguration<JoinTeacherTeamRequest>
+{
+    public void Configure(EntityTypeBuilder<JoinTeacherTeamRequest> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("JoinTeacherTeamRequest", SchemaNames.GroupTeacher);
+    }
+}
+
+public class InviteJoinTeacherTeamConfig : IEntityTypeConfiguration<InviteJoinTeacherTeam>
+{
+    public void Configure(EntityTypeBuilder<InviteJoinTeacherTeam> builder)
+    {
+        builder.IsMultiTenant();
+        builder.ToTable("InviteJoinTeacherTeam", SchemaNames.GroupTeacher);
+    }
+}
+

@@ -1,6 +1,7 @@
 ﻿using FSH.WebApi.Application.Assignments.Dtos;
 using FSH.WebApi.Application.Class.UserStudents.Dto;
 using FSH.WebApi.Application.Examination.Papers;
+using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.TeacherGroup.PermissionClasses;
 
 namespace FSH.WebApi.Application.Class.Dto;
@@ -17,4 +18,11 @@ public class ClassDto : IDto
     public List<UserStudentDto>? Students { get; set; }
     public List<PaperInListDto>? Papers { get; set; }
     public List<PermissionInClassDto>? Permissions { get; set; }
+    public UserDetailsDto? Owner { get; set; }
+}
+
+public class ClassMoniDto : IDto
+{
+    public DefaultIdType Id { get; set; }
+    public required string Name { get; set; }
 }

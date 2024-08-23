@@ -1,8 +1,10 @@
 ﻿using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Application.Examination.Monitor;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.Papers.Dtos;
+using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.SubmitPapers;
 using FSH.WebApi.Application.Examination.SubmitPapers.Dtos;
 using FSH.WebApi.Application.Examination.SubmitPapers.Specs;
@@ -10,6 +12,7 @@ using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
 using FSH.WebApi.Infrastructure.Common.Utils;
@@ -501,7 +504,7 @@ public class SubmmitPaperService : ISubmmitPaperService
 
     }
 
-    public async Task<DefaultIdType> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
+    public async Task<string> SubmitExamAsync(SubmitExamRequest request, CancellationToken cancellationToken)
     {
         // Decrypt and validate submit paper data
         string submitPaperDataDecrypted = EncryptionUtils.SimpleDec(request.SubmitPaperData);
@@ -532,14 +535,6 @@ public class SubmmitPaperService : ISubmmitPaperService
         var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
         var timeNow = DateTime.Now;
         int duration = (int)(timeNow - submitPaper.StartTime).TotalMinutes;
-        if (paper.Duration.HasValue && duration > paper.Duration)
-        {
-            // Update submit paper status
-            submitPaper.Status = SubmitPaperStatus.End;
-            submitPaper.EndTime = timeNow;
-            await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
-            throw new ConflictException(_t["Over time to do this exam."]);
-        }
 
         // Update or Add submit paper details
         foreach (var q in sbp.Questions)
@@ -619,19 +614,29 @@ public class SubmmitPaperService : ISubmmitPaperService
             submitPaper.Status = SubmitPaperStatus.End;
             submitPaper.EndTime = timeNow;
 
+            // Update submit paper
+            await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
+
             // Calculate score
             submitPaper.TotalMark = await CalculateScoreSubmitPaper(submitPaper);
 
             // Update submit paper
             await _submitPaperRepository.UpdateAsync(submitPaper, cancellationToken);
         }
+        else
+        {
+            await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
+        }
 
-        // Update submit paper
-        await _submitPaperRepository.UpdateAsync(submitPaper!, cancellationToken);
-
-        return submitPaper == null
-            ? throw new NotFoundException(_t["Submit paper {0} not found.", sbp.SubmitPaperId])
-            : await Task.FromResult(submitPaper.Id);
+        if (paper.ShowMarkResult == ShowResult.No)
+        {
+            return _t["Submit exam successfully."];
+        }
+        else
+        {
+            float? mark = submitPaper.TotalMark / paper.Adapt<PaperDto>().MaxPoint * 10;
+            return mark.HasValue ? mark.Value.ToString() : "0";
+        }
     }
 
     public string FormatAnswerRaw(SubmitPaperQuestion spq, QuestionClone question)
@@ -763,9 +768,16 @@ public class SubmmitPaperService : ISubmmitPaperService
         // SingleChoice
         foreach (var a in question.AnswerClones)
         {
-            if (a.Id == Guid.Parse(detail.AnswerRaw!) && a.IsCorrect)
+            try
             {
-                return mark;
+                if (a.Id == Guid.Parse(detail.AnswerRaw!) && a.IsCorrect)
+                {
+                    return mark;
+                }
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
 
@@ -914,8 +926,36 @@ public class SubmmitPaperService : ISubmmitPaperService
     {
         SubmitPaperLog spl = request.Adapt<SubmitPaperLog>();
 
-        // Add new submit paper log
-        _ = await _submitPaperLogRepository.AddAsync(spl, cancellationToken);
+        // get last submit paper log
+        var lastLog = await _submitPaperLogRepository.FirstOrDefaultAsync(new SubmitPaperLogBySubmitPaperIdSpec(spl.SubmitPaperId), cancellationToken);
+
+        // compare last log and current log
+        bool flag = false;
+        if (lastLog != null)
+        {
+            flag = lastLog.DeviceId != spl.DeviceId ||
+                        lastLog.DeviceName != spl.DeviceName ||
+                        lastLog.DeviceType != spl.DeviceType ||
+                        lastLog.PublicIp != spl.PublicIp ||
+                        lastLog.LocalIp != spl.LocalIp ||
+                        lastLog.ProcessLog != spl.ProcessLog ||
+                        lastLog.MouseLog != spl.MouseLog ||
+                        lastLog.KeyboardLog != spl.KeyboardLog ||
+                        lastLog.NetworkLog != spl.NetworkLog ||
+                        lastLog.IsSuspicious != spl.IsSuspicious;
+        }
+
+        if (!flag && lastLog != null)
+        {
+            // Update last submit paper log lasmodified
+            lastLog.LastModifiedOn = DateTime.Now;
+            await _submitPaperLogRepository.UpdateAsync(lastLog, cancellationToken);
+        }
+        else
+        {
+            // Add new submit paper log
+            _ = await _submitPaperLogRepository.AddAsync(spl, cancellationToken);
+        }
 
         return spl.Id;
     }
@@ -923,7 +963,80 @@ public class SubmmitPaperService : ISubmmitPaperService
     public bool IsCorrectAnswer(SubmitPaperDetail submitDetail, QuestionClone question)
     {
         float markFlag = 10f;
-        var x = CalculateScore(submitDetail, question, markFlag);
+        float x = CalculateScore(submitDetail, question, markFlag);
         return x == markFlag;
+    }
+
+    public async Task<LastResultExamDto> GetLastResultExamAsync(Guid paperId, Guid userId, Guid submitPaperId, CancellationToken cancellationToken)
+    {
+        var spec = new ExamResultSpec(submitPaperId, paperId, userId);
+        var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(spec, cancellationToken)
+            ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
+
+        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
+
+        var student = await _userService.GetAsync(userId.ToString(), cancellationToken);
+
+        float totalMark = 0;
+        var submitPaperDetailsDtos = new List<SubmitPaperDetailDto>();
+        foreach (var submit in submitPaper.SubmitPaperDetails)
+        {
+            float questionMark = paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId)?.Mark ?? 0;
+
+            // if question is Reading
+            if (submit.Question.QuestionType == QuestionType.Reading)
+            {
+                // list of question passages detail
+                List<SubmitPaperDetail> details = new();
+                foreach (var qp in submit.Question!.QuestionPassages)
+                {
+                    var detail1 = submitPaper.SubmitPaperDetails.FirstOrDefault(x => x.QuestionId == qp.Id);
+                    if (detail1 != null)
+                    {
+                        details.Add(detail1);
+                    }
+                }
+
+                totalMark += CalculateScore(submit, submit.Question!, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark, details);
+            }
+            else
+            {
+                totalMark += CalculateScore(submit, submit.Question!, paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId).Mark);
+            }
+
+            // Fill SubmitPaperDetailDto
+            var submitPaperDetailDto = new SubmitPaperDetailDto
+            {
+                SubmitPaperId = submit.SubmitPaperId,
+                QuestionId = submit.QuestionId,
+                AnswerRaw = submit.AnswerRaw,
+                Mark = submit.Mark,
+                IsCorrect = IsCorrectAnswer(submit, submit.Question),
+                CreatedBy = submit.CreatedBy,
+                CreatedOn = submit.CreatedOn,
+                LastModifiedBy = submit.LastModifiedBy,
+                LastModifiedOn = submit.LastModifiedOn,
+                Question = submit.Question.Adapt<QuestionDto>() // Assuming you have a mapping for QuestionDto
+            };
+
+            submitPaperDetailsDtos.Add(submitPaperDetailDto);
+        }
+
+        // Fill LastResultExamDto
+        var examResultDto = new LastResultExamDto
+        {
+            Id = submitPaper.Id,
+            PaperId = submitPaper.PaperId,
+            Status = submitPaper.Status,
+            StartTime = submitPaper.StartTime,
+            EndTime = submitPaper.EndTime,
+            TotalMark = totalMark,
+            TotalQuestion = submitPaper.SubmitPaperDetails.Count,
+            Paper = paper.Adapt<PaperDto>(), // Assuming you have a mapping for PaperDto
+            SubmitPaperDetails = submitPaperDetailsDtos,
+            Student = student
+        };
+
+        return examResultDto;
     }
 }

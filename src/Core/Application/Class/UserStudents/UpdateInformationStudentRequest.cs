@@ -26,14 +26,15 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
     private readonly ICurrentUser _currentUser;
     private readonly IRepository<GroupPermissionInClass> _groupPermissionRepo;
     private readonly IRepository<TeacherPermissionInClass> _teacherPermissionRepo;
-
+    private readonly IRepository<Student> _userStudentRepository;
     public UpdateInformationStudentRequestHandler(
         IRepositoryWithEvents<Student> repository,
         IStringLocalizer<UpdateInformationStudentRequestHandler> t,
         IRepository<Classes> classRepository,
         ICurrentUser currentUser,
         IRepository<GroupPermissionInClass> groupPermissionRepo,
-        IRepository<TeacherPermissionInClass> teacherPermissionRepo)
+        IRepository<TeacherPermissionInClass> teacherPermissionRepo,
+        IRepository<Student> userStudentRepository)
     {
         _repository = repository;
         _t = t;
@@ -41,6 +42,7 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
         _currentUser = currentUser;
         _groupPermissionRepo = groupPermissionRepo;
         _teacherPermissionRepo = teacherPermissionRepo;
+        _userStudentRepository = userStudentRepository;
     }
 
     public async Task<Guid> Handle(UpdateInformationStudentRequest request, CancellationToken cancellationToken)
@@ -74,11 +76,16 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
 
         if (classOfStudent.UserClasses != null)
         {
-            if (classOfStudent.UserClasses.Any(x => x.Student.Email.Trim() == request.Email.Trim()))
+            if (classOfStudent.UserClasses.Any(x => x.Student.Email.Trim() == request.Email.Trim() && x.Student.Id != request.Id))
                 throw new BadRequestException(_t["Email is existed in class"]);
-            else if (classOfStudent.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim()))
+            else if (classOfStudent.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim() && x.Student.Id != request.Id))
                 throw new BadRequestException(_t["Phone number is existed in class"]);
         }
+
+        string existDuplicate = await _userStudentRepository
+          .AnyAsync(new StudentByStudentCodeSpec(request.StudentCode))
+          ? throw new ConflictException(_t["The student code '{0}' is already in use.", request.StudentCode])
+          : student.StudentCode = request.StudentCode;
 
         var updatedStudent = student.Update(
             request.FirstName,

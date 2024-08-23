@@ -2,28 +2,27 @@
 using FSH.WebApi.Application.Class;
 using FSH.WebApi.Domain.Assignment;
 using FSH.WebApi.Domain.Class;
+using FSH.WebApi.Shared.Authorization;
 
 namespace FSH.WebApi.Application.Assignments;
-public class SearchAssignmentsRequest : PaginationFilter, IRequest<PaginationResponse<AssignmentDto>>
+public class SearchMyAssignmentsRequest : PaginationFilter, IRequest<PaginationResponse<AssignmentDto>>
 {
     public Guid? SubjectId { get; set; }
-    public decimal? MinimumRate { get; set; }
-    public decimal? MaximumRate { get; set; }
     public Guid? ClassId { get; set; }
 }
 
-public class SearchAssignmentsRequestHandler : IRequestHandler<SearchAssignmentsRequest, PaginationResponse<AssignmentDto>>
+public class SearchMyAssignmentsRequestHandler : IRequestHandler<SearchMyAssignmentsRequest, PaginationResponse<AssignmentDto>>
 {
     private readonly IReadRepository<Assignment> _repository;
     private readonly ICurrentUser _currentUser;
     private readonly IRepository<Classes> _classRepo;
     private readonly IStringLocalizer _t;
 
-    public SearchAssignmentsRequestHandler(
+    public SearchMyAssignmentsRequestHandler(
         IReadRepository<Assignment> repository,
         ICurrentUser currentUser,
         IRepository<Classes> classRepo,
-        IStringLocalizer<SearchAssignmentsRequestHandler> t)
+        IStringLocalizer<SearchMyAssignmentsRequestHandler> t)
     {
         _repository = repository;
         _currentUser = currentUser;
@@ -31,7 +30,7 @@ public class SearchAssignmentsRequestHandler : IRequestHandler<SearchAssignments
         _t = t;
     }
 
-    public async Task<PaginationResponse<AssignmentDto>> Handle(SearchAssignmentsRequest request, CancellationToken cancellationToken)
+    public async Task<PaginationResponse<AssignmentDto>> Handle(SearchMyAssignmentsRequest request, CancellationToken cancellationToken)
     {
         var currentUserId = _currentUser.GetUserId();
         if (request.ClassId.HasValue)
@@ -40,8 +39,9 @@ public class SearchAssignmentsRequestHandler : IRequestHandler<SearchAssignments
                 new ClassByIdSpec(request.ClassId.Value, currentUserId), cancellationToken)
                 ?? throw new NotFoundException(_t["Classroom Not Found"]);
         }
+        
+        var spec = new AssignmentsBySearchSpec(request, currentUserId ,_currentUser.IsInRole(FSHRoles.Student));
 
-        var spec = new AssignmentsBySearchRequestWithSubjectsSpec(request, currentUserId);
         return await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken: cancellationToken);
     }
 }

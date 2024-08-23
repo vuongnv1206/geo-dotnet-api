@@ -47,11 +47,13 @@ public class RemoveAssignmentFromClassRequestHandler : IRequestHandler<RemoveAss
     {
         var assignment = await _assignmentRepo.FirstOrDefaultAsync(new AssignmentByIdSpec(request.AssignmentId));
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not Found", request.AssignmentId]);
-        assignment.RemoveAssignmentFromClass(request.ClassId);
-        await _assignmentRepo.UpdateAsync(assignment);
 
         var classroom = await _classesRepository.FirstOrDefaultAsync(new ClassesByIdSpec(request.ClassId));
         _ = classroom ?? throw new NotFoundException(_t["Class {0} Not Found.", request.ClassId]);
+
+        var studentIds = classroom.UserClasses.Select(x => x.StudentId).ToList();
+        assignment.RemoveSubmissionFromClass(studentIds);
+
         classroom.RemoveAssignment(request.AssignmentId);
         await _classesRepository.UpdateAsync(classroom, cancellationToken);
 

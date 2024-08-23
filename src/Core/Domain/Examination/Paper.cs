@@ -9,7 +9,7 @@ public class Paper : AuditableEntity, IAggregateRoot
     public string ExamName { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public int? Duration { get; set; }
+    public float? Duration { get; set; }
     public PaperType Type { get; set; }
     public bool IsPublish { get; set; }
     public string? Content { get; set; }
@@ -59,6 +59,12 @@ public class Paper : AuditableEntity, IAggregateRoot
         SubjectId = subjectId;
         Password = password;
         ExamCode = examName;
+    }
+    public void UpdateTime(DateTime? startTime, DateTime? endTime, float? duration)
+    {
+        StartTime = startTime;
+        EndTime = endTime;
+        Duration = duration;
     }
 
     public void AddQuestions(List<PaperQuestion> questions)
@@ -112,12 +118,13 @@ public class Paper : AuditableEntity, IAggregateRoot
         }
     }
 
+    #region update constructor
     public Paper Update(
         string examName,
         PaperStatus status,
         DateTime? startTime,
         DateTime? endTime,
-        int? duration,
+        float? duration,
         bool shuffle,
         ShowResult showMarkResult,
         ShowQuestionAnswer showQuestionAnswer,
@@ -156,6 +163,7 @@ public class Paper : AuditableEntity, IAggregateRoot
         LocalIpAllowed = localIpAllowed;
         return this;
     }
+    #endregion
 
     public void UpdatePaperAccesses(PaperShareType shareType, List<PaperAccess> newPaperAccesses)
     {
@@ -195,6 +203,12 @@ public class Paper : AuditableEntity, IAggregateRoot
         }
     }
 
+    public bool HasPermission(Guid userId)
+    {
+        // Kiểm tra xem có bất kỳ quyền nào được gán cho người dùng này không
+        return PaperPermissions.Any(permission => permission.UserId == userId);
+    }
+
     public void AddPermission(PaperPermission permission)
     {
         PaperPermissions.Add(permission);
@@ -232,5 +246,9 @@ public class Paper : AuditableEntity, IAggregateRoot
         return PaperPermissions.Any(x => x.UserId == userId && x.CanShare);
     }
 
-
+    // lấy ra số người đã hoàn thành bài làm
+    public int GetTotalSubmissions()
+    => SubmitPapers.Any()
+        ? SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End).Count()
+        : 0;
 }

@@ -14,5 +14,9 @@ public class PaperInfoStatistic : IDto
     public float AverageMark { get; set; }
     public int TotalPopular { get; set; }
     public float MarkPopular { get; set; }
+    public float HighestMark { get; set; }
+    public int TotalHighestMark { get; set; }
+    public float LowestMark { get; set; }
+    public int TotalLowestMark { get; set; }
     public List<ClassroomInfoStatistic>? Classrooms { get; set; }
 }

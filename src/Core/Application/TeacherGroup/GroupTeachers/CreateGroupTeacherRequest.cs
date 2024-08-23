@@ -1,4 +1,6 @@
-﻿using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Application.TeacherGroup.QRCode;
+using FSH.WebApi.Domain.TeacherGroup;
+using System.Data.Common;
 
 namespace FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 public class CreateGroupTeacherRequest : IRequest<Guid>
@@ -21,7 +23,8 @@ public class CreateGroupTeacherRequestHandler : IRequestHandler<CreateGroupTeach
 {
     private readonly IRepositoryWithEvents<GroupTeacher> _repository;
 
-    public CreateGroupTeacherRequestHandler(IRepositoryWithEvents<GroupTeacher> repository)
+    public CreateGroupTeacherRequestHandler(
+        IRepositoryWithEvents<GroupTeacher> repository)
     {
         _repository = repository;
     }
@@ -30,6 +33,15 @@ public class CreateGroupTeacherRequestHandler : IRequestHandler<CreateGroupTeach
     {
         var groupTeacher = new GroupTeacher(request.Name);
         await _repository.AddAsync(groupTeacher, cancellationToken);
+
+        Dictionary<string, string> data = new Dictionary<string, string>
+        {
+            { "id", groupTeacher.Id.ToString() }
+        };
+
+        groupTeacher.UpdateJoinGroup($"join-group/{groupTeacher.Id}");
+
+        await _repository.UpdateAsync(groupTeacher, cancellationToken);
 
         return groupTeacher.Id;
     }

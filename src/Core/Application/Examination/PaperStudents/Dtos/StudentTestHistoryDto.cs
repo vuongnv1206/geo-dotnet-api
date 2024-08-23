@@ -5,7 +5,7 @@ public class StudentTestHistoryDto : IDto
 {
     public DefaultIdType Id { get; set; }
     public required string ExamName { get; set; }
-    public int? Duration { get; set; }
+    public float? Duration { get; set; }
     public DefaultIdType? PaperLabelId { get; set; }
     public string? PaperLabelName { get; set; }
     public DefaultIdType? SubjectId { get; set; }

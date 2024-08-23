@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using FSH.WebApi.Domain.Examination.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FSH.WebApi.Domain.Examination;
 public class SubmitPaper : AuditableEntity, IAggregateRoot

@@ -13,7 +13,7 @@ public class PaperForStudentDto
     public required string ExamName { get; set; }
     public int NumberOfQuestion { get; set; }
     public int TotalAttended { get; set; }
-    public int? Duration { get; set; }
+    public float? Duration { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public ShowResult ShowMarkResult { get; set; }

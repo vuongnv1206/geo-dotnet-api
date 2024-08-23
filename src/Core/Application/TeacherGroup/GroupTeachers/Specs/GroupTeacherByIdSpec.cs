@@ -9,6 +9,8 @@ public class GroupTeacherByIdSpec : Specification<GroupTeacher>, ISingleResultSp
             .Include(x => x.TeacherInGroups)
                 .ThenInclude(tig => tig.TeacherTeam)
             .Include(x => x.GroupPermissionInClasses)
+                .ThenInclude(gpc => gpc.Classroom)
+            .Include(x => x.JoinGroupRequests)
             .Where(x => x.Id == id);
     }
 }
