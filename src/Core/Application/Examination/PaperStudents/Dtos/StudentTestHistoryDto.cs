@@ -14,5 +14,6 @@ public class StudentTestHistoryDto : IDto
     public DateTime? SubmittedTime { get; set; }
     public float? Score { get; set; }
     public CompletionStatusEnum CompletionStatus { get; set; }
+    public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
     public ShowResult ShowMarkResult { get; set; }
 }
