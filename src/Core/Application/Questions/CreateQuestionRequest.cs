@@ -22,74 +22,74 @@ public class CreateQuestionRequestValidator : CustomValidator<CreateQuestionRequ
 
         _ = RuleForEach(x => x.Questions).ChildRules(questions =>
         {
-            _ = questions.RuleFor(q => q.QuestionType).NotEmpty().WithMessage(_t["QuestionTypeRequired"]);
+            _ = questions.RuleFor(q => q.QuestionType).NotEmpty().WithMessage(_t["Question Type Required"]);
 
             _ = questions.When(q => q.QuestionType == QuestionType.MultipleChoice, () =>
             {
                 _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 3)
-                    .WithMessage(_t["MultipleChoiceAtLeast3Answers"]);
+                    .WithMessage(_t["Multiple Choice At Least 3 Answers"]);
 
                 _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count(a => a.IsCorrect) >= 2)
-                    .WithMessage(_t["MultipleChoiceAtLeast2CorrectAnswers"]);
+                    .WithMessage(_t["Multiple Choice At Least 2 Correct Answers"]);
             });
 
             _ = questions.When(q => q.QuestionType == QuestionType.SingleChoice, () =>
             {
                 _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 2)
-                    .WithMessage(_t["SingleChoiceAtLeast2Answers"]);
+                    .WithMessage(_t["Single Choice At Least 2 Answers"]);
 
                 _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count(a => a.IsCorrect) == 1)
-                    .WithMessage(_t["SingleChoiceExactly1CorrectAnswer"]);
+                    .WithMessage(_t["Single Choice Exactly 1 Correct Answer"]);
             });
 
             _ = questions.When(q => q.QuestionType == QuestionType.Matching, () =>
             {
                 _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 1)
-                    .WithMessage(_t["MatchingAtLeast1Pair"]);
+                    .WithMessage(_t["Matching At Least 1 Pair"]);
 
                 _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.All(a => !a.Content.Equals(string.Empty)))
-                    .WithMessage(_t["MatchingNoEmptyPairs"]);
+                    .WithMessage(_t["Matching No Empty Pairs"]);
             });
 
             _ = questions.When(q => q.QuestionType == QuestionType.FillBlank, () =>
             {
                 _ = questions.RuleFor(q => q.Content)
                     .Must((question, content) => content != null && content.Split("$_fillblank").Length - 1 == question.Answers?.Count)
-                    .WithMessage((question, content) => _t["FillBlankExactAnswers", content.Split("$_fillblank").Length - 1]);
+                    .WithMessage((question, content) => _t["Fill Blank Exact Answers", content.Split("$_fillblank").Length - 1]);
             });
 
             _ = questions.When(q => q.QuestionType == QuestionType.Writing, () =>
             {
                 _ = questions.RuleFor(q => q.Content)
                     .NotEmpty()
-                    .WithMessage(_t["WritingContentRequired"]);
+                    .WithMessage(_t["Writing Content Required"]);
             });
 
             _ = questions.When(q => q.QuestionType == QuestionType.Reading, () =>
             {
                 _ = questions.RuleFor(q => q.QuestionPassages)
                     .NotEmpty()
-                    .WithMessage(_t["ReadingAtLeast1Passage"]);
+                    .WithMessage(_t["Reading At Least 1 Passage"]);
 
                 _ = questions.RuleForEach(q => q.QuestionPassages).ChildRules(passages =>
                 {
                     _ = passages.RuleFor(p => p.Answers)
                         .NotEmpty()
-                        .WithMessage(_t["ReadingPassageAtLeast1Answer"]);
+                        .WithMessage(_t["Reading Passage At Least 1 Answer"]);
 
                     _ = passages.RuleFor(p => p.Answers)
                         .Must(answers => answers != null && answers.Count >= 2)
-                        .WithMessage(_t["ReadingPassageAtLeast2Answers"]);
+                        .WithMessage(_t["Reading Passage At Least 2 Answers"]);
 
                     _ = passages.RuleFor(p => p.Answers)
                         .Must(answers => answers != null && answers.Count(a => a.IsCorrect) >= 1)
-                        .WithMessage(_t["ReadingPassageAtLeast1CorrectAnswer"]);
+                        .WithMessage(_t["Reading Passage At Least 1 Correct Answer"]);
                 });
             });
         });
