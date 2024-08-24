@@ -2,7 +2,7 @@
 using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.PaperStudents.Specs;
-public class HistorySubmitPaperSpec : EntitiesByPaginationFilterSpec<SubmitPaper, StudentTestHistoryDto>
+public class HistorySubmitPaperSpec : EntitiesByPaginationFilterSpec<SubmitPaper>
 {
     public HistorySubmitPaperSpec(GetHistoryTestOfStudentRequest request, DefaultIdType userId)
         : base(request)
@@ -12,6 +12,10 @@ public class HistorySubmitPaperSpec : EntitiesByPaginationFilterSpec<SubmitPaper
             .Include(sp => sp.Paper)
                 .ThenInclude(p => p.PaperLabel)
             .Include(sp => sp.Paper)
-                .ThenInclude(p => p.Subject);
+                .ThenInclude(p => p.Subject)
+            .Include(sp => sp.Paper)
+                .ThenInclude(p => p.PaperAccesses)
+                .ThenInclude(pa => pa.Class)
+               .Include(sp => sp.SubmitPaperDetails);
     }
 }

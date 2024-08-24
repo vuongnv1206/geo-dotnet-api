@@ -1,6 +1,7 @@
 ﻿using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.PaperStudents.Specs;
 using FSH.WebApi.Domain.Examination;
+using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperStudents;
 public class GetHistoryTestOfStudentRequest : PaginationFilter, IRequest<PaginationResponse<StudentTestHistoryDto>>
@@ -10,7 +11,7 @@ public class GetHistoryTestOfStudentRequest : PaginationFilter, IRequest<Paginat
 public class GetHistoryTestOfStudentRequestHandler
     : IRequestHandler<GetHistoryTestOfStudentRequest, PaginationResponse<StudentTestHistoryDto>>
 {
-    private readonly ICurrentUser _currentUser;
+    private readonly ICurrentUser _currentUser; 
     private readonly IReadRepository<SubmitPaper> _submitPaperRepo;
 
     public GetHistoryTestOfStudentRequestHandler(
@@ -26,6 +27,11 @@ public class GetHistoryTestOfStudentRequestHandler
     {
         var userId = _currentUser.GetUserId();
         var spec = new HistorySubmitPaperSpec(request, userId);
-        return await _submitPaperRepo.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
+        var submitions = await _submitPaperRepo.ListAsync(spec, cancellationToken);
+
+        var data = submitions.Adapt<List<StudentTestHistoryDto>>();
+
+        return new PaginationResponse<StudentTestHistoryDto>
+            (data, await _submitPaperRepo.CountAsync(spec, cancellationToken), request.PageNumber, request.PageSize);
     }
 }
