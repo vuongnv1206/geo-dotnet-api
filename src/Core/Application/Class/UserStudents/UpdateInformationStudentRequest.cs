@@ -80,12 +80,9 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
                 throw new BadRequestException(_t["Email is existed in class"]);
             else if (classOfStudent.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim() && x.Student.Id != request.Id))
                 throw new BadRequestException(_t["Phone number is existed in class"]);
+            else if (classOfStudent.UserClasses.Any(x => x.Student.StudentCode.Trim() == request.StudentCode.Trim() && x.Student.Id != request.Id))
+                throw new BadRequestException(_t["Student code is existed in class"]);
         }
-
-        string existDuplicate = await _userStudentRepository
-          .AnyAsync(new StudentByStudentCodeSpec(request.StudentCode))
-          ? throw new ConflictException(_t["The student code '{0}' is already in use.", request.StudentCode])
-          : student.StudentCode = request.StudentCode;
 
         var updatedStudent = student.Update(
             request.FirstName,
