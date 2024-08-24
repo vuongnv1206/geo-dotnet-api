@@ -85,6 +85,13 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             }
         }
 
+        //Check nếu gia hạn thời gian nộp bài assignment thì xóa hết điểm và comment của assignmentStudent ,đồng thời update tất cả status thành Doing
+        if (request.EndTime != null && request.EndTime > assignment.EndTime)
+        {
+            assignment.ExtendTimeAssignment();
+        }
+
+
         // Cập nhật thông tin Assignment
         var updatedAssignment = assignment.Update(
             request.Name,
@@ -150,7 +157,16 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             }
         }
 
+        
+
         await _repository.UpdateAsync(updatedAssignment, cancellationToken);
+
+
+      
+       
+
+      
+
 
         return request.Id;
     }
