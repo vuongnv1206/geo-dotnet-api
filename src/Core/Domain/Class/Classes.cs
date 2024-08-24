@@ -17,6 +17,7 @@ public class Classes : AuditableEntity, IAggregateRoot
     public virtual List<PaperAccess>? PaperAccesses { get; set; } = new();
     public virtual IEnumerable<TeacherPermissionInClass>? TeacherPermissionInClasses { get; set; }
     public virtual IEnumerable<GroupPermissionInClass>? GroupPermissionInClasses { get; set; }
+    public virtual List<Post> Posts { get; set; } = new();
 
     public Classes()
     {
