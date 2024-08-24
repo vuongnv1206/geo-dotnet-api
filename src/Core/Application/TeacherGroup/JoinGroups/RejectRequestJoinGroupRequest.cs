@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.TeacherGroup;
+﻿using FSH.WebApi.Application.Notifications;
+using FSH.WebApi.Domain.TeacherGroup;
 
 namespace FSH.WebApi.Application.TeacherGroup.JoinGroups;
 public class RejectRequestJoinGroupRequest : IRequest<Guid>
@@ -11,15 +12,18 @@ public class RejectRequestJoinGroupRequestHandler : IRequestHandler<RejectReques
     private readonly ICurrentUser _currentUser;
     private readonly IRepository<JoinGroupTeacherRequest> _joinGroupTeacherRepo;
     private readonly IStringLocalizer _t;
+    private readonly INotificationService _notificationService;
 
     public RejectRequestJoinGroupRequestHandler(
         ICurrentUser currentUser,
         IRepository<JoinGroupTeacherRequest> joinGroupTeacherRepo,
-        IStringLocalizer<RejectRequestJoinGroupRequestHandler> t)
+        IStringLocalizer<RejectRequestJoinGroupRequestHandler> t,
+        INotificationService notificationService)
     {
         _currentUser = currentUser;
         _joinGroupTeacherRepo = joinGroupTeacherRepo;
         _t = t;
+        _notificationService = notificationService;
     }
 
     public async Task<DefaultIdType> Handle(RejectRequestJoinGroupRequest request, CancellationToken cancellationToken)
@@ -38,6 +42,16 @@ public class RejectRequestJoinGroupRequestHandler : IRequestHandler<RejectReques
         joinRequest.RejectRequest();
 
         await _joinGroupTeacherRepo.UpdateAsync(joinRequest);
+
+        var noti = new BasicNotification
+        {
+            Message = $"{_currentUser.GetUserEmail()} rejected your join group request. You can send request again.",
+            Label = BasicNotification.LabelType.Warning,
+            Title = "Join Group",
+        };
+
+        await _notificationService.SendNotificationToUser(joinRequest.CreatedBy.ToString(), noti, null, cancellationToken);
+
 
         return joinRequest.Id;
     }

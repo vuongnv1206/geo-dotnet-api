@@ -116,4 +116,23 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
 
         return totalMark;
     }
+
+    public bool CheckDetailAnswerResult()
+    {
+        if (Paper.ShowQuestionAnswer == ShowQuestionAnswer.No)
+        {
+            return false;
+        }
+        else if (Paper.ShowQuestionAnswer == ShowQuestionAnswer.WhenSubmitted)
+        {
+            return true;
+        }
+        else
+        {
+            int totalStudent = Paper.GetTotalStudentsNeedTake();
+            int totalSubmit = Paper.SubmitPapers.Count();
+
+            return totalStudent == totalSubmit;
+        }
+    }
 }

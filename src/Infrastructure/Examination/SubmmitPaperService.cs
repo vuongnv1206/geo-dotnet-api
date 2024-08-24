@@ -969,11 +969,19 @@ public class SubmmitPaperService : ISubmmitPaperService
 
     public async Task<LastResultExamDto> GetLastResultExamAsync(Guid paperId, Guid userId, Guid submitPaperId, CancellationToken cancellationToken)
     {
-        var spec = new ExamResultSpec(submitPaperId, paperId, userId);
+        var currentUser = _currentUser.GetUserId();
+
+        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(paperId), cancellationToken)
+            ?? throw new NotFoundException(_t["Paper {0) Not Found."]);
+
+        var spec = new ExamResultSpec(submitPaperId, paper, userId, currentUser);
         var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(spec, cancellationToken)
             ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
 
-        var paper = await _paperRepository.FirstOrDefaultAsync(new PaperByIdSpec(submitPaper.PaperId), cancellationToken);
+        if (userId == currentUser && !submitPaper.CheckDetailAnswerResult())
+        {
+            throw new BadRequestException(_t["You cannot view detail"]);
+        }
 
         var student = await _userService.GetAsync(userId.ToString(), cancellationToken);
 
