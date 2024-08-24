@@ -71,6 +71,8 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
 
     public float getScore()
     {
+        float totalMark = 0;
+
         if (SubmitPaperDetails == null || SubmitPaperDetails.Count == 0)
         {
             return 0;
@@ -80,15 +82,37 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         {
             return 0;
         }
-
-        float totalMark = 0;
-        foreach (var item in SubmitPaperDetails)
+        else if (Paper.ShowMarkResult == ShowResult.WhenSubmitted)
         {
-            if (item.Mark.HasValue)
+            foreach (var item in SubmitPaperDetails)
             {
-                totalMark += item.Mark.Value;
+                if (item.Mark.HasValue)
+                {
+                    totalMark += item.Mark.Value;
+                }
             }
         }
+        else
+        {
+            int totalStudent = Paper.GetTotalStudentsNeedTake();
+            int totalSubmit = Paper.SubmitPapers.Count();
+
+            if (totalStudent == totalSubmit)
+            {
+                foreach (var item in SubmitPaperDetails)
+                {
+                    if (item.Mark.HasValue)
+                    {
+                        totalMark += item.Mark.Value;
+                    }
+                }
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
 
         return totalMark;
     }

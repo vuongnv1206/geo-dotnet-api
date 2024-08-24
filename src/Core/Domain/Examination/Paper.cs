@@ -1,6 +1,7 @@
 ﻿using FSH.WebApi.Domain.Examination.Enums;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Subjects;
+using System.Linq;
 
 namespace FSH.WebApi.Domain.Examination;
 public class Paper : AuditableEntity, IAggregateRoot
@@ -251,4 +252,21 @@ public class Paper : AuditableEntity, IAggregateRoot
     => SubmitPapers.Any()
         ? SubmitPapers.Where(x => x.Status == SubmitPaperStatus.End).Count()
         : 0;
+
+    // 
+    public int GetTotalStudentsNeedTake()
+    {
+        // lấy học sinh được asign riêng
+        var studentIds = PaperAccesses.Where(x => x.UserId.HasValue).Select(x => x.UserId.Value).ToList();
+
+        //học sinh trong lớp được assign
+        var studentIdsInClass = PaperAccesses
+            .Where(x => x.ClassId.HasValue && x.Class?.UserClasses != null)
+            .SelectMany(x => x.Class.UserClasses!.Select(uc => uc.StudentId)).ToList();
+
+        // Thêm những studentIds mà không có trong studentInclass
+        var allStudentIds = studentIdsInClass.Union(studentIds.Except(studentIdsInClass)).ToList();
+
+        return allStudentIds.Count;
+    }
 }
