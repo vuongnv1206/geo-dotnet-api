@@ -72,11 +72,16 @@ public class GetGroupClassesAccessPaperRequestHandler : IRequestHandler<GetGroup
 
         foreach (var group in groups)
         {
-            group.Classes = group.Classes.Where(c => accessClassIds.Contains(c.Id) || c.UserClasses.Any(uc => accessStudentIds.Contains(uc.StudentId))).ToList();
-
-            foreach(var classroom in group.Classes)
+            if (request.Status == PaperShareType.AssignToStudent)
             {
-                classroom.UserClasses = classroom.UserClasses.Where(uc => accessStudentIds.Contains(uc.StudentId)).ToList();
+                group.Classes = group.Classes.Where(c => c.UserClasses.Any(uc => accessStudentIds.Contains(uc.StudentId))).ToList();
+                foreach(var classroom in group.Classes)
+                {
+                    classroom.UserClasses = classroom.UserClasses.Where(uc => accessStudentIds.Contains(uc.StudentId)).ToList();
+                }
+            }else if (request.Status == PaperShareType.AssignToClass)
+            {
+                group.Classes = group.Classes.Where(c => accessClassIds.Contains(c.Id)).ToList();
             }
         }
 

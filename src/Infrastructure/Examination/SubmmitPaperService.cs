@@ -1039,7 +1039,7 @@ public class SubmmitPaperService : ISubmmitPaperService
             Status = submitPaper.Status,
             StartTime = submitPaper.StartTime,
             EndTime = submitPaper.EndTime,
-            TotalMark = totalMark,
+            TotalMark = submitPaper.TotalMark,
             TotalQuestion = submitPaper.SubmitPaperDetails.Count,
             Paper = paper.Adapt<PaperDto>(), // Assuming you have a mapping for PaperDto
             SubmitPaperDetails = submitPaperDetailsDtos,

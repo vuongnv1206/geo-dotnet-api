@@ -53,7 +53,16 @@ public class GetSubmittedPaperRequestHandler : IRequestHandler<GetSubmittedPaper
             studentIds = classroom.UserClasses.Where(x => x.Student.StId != null).Select(x => x.Student.StId).ToList();
         }
 
-        var spec = new SubmitPaperByPaperIdPaging(request, paper, currentUserId, studentIds);
+        bool isTeacher = false;
+
+        if (paper.CreatedBy == currentUserId
+            || paper.PaperPermissions.Any(x => x.UserId.HasValue && x.UserId.Value == currentUserId && x.CanView)
+            || paper.PaperPermissions.Any(x => x.GroupTeacherId.HasValue && x.GroupTeacher.TeacherInGroups.Any(tig => tig.TeacherTeam.TeacherId == currentUserId) && x.CanView))
+        {
+            isTeacher = true;
+        }
+
+        var spec = new SubmitPaperByPaperIdPaging(request, paper, currentUserId, studentIds, isTeacher);
         var submitPapers = await _repository.PaginatedListAsync(spec, request.PageNumber, request.PageSize, cancellationToken);
         foreach (var submitter in submitPapers.Data)
         {

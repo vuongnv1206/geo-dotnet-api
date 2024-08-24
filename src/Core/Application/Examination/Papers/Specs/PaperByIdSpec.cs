@@ -14,6 +14,6 @@ public class PaperByIdSpec : Specification<Paper>, ISingleResultSpecification
             .Include(x => x.SubmitPapers)
             .Include(x => x.PaperAccesses).ThenInclude(pa => pa.Class).ThenInclude(c => c.UserClasses).ThenInclude(uc => uc.Student)
             .Include(x => x.PaperAccesses).ThenInclude(pa => pa.Class).ThenInclude(c => c.GroupClass)
-            .Include(x => x.PaperPermissions);
+            .Include(x => x.PaperPermissions).ThenInclude(x => x.GroupTeacher).ThenInclude(gt => gt.TeacherInGroups).ThenInclude(tig => tig.TeacherTeam);
     }
 }
