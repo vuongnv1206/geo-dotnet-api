@@ -190,6 +190,8 @@ public class MapsterSettings
             .Map(dest => dest.Score, src => src.getScore())
             .Map(dest => dest.ShowMarkResult, src => src.Paper.ShowMarkResult)
             .Map(dest => dest.ShowQuestionAnswer, src => src.Paper.ShowQuestionAnswer)
+            .Map(dest => dest.PaperId, src => src.Paper.Id)
+            .Map(dest => dest.CanViewDetailAnswer, src => src.CheckDetailAnswerResult())
             .Map(dest => dest.ShowMarkResult, src => src.Paper.ShowMarkResult);
 
         _ = TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();
