@@ -46,12 +46,6 @@ public class DeletePaperRequestHandler : IRequestHandler<DeletePaperRequest, Gui
             throw new ConflictException(_t["Cannot delete this paper because there are submitted exams associated with it."]);
         }
 
-        // Kiểm tra nếu đang trong quá trình thi
-        var timeNow = DateTime.UtcNow;
-        if (paper.StartTime.HasValue && paper.EndTime.HasValue && timeNow >= paper.StartTime.Value && timeNow <= paper.EndTime.Value)
-        {
-            throw new ConflictException(_t["Cannot delete this paper because the exam is currently in progress."]);
-        }
 
         await _repo.DeleteAsync(paper);
 
