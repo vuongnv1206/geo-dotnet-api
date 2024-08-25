@@ -192,7 +192,21 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
         return count;
     }
 
-    
+    public bool IsValidToDeleteFolder()
+    {
+        if (Papers.Any(x => x.SubmitPapers.Any()))
+        {
+            return false;
+        }
+        foreach (var child in PaperFolderChildrens)
+        {
+            if (!child.IsValidToDeleteFolder())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
 
