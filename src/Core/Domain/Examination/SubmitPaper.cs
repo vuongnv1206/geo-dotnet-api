@@ -97,7 +97,7 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
             int totalStudent = Paper.GetTotalStudentsNeedTake();
             int totalSubmit = Paper.SubmitPapers.Count();
 
-            if (totalStudent == totalSubmit)
+            if (totalStudent == totalSubmit || Paper.EndTime < DateTime.UtcNow)
             {
                 foreach (var item in SubmitPaperDetails)
                 {
@@ -132,7 +132,7 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
             int totalStudent = Paper.GetTotalStudentsNeedTake();
             int totalSubmit = Paper.SubmitPapers.Count();
 
-            return totalStudent == totalSubmit;
+            return totalStudent == totalSubmit || Paper.EndTime < DateTime.UtcNow;
         }
     }
 }
