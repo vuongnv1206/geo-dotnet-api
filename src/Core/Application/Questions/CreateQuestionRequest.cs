@@ -152,7 +152,8 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
             SearchQuestionsRequest searchDuplicate = new()
             {
                 Content = questionDto.Content,
-                QuestionType = questionDto.QuestionType
+                QuestionType = questionDto.QuestionType,
+                folderId = questionDto.QuestionFolderId
             };
             var spec = new QuestionsBySearchEqRequestSpec(searchDuplicate, folderIds);
             var duplicate = await _questionRepo.FirstOrDefaultAsync(spec, cancellationToken);
