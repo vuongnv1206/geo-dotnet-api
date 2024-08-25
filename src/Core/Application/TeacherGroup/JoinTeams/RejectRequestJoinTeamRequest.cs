@@ -44,9 +44,9 @@ public class RejectRequestJoinTeamRequestHandler : IRequestHandler<RejectRequest
 
         var noti = new BasicNotification
         {
-            Message = $"{_currentUser.GetUserEmail()} rejected your request. You can send request again.",
+            Message = $"{_currentUser.GetUserEmail()} rejected your join team request. You can send request again.",
             Label = BasicNotification.LabelType.Warning,
-            Title = "Join team",
+            Title = "Join Team",
         };
 
         await _notificationService.SendNotificationToUser(joinRequest.CreatedBy.ToString(), noti, null, cancellationToken);

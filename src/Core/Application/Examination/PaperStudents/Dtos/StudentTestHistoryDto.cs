@@ -5,6 +5,7 @@ public class StudentTestHistoryDto : IDto
 {
     public DefaultIdType Id { get; set; }
     public required string ExamName { get; set; }
+    public Guid PaperId { get; set; }
     public float? Duration { get; set; }
     public DefaultIdType? PaperLabelId { get; set; }
     public string? PaperLabelName { get; set; }
@@ -15,5 +16,6 @@ public class StudentTestHistoryDto : IDto
     public float? Score { get; set; }
     public CompletionStatusEnum CompletionStatus { get; set; }
     public ShowQuestionAnswer ShowQuestionAnswer { get; set; }
+    public bool CanViewDetailAnswer { get; set; }
     public ShowResult ShowMarkResult { get; set; }
 }
