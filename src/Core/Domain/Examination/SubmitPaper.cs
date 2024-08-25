@@ -69,7 +69,7 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         }
     }
 
-    public float getScore()
+    public float getScore(int totalSubmitted)
     {
         float totalMark = 0;
 
@@ -95,9 +95,8 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         else
         {
             int totalStudent = Paper.GetTotalStudentsNeedTake();
-            int totalSubmit = Paper.SubmitPapers.Count();
 
-            if (totalStudent == totalSubmit || Paper.EndTime < DateTime.UtcNow)
+            if (totalStudent == totalSubmitted || Paper.EndTime < DateTime.UtcNow)
             {
                 foreach (var item in SubmitPaperDetails)
                 {
@@ -117,7 +116,7 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         return totalMark;
     }
 
-    public bool CheckDetailAnswerResult()
+    public bool CheckDetailAnswerResult(int totalSubmitted)
     {
         if (Paper.ShowQuestionAnswer == ShowQuestionAnswer.No)
         {
@@ -130,9 +129,8 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         else
         {
             int totalStudent = Paper.GetTotalStudentsNeedTake();
-            int totalSubmit = Paper.SubmitPapers.Count();
 
-            return totalStudent == totalSubmit || Paper.EndTime < DateTime.UtcNow;
+            return totalStudent == totalSubmitted || Paper.EndTime < DateTime.UtcNow;
         }
     }
 }

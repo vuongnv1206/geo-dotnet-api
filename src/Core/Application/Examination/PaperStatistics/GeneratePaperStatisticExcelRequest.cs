@@ -7,6 +7,7 @@ namespace FSH.WebApi.Application.Examination.PaperStatistics;
 public class GeneratePaperStatisticExcelRequest : IRequest<byte[]>
 {
     public Guid PaperId { get; set; }
+    public Guid? ClassId { get; set; }
     public List<RequestStatisticType> RequestStatisticTypes { get; set; }
 }
 
@@ -32,15 +33,15 @@ public class GeneratePaperStatisticExcelRequestHandler : IRequestHandler<Generat
             switch (requestType)
             {
                 case RequestStatisticType.GetClassroomFrequencyMark:
-                    frequencyMarkData = await _mediator.Send(new GetClassroomFrequencyMarkRequest { PaperId = request.PaperId }, cancellationToken);
+                    frequencyMarkData = await _mediator.Send(new GetClassroomFrequencyMarkRequest { PaperId = request.PaperId , ClassroomId = request.ClassId }, cancellationToken);
                     break;
 
                 case RequestStatisticType.GetListTranscript:
-                    transcriptData = await _mediator.Send(new GetListTranscriptRequest { PaperId = request.PaperId }, cancellationToken);
+                    transcriptData = await _mediator.Send(new GetListTranscriptRequest { PaperId = request.PaperId, ClassId = request.ClassId }, cancellationToken);
                     break;
 
                 case RequestStatisticType.GetPaperInfor:
-                    paperInfoData = await _mediator.Send(new GetPaperInfoRequest(request.PaperId, null), cancellationToken);
+                    paperInfoData = await _mediator.Send(new GetPaperInfoRequest(request.PaperId, request.ClassId), cancellationToken);
                     break;
 
                 default:
