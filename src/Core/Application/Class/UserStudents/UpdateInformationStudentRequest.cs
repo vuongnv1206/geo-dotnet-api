@@ -63,7 +63,7 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
                                             .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
 
             if (!listPermission.Any(x => x.PermissionType == PermissionType.ManageStudentList))
-                throw new NotFoundException(_t["Student {0} Not Found.", request.Id]);
+                throw new ForbiddenException(_t["You don't have student management"]);
         }
 
         var student = await _repository.FirstOrDefaultAsync(new StudentByIdSpec(request.Id), cancellationToken);

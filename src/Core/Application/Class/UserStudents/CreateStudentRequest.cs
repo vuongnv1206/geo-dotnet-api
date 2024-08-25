@@ -70,7 +70,7 @@ public class CreateUserStudentRequestHandler : IRequestHandler<CreateStudentRequ
                                             .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
 
             if (!listPermission.Any(x => x.PermissionType == PermissionType.ManageStudentList))
-                throw new NotFoundException(_t["Classes {0} Not Found.", request.ClassesId]);
+                throw new NotFoundException(_t["You don't have student management"]);
         }
 
         if (string.IsNullOrEmpty(request.Email) && string.IsNullOrEmpty(request.PhoneNumber))
