@@ -978,7 +978,7 @@ public class SubmmitPaperService : ISubmmitPaperService
         var submitPaper = await _submitPaperRepository.FirstOrDefaultAsync(spec, cancellationToken)
             ?? throw new NotFoundException(_t["SubmitPaper Not Found."]);
 
-        if (userId == currentUser && !submitPaper.CheckDetailAnswerResult())
+        if (userId == currentUser && !submitPaper.CheckDetailAnswerResult(paper.SubmitPapers.Count))
         {
             throw new BadRequestException(_t["You cannot view detail"]);
         }

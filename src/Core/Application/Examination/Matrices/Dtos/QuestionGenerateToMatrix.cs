@@ -6,4 +6,5 @@ public class QuestionGenerateToMatrix : IDto
     public QuestionDto Question { get; set; }
     public float Mark { get; set; }
     public int? RawIndex { get; set; }
+    public Guid FolderId { get; set; } // folder đã chọn ở matrix
 }

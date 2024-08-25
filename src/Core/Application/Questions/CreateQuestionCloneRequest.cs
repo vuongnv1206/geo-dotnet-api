@@ -49,9 +49,11 @@ public class CreateQuestionCloneRequestHandler : IRequestHandler<CreateQuestionC
             throw new NotFoundException(_t["Question {0} Not Found.", request.OriginalQuestionId]);
 
         var questionCloneDto = existingQuestion.Adapt<CreateQuestionCloneDto>();
+        questionCloneDto.QuestionLabelId = existingQuestion.QuestionLableId;
         questionCloneDto.OriginalQuestionId = existingQuestion.Id;
 
         var questionClone = questionCloneDto.Adapt<QuestionClone>();
+        questionClone.QuestionLabelId = existingQuestion.QuestionLableId;
         await _questionCloneRepo.AddAsync(questionClone,cancellationToken);
 
         return questionClone.Id;
