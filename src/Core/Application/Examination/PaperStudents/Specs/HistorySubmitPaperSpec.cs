@@ -16,6 +16,7 @@ public class HistorySubmitPaperSpec : EntitiesByPaginationFilterSpec<SubmitPaper
             .Include(sp => sp.Paper)
                 .ThenInclude(p => p.PaperAccesses)
                 .ThenInclude(pa => pa.Class)
+                .ThenInclude(c => c.UserClasses)
                .Include(sp => sp.SubmitPaperDetails);
     }
 }
