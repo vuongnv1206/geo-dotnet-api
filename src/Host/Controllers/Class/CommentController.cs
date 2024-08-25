@@ -1,7 +1,4 @@
 ﻿using FSH.WebApi.Application.Class.Comments;
-using FSH.WebApi.Application.Class.New.Dto;
-using FSH.WebApi.Application.Class.New;
-using Microsoft.AspNetCore.Mvc;
 
 namespace FSH.WebApi.Host.Controllers.Class;
 public class CommentController : VersionedApiController
@@ -31,6 +28,7 @@ public class CommentController : VersionedApiController
     {
         return Mediator.Send(new DeleteCommentRequest(id));
     }
+
     [HttpPost("like")]
     [MustHavePermission(FSHAction.Create, FSHResource.NewsReaction)]
     [OpenApiOperation("Like a comment.", "")]
