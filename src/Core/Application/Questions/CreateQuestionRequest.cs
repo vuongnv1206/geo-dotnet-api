@@ -1,5 +1,7 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Notifications;
+using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.Questions.QuestionLabel;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
@@ -104,6 +106,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
     private readonly IRepositoryWithEvents<QuestionFolder> _questionFolderRepository;
     private readonly IQuestionService _questionService;
     private readonly INotificationService _notificationService;
+    private readonly IRepository<QuestionLable> _questionLableRepository;
     private readonly IStringLocalizer<CreateQuestionRequestHandler> _t;
 
     public CreateQuestionRequestHandler(
@@ -113,6 +116,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         IRepositoryWithEvents<QuestionFolder> questionFolderRepository,
         IQuestionService questionService,
         INotificationService notificationService,
+        IRepository<QuestionLable> questionLableRepository,
         IStringLocalizer<CreateQuestionRequestHandler> t)
     {
         _questionRepo = questionRepo;
@@ -121,6 +125,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         _questionFolderRepository = questionFolderRepository;
         _questionService = questionService;
         _notificationService = notificationService;
+        _questionLableRepository = questionLableRepository;
         _t = t;
     }
 
@@ -148,6 +153,21 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         foreach (var questionDto in request.Questions)
         {
             var question = questionDto.Adapt<Question>();
+
+            // if questionLabel is not null, search label by name and assign to question
+            if (questionDto.QuestionLable != null)
+            {
+                var label = await _questionLableRepository.FirstOrDefaultAsync(new QuestionLabelByNameSpec(questionDto.QuestionLable.Name), cancellationToken);
+                if (label == null)
+                {
+                    label = new QuestionLable(questionDto.QuestionLable.Name, "primary");
+                    _ = await _questionLableRepository.AddAsync(label, cancellationToken);
+                }
+
+                question.QuestionLableId = label.Id;
+                question.QuestionLable = label;
+            }
+
             var answers = questionDto.Answers?.Adapt<List<Answer>>();
             SearchQuestionsRequest searchDuplicate = new()
             {
