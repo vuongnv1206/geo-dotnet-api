@@ -46,22 +46,32 @@ public class DeleteAssignmentRequestHandler : IRequestHandler<DeleteAssignmentRe
 
         var userId = _currentUser.GetUserId();
 
-        var classOfStudent = await _classRepo.FirstOrDefaultAsync(new ClassByStudentClassIdSpec(request.Id));
-        if (classOfStudent.CreatedBy != userId && assignment.CreatedBy != userId)
+        if(assignment.CreatedBy != userId)
         {
-            var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, classOfStudent.Id);
-            var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, classOfStudent.Id);
-
-            var listPermission = new List<PermissionInClassDto>();
-
-            listPermission.AddRange(await _groupPermissionRepo.ListAsync(groupPermissionSpec));
-            listPermission.AddRange((await _teacherPermissionRepo
-                                            .ListAsync(teacherPermissionSpec))
-                                            .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
-
-            if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment))
-                throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
+            throw new ForbiddenException(_t["You cannot delete this assignment"]);
         }
+
+        if (assignment.AssignmentStudents.Any(x => x.Status == SubmitAssignmentStatus.Submitted))
+        {
+            throw new BadRequestException(_t["Cannot delete this assignment because students have already submitted."]);
+        }
+
+        //var classOfStudent = await _classRepo.FirstOrDefaultAsync(new ClassByStudentClassIdSpec(request.Id));
+        //if (classOfStudent.CreatedBy != userId && assignment.CreatedBy != userId)
+        //{
+        //    var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, classOfStudent.Id);
+        //    var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, classOfStudent.Id);
+
+        //    var listPermission = new List<PermissionInClassDto>();
+
+        //    listPermission.AddRange(await _groupPermissionRepo.ListAsync(groupPermissionSpec));
+        //    listPermission.AddRange((await _teacherPermissionRepo
+        //                                    .ListAsync(teacherPermissionSpec))
+        //                                    .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
+
+        //    if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment))
+        //        throw new NotFoundException(_t["Assignment {0} Not Found.", request.Id]);
+        //}
 
         // Add Domain Events to be raised after the commit
         assignment.DomainEvents.Add(EntityDeletedEvent.WithEntity(assignment));
