@@ -461,3 +461,5 @@ $RECYCLE.BIN/
 
 ##Igore all from Files
 Files/
+##Except the following
+!Files/QuestionImportTemplate.docx
