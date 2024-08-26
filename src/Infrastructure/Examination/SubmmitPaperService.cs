@@ -443,10 +443,10 @@ public class SubmmitPaperService : ISubmmitPaperService
         }
 
         // check public ip
-        // if (!string.IsNullOrEmpty(paper.PublicIpAllowed) && !string.IsNullOrEmpty(request.PublicIp) && !IsIpInRange(request.PublicIp, paper.PublicIpAllowed))
-        // {
-        //    throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
-        // }
+        if (!string.IsNullOrEmpty(paper.PublicIpAllowed) && !string.IsNullOrEmpty(request.PublicIp) && !IsIpInRange(request.PublicIp, paper.PublicIpAllowed))
+        {
+            throw new ForbiddenException("Your public IP: " + request.PublicIp + " is not allowed to start this exam.");
+        }
 
         if (request.IsResume)
         {
@@ -992,6 +992,7 @@ public class SubmmitPaperService : ISubmmitPaperService
             float questionMark = paper.PaperQuestions.FirstOrDefault(x => x.QuestionId == submit.QuestionId)?.Mark ?? 0;
 
             bool isCorrect = false;
+
             // if question is Reading
             if (submit.Question.QuestionType == QuestionType.Reading)
             {

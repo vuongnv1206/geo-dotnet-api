@@ -32,7 +32,7 @@
         <None Update="Files\full-stack-hero-logo.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Files\QuestionTemplate.docx">
+        <None Update="Files\QuestionImportTemplate.docx">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Files\QuestionTemplate.txt">
