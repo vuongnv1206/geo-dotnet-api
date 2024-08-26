@@ -43,8 +43,6 @@ public class TeacherTeamConfig : IEntityTypeConfiguration<TeacherTeam>
         builder.IsMultiTenant();
         builder.ToTable("TeacherTeams", SchemaNames.GroupTeacher);
         builder.Property(b => b.TeacherName).HasMaxLength(50);
-        builder.Property(b => b.Phone).HasMaxLength(20);
-        builder.Property(b => b.Email).HasMaxLength(20);
     }
 }
 
