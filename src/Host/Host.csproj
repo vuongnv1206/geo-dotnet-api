@@ -32,6 +32,12 @@
         <None Update="Files\full-stack-hero-logo.png">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Files\QuestionTemplate.docx">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Files\QuestionTemplate.txt">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="libwkhtmltox.dll">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
