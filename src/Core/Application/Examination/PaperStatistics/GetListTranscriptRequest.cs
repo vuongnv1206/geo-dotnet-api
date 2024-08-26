@@ -1,5 +1,6 @@
 ﻿using FSH.WebApi.Application.Class;
 using FSH.WebApi.Application.Class.Dto;
+using FSH.WebApi.Application.Class.Specs;
 using FSH.WebApi.Application.Class.UserStudents;
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Examination.PaperStatistics.Dtos;
@@ -69,16 +70,35 @@ public class GetListTranscriptRequestHandler : IRequestHandler<GetListTranscript
         var results = new List<TranscriptResultDto>();
         foreach (var submission in submissions)
         {
+
+            ClassViewListDto foundClass = null;
+
+            foreach (var pa in paper.PaperAccesses)
+            {
+                if (pa.ClassId.HasValue && pa.Class != null && pa.Class.UserClasses
+                        .Any(uc => uc.Student.StId == submission.CreatedBy))
+                {
+                    foundClass = pa.Class.Adapt<ClassViewListDto>();
+                    break; // Dừng lại khi tìm thấy lớp học
+                }
+                else if (pa.UserId.HasValue)
+                {
+                    var classForUser = await GetClassByStudentId(pa.UserId.Value);
+                    if (classForUser.UserClasses.Any(x => x.Student.StId == submission.CreatedBy))
+                    {
+                        foundClass = classForUser.Adapt<ClassViewListDto>();
+                        break; // Dừng lại khi tìm thấy lớp học từ UserId
+                    }
+                }
+            }
+
             var student = await _repoStudent.FirstOrDefaultAsync(new StudentByStIdSpec(submission.CreatedBy), cancellationToken);
 
             results.Add(new TranscriptResultDto
             {
                 Attendee = student != null ? student.Adapt<StudentDto>() : null,
                 Mark = submission.TotalMark,
-                Classrooms = paper.PaperAccesses
-                                    .Where(x => x.Class.UserClasses
-                                    .Any(uc => uc.Student.StId == submission.CreatedBy))
-                                    .Select(x => x.Class).Adapt<List<ClassViewListDto>>(),
+                Classrooms = foundClass != null ? new List<ClassViewListDto> { foundClass } : new List<ClassViewListDto>(),
                 StartedTest = submission.StartTime,
                 FinishedTest = submission.EndTime
             });
@@ -95,5 +115,12 @@ public class GetListTranscriptRequestHandler : IRequestHandler<GetListTranscript
         return paginatedResponse;
     }
 
-   
+    private async Task<Classes> GetClassByStudentId(Guid studentId)
+    {
+        var specClass = new ClassByStudentClassIdSpec(studentId);
+        var classroom = await _repoClass.FirstOrDefaultAsync(specClass)
+            ?? throw new NotFoundException(_t["Classroom {0} Not Found."]);
+
+        return classroom;
+    }
 }
