@@ -75,7 +75,7 @@ public class GeneratePaperDocxRequestHandler : IRequestHandler<GeneratePaperDocx
                 paragraph
                     .InsertTabStopPosition(Alignment.center, 200f, TabStopPositionLeader.dot)
                     .InsertTabStopPosition(Alignment.right, 125f, TabStopPositionLeader.dot)
-                    .Append($"Subject: {paperTemplateModel.SubjectName ?? "\t"} - Duration: {(paperTemplateModel.Duration.HasValue ? "\t" : paperTemplateModel.Duration)} minute(s)")
+                    .Append($"Subject: {paperTemplateModel.SubjectName ?? "\t"} - Duration: {(paperTemplateModel.Duration.HasValue ? paperTemplateModel.Duration : "\t")} minute(s)")
                     .FontSize(10)
                     .Italic()
                     .AppendLine();

@@ -43,14 +43,27 @@ public class PaperTemplateService : IPaperTemplateService
     public byte[] GeneratePaperStatisticExcel(
        List<ClassroomFrequencyMarkDto> frequencyMarkData,
        TranscriptPaginationResponse transcriptData,
-       PaperInfoStatistic paperInfoData)
+       PaperInfoStatistic paperInfoData, List<RequestStatisticType> requestStatisticTypes)
     {
         using (var workbook = new XLWorkbook())
         {
+            foreach (var statisticType in requestStatisticTypes)
+            {
+                if (statisticType == RequestStatisticType.GetClassroomFrequencyMark)
+                {
+                    AddFrequencyMarkSheet(workbook, frequencyMarkData);
+                }
+                else if (statisticType == RequestStatisticType.GetListTranscript)
+                {
+                    AddTranscriptSheet(workbook, transcriptData);
+
+                }
+                else if (statisticType == RequestStatisticType.GetPaperInfor)
+                {
+                    AddPaperInfoSheet(workbook, paperInfoData);
+                }
+            }
             // Thêm dữ liệu vào các sheet
-            AddFrequencyMarkSheet(workbook, frequencyMarkData);
-            AddTranscriptSheet(workbook, transcriptData);
-            AddPaperInfoSheet(workbook, paperInfoData);
 
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
@@ -195,7 +208,8 @@ public class PaperTemplateService : IPaperTemplateService
 
     public async Task<byte[]> GeneratePdfFromHtml(string htmlContent, string title)
     {
-        var pdfOptions = new PdfOptions {
+        var pdfOptions = new PdfOptions
+        {
             DisplayHeaderFooter = true,
             Landscape = true,
             PrintBackground = true,
