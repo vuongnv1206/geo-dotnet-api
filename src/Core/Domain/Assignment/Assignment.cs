@@ -127,11 +127,23 @@ public class Assignment : AuditableEntity, IAggregateRoot
         AssignmentStudents.RemoveAll(x => x.StudentId == studentId);
     }
 
-    public void UpdateStatusSubmitAssignment(SubmitAssignmentStatus status)
+    public void UpdateStatusSubmitAssignment(SubmitAssignmentStatus statusFrom, SubmitAssignmentStatus statusTo)
     {
-        AssignmentStudents.Where(s => s.Status == SubmitAssignmentStatus.Doing)
+        AssignmentStudents.Where(s => s.Status == statusFrom)
                    .ToList()
-                   .ForEach(s => s.Status = status);
+                   .ForEach(s => s.Status = statusTo);
     }
+
+    //write func to  remove score and comment of assignmentStudent ,and update all status to Doing
+    public void ExtendTimeAssignment()
+    {
+        AssignmentStudents.ForEach(s =>
+        {
+            s.Score = null;
+            s.Comment = null;
+            s.Status = SubmitAssignmentStatus.Doing;
+        });
+    }
+
 
 }

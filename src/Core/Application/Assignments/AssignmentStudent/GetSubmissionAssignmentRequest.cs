@@ -83,7 +83,8 @@ public class GetSubmissionAssignmentRequestHandler : IRequestHandler<GetSubmissi
             await _mediator.Send(new UpdateStatusSubmitAssignmentRequest
             {
                 AssignmentId = request.AssignmentId,
-                Status = SubmitAssignmentStatus.NotSubmitted,
+                StatusFrom = SubmitAssignmentStatus.Doing,
+                StatusTo = SubmitAssignmentStatus.Submitted,
             });
         }
        

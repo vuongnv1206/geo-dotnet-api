@@ -166,8 +166,19 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
 
         foreach (var permission in paperFolderParent.PaperFolderPermissions)
         {
-            AddPermission(new PaperFolderPermission(permission.UserId, Id, permission.GroupTeacherId, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete,permission.CanShare));
-            AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true,true));
+            //AddPermission(new PaperFolderPermission(permission.UserId, Id, permission.GroupTeacherId, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete,permission.CanShare));
+            //AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true,true));
+
+            if (!PaperFolderPermissions.Any(p => p.UserId == permission.UserId && p.GroupTeacherId == permission.GroupTeacherId))
+            {
+                AddPermission(new PaperFolderPermission(permission.UserId, Id, permission.GroupTeacherId, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete, permission.CanShare));
+            }
+
+            // Thêm permission cho owner của thư mục cha, nhưng chỉ khi nó chưa tồn tại
+            if (!PaperFolderPermissions.Any(p => p.UserId == paperFolderParent.CreatedBy && p.GroupTeacherId == permission.GroupTeacherId))
+            {
+                AddPermission(new PaperFolderPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true, true));
+            }
         }
     }
 
@@ -181,7 +192,21 @@ public class PaperFolder : AuditableEntity, IAggregateRoot
         return count;
     }
 
-    
+    public bool IsValidToDeleteFolder()
+    {
+        if (Papers.Any(x => x.SubmitPapers.Any()))
+        {
+            return false;
+        }
+        foreach (var child in PaperFolderChildrens)
+        {
+            if (!child.IsValidToDeleteFolder())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
 

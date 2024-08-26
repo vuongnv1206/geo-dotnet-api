@@ -4,7 +4,8 @@ namespace FSH.WebApi.Application.Assignments.AssignmentStudent;
 public class UpdateStatusSubmitAssignmentRequest : IRequest<Guid>
 {
     public Guid AssignmentId { get; set; }
-    public SubmitAssignmentStatus Status { get; set; }
+    public SubmitAssignmentStatus StatusFrom { get; set; }
+    public SubmitAssignmentStatus StatusTo { get; set; }
 }
 
 public class UpdateStatusSubmitAssignmentRequestHandler : IRequestHandler<UpdateStatusSubmitAssignmentRequest, Guid>
@@ -29,7 +30,7 @@ public class UpdateStatusSubmitAssignmentRequestHandler : IRequestHandler<Update
         var assignment = await _assignmentRepo.FirstOrDefaultAsync(new AssignmentByIdSpec(request.AssignmentId));
         _ = assignment ?? throw new NotFoundException(_t["Assignment {0} Not  Found.", request.AssignmentId]);
 
-        assignment.UpdateStatusSubmitAssignment(request.Status);
+        assignment.UpdateStatusSubmitAssignment(request.StatusFrom,request.StatusTo);
         await _assignmentRepo.UpdateAsync(assignment);
         return assignment.Id;
     }

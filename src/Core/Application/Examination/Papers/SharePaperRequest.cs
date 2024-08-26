@@ -2,6 +2,7 @@
 
 using FSH.WebApi.Application.Examination.PaperFolders;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.TeacherTeams.Specs;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
@@ -23,8 +24,10 @@ public class PaperPermissionDto
 {
     public Guid Id { get; set; }
     public Guid? UserId { get; set; }
+    public UserDetailsDto? User { get; set; }
     public Guid PaperId { get; set; }
-    public Guid? GroupId { get; set; }
+    public Guid? GroupTeacherId { get; set; }
+    public GroupTeacherDto? GroupTeacher { get; set; }
     public bool CanView { get; set; }
     public bool CanAdd { get; set; }
     public bool CanUpdate { get; set; }

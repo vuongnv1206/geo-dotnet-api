@@ -1,9 +1,11 @@
 ﻿
 using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Notifications;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Domain.Examination;
 using FSH.WebApi.Domain.TeacherGroup;
+using Mapster;
 
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
@@ -42,6 +44,8 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
     private readonly IReadRepository<TeacherTeam> _teacherTeamRepo;
     private readonly IRepository<PaperFolderPermission> _paperFolderPermissionRepo;
     private readonly IMediator _mediator;
+    private readonly INotificationService _notificationService;
+    private readonly IRepository<GroupTeacher> _groupTeacherRepo;
 
     public SharePaperFolderRequestHandler(
         ICurrentUser currentUser,
@@ -49,7 +53,9 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
         IRepositoryWithEvents<PaperFolder> paperFolderRepo,
         IReadRepository<TeacherTeam> teacherTeamRepo,
         IRepository<PaperFolderPermission> paperFolderPermissionRepo,
-        IMediator mediator
+        IMediator mediator,
+        INotificationService notificationService,
+        IRepository<GroupTeacher> groupTeacherRepo
         )
     {
         _currentUser = currentUser;
@@ -58,6 +64,8 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
         _teacherTeamRepo = teacherTeamRepo;
         _paperFolderPermissionRepo = paperFolderPermissionRepo;
         _mediator = mediator;
+        _notificationService = notificationService;
+        _groupTeacherRepo = groupTeacherRepo;
     }
 
     public async Task<DefaultIdType> Handle(SharePaperFolderRequest request, CancellationToken cancellationToken)
@@ -81,6 +89,7 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
 
         if (request.GroupId.HasValue)
         {
+           
             foreach (var folderChildrenId in folderChildrenIds)
             {
                 var folderChildren = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(folderChildrenId), cancellationToken)
@@ -99,6 +108,25 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
                     await _paperFolderPermissionRepo.AddAsync(newPermission);
                 }
             }
+
+            var groupTeacher = await _groupTeacherRepo.FirstOrDefaultAsync(new GroupTeacherByIdSpec(request.GroupId.Value), cancellationToken)
+               ?? throw new NotFoundException(_t["The Group {0} Not Found", request.GroupId.Value]);
+
+            var groupMemberIds = groupTeacher.TeacherInGroups.Select(tig => tig.TeacherTeam.TeacherId);
+
+            // Tạo và gửi thông báo cho các thành viên nhóm
+            if (groupMemberIds.Any())
+            {
+                var notification = new BasicNotification
+                {
+                    Title = "Folder Shared with Group",
+                    Message = $"Your group ({groupTeacher.Name}) has been granted access to the folder '{folderParent.Name}'.",
+                    Label = BasicNotification.LabelType.Information,
+                };
+
+                await _notificationService.SendNotificationToUsers(groupMemberIds.Adapt<List<string>>(), notification, null, cancellationToken);
+            }
+
         }
 
         if (request.UserId.HasValue)
@@ -121,6 +149,15 @@ public class SharePaperFolderRequestHandler : IRequestHandler<SharePaperFolderRe
                     await _paperFolderPermissionRepo.AddAsync(newPermission);
                 }
             }
+
+            var notification = new BasicNotification
+            {
+                Title = "Folder Shared with You",
+                Message = $"You have been granted access to the folder '{folderParent.Name}'.",
+                Label = BasicNotification.LabelType.Information,
+            };
+
+            await _notificationService.SendNotificationToUser(request.UserId.Value.ToString(), notification, null, cancellationToken);
         }
 
         foreach (var folderChildrenId in folderChildrenIds)

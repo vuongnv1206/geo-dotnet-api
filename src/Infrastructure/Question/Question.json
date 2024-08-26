@@ -10,7 +10,7 @@
     "QuestionType": 1,
     "QuestionLable": {
       "Name": "Easy",
-      "Color": "#FF0000"
+      "Color": "success"
     },
     "Answers": [
       {
@@ -41,7 +41,7 @@
     "QuestionType": 1,
     "QuestionLable": {
       "Name": "Easy",
-      "Color": "#FF0000"
+      "Color": "success"
     },
     "Answers": [
       {
@@ -72,7 +72,7 @@
     "QuestionType": 1,
     "QuestionLable": {
       "Name": "Hard",
-      "Color": "#00FF00"
+      "Color": "#34ffc5"
     },
     "Answers": [
       {
@@ -103,7 +103,7 @@
     "QuestionType": 1,
     "QuestionLable": {
       "Name": "Hard",
-      "Color": "#00FF00"
+      "Color": "#34ffc5"
     },
     "Answers": [
       {
@@ -134,7 +134,7 @@
     "QuestionType": 1,
     "QuestionLable": {
       "Name": "Hard",
-      "Color": "#00FF00"
+      "Color": "#34ffc5"
     },
     "Answers": [
       {
@@ -166,7 +166,7 @@
     "QuestionType": 2,
     "QuestionLable": {
       "Name": "Hard",
-      "Color": "#00FF00"
+      "Color": "#34ffc5"
     },
     "Answers": [
       {
@@ -197,7 +197,7 @@
     "QuestionType": 2,
     "QuestionLable": {
       "Name": "Hard",
-      "Color": "#00FF00"
+      "Color": "#34ffc5"
     },
     "Answers": [
       {
@@ -228,7 +228,7 @@
     "QuestionType": 2,
     "QuestionLable": {
       "Name": "Hard",
-      "Color": "#00FF00"
+      "Color": "#34ffc5"
     },
     "Answers": [
       {
@@ -406,12 +406,12 @@
     "Image": null,
     "Audio": null,
     "QuestionFolder": {
-      "Name": "Medium",
-      "Color": "#FFFF00"
+      "Name": "Science"
     },
     "QuestionType": 5,
     "QuestionLable": {
-      "Name": "Country-Capital Matching"
+      "Name": "Very Hard",
+      "Color": "danger"
     },
     "Answers": [
       {
@@ -450,7 +450,7 @@
     "QuestionType": 6,
     "QuestionLable": {
       "Name": "Easy",
-      "Color": "#FF0000"
+      "Color": "success"
     },
     "QuestionPassages": [
       {

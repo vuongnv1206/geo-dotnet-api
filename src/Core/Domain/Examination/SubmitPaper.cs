@@ -63,12 +63,16 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         }
         else
         {
+            TotalMark -= answer.Mark ?? 0;
             answer.Mark = mark;
+            TotalMark += mark;
         }
     }
 
-    public float getScore()
+    public float getScore(int totalSubmitted)
     {
+        float totalMark = 0;
+
         if (SubmitPaperDetails == null || SubmitPaperDetails.Count == 0)
         {
             return 0;
@@ -78,16 +82,55 @@ public class SubmitPaper : AuditableEntity, IAggregateRoot
         {
             return 0;
         }
-
-        float totalMark = 0;
-        foreach (var item in SubmitPaperDetails)
+        else if (Paper.ShowMarkResult == ShowResult.WhenSubmitted)
         {
-            if (item.Mark.HasValue)
+            foreach (var item in SubmitPaperDetails)
             {
-                totalMark += item.Mark.Value;
+                if (item.Mark.HasValue)
+                {
+                    totalMark += item.Mark.Value;
+                }
+            }
+        }
+        else
+        {
+            int totalStudent = Paper.GetTotalStudentsNeedTake();
+
+            if (totalStudent == totalSubmitted || Paper.EndTime < DateTime.UtcNow)
+            {
+                foreach (var item in SubmitPaperDetails)
+                {
+                    if (item.Mark.HasValue)
+                    {
+                        totalMark += item.Mark.Value;
+                    }
+                }
+            }
+            else
+            {
+                return -1;
             }
         }
 
+
         return totalMark;
+    }
+
+    public bool CheckDetailAnswerResult(int totalSubmitted)
+    {
+        if (Paper.ShowQuestionAnswer == ShowQuestionAnswer.No)
+        {
+            return false;
+        }
+        else if (Paper.ShowQuestionAnswer == ShowQuestionAnswer.WhenSubmitted)
+        {
+            return true;
+        }
+        else
+        {
+            int totalStudent = Paper.GetTotalStudentsNeedTake();
+
+            return totalStudent == totalSubmitted || Paper.EndTime < DateTime.UtcNow;
+        }
     }
 }

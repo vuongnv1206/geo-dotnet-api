@@ -30,11 +30,8 @@ public class DeleteClassRequestHandler : IRequestHandler<DeleteClassRequest, Gui
     public async Task<Guid> Handle(DeleteClassRequest request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId();
-        var classes = await _repository.FirstOrDefaultAsync(new ClassByIdSpec(request.Id, userId), cancellationToken);
+        var classes = await _repository.FirstOrDefaultAsync(new ClassToDeleteSpec(request.Id), cancellationToken);
         _ = classes ?? throw new NotFoundException(_t["Classes {0} Not Found."]);
-
-        var news = await _postRepository.ListAsync(new PostBySearchRequestWithClass(request.Id), cancellationToken);
-        await _postRepository.DeleteRangeAsync(news, cancellationToken);
 
         await _repository.DeleteAsync(classes, cancellationToken);
 

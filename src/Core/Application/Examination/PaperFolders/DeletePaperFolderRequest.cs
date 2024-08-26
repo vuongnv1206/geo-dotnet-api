@@ -26,18 +26,31 @@ public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolder
 
     public async Task<DefaultIdType> Handle(DeletePaperFolderRequest request, CancellationToken cancellationToken)
     {
-        var paperFolder = await _repository.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.Id), cancellationToken);
+        var paperFolder = await _repository.FirstOrDefaultAsync(new MyPaperFolderTreeByIdSpec(request.Id), cancellationToken);
         _ = paperFolder ?? throw new NotFoundException(_t["PaperFolder {0} Not Found.", request.Id]);
-
+        var currentUserId = _currentUser.GetUserId();
         if (!paperFolder.CanDelete(_currentUser.GetUserId()))
         {
             throw new ForbiddenException(_t["You do not have permission to delete this folder."]);
         }
 
-        // Xóa tất cả các Papers và ChildFolders
-        await DeleteAllPapersAndChildFolders(paperFolder, cancellationToken);
+        var treeFolder = await _repository.ListAsync(new PaperFolderTreeSpec());
+        var folderDelete = treeFolder.FirstOrDefault(x => x.Id == request.Id);
+        _ = folderDelete ?? throw new NotFoundException(_t["PaperFolder {0} Not Found.", request.Id]);
 
-        await _repository.DeleteAsync(paperFolder, cancellationToken);
+        if (folderDelete.IsValidToDeleteFolder())
+        {
+            // Xóa tất cả các Papers và ChildFolders
+            await DeleteAllPapersAndChildFolders(paperFolder, cancellationToken);
+
+            await _repository.DeleteAsync(paperFolder, cancellationToken);
+        }
+        else
+        {
+            throw new ConflictException(_t["Cannot delete the folder because there are papers in it or its subfolders has already submitted"]);
+        }
+
+        
 
         return request.Id;
     }
@@ -57,5 +70,11 @@ public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolder
             await _repository.DeleteAsync(childFolder, cancellationToken);
         }
     }
+
+
+   
+   
+
+
 
 }

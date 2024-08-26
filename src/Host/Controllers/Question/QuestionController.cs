@@ -105,7 +105,6 @@ public class QuestionController : VersionedApiController
     }
 
     [HttpPost("question-random")]
-    [MustHavePermission(FSHAction.Search, FSHResource.Question)]
     [OpenApiOperation("Get random question in folder", "")]
     public async Task<List<QuestionDto>> GetQuestionRandom(GetQuestionRandomRequest request)
     {

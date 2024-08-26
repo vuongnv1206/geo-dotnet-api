@@ -112,59 +112,54 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
             if (paper.Status == PaperStatus.Publish)
             {
                 var timeNow = DateTime.UtcNow;
-                // Kiểm tra nếu đang trong giai đoạn 30 phút trước khi thi, đang thi hoặc đã thi xong
-                if (paper.StartTime.HasValue)
+
+                // Nếu đã có học sinh thi or đang thi
+                if (paper.SubmitPapers.Any())
                 {
-                    var startTime = paper.StartTime.Value;
-
-                    // Nếu đã vượt quá EndTime, không cho phép cập nhật
-                    if (paper.EndTime.HasValue && timeNow > paper.EndTime.Value)
-                    {
-                        throw new ConflictException(_t["Cannot update setting after the exam has ended."]);
-                    }
-
-                    // Nếu đang trong khoảng 30 phút trước StartTime hoặc trong thời gian thi, không cho phép cập nhật
-                    if (timeNow > startTime.AddMinutes(-30) && timeNow < paper.EndTime)
-                    {
-                        throw new ConflictException(_t["Cannot update the paper within 30 minutes before the start time or during the exam."]);
-                    }
+                    throw new ConflictException(_t["Cannot update settings because students have already started or completed the exam."]);
                 }
 
+                paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
+                paper.Update(
+               request.ExamName,
+               request.Status,
+               request.StartTime,
+               request.EndTime,
+               request.Duration,
+               request.Shuffle,
+               request.ShowMarkResult,
+               request.ShowQuestionAnswer,
+               request.Type,
+               request.IsPublish,
+               request.Content,
+               request.Description,
+               request.Password,
+               request.NumberAttempt,
+               request.ShareType,
+               request.PaperFolderId,
+               request.PaperLabelId,
+               request.SubjectId,
+               request.PublicIpAllowed,
+               request.LocalIpAllowed
+               );
 
-                //Chỉ cho phép sửa Time và send notification
-                if (request.StartTime.HasValue && request.EndTime.HasValue)
+                await _paperRepo.UpdateAsync(paper, cancellationToken);
+                if (request.PaperAccesses is not null && request.PaperAccesses.Any())
                 {
-                    bool isStartTimeChanged = paper.StartTime != request.StartTime.Value;
-                    bool isEndTimeChanged = paper.EndTime != request.EndTime.Value;
-
-                    // Gửi thông báo khi thời gian thi được cập nhật
-                    if (isStartTimeChanged || isEndTimeChanged) //nếu changes
+                    var studentIds = await GetStudentIdsAsync(request.PaperAccesses, cancellationToken);
+                    if (studentIds.Count > 0)
                     {
-
-                        // Cập nhật StartTime và EndTime
-                        paper.UpdateTime(request.StartTime, request.EndTime, request.Duration);
-                        await _paperRepo.UpdateAsync(paper, cancellationToken);
-                        if (request.PaperAccesses is not null && request.PaperAccesses.Any())
+                        var notification = new BasicNotification
                         {
-                            var studentIds = await GetStudentIdsAsync(request.PaperAccesses, cancellationToken);
-                            if (studentIds.Count > 0)
-                            {
-                                var notification = new BasicNotification
-                                {
-                                    Title = "Exam Schedule Updated",
-                                    Message = $"The exam '{paper.ExamName}' has had its schedule updated. Please check the new schedule",
-                                    Label = BasicNotification.LabelType.Information,
-                                };
+                            Title = "Exam Schedule Updated",
+                            Message = $"The exam '{paper.ExamName}' has had its schedule updated. Please check the new schedule",
+                            Label = BasicNotification.LabelType.Information,
+                        };
 
-                                await _notificationService.SendNotificationToUsers(studentIds, notification, null, cancellationToken);
-                            }
-                        }
+                        await _notificationService.SendNotificationToUsers(studentIds, notification, null, cancellationToken);
                     }
                 }
-                else
-                {
-                    throw new ConflictException(_t["When publishing, StartTime and EndTime are required."]);
-                }
+
             }
             else  //  Paper đã đc Save as draft
             {
@@ -175,7 +170,6 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
                 //Gửi noti đến những ai thi
                 if (request.PaperAccesses is not null && request.PaperAccesses.Any())
                 {
-
                     paper.UpdatePaperAccesses(request.ShareType, request.PaperAccesses.Adapt<List<PaperAccess>>());
                     paper.Update(
                    request.ExamName,
@@ -257,11 +251,9 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
                 }
 
                 await _paperRepo.UpdateAsync(paper, cancellationToken);
+
             }
-
         }
-
-
 
         return paper.Id;
     }
@@ -289,3 +281,5 @@ public class UpdatePaperRequestHandler : IRequestHandler<UpdatePaperRequest, Gui
         return studentIds.Distinct().ToList();
     }
 }
+
+
