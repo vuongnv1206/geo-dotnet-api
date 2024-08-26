@@ -9,10 +9,11 @@ namespace FSH.WebApi.Infrastructure.Class.UserClasses
     {
         private readonly List<dynamic> students = new List<dynamic>
             {
-                new { FirstName = "John", LastName = "Doe", Gender = "Male", DateOfBirth = new DateTime(2000, 1, 15), Email = "johndoe@example.com", PhoneNumber = "0123456789", StudentCode = "S001" },
-                new { FirstName = "Jane", LastName = "Smith", Gender = "Female", DateOfBirth = new DateTime(1999, 5, 22), Email = "janesmith@example.com", PhoneNumber = "0987654321", StudentCode = "S002" },
-                new { FirstName = "Alice", LastName = "Johnson", Gender = "Female", DateOfBirth = new DateTime(2001, 8, 10), Email = "alicejohnson@example.com", PhoneNumber = "0123987654", StudentCode = "S003" },
-                new { FirstName = "Bob", LastName = "Brown", Gender = "Male", DateOfBirth = new DateTime(2002, 3, 30), Email = "bobbrown@example.com", PhoneNumber = "0345678901", StudentCode = "S004" }
+                new { FirstName = "Nguyen", LastName = "Van Cao Ky", Gender = "Male", DateOfBirth = new DateTime(2000, 1, 15), Email = "kynvche163260@fpt.edu.vn", PhoneNumber = "0123456789", StudentCode = "S001" },
+                new { FirstName = "Nguyen", LastName = "Van Vuong", Gender = "Female", DateOfBirth = new DateTime(1999, 5, 22), Email = "vuongnvhe163821@fpt.edu.vn", PhoneNumber = "0987654321", StudentCode = "S002" },
+                new { FirstName = "Nguyen", LastName = "Minh Tam", Gender = "Female", DateOfBirth = new DateTime(2001, 8, 10), Email = "tamnmhe163882@fpt.edu.vn", PhoneNumber = "0123987654", StudentCode = "S003" },
+                new { FirstName = "Nguyen", LastName = "Duc Thang", Gender = "Male", DateOfBirth = new DateTime(2002, 3, 30), Email = "thangndhe163063@fpt.edu.vn", PhoneNumber = "0345678901", StudentCode = "S004" },
+                new { FirstName = "Nguyen", LastName = "Thong Duc", Gender = "Male", DateOfBirth = new DateTime(2002, 3, 30), Email = "ducnthe161707@fpt.edu.vn", PhoneNumber = "0345678901", StudentCode = "S005" }
             };
         public byte[] GenerateFormatImportStudent()
         {

@@ -42,8 +42,8 @@ public class PaperStatisticsController : VersionedApiController
         return Mediator.Send(request);
     }
 
-    [HttpGet("generate-excel")]
-    public async Task<IActionResult> GenerateExcel([FromQuery] GeneratePaperStatisticExcelRequest request)
+    [HttpPost("generate-excel")]
+    public async Task<IActionResult> GenerateExcel(GeneratePaperStatisticExcelRequest request)
     {
         var fileBytes = await Mediator.Send(request);
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PaperStatistics.xlsx");
