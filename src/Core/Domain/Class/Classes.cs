@@ -8,7 +8,7 @@ public class Classes : AuditableEntity, IAggregateRoot
     public string Name { get; private set; }
     public string SchoolYear { get; private set; }
     public Guid OwnerId { get; private set; }
-    public Guid? GroupClassId { get; private set; }
+    public Guid GroupClassId { get; private set; }
     public virtual GroupClass? GroupClass { get; private set; }
     public virtual List<AssignmentClass>? AssignmentClasses { get; set; } = new();
     public virtual List<AssignmentStudent>? AssignmentStudents { get; set; } = new();
@@ -23,7 +23,7 @@ public class Classes : AuditableEntity, IAggregateRoot
     {
     }
 
-    public Classes(string name, string schoolYear, Guid ownerId, Guid? groupClassId)
+    public Classes(string name, string schoolYear, Guid ownerId, Guid groupClassId)
     {
         Name = name;
         SchoolYear = schoolYear;
@@ -50,7 +50,7 @@ public class Classes : AuditableEntity, IAggregateRoot
         UserClasses.Remove(userClass);
     }
 
-    public void UpdateGroupClassId(Guid? newGroupClassId)
+    public void UpdateGroupClassId(Guid newGroupClassId)
     {
         GroupClassId = newGroupClassId;
     }

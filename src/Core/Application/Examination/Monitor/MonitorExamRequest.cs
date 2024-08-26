@@ -84,10 +84,20 @@ public class MonitorExamRequestHandler : IRequestHandler<MonitorExamRequest, Pag
         {
             if (item.UserId != null)
             {
+                UserDetailsDto s = new UserDetailsDto();
+                try
+                {
+                    s = await _userService.GetAsync(item.UserId.ToString(), cancellationToken);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+
                 StudentMoni student = new()
                 {
                     StudentId = (DefaultIdType)item.UserId,
-                    Student = await _userService.GetAsync(item.UserId.ToString(), cancellationToken),
+                    Student = s,
                     Paper = paper.Adapt<PaperMoniDto>()
                 };
 

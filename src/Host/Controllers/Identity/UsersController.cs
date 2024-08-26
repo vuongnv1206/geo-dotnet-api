@@ -33,7 +33,7 @@ public class UsersController : VersionNeutralApiController
     public Task<List<UserRoleDto>> GetRolesAsync(string id, CancellationToken cancellationToken)
     {
         return _userService.GetRolesAsync(id, cancellationToken);
-    }
+    }   
 
     [HttpPost("{id}/roles")]
     [ApiConventionMethod(typeof(FSHApiConventions), nameof(FSHApiConventions.Register))]
