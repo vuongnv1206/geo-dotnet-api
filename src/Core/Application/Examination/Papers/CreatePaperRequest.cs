@@ -129,13 +129,7 @@ public class CreatePaperRequestHandler : IRequestHandler<CreatePaperRequest, Gui
         if (request.PaperFolderId.HasValue)
         {
             var parentFolder = await _paperFolderRepo.FirstOrDefaultAsync(new PaperFolderByIdSpec(request.PaperFolderId.Value), cancellationToken);
-            if (parentFolder != null)
-            {
-                foreach (var permission in parentFolder.PaperFolderPermissions)
-                {
-                    newPaper.AddPermission(new PaperPermission(permission.UserId, newPaper.Id, permission.GroupTeacherId, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete, permission.CanShare));
-                }
-            }
+            newPaper.CopyPermissions(parentFolder);
         }
         else //Root
         {

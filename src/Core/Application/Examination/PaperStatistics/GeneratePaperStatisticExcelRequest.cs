@@ -50,7 +50,7 @@ public class GeneratePaperStatisticExcelRequestHandler : IRequestHandler<Generat
         }
 
         // Generate the Excel file with the collected data
-        var result = _paperTemplateService.GeneratePaperStatisticExcel(frequencyMarkData, transcriptData, paperInfoData);
+        var result = _paperTemplateService.GeneratePaperStatisticExcel(frequencyMarkData, transcriptData, paperInfoData, request.RequestStatisticTypes);
         return result;
     }
 }
