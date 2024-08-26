@@ -240,6 +240,25 @@ public class Paper : AuditableEntity, IAggregateRoot
     }
 
 
+    public void CopyPermissions(PaperFolder? paperFolderParent)
+    {
+        if (paperFolderParent is null) return;
+
+        foreach (var permission in paperFolderParent.PaperFolderPermissions)
+        {
+            if (!PaperPermissions.Any(p => p.UserId == permission.UserId && p.GroupTeacherId == permission.GroupTeacherId))
+            {
+                AddPermission(new PaperPermission(permission.UserId, Id, permission.GroupTeacherId, permission.CanView, permission.CanAdd, permission.CanUpdate, permission.CanDelete, permission.CanShare));
+            }
+
+            // Thêm permission cho owner của thư mục cha, nhưng chỉ khi nó chưa tồn tại
+            if (!PaperPermissions.Any(p => p.UserId == paperFolderParent.CreatedBy && p.GroupTeacherId == permission.GroupTeacherId))
+            {
+                AddPermission(new PaperPermission(paperFolderParent.CreatedBy, Id, permission.GroupTeacherId, true, true, true, true, true));
+            }
+        }
+    }
+
 
     public bool CanShare(Guid userId)
     {
