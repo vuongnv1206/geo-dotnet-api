@@ -9,6 +9,7 @@ internal class MyPaperFolderTreeByIdSpec : Specification<PaperFolder>
         Query
         .Include(x => x.PaperFolderParent)
         .Include(x => x.PaperFolderChildrens)
+        .Include(x => x.PaperFolderPermissions)
         .Where(x => (x.CreatedBy == currentUserId || x.PaperFolderPermissions.Any(x => x.CanView)));
     }
 }   

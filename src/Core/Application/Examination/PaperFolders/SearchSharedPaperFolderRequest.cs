@@ -72,6 +72,20 @@ public class SearchSharedPaperFolderRequestHandler : IRequestHandler<SearchShare
             var dto = await CustomMappings.MapPaperFolderAsync(folder, _userService, cancellationToken);
             var parents = folder.ListAccessibleParents(accessibleFolderIds);
             dto.Parents = parents.Adapt<List<PaperFolderParentDto>>();
+            if (dto.PaperFolderPermissions.Any())
+            {
+                foreach (var per in dto.PaperFolderPermissions)
+                {
+                    if (per.UserId.HasValue)
+                    {
+                        var user_permission = await _userService.GetAsync(per.UserId.ToString(), cancellationToken);
+                        if (user_permission != null)
+                        {
+                            per.User = user_permission;
+                        }
+                    }
+                }
+            }
             dtos.Add(dto);
         }
 
