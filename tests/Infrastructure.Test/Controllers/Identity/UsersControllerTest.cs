@@ -1,14 +1,13 @@
 ﻿using System.Net;
 using System.Security.Claims;
-using DocumentFormat.OpenXml.Spreadsheet;
 using FSH.WebApi.Application.Common.Exceptions;
 using FSH.WebApi.Application.Common.Interfaces;
 using FSH.WebApi.Application.Identity.Users;
+using FSH.WebApi.Application.Identity.Users.Password;
 using FSH.WebApi.Application.Identity.Users.Verify;
 using FSH.WebApi.Host.Controllers.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
@@ -52,7 +51,8 @@ public class UsersControllerTest
                     User = claimsPrincipal,
                     RequestServices = new ServiceCollection()
                         .AddScoped(_ => _mediatorMock.Object)
-                        .BuildServiceProvider()
+                        .BuildServiceProvider(),
+                    Connection = { RemoteIpAddress = IPAddress.Parse("127.0.0.1") }
                 }
             };
         }
@@ -64,6 +64,20 @@ public class UsersControllerTest
                 HttpContext = new DefaultHttpContext()
             };
         }
+    }
+
+    public void SetRequestContext()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Headers["x-from-host"] = "testhost";
+        httpContext.Request.Scheme = "https";
+        httpContext.Request.Host = new HostString("localhost:5001");
+        httpContext.Request.PathBase = "/basepath";
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = httpContext
+        };
     }
 
     // Test for the GetUserDetail
@@ -536,5 +550,677 @@ public class UsersControllerTest
         // Act & Assert
         await Assert.ThrowsAsync<InternalServerException>(() =>
             _controller.ResendEmailConfirmAsync());
+    }
+
+    // selfRegisterAccountForUser
+    [Fact]
+    public async Task SelfRegisterAsync_ValidRequest_ReturnsExpectedResult()
+    {
+        // Arrange
+        SetRequestContext();
+
+        var request = new CreateUserRequest
+        {
+            Email = "nguyenvancaoky@hotmail.com",
+            UserName = "nguyenvancaoky",
+            Password = "123456!!!@",
+            FirstName = "Nguyễn Văn Cao Kỳ",
+            PhoneNumber = "965476312"
+        };
+
+        var expectedOrigin = "https://testhost";
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), expectedOrigin))
+                        .ReturnsAsync("User testuser Registered.");
+
+        // Act
+        var result = await _controller.SelfRegisterAsync(request);
+
+        // Assert
+        Assert.Equal("User testuser Registered.", result);
+        _userServiceMock.Verify(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), expectedOrigin), Times.Once);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_EmptyPhoneNumber_ReturnsBadRequest()
+    {
+        // Arrange
+        SetRequestContext();
+
+        var request = new CreateUserRequest
+        {
+            Email = "nguyenvancaoky@hotmail.com",
+            UserName = "nguyenvancaoky",
+            Password = "123456!!!@",
+            FirstName = "Nguyễn Văn Cao Kỳ",
+            PhoneNumber = ""
+        };
+        var expectedOrigin = "https://testhost";
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), expectedOrigin))
+            .ThrowsAsync(new BadRequestException("Phone number is required."));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Phone number is required.", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_ExistingUsername_ReturnsBadRequest()
+    {
+        // Arrange
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "test@example.com",
+            UserName = "12userIsExits",
+            Password = "password",
+            FirstName = "Test",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Username already exists."));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Username already exists.", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_InvalidEmail_ReturnsBadRequest()
+    {
+        // Arrange
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "54emailIsExits",
+            UserName = "testuser",
+            Password = "password",
+            FirstName = "Test",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Invalid email format."));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid email format.", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_ExistingEmail_ReturnsFalse()
+    {
+        // Arrange
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "12@48.3",
+            UserName = "testuser",
+            Password = "password",
+            FirstName = "Test",
+            PhoneNumber = "1234567890"
+        };
+
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Email already exists."));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Email already exists.", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_NameWithSpecialCharacters_ReturnsFalse()
+    {
+        // Arrange
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "test@example.com",
+            UserName = "testuser",
+            Password = "password",
+            FirstName = "Nguyễn Văn Cao Kỳ",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Name contains invalid characters"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Name contains invalid characters", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_UsernameWithSpecialCharacters_ReturnsFalse()
+    {
+        // Arrange
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "test@example.com",
+            UserName = "nguyenvancaoky!",
+            Password = "password",
+            FirstName = "Test",
+            PhoneNumber = "1234567890"
+        };
+
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Username contains invalid characters"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Username contains invalid characters", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_InvalidPassword_ReturnsFalse()
+    {
+        // Arrange
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "test@example.com",
+            UserName = "testuser",
+            Password = "123456!!!",
+            FirstName = "Test",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Password does not meet complexity requirements"));
+
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Password does not meet complexity requirements", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_InvalidPhoneNumber_ReturnsFalse()
+    {
+        // Arrange
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "test@example.com",
+            UserName = "testuser",
+            Password = "password",
+            FirstName = "Test",
+            PhoneNumber = "abc123"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Invalid phone number format"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid phone number format", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_EmailWithSpecialCharacters_ReturnsFalse()
+    {
+        // Arrange
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "nguyenvancaoky@hotmail.com",
+            UserName = "testuser",
+            Password = "password",
+            FirstName = "Test",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Email contains invalid characters"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        // Assert
+        Assert.Equal("Email contains invalid characters", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_ValidDataAlternate_ReturnsTrue()
+    {
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "alternate@example.com",
+            UserName = "alternateuser",
+            Password = "ValidPass123!",
+            FirstName = "Alternate",
+            PhoneNumber = "9876543210"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ReturnsAsync("User registered successfully");
+
+        var result = await _controller.SelfRegisterAsync(request);
+
+        // Assert
+        Assert.Equal("User registered successfully", result);
+        _userServiceMock.Verify(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_ExistingUsernameAlternate_ReturnsFalse()
+    {
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "new@example.com",
+            UserName = "12userIsExits",
+            Password = "password",
+            FirstName = "New",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Username already exists"));
+
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        Assert.Equal("Username already exists", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_ExistingEmailAlternate_ReturnsFalse()
+    {
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "12@48.3",
+            UserName = "newuser",
+            Password = "password",
+            FirstName = "New",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Email already exists"));
+
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        Assert.Equal("Email already exists", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_InvalidPasswordAlternate_ReturnsFalse()
+    {
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "test@example.com",
+            UserName = "testuser",
+            Password = "123@#$$$",
+            FirstName = "Test",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Password does not meet complexity requirements"));
+
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        Assert.Equal("Password does not meet complexity requirements", result.Message);
+    }
+
+    [Fact]
+    public async Task SelfRegisterAsync_NameWithWhitespace_ReturnsFalse()
+    {
+        SetRequestContext();
+        var request = new CreateUserRequest
+        {
+            Email = "test@example.com",
+            UserName = "testuser",
+            Password = "password",
+            FirstName = "Abc ",
+            PhoneNumber = "1234567890"
+        };
+        _userServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<string>()))
+            .ThrowsAsync(new BadRequestException("Name contains leading or trailing whitespace"));
+
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.SelfRegisterAsync(request));
+
+        Assert.Equal("Name contains leading or trailing whitespace", result.Message);
+    }
+
+    // resetPassword
+    [Fact]
+    public async Task UC1_ResetPasswordAsync_EmptyValues_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = null,
+            Password = null,
+            Token = null,
+            captchaToken = null
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid request"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid request", result.Message);
+    }
+
+    [Fact]
+    public async Task UC2_ResetPasswordAsync_NullEmail_InvalidToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = null,
+            Password = "123Pa$$word!",
+            Token = "invalid_token",
+            captchaToken = "invalid_token"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid format"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid format", result.Message);
+    }
+
+    [Fact]
+    public async Task UC3_ResetPasswordAsync_NullEmail_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = null,
+            Password = "456Pa$$word!",
+            Token = "token",
+            captchaToken = "token"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Incorrect infor"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Contains("Incorrect", result.Message);
+    }
+
+    [Fact]
+    public async Task UC4_ResetPasswordAsync_NullPassword_NullCaptchaToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com",
+            Password = null,
+            Token = "token",
+            captchaToken = null
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Incorrect infor"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Contains("Incorrect", result.Message);
+    }
+
+    [Fact]
+    public async Task UC5_ResetPasswordAsync_InvalidToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com",
+            Password = "123Pa$$word",
+            Token = "invalidtoken",
+            captchaToken = "invalidtoken"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid token"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid token", result.Message);
+    }
+
+    [Fact]
+    public async Task UC6_ResetPasswordAsync_InvalidPassword_NullToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com",
+            Password = "123Pa$$word",
+            Token = null,
+            captchaToken = "valid"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Somethings went wrong"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Somethings went wrong", result.Message);
+    }
+
+    [Fact]
+    public async Task UC7_ResetPasswordAsync_WhitespaceEmail_NullPassword_NullToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com ",
+            Password = null,
+            Token = null,
+            captchaToken = "null"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Bad Request"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Bad Request", result.Message);
+    }
+
+    [Fact]
+    public async Task UC8_ResetPasswordAsync_WhitespaceEmail_InvalidToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com ",
+            Password = "123Pa$$word",
+            Token = "invalidtoken",
+            captchaToken = "invalidtoken"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Bad Request"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Bad Request", result.Message);
+    }
+
+    [Fact]
+    public async Task UC9_ResetPasswordAsync_WhitespaceEmail_InvalidPassword_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com ",
+            Password = "456Pa$$word",
+            Token = "token",
+            captchaToken = "token"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid password"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid password", result.Message);
+    }
+
+    [Fact]
+    public async Task UC10_ResetPasswordAsync_WrongFormatEmail_IncorrectPassword_NullToken_InvalidCaptchaToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root",
+            Password = "456Pa$$word",
+            Token = null,
+            captchaToken = "invalid"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid email format"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid email format", result.Message);
+    }
+
+    [Fact]
+    public async Task UC11_ResetPasswordAsync_WrongFormatEmail_InValidToken_NullCaptchaToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root",
+            Password = "123Pa$$word",
+            Token = "invalidtoken",
+            captchaToken = null
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid email format"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid email format", result.Message);
+    }
+
+    [Fact]
+    public async Task UC12_ResetPasswordAsync_WrongFormatEmail_NullPassword_InValidCaptchaToken_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root",
+            Password = null,
+            Token = "token",
+            captchaToken = "invalidtoken"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid email format"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid email format", result.Message);
+    }
+
+    [Fact]
+    public async Task UC13_ResetPasswordAsync_WrongPassword_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com",
+            Password = "456Pa$$word",
+            Token = "token",
+            captchaToken = "token"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid password"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid password", result.Message);
+    }
+
+    [Fact]
+    public async Task UC14_ResetPasswordAsync_ValidRequest_ReturnsExpectedResult()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com",
+            Password = "123Pa$$word",
+            Token = "token",
+            captchaToken = "token"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ReturnsAsync("Password reset successfully");
+
+        // Act
+        var result = await _controller.ResetPasswordAsync(request);
+
+        // Assert
+        Assert.Equal("Password reset successfully", result);
+        _userServiceMock.Verify(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UC15_ResetPasswordAsync_WhitespaceEmail_WrongPassword_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new ResetPasswordRequest
+        {
+            Email = "admin@root.com ",
+            Password = "456Pa$$ord!",
+            Token = "token",
+            captchaToken = "token"
+        };
+
+        _userServiceMock.Setup(x => x.ResetPasswordAsync(It.IsAny<ResetPasswordRequest>()))
+            .ThrowsAsync(new BadRequestException("Invalid password"));
+
+        // Act
+        var result = await Assert.ThrowsAsync<BadRequestException>(() => _controller.ResetPasswordAsync(request));
+
+        // Assert
+        Assert.Equal("Invalid password", result.Message);
     }
 }
