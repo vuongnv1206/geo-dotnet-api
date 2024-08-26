@@ -35,6 +35,9 @@
         <None Update="Files\QuestionImportTemplate.docx">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Files\QuestionTemplate.txt">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="libwkhtmltox.dll">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
