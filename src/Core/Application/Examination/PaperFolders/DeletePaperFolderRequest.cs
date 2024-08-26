@@ -41,9 +41,9 @@ public class DeletePaperFolderRequestHandler : IRequestHandler<DeletePaperFolder
         if (folderDelete.IsValidToDeleteFolder())
         {
             // Xóa tất cả các Papers và ChildFolders
-            await DeleteAllPapersAndChildFolders(paperFolder, cancellationToken);
+            await DeleteAllPapersAndChildFolders(folderDelete, cancellationToken);
 
-            await _repository.DeleteAsync(paperFolder, cancellationToken);
+            await _repository.DeleteAsync(folderDelete, cancellationToken);
         }
         else
         {

@@ -35,10 +35,13 @@ public class UpdatePaperFolderRequestHandler : IRequestHandler<UpdatePaperFolder
         {
             throw new ForbiddenException(_t["You do not have permission to edit this folder."]);
         }
+        var treeFolder = await _paperFolderRepo.ListAsync(new PaperFolderTreeSpec());
+        var folderUpdate = treeFolder.FirstOrDefault(x => x.Id == request.Id);
+        _ = folderUpdate ?? throw new NotFoundException(_t["PaperFolder {0} Not Found.", request.Id]);
 
-        var updatedFolder = folder.Update(request.Name, request.ParentId);
+        folderUpdate.Update(request.Name, request.ParentId);
 
-        await _paperFolderRepo.UpdateAsync(updatedFolder);
+        await _paperFolderRepo.UpdateAsync(folderUpdate);
 
         return folder.Id;
     }
