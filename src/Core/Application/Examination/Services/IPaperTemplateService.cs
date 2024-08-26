@@ -9,7 +9,7 @@ public interface IPaperTemplateService : ITransientService
     byte[] GeneratePaperStatisticExcel(
         List<ClassroomFrequencyMarkDto> frequencyMarkData,
         TranscriptPaginationResponse transcriptData,
-        PaperInfoStatistic paperInfoData
+        PaperInfoStatistic paperInfoData, List<RequestStatisticType> requestStatisticTypes
     );
     Task<byte[]> GeneratePdfFromHtml(string htmlContent, string title);
 

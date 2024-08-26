@@ -136,9 +136,9 @@ public static class FSHPermissions
         // NEWS REACTIONS
         new("View NewsReaction", FSHAction.View, FSHResource.NewsReaction, new[] { STUDENT }),
         new("Search NewsReaction", FSHAction.Search, FSHResource.NewsReaction, new[] { STUDENT }),
-        new("Create NewsReaction", FSHAction.Create, FSHResource.NewsReaction),
+        new("Create NewsReaction", FSHAction.Create, FSHResource.NewsReaction, new[] { STUDENT }),
         new("Update NewsReaction", FSHAction.Update, FSHResource.NewsReaction),
-        new("Delete NewsReaction", FSHAction.Delete, FSHResource.NewsReaction),
+        new("Delete NewsReaction", FSHAction.Delete, FSHResource.NewsReaction, new[] { STUDENT }),
         new("Create QuestionFolders", FSHAction.Create, FSHResource.QuestionFolders),
         new("Update QuestionFolders", FSHAction.Update, FSHResource.QuestionFolders),
         new("Delete QuestionFolders", FSHAction.Delete, FSHResource.QuestionFolders),

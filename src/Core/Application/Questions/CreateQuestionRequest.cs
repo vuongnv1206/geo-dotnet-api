@@ -1,5 +1,7 @@
 ﻿using FSH.WebApi.Application.Identity.Users;
 using FSH.WebApi.Application.Notifications;
+using FSH.WebApi.Application.Questions.Dtos;
+using FSH.WebApi.Application.Questions.QuestionLabel;
 using FSH.WebApi.Application.Questions.Specs;
 using FSH.WebApi.Domain.Question;
 using FSH.WebApi.Domain.Question.Enums;
@@ -20,76 +22,76 @@ public class CreateQuestionRequestValidator : CustomValidator<CreateQuestionRequ
     {
         _t = localizer;
 
-        RuleForEach(x => x.Questions).ChildRules(questions =>
+        _ = RuleForEach(x => x.Questions).ChildRules(questions =>
         {
-            questions.RuleFor(q => q.QuestionType).NotEmpty().WithMessage(_t["QuestionTypeRequired"]);
+            _ = questions.RuleFor(q => q.QuestionType).NotEmpty().WithMessage(_t["Question Type Required"]);
 
-            questions.When(q => q.QuestionType == QuestionType.MultipleChoice, () =>
+            _ = questions.When(q => q.QuestionType == QuestionType.MultipleChoice, () =>
             {
-                questions.RuleFor(q => q.Answers)
+                _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 3)
-                    .WithMessage(_t["MultipleChoiceAtLeast3Answers"]);
+                    .WithMessage(_t["Multiple Choice At Least 3 Answers"]);
 
-                questions.RuleFor(q => q.Answers)
+                _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count(a => a.IsCorrect) >= 2)
-                    .WithMessage(_t["MultipleChoiceAtLeast2CorrectAnswers"]);
+                    .WithMessage(_t["Multiple Choice At Least 2 Correct Answers"]);
             });
 
-            questions.When(q => q.QuestionType == QuestionType.SingleChoice, () =>
+            _ = questions.When(q => q.QuestionType == QuestionType.SingleChoice, () =>
             {
-                questions.RuleFor(q => q.Answers)
+                _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 2)
-                    .WithMessage(_t["SingleChoiceAtLeast2Answers"]);
+                    .WithMessage(_t["Single Choice At Least 2 Answers"]);
 
-                questions.RuleFor(q => q.Answers)
+                _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count(a => a.IsCorrect) == 1)
-                    .WithMessage(_t["SingleChoiceExactly1CorrectAnswer"]);
+                    .WithMessage(_t["Single Choice Exactly 1 Correct Answer"]);
             });
 
-            questions.When(q => q.QuestionType == QuestionType.Matching, () =>
+            _ = questions.When(q => q.QuestionType == QuestionType.Matching, () =>
             {
-                questions.RuleFor(q => q.Answers)
+                _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.Count >= 1)
-                    .WithMessage(_t["MatchingAtLeast1Pair"]);
+                    .WithMessage(_t["Matching At Least 1 Pair"]);
 
-                questions.RuleFor(q => q.Answers)
+                _ = questions.RuleFor(q => q.Answers)
                     .Must(answers => answers != null && answers.All(a => !a.Content.Equals(string.Empty)))
-                    .WithMessage(_t["MatchingNoEmptyPairs"]);
+                    .WithMessage(_t["Matching No Empty Pairs"]);
             });
 
-            questions.When(q => q.QuestionType == QuestionType.FillBlank, () =>
+            _ = questions.When(q => q.QuestionType == QuestionType.FillBlank, () =>
             {
-                questions.RuleFor(q => q.Content)
+                _ = questions.RuleFor(q => q.Content)
                     .Must((question, content) => content != null && content.Split("$_fillblank").Length - 1 == question.Answers?.Count)
-                    .WithMessage((question, content) => _t["FillBlankExactAnswers", content.Split("$_fillblank").Length - 1]);
+                    .WithMessage((question, content) => _t["Fill Blank Exact Answers", content.Split("$_fillblank").Length - 1]);
             });
 
-            questions.When(q => q.QuestionType == QuestionType.Writing, () =>
+            _ = questions.When(q => q.QuestionType == QuestionType.Writing, () =>
             {
-                questions.RuleFor(q => q.Content)
+                _ = questions.RuleFor(q => q.Content)
                     .NotEmpty()
-                    .WithMessage(_t["WritingContentRequired"]);
+                    .WithMessage(_t["Writing Content Required"]);
             });
 
-            questions.When(q => q.QuestionType == QuestionType.Reading, () =>
+            _ = questions.When(q => q.QuestionType == QuestionType.Reading, () =>
             {
-                questions.RuleFor(q => q.QuestionPassages)
+                _ = questions.RuleFor(q => q.QuestionPassages)
                     .NotEmpty()
-                    .WithMessage(_t["ReadingAtLeast1Passage"]);
+                    .WithMessage(_t["Reading At Least 1 Passage"]);
 
-                questions.RuleForEach(q => q.QuestionPassages).ChildRules(passages =>
+                _ = questions.RuleForEach(q => q.QuestionPassages).ChildRules(passages =>
                 {
-                    passages.RuleFor(p => p.Answers)
+                    _ = passages.RuleFor(p => p.Answers)
                         .NotEmpty()
-                        .WithMessage(_t["ReadingPassageAtLeast1Answer"]);
+                        .WithMessage(_t["Reading Passage At Least 1 Answer"]);
 
-                    passages.RuleFor(p => p.Answers)
+                    _ = passages.RuleFor(p => p.Answers)
                         .Must(answers => answers != null && answers.Count >= 2)
-                        .WithMessage(_t["ReadingPassageAtLeast2Answers"]);
+                        .WithMessage(_t["Reading Passage At Least 2 Answers"]);
 
-                    passages.RuleFor(p => p.Answers)
+                    _ = passages.RuleFor(p => p.Answers)
                         .Must(answers => answers != null && answers.Count(a => a.IsCorrect) >= 1)
-                        .WithMessage(_t["ReadingPassageAtLeast1CorrectAnswer"]);
+                        .WithMessage(_t["Reading Passage At Least 1 Correct Answer"]);
                 });
             });
         });
@@ -104,6 +106,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
     private readonly IRepositoryWithEvents<QuestionFolder> _questionFolderRepository;
     private readonly IQuestionService _questionService;
     private readonly INotificationService _notificationService;
+    private readonly IRepository<QuestionLable> _questionLableRepository;
     private readonly IStringLocalizer<CreateQuestionRequestHandler> _t;
 
     public CreateQuestionRequestHandler(
@@ -113,8 +116,8 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         IRepositoryWithEvents<QuestionFolder> questionFolderRepository,
         IQuestionService questionService,
         INotificationService notificationService,
-        IStringLocalizer<CreateQuestionRequestHandler> t
-        )
+        IRepository<QuestionLable> questionLableRepository,
+        IStringLocalizer<CreateQuestionRequestHandler> t)
     {
         _questionRepo = questionRepo;
         _currentUser = currentUser;
@@ -122,6 +125,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
         _questionFolderRepository = questionFolderRepository;
         _questionService = questionService;
         _notificationService = notificationService;
+        _questionLableRepository = questionLableRepository;
         _t = t;
     }
 
@@ -144,17 +148,48 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
             }
         }
 
+        var folderIds = await _questionService.GetFolderIds(questionfolderIds[0].Value, cancellationToken);
+
         foreach (var questionDto in request.Questions)
         {
             var question = questionDto.Adapt<Question>();
+
+            // if questionLabel is not null, search label by name and assign to question
+            if (questionDto.QuestionLable != null)
+            {
+                var label = await _questionLableRepository.FirstOrDefaultAsync(new QuestionLabelByNameSpec(questionDto.QuestionLable.Name), cancellationToken);
+                if (label == null)
+                {
+                    label = new QuestionLable(questionDto.QuestionLable.Name, "primary");
+                    _ = await _questionLableRepository.AddAsync(label, cancellationToken);
+                }
+
+                question.QuestionLableId = label.Id;
+                question.QuestionLable = label;
+            }
+
             var answers = questionDto.Answers?.Adapt<List<Answer>>();
+            SearchQuestionsRequest searchDuplicate = new()
+            {
+                Content = questionDto.Content,
+                QuestionType = questionDto.QuestionType,
+                folderId = questionDto.QuestionFolderId
+            };
+            var spec = new QuestionsBySearchEqRequestSpec(searchDuplicate, folderIds);
+            var duplicate = await _questionRepo.FirstOrDefaultAsync(spec, cancellationToken);
+
+            if (duplicate != null)
+            {
+                throw new BadRequestException(_t["There is already a question with the same content and type in the folder."]);
+            }
+
             await SetQuestionStatus(question, questionDto.QuestionFolderId, notiUserId, cancellationToken);
             if (answers != null)
             {
                 question.AddAnswers(answers);
             }
 
-            await _questionRepo.AddAsync(question, cancellationToken);
+            _ = await _questionRepo.AddAsync(question, cancellationToken);
             createdQuestionIds.Add(question.Id);
             if (questionDto.QuestionPassages != null)
             {
@@ -162,7 +197,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
             }
         }
 
-        var fullName = await _userService.GetFullName(_currentUser.GetUserId());
+        string fullName = await _userService.GetFullName(_currentUser.GetUserId());
 
         var noti = new BasicNotification
         {
@@ -191,7 +226,7 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
             }
 
             passage.QuestionType = QuestionType.ReadingQuestionPassage;
-            await _questionRepo.AddAsync(passage, cancellationToken);
+            _ = await _questionRepo.AddAsync(passage, cancellationToken);
 
             if (passageDto.QuestionPassages != null)
             {
@@ -202,7 +237,10 @@ public class CreateQuestionRequestHandler : IRequestHandler<CreateQuestionReques
 
     private async Task SetQuestionStatus(Question question, Guid? folderId, List<string> notiUserIds, CancellationToken cancellationToken)
     {
-        if (folderId == null) return;
+        if (folderId == null)
+        {
+            return;
+        }
 
         var questionFolder = await _questionService.GetRootFolder(folderId.Value, cancellationToken);
 

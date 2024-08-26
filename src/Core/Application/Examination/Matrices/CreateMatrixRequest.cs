@@ -92,8 +92,7 @@ public class CreateMatrixRequestHandler : IRequestHandler<CreateMatrixRequest, G
                 // Kiểm tra nếu NumberOfQuestion lớn hơn tổng số câu hỏi có sẵn trong folder
                 if (criteria.NumberOfQuestion > totalQuestionsAlreadyExisted)
                 {
-                    throw new ConflictException(
-                        $" Number of question {criteria.NumberOfQuestion} for {questionLabelExists.Name} exceeds available {totalQuestionsAlreadyExisted} in the folder.");
+                    throw new ConflictException($"Cannot get {criteria.NumberOfQuestion} questions for  {questionLabelExists.Name} level in '{questionFolder.Name}' folder as only {totalQuestionsAlreadyExisted} are available");
                 }
 
                 // Nếu RawIndex trống, tính toán và gán giá trị mới cho RawIndex

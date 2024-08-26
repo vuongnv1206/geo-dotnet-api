@@ -15,10 +15,9 @@ using FSH.WebApi.Application.Examination.PaperStudents.Dtos;
 using FSH.WebApi.Application.Examination.Reviews;
 using FSH.WebApi.Application.Examination.Services.Models;
 using FSH.WebApi.Application.Examination.SubmitPapers;
-using FSH.WebApi.Application.Extensions;
 using FSH.WebApi.Application.Questions;
 using FSH.WebApi.Application.Questions.Dtos;
-using FSH.WebApi.Application.Questions.QuestionLabel;
+using FSH.WebApi.Application.Questions.QuestionLabel.Dtos;
 using FSH.WebApi.Application.TeacherGroup.GroupTeachers;
 using FSH.WebApi.Application.TeacherGroup.JoinGroups;
 using FSH.WebApi.Application.TeacherGroup.JoinTeams;
@@ -67,11 +66,13 @@ public class MapsterSettings
 
         _ = TypeAdapterConfig<CreateQuestionCloneDto, Domain.Question.Question>.NewConfig()
           .Map(dest => dest.Answers, src => src.Answers)
+          .Map(dest => dest.QuestionLableId, src => src.QuestionLabelId)
             .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<CreateQuestionCloneDto>>())
           .TwoWays();
 
         _ = TypeAdapterConfig<CreateQuestionCloneDto, Domain.Question.QuestionClone>.NewConfig()
         .Map(dest => dest.AnswerClones, src => src.Answers)
+          .Map(dest => dest.QuestionLabelId, src => src.QuestionLabelId)
         .Map(dest => dest.QuestionPassages, src => src.QuestionPassages.Adapt<List<CreateQuestionCloneDto>>())
         .TwoWays();
 
@@ -187,7 +188,10 @@ public class MapsterSettings
             .Map(dest => dest.StartedTime, src => src.StartTime)
             .Map(dest => dest.SubmittedTime, src => src.EndTime)
             .Map(dest => dest.CompletionStatus, src => src.Status)
-            .Map(dest => dest.Score, src => src.getScore())
+            .Map(dest => dest.ShowMarkResult, src => src.Paper.ShowMarkResult)
+            .Map(dest => dest.ShowQuestionAnswer, src => src.Paper.ShowQuestionAnswer)
+            .Map(dest => dest.PaperId, src => src.Paper.Id)
+            .Map(dest => dest.Score, src => src.TotalMark)
             .Map(dest => dest.ShowMarkResult, src => src.Paper.ShowMarkResult);
 
         _ = TypeAdapterConfig<PaperQuestion, CreateUpdateQuestionInPaperDto>.NewConfig();

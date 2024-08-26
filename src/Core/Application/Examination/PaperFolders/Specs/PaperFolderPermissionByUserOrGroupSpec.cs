@@ -5,6 +5,7 @@ public class PaperFolderPermissionByUserOrGroupSpec : Specification<PaperFolderP
 {
     public PaperFolderPermissionByUserOrGroupSpec(Guid currentUserId, List<Guid> groupIds)
     {
-        Query.Where(p => p.UserId == currentUserId || (groupIds.Contains(p.GroupTeacherId.Value) && p.GroupTeacherId.HasValue));
+        Query.Where(p => p.UserId == currentUserId || (groupIds.Contains(p.GroupTeacherId.Value) && p.GroupTeacherId.HasValue))
+            .Where(p => p.CreatedBy != currentUserId);
     }
 }

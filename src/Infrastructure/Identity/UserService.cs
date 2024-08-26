@@ -168,7 +168,7 @@ internal partial class UserService : IUserService
     {
         var user = await _userManager.Users
            .AsNoTracking()
-           .Where(u => u.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && u.IsActive)
+           .Where(u => u.Email.Trim().ToLower().Equals(email.Trim().ToLower()))
            .FirstOrDefaultAsync(cancellationToken);
         return user is null ? new UserDetailsDto() : user.Adapt<UserDetailsDto>();
     }

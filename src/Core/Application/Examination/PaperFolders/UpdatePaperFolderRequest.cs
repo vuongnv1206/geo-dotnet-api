@@ -1,4 +1,5 @@
-﻿using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Application.Common.Persistence;
+using FSH.WebApi.Domain.Examination;
 
 namespace FSH.WebApi.Application.Examination.PaperFolders;
 public class UpdatePaperFolderRequest : IRequest<Guid>
@@ -26,7 +27,7 @@ public class UpdatePaperFolderRequestHandler : IRequestHandler<UpdatePaperFolder
 
     public async Task<DefaultIdType> Handle(UpdatePaperFolderRequest request, CancellationToken cancellationToken)
     {
-        var folder = await _paperFolderRepo.GetByIdAsync(request.Id);
+        var folder = await _paperFolderRepo.FirstOrDefaultAsync(new MyPaperFolderTreeByIdSpec(request.Id), cancellationToken);
         _ = folder ?? throw new NotFoundException(_t["Paper Folder {0} Not Found.", request.Id]);
 
         var userId = _currentUser.GetUserId();

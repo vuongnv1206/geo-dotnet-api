@@ -63,7 +63,7 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
                                             .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
 
             if (!listPermission.Any(x => x.PermissionType == PermissionType.ManageStudentList))
-                throw new NotFoundException(_t["Student {0} Not Found.", request.Id]);
+                throw new ForbiddenException(_t["You don't have student management"]);
         }
 
         var student = await _repository.FirstOrDefaultAsync(new StudentByIdSpec(request.Id), cancellationToken);
@@ -80,12 +80,9 @@ public class UpdateInformationStudentRequestHandler : IRequestHandler<UpdateInfo
                 throw new BadRequestException(_t["Email is existed in class"]);
             else if (classOfStudent.UserClasses.Any(x => x.Student.PhoneNumber.Trim() == request.PhoneNumber.Trim() && x.Student.Id != request.Id))
                 throw new BadRequestException(_t["Phone number is existed in class"]);
+            else if (classOfStudent.UserClasses.Any(x => x.Student.StudentCode.Trim() == request.StudentCode.Trim() && x.Student.Id != request.Id))
+                throw new BadRequestException(_t["Student code is existed in class"]);
         }
-
-        string existDuplicate = await _userStudentRepository
-          .AnyAsync(new StudentByStudentCodeSpec(request.StudentCode))
-          ? throw new ConflictException(_t["The student code '{0}' is already in use.", request.StudentCode])
-          : student.StudentCode = request.StudentCode;
 
         var updatedStudent = student.Update(
             request.FirstName,

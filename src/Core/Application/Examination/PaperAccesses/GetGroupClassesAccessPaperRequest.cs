@@ -1,12 +1,14 @@
 ﻿using FSH.WebApi.Application.Examination.Papers;
 using FSH.WebApi.Domain.Class;
 using FSH.WebApi.Domain.Examination;
+using FSH.WebApi.Domain.Examination.Enums;
 using Mapster;
 
 namespace FSH.WebApi.Application.Examination.PaperAccesses;
 public class GetGroupClassesAccessPaperRequest : PaginationFilter, IRequest<PaginationResponse<GroupClassAccessPaper>>
 {
     public Guid PaperId { get; set; }
+    public PaperShareType Status { get; set; }
 
     public GetGroupClassesAccessPaperRequest(DefaultIdType paperId)
     {
@@ -53,17 +55,33 @@ public class GetGroupClassesAccessPaperRequestHandler : IRequestHandler<GetGroup
             }
         }
 
-        var spec = new GroupClassAccessPaperByClassId(accessClassIds, accessStudentIds, request, paper.CreatedBy);
+        GroupClassAccessPaperSpec spec;
+            
+        if (request.Status == PaperShareType.AssignToStudent)
+        {
+            spec = new GroupClassAccessPaperSpec(accessStudentIds, request, paper.CreatedBy, request.Status);
+        }else if (request.Status == PaperShareType.AssignToClass)
+        {
+            spec = new GroupClassAccessPaperSpec(accessClassIds, request, paper.CreatedBy, request.Status);
+        }else
+        {
+            spec = new GroupClassAccessPaperSpec(accessClassIds, accessStudentIds, request, paper.CreatedBy);
+        }
 
         var groups = await _groupRepo.ListAsync(spec, cancellationToken);
 
         foreach (var group in groups)
         {
-            group.Classes = group.Classes.Where(c => accessClassIds.Contains(c.Id) || c.UserClasses.Any(uc => accessStudentIds.Contains(uc.StudentId))).ToList();
-
-            foreach(var classroom in group.Classes)
+            if (request.Status == PaperShareType.AssignToStudent)
             {
-                classroom.UserClasses = classroom.UserClasses.Where(uc => accessStudentIds.Contains(uc.StudentId)).ToList();
+                group.Classes = group.Classes.Where(c => c.UserClasses.Any(uc => accessStudentIds.Contains(uc.StudentId))).ToList();
+                foreach(var classroom in group.Classes)
+                {
+                    classroom.UserClasses = classroom.UserClasses.Where(uc => accessStudentIds.Contains(uc.StudentId)).ToList();
+                }
+            }else if (request.Status == PaperShareType.AssignToClass)
+            {
+                group.Classes = group.Classes.Where(c => accessClassIds.Contains(c.Id)).ToList();
             }
         }
 

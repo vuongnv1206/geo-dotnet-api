@@ -43,17 +43,13 @@ public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFr
 
         foreach (var item in matrixContent)
         {
-            var rootFolder = await _questionFolderRepo.FirstOrDefaultAsync(new QuestionFolderByIdSpec(item.QuestionFolderId));
-            var folderIds = new List<Guid> { item.QuestionFolderId };
-            rootFolder.ChildQuestionFolderIds(rootFolder.Children, folderIds);
-
             int totalQuestionsRequestInFolder = item.CriteriaQuestions.Sum(criteria => criteria.NumberOfQuestion);
             float markPerQuestion = item.TotalPoint / totalQuestionsRequestInFolder;
 
             foreach (var criteria in item.CriteriaQuestions.Where(x => x.NumberOfQuestion > 0))
             {
                 var questionRequest = new GetQuestionRandomRequest(
-                    folderIds,
+                    item.QuestionFolderId,
                     criteria.QuestionType,
                     criteria.QuestionLabelId,
                     criteria.NumberOfQuestion);
@@ -66,6 +62,7 @@ public class CreatePaperFromMatrixRequestHandler : IRequestHandler<CreatePaperFr
                     {
                         Question = question,
                         Mark = markPerQuestion,
+                        FolderId = item.QuestionFolderId
                     }));
                 }
                 else

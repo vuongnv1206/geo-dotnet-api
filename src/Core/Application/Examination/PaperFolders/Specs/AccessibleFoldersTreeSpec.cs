@@ -10,6 +10,7 @@ public sealed class AccessibleFoldersTreeSpec : Specification<PaperFolder>
             
             .Include(x => x.PaperFolderParent)
             .Include(folder => folder.PaperFolderChildrens)
+            .Include(x => x.PaperFolderPermissions)
             .Where(folder => accessibleFolderIds.Contains(folder.Id))
             .Where(x => x.ParentId == request.ParentId)
             .OrderBy(x => x.CreatedOn);

@@ -1,12 +1,6 @@
-﻿using FSH.WebApi.Application.Examination.PaperLabels;
-using FSH.WebApi.Domain.Examination;
+﻿using FSH.WebApi.Application.Questions.QuestionLabel.Dtos;
 using FSH.WebApi.Domain.Question;
 using Mapster;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FSH.WebApi.Application.Questions.QuestionLabel;
 public class GetQuestionLabelRequest : IRequest<QuestionLabelDto>
@@ -24,7 +18,7 @@ public class GetQuestionLabelRequestHandler : IRequestHandler<GetQuestionLabelRe
     private readonly IStringLocalizer _t;
     public GetQuestionLabelRequestHandler(IRepository<QuestionLable> repository, IStringLocalizer<GetQuestionLabelRequestHandler> localizer)
     {
-       _repository = repository;
+        _repository = repository;
         _t = localizer;
     }
 

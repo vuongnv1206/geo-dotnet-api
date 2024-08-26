@@ -22,6 +22,9 @@ public class AuditService : IAuditService
 
             // filter TableName not Have "Clone" string
             .Where(a => !a.Contains("Clone"))
+
+            // filter TableName not Have "Notification" string
+            .Where(a => !a.Contains("Notification"))
             .Distinct()
             .OrderBy(a => a)
             .ToListAsync();

@@ -62,28 +62,40 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
 
         var userId = _currentUser.GetUserId();
 
-        // Kiểm tra quyền cập nhật Assignment
-        foreach (var class1 in assignment.AssignmentClasses)
+        if (assignment.CreatedBy != userId)
         {
-            var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(class1.ClassesId, userId))
-                ?? throw new NotFoundException(_t["Class not found", class1.ClassesId]);
-
-            if (classroom.CreatedBy != userId && assignment.CreatedBy != userId)
-            {
-                var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, class1.ClassesId);
-                var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, class1.ClassesId);
-
-                var listPermission = new List<PermissionInClassDto>();
-
-                listPermission.AddRange(await _groupPermissionRepo.ListAsync(groupPermissionSpec));
-                listPermission.AddRange((await _teacherPermissionRepo
-                                                .ListAsync(teacherPermissionSpec))
-                                                .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
-
-                if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment))
-                    throw new NotFoundException(_t["Classes {0} Not Found.", class1.ClassesId]);
-            }
+            throw new ForbiddenException(_t["You cannot update this assignment"]);
         }
+
+        // Kiểm tra quyền cập nhật Assignment
+        //foreach (var class1 in assignment.AssignmentClasses)
+        //{
+        //    var classroom = await _classRepository.FirstOrDefaultAsync(new ClassByIdSpec(class1.ClassesId, userId))
+        //        ?? throw new NotFoundException(_t["Class not found", class1.ClassesId]);
+
+        //    if (classroom.CreatedBy != userId && assignment.CreatedBy != userId)
+        //    {
+        //        var groupPermissionSpec = new GroupPermissionClassByUserIdAndClassIdSpec(userId, class1.ClassesId);
+        //        var teacherPermissionSpec = new TeacherPermissionCLassByUserIdAndClassIdSpec(userId, class1.ClassesId);
+
+        //        var listPermission = new List<PermissionInClassDto>();
+
+        //        listPermission.AddRange(await _groupPermissionRepo.ListAsync(groupPermissionSpec));
+        //        listPermission.AddRange((await _teacherPermissionRepo
+        //                                        .ListAsync(teacherPermissionSpec))
+        //                                        .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
+
+        //        if (!listPermission.Any(x => x.PermissionType == PermissionType.AssignAssignment))
+        //            throw new NotFoundException(_t["Classes {0} Not Found.", class1.ClassesId]);
+        //    }
+        //}
+
+        //Check nếu gia hạn thời gian nộp bài assignment thì xóa hết điểm và comment của assignmentStudent ,đồng thời update tất cả status thành Doing
+        if (request.EndTime != null && request.EndTime > assignment.EndTime)
+        {
+            assignment.ExtendTimeAssignment();
+        }
+
 
         // Cập nhật thông tin Assignment
         var updatedAssignment = assignment.Update(
@@ -150,7 +162,16 @@ public class UpdateAssignmentRequestHandler : IRequestHandler<UpdateAssignmentRe
             }
         }
 
+        
+
         await _repository.UpdateAsync(updatedAssignment, cancellationToken);
+
+
+      
+       
+
+      
+
 
         return request.Id;
     }

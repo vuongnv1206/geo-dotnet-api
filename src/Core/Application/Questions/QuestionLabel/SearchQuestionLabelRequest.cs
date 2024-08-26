@@ -1,9 +1,5 @@
-﻿using FSH.WebApi.Domain.Question;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FSH.WebApi.Application.Questions.QuestionLabel.Dtos;
+using FSH.WebApi.Domain.Question;
 
 namespace FSH.WebApi.Application.Questions.QuestionLabel;
 public class SearchQuestionLabelRequest : PaginationFilter, IRequest<PaginationResponse<QuestionLabelDto>>
@@ -14,7 +10,10 @@ public class SearchQuestionLabelRequestHandler : IRequestHandler<SearchQuestionL
 {
     private readonly IReadRepository<QuestionLable> _repository;
 
-    public SearchQuestionLabelRequestHandler(IReadRepository<QuestionLable> repository) => _repository = repository;
+    public SearchQuestionLabelRequestHandler(IReadRepository<QuestionLable> repository)
+    {
+        _repository = repository;
+    }
 
     public async Task<PaginationResponse<QuestionLabelDto>> Handle(SearchQuestionLabelRequest request, CancellationToken cancellationToken)
     {

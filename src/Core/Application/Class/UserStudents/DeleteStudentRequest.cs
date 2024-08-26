@@ -64,7 +64,7 @@ public class DeleteStudentRequestHandler : IRequestHandler<DeleteStudentRequest,
                                             .Where(x => !listPermission.Any(lp => lp.PermissionType == x.PermissionType)));
 
             if (!listPermission.Any(x => x.PermissionType == PermissionType.ManageStudentList))
-                throw new NotFoundException(_localizer["Student in class {0} Not Found.", request.Id]);
+                throw new NotFoundException(_localizer["You don't have student management"]);
         }
 
         var student = await _userStudentRepository.FirstOrDefaultAsync(new StudentByIdSpec(request.Id))
